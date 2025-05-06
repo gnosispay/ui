@@ -1,5 +1,6 @@
 import { useAccount, useConnect, useDisconnect } from "wagmi";
 import { Button } from "./components/ui/button";
+import { ModeToggle } from "./components/mode-toggle";
 
 function App() {
   const account = useAccount();
@@ -9,6 +10,7 @@ function App() {
   return (
     <>
       <div>
+        <ModeToggle />
         <h2>Account</h2>
 
         <div>
