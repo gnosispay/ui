@@ -10,19 +10,27 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.1.5",
     "@tanstack/react-query": "5.45.1",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.507.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss": "^4.1.5",
     "viem": "latest",
     "wagmi": "latest"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.8.0",
+    "@types/node": "^22.15.12",
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.2.1",
     "@wagmi/cli": "latest",
     "buffer": "^6.0.3",
+    "tw-animate-css": "^1.2.9",
     "typescript": "^5.4.5",
     "vite": "^5.2.11"
   }
