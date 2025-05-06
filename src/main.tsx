@@ -9,14 +9,11 @@ import { config } from "./wagmi.ts";
 
 import "./index.css";
 
-declare global {
-  var Buffer: typeof import("buffer").Buffer;
-}
-
 globalThis.Buffer = Buffer;
 
 const queryClient = new QueryClient();
 
+// biome-ignore lint/style/noNonNullAssertion: <explanation>
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <WagmiProvider config={config}>
@@ -24,5 +21,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <App />
       </QueryClientProvider>
     </WagmiProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );
