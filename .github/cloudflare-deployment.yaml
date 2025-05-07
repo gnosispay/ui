@@ -1,0 +1,33 @@
+name: Cloudflare deployment gp-ui
+on:
+  push:
+    branches: ['main']
+  pull_request:
+    branches: ['main']
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          cache: pnpm
+          node-version: 20
+          cache-dependency-path: 'pnpm-lock.yaml'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - name: Publish to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_GP_UI }}
+          accountId: 8c558f9b31e53240659ee45069b7ec2b
+          projectName: gp-ui
+          directory: ./dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

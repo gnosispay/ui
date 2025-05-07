@@ -1,0 +1,18 @@
+{
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "homepage_url": "https://gp-ui.pages.dev",
+  "description": "Gnosis Pay UI",
+  "icons": [
+    {
+      "src": "logo.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    }
+  ],
+  "orientation": "portrait",
+  "name": "Gnosis Pay UI",
+  "short_name": "Gnosis Pay UI",
+  "start_url": ".",
+  "theme_color": "#ffffff"
+}

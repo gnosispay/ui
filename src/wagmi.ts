@@ -1,23 +1,21 @@
 import { http, createConfig } from "wagmi";
-import { mainnet, sepolia } from "wagmi/chains";
-import {
-  coinbaseWallet,
-  injected,
-  safe,
-  // walletConnect
-} from "wagmi/connectors";
+import { gnosis, sepolia } from "wagmi/chains";
+import { coinbaseWallet, injected, safe } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [mainnet, sepolia],
+  chains: [gnosis, sepolia],
   connectors: [
+    safe({
+      allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
+      debug: false,
+      shimDisconnect: false,
+    }),
     injected(),
-    safe(),
     coinbaseWallet(),
-    // walletConnect({ projectId: import.meta.env.VITE_WC_PROJECT_ID })
   ],
   transports: {
-    [mainnet.id]: http(),
     [sepolia.id]: http(),
+    [gnosis.id]: http(),
   },
 });
 
