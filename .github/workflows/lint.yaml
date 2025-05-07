@@ -1,12 +1,9 @@
-name: Cloudflare deployment gp-ui
+name: Lint
 on:
-  push:
-    branches: ['main']
-  pull_request:
-    branches: ['main']
+  pull_request
 
 jobs:
-  deploy:
+  lint:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -30,13 +27,5 @@ jobs:
           cache: 'pnpm'
       - name: Install dependencies
         run: pnpm install
-      - name: Build
-        run: pnpm build
-      - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_GP_UI }}
-          accountId: 8c558f9b31e53240659ee45069b7ec2b
-          projectName: gp-ui
-          directory: ./dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: lint
+        run: pnpm lint

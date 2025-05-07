@@ -1,3 +1,4 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import {
   useAccount,
   // useConnect,
@@ -5,7 +6,6 @@ import {
 } from "wagmi";
 // import { Button } from "./components/ui/button";
 import { ModeToggle } from "./components/mode-toggle";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import "@rainbow-me/rainbowkit/styles.css";
 
 function App() {
