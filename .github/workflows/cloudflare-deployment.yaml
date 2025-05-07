@@ -15,14 +15,20 @@ jobs:
       contents: read
       deployments: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
         with:
-          cache: pnpm
-          node-version: 20
-          cache-dependency-path: 'pnpm-lock.yaml'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+          version: 10
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+      - name: Install dependencies
+          run: pnpm install
+      - name: Build
+          run: pnpm build
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
