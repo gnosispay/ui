@@ -1,9 +1,9 @@
 import { http, createConfig } from "wagmi";
-import { gnosis, sepolia } from "wagmi/chains";
+import { gnosis } from "wagmi/chains";
 import { coinbaseWallet, injected, safe } from "wagmi/connectors";
 
 export const config = createConfig({
-  chains: [gnosis, sepolia],
+  chains: [gnosis],
   connectors: [
     safe({
       allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
@@ -14,7 +14,6 @@ export const config = createConfig({
     coinbaseWallet(),
   ],
   transports: {
-    [sepolia.id]: http(),
     [gnosis.id]: http(),
   },
 });

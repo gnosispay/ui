@@ -69,10 +69,10 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     console.log("using nonce:", data);
 
     const message = new SiweMessage({
-      domain: window.location.host,
+      domain: "gnosispay.com",
       address,
       statement: "Sign in with Ethereum to the app.",
-      uri: window.location.origin,
+      uri: "gnosispay.com",
       version: "1",
       chainId,
       // nonce is not properly typed in our api
