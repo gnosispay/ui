@@ -11,6 +11,6 @@
     "enabled": true
   },
   "files": {
-    "ignore": ["components/ui/**/*.tsx", "dist"]
+    "ignore": ["components/ui/**/*.tsx", "dist", "src/client"]
   }
 }

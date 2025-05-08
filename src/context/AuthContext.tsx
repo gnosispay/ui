@@ -1,22 +1,22 @@
-import { client } from "@/client/client.gen";
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { jwtDecode } from "jwt-decode";
 import { getApiV1AuthNonce, postApiV1AuthChallenge } from "@/client";
+import { client } from "@/client/client.gen";
+import { BASE_URL, LOCALSTORAGE_JWT_KEY } from "@/main";
+import { jwtDecode } from "jwt-decode";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { SiweMessage } from "siwe";
 import { useAccount, useConnections, useSignMessage } from "wagmi";
-import { BASE_URL, LOCALSTORAGE_JWT_KEY } from "@/main";
 
-type ApiContextProps = {
+type AuthContextProps = {
   children: ReactNode | ReactNode[];
 };
 
-export type IApiContext = {
+export type IAuthContext = {
   renewToken: () => void;
 };
 
-const ApiContext = createContext<IApiContext | undefined>(undefined);
+const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
-const ApiContextProvider = ({ children }: ApiContextProps) => {
+const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [jwt, setJwt] = useState<string | null>(localStorage.getItem(LOCALSTORAGE_JWT_KEY));
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
@@ -51,17 +51,14 @@ const ApiContextProvider = ({ children }: ApiContextProps) => {
       return;
     }
 
-    console.log("chainId", chainId);
-
     const { data, error } = await getApiV1AuthNonce();
 
-    console.log("Nonce data", data);
     if (error) {
       console.error(error);
       return;
     }
 
-    if (!data || (typeof data === "string" && (data as string).length > 30)) {
+    if (!data) {
       console.error("No nonce returned");
       return;
     }
@@ -151,15 +148,15 @@ const ApiContextProvider = ({ children }: ApiContextProps) => {
     }
   }, [renewToken, isTokenExpired, jwt]);
 
-  return <ApiContext.Provider value={{ renewToken }}>{children}</ApiContext.Provider>;
+  return <AuthContext.Provider value={{ renewToken }}>{children}</AuthContext.Provider>;
 };
 
-const useApi = () => {
-  const context = useContext(ApiContext);
+const useAuth = () => {
+  const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useApi must be used within a ApiContextProvider");
+    throw new Error("useAuth must be used within a AuthContextProvider");
   }
   return context;
 };
 
-export { ApiContextProvider, useApi };
+export { AuthContextProvider, useAuth };
