@@ -8,7 +8,7 @@
     "enabled": true
   },
   "organizeImports": {
-    "enabled": true
+    "enabled": false
   },
   "files": {
     "ignore": ["components/ui/**/*.tsx", "dist", "src/client"]

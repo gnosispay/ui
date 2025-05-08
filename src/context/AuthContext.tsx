@@ -22,6 +22,9 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
 
+  // todo implement interceptor to refresh the jwt if it's expired
+  // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
+
   const updateClient = useCallback(() => {
     client.setConfig({
       baseUrl: BASE_URL,

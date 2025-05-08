@@ -1,53 +1,28 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
-import {
-  useAccount,
-  // useConnect,
-  // useDisconnect
-} from "wagmi";
-// import { Button } from "./components/ui/button";
-import { ModeToggle } from "./components/mode-toggle";
+import { useAccount } from "wagmi";
 import "@rainbow-me/rainbowkit/styles.css";
+import { SiteHeader } from "./components/site-header";
 
 function App() {
   const account = useAccount();
-  // const { connectors, connect, status, error } = useConnect();
-  // const { disconnect } = useDisconnect();
 
   return (
-    <>
-      <ModeToggle />
-      <div>
-        <ConnectButton />
-      </div>
-      <div>
-        <h2>Account</h2>
-
-        <div>
-          status: {account.status}
-          <br />
-          addresses: {JSON.stringify(account.addresses)}
-          <br />
-          chainId: {account.chainId}
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <div className="grid grid-cols-6 gap-4 h-full mt-4">
+        <div className="col-span-4 col-start-2 ...">
+          <div>
+            <h2>Account: {account.status}</h2>
+            {account.address && (
+              <div>
+                addresses: {JSON.stringify(account.addresses)}
+                <br />
+                chainId: {account.chainId}
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* {account.status === "connected" && (
-          <Button type="button" onClick={() => disconnect()}>
-            Disconnect
-          </Button>
-        )} */}
       </div>
-
-      {/*<div>
-        <h2>Connect</h2>
-        {connectors.map((connector) => (
-          <Button key={connector.uid} onClick={() => connect({ connector })} type="button" className="ml-2">
-            {connector.name}
-          </Button>
-        ))}
-        <div>{status}</div>
-        <div>{error?.message}</div>
-      </div> */}
-    </>
+    </div>
   );
 }
 
