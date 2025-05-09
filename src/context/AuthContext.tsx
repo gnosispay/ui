@@ -72,7 +72,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       domain: "gnosispay.com",
       address,
       statement: "Sign in with Ethereum to the app.",
-      uri: "gnosispay.com",
+      uri: "https://www.gnosispay.com",
       version: "1",
       chainId,
       // nonce is not properly typed in our api
@@ -114,6 +114,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
+      localStorage.setItem(LOCALSTORAGE_JWT_KEY, data.token);
       setJwt(data.token);
     } catch (error) {
       console.error("Error validating message", error);
