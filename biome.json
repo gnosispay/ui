@@ -1,0 +1,16 @@
+{
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "lineWidth": 120
+  },
+  "linter": {
+    "enabled": true
+  },
+  "organizeImports": {
+    "enabled": false
+  },
+  "files": {
+    "ignore": ["components/ui/**/*.tsx", "dist", "src/client"]
+  }
+}
