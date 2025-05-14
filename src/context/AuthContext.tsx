@@ -12,20 +12,51 @@ type AuthContextProps = {
 
 export type IAuthContext = {
   renewToken: () => void;
+  isAuthenticated: boolean;
+  isAuthenticating: boolean;
 };
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [jwt, setJwt] = useState<string | null>(localStorage.getItem(LOCALSTORAGE_JWT_KEY));
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
+  const isTokenExpired = useMemo(() => {
+    if (!jwt) {
+      return false;
+    }
+
+    const decodedToken = jwtDecode(jwt);
+
+    if (!decodedToken.exp) {
+      return true;
+    }
+
+    const currentDate = new Date();
+
+    // JWT exp is in seconds
+    if (decodedToken.exp * 1000 < currentDate.getTime()) {
+      console.log("Token expired.");
+      setJwt(null);
+      return true;
+    }
+
+    console.log("Valid token");
+    return false;
+  }, [jwt]);
+  const isAuthenticated = useMemo(
+    () => !!jwt && !isTokenExpired && !isAuthenticating,
+    [jwt, isTokenExpired, isAuthenticating],
+  );
 
   // todo implement interceptor to refresh the jwt if it's expired
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
 
   const updateClient = useCallback(() => {
+    console.log("Updating client with jwt:", jwt);
     client.setConfig({
       baseUrl: BASE_URL,
       // set default headers for requests
@@ -33,6 +64,8 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         Authorization: `Bearer ${jwt}`,
       },
     });
+
+    setIsAuthenticating(false);
   }, [jwt]);
 
   useEffect(() => {
@@ -114,45 +147,40 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
-      localStorage.setItem(LOCALSTORAGE_JWT_KEY, data.token);
-      setJwt(data.token);
+      console.log("Token returned:", data.token);
+      return data.token;
     } catch (error) {
       console.error("Error validating message", error);
       return;
     }
   }, [address, chainId, signMessageAsync, connections]);
 
-  const isTokenExpired = useMemo(() => {
-    if (!jwt) {
-      return false;
-    }
-
-    const decodedToken = jwtDecode(jwt);
-    console.log("Decoded Token", decodedToken);
-
-    if (!decodedToken.exp) {
-      return true;
-    }
-
-    const currentDate = new Date();
-
-    // JWT exp is in seconds
-    if (decodedToken.exp * 1000 < currentDate.getTime()) {
-      console.log("Token expired.");
-      return true;
-    }
-
-    console.log("Valid token");
-    return false;
-  }, [jwt]);
-
   useEffect(() => {
-    if (isTokenExpired || !jwt) {
-      renewToken();
+    if (jwt !== null && !isTokenExpired) {
+      console.log("Token is valid");
+      return;
     }
+
+    setIsAuthenticating(true);
+
+    renewToken()
+      .then((token) => {
+        if (!token) {
+          console.error("No token returned");
+          return;
+        }
+        localStorage.setItem(LOCALSTORAGE_JWT_KEY, token);
+        setJwt(token);
+      })
+      .catch((error) => {
+        setIsAuthenticating(false);
+        console.error("Error renewing token", error);
+      });
   }, [renewToken, isTokenExpired, jwt]);
 
-  return <AuthContext.Provider value={{ renewToken }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ renewToken, isAuthenticated, isAuthenticating }}>{children}</AuthContext.Provider>
+  );
 };
 
 const useAuth = () => {
