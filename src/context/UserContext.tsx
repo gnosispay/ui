@@ -7,7 +7,7 @@ import {
   type SafeConfig,
   type User,
 } from "@/client";
-import { type ReactNode, createContext, useContext, useEffect, useState } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 type UserContextProps = {
@@ -36,39 +36,37 @@ export type IUserContext = {
 const UserContext = createContext<IUserContext | undefined>(undefined);
 
 const UserContextProvider = ({ children }: UserContextProps) => {
-  const [user, setUser] = useState<IUserContext["user"]>();
   const { isAuthenticated } = useAuth();
-  const [safeConfig, setSafeConfig] = useState<IUserContext["safeConfig"]>();
-  const [cards, setCards] = useState<IUserContext["cards"]>();
-  const [cardInfoMap, setCardInfoMap] = useState<IUserContext["cardInfoMap"]>();
+  const [user, setUser] = useState<IUserContext["user"]>(undefined);
+  const [cards, setCards] = useState<IUserContext["cards"]>(undefined);
+  const [safeConfig, setSafeConfig] = useState<IUserContext["safeConfig"]>(undefined);
+  const [cardInfoMap, setCardInfoMap] = useState<IUserContext["cardInfoMap"]>(undefined);
 
-  useEffect(() => {
-    if (!isAuthenticated || !cards || !cards.length) return;
-
+  const setCardsInfo = useCallback(async (cards: Card[]) => {
     const newMap: CardInfoMap = {};
+
     for (const card of cards || []) {
-      getApiV1CardsByCardIdStatus({
+      const { data, error } = await getApiV1CardsByCardIdStatus({
         path: {
           cardId: card.id,
         },
-      }).then(({ data, error }) => {
-        if (error) {
-          console.error(error);
-          return;
-        }
-
-        if (!data) {
-          console.error("Card status: No data returned for card", card);
-          return;
-        }
-
-        console.log("Card status data: ", card.id, data);
-        newMap[card.id] = data;
       });
+      if (error) {
+        console.error(error);
+        return;
+      }
 
-      setCardInfoMap(newMap);
+      if (!data) {
+        console.error("Card status: No data returned for card", card);
+        return;
+      }
+
+      console.log("Card status data: ", card.id, data);
+      newMap[card.id] = data;
     }
-  }, [cards, isAuthenticated]);
+
+    setCardInfoMap(newMap);
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -89,16 +87,22 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     if (!isAuthenticated) return;
 
     getApiV1Cards()
-      .then(({ data, error }) => {
+      .then(async ({ data, error }) => {
         if (error) {
           console.error(error);
           return;
         }
 
+        if (!data) {
+          console.error("No cards data returned");
+          return;
+        }
+
+        await setCardsInfo(data);
         setCards(data);
       })
       .catch(console.error);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, setCardsInfo]);
 
   useEffect(() => {
     getApiV1SafeConfig()
@@ -107,6 +111,11 @@ const UserContextProvider = ({ children }: UserContextProps) => {
           console.error(error);
           return;
         }
+        if (!data) {
+          console.error("No safe config data returned");
+          return;
+        }
+
         setSafeConfig(data);
       })
       .catch(console.error);
