@@ -11,6 +11,7 @@ import { config } from "./wagmi.ts";
 import "./index.css";
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
+import { UserContextProvider } from "./context/UserContext.tsx";
 
 const PROD_BASE_URL = "https://api.gnosispay.com/";
 export const BASE_URL = import.meta.env.VITE_BASE_URL || PROD_BASE_URL;
@@ -39,7 +40,9 @@ ReactDOM.createRoot(rootElement).render(
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
           <AuthContextProvider>
-            <App />
+            <UserContextProvider>
+              <App />
+            </UserContextProvider>
           </AuthContextProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
