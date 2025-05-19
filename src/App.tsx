@@ -12,12 +12,18 @@ function App() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <div className="grid grid-cols-6 gap-4 h-full mt-4">
+        {!isAuthenticated && (
+          <div className="col-span-4 col-start-2">
+            <h2 className="text-xl">Welcome to Gnosis Pay</h2>
+            <p className="text-muted-foreground">Connect your wallet to get started.</p>
+          </div>
+        )}
         {isAuthenticating && (
           <div className="col-span-4 col-start-2">
             <h2 className="flex items-center text-xl">
               <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Authenticating...
             </h2>
-            <p>Please connect your wallet and sign the message request.</p>
+            <p>Please sign the message request.</p>
           </div>
         )}
         <div className="col-span-4 col-start-2">

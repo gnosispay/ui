@@ -5,6 +5,8 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogT
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useCards } from "@/context/CardsContext";
+import { toast } from "sonner";
+import { CollapsedError } from "../collapsedError";
 
 export const VirtualCardsOrderModal = () => {
   const [open, setOpen] = useState(false);
@@ -25,17 +27,21 @@ export const VirtualCardsOrderModal = () => {
       .then(({ data, error }) => {
         if (error) {
           console.error("Error ordering card: ", error);
+          toast.error(<CollapsedError title="Error ordering card" error={error} />);
+          return;
         }
 
         console.log("Card order data: ", data);
+        toast.success("Virtual card ordered successfully");
+        refreshCards();
       })
       .catch((error) => {
         console.error("Error ordering card: ", error);
+        toast.error(`Error ordering card: ${JSON.stringify(error)}`);
       })
       .finally(() => {
         setIsLoading(false);
         setOpen(false);
-        refreshCards();
       });
   }, [refreshCards, nameOnCard]);
 
@@ -44,25 +50,19 @@ export const VirtualCardsOrderModal = () => {
       <DialogTrigger asChild>
         <Button className="ml-6">Order Virtual Card</Button>
       </DialogTrigger>
-      <DialogContent>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Virtual card order</DialogTitle>
-          </DialogHeader>
-          <div className="grid flex-1 gap-2">
-            <Label htmlFor="nameOnCard">Name on the card</Label>
-            <Input
-              id="nameOnCard"
-              placeholder="Your name or ENS name"
-              onChange={(e) => setNameOnCard(e.target.value)}
-            />
-            <DialogFooter className="justify-end">
-              <Button disabled={isLoading} loading={isLoading} onClick={onCardOrder}>
-                Order
-              </Button>
-            </DialogFooter>
-          </div>
-        </DialogContent>
+      <DialogContent aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>Virtual card order</DialogTitle>
+        </DialogHeader>
+        <div className="grid flex-1 gap-2">
+          <Label htmlFor="nameOnCard">Name on the card</Label>
+          <Input id="nameOnCard" placeholder="Your name or ENS name" onChange={(e) => setNameOnCard(e.target.value)} />
+          <DialogFooter className="justify-end">
+            <Button disabled={isLoading} loading={isLoading} onClick={onCardOrder}>
+              Order
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

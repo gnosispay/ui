@@ -1,5 +1,6 @@
 import { getApiV1AuthNonce, postApiV1AuthChallenge } from "@/client";
 import { client } from "@/client/client.gen";
+import { CollapsedError } from "@/components/collapsedError";
 import { BASE_URL, LOCALSTORAGE_JWT_KEY } from "@/main";
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -91,12 +92,14 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     const { data, error } = await getApiV1AuthNonce();
 
     if (error) {
+      toast.error(<CollapsedError title="Error getting nonce" error={error} />);
       console.error(error);
       return;
     }
 
     if (!data) {
       console.error("No nonce returned");
+      toast.error("No nonce returned");
       return;
     }
 
@@ -139,6 +142,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       });
 
       if (error) {
+        toast.error(<CollapsedError title="Error validating message" error={error} />);
         console.error(error);
         return;
       }
@@ -175,7 +179,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       })
       .catch((error) => {
         setIsAuthenticating(false);
-        toast.error("Error renewing token");
+        toast.error(<CollapsedError title="Error renewing token" error={error} />);
         console.error("Error renewing token", error);
       });
   }, [renewToken, isTokenExpired, jwt]);

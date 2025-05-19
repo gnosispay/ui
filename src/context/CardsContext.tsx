@@ -3,17 +3,20 @@ import {
   getApiV1Cards,
   getApiV1CardsByCardIdStatus,
   postApiV1CardsByCardIdFreeze,
+  postApiV1CardsByCardIdLost,
+  postApiV1CardsByCardIdStolen,
   postApiV1CardsByCardIdUnfreeze,
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
+import { CollapsedError } from "@/components/collapsedError";
 
 type CardContextProps = {
   children: ReactNode | ReactNode[];
 };
 
-interface CardInfo {
+export interface CardInfo {
   activatedAt?: string;
   statusCode: number;
   isFrozen: boolean;
@@ -31,6 +34,8 @@ export type ICardContext = {
   refreshCards: () => void;
   freezeCard: (cardId: string) => void;
   unfreezeCard: (cardId: string) => void;
+  markCardAsStolen: (cardId: string) => void;
+  markCardAsLost: (cardId: string) => void;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -76,7 +81,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ data, error }) => {
         if (error) {
           console.error("Error freezing card: ", error);
-          toast.error(`Error freezing card ${error}`);
+          toast.error(<CollapsedError title="Error freezing card" error={error} />);
           return;
         }
 
@@ -86,7 +91,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch((error) => {
         console.error("Error freezing card: ", error);
-        toast.error(`Error freezing card ${error}`);
+        toast.error(<CollapsedError title="Error freezing card" error={error} />);
       });
   }, []);
 
@@ -99,7 +104,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ data, error }) => {
         if (error) {
           console.error("Error unfreezing card: ", error);
-          toast.error(`Error unfreezing card ${error}`);
+          toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
           return;
         }
 
@@ -109,7 +114,53 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch((error) => {
         console.error("Error unfreezing card: ", error);
-        toast.error(`Error unfreezing card ${error}`);
+        toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
+      });
+  }, []);
+
+  const markCardAsStolen = useCallback(async (cardId: string) => {
+    postApiV1CardsByCardIdStolen({
+      path: {
+        cardId,
+      },
+    })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error marking card as stolen: ", error);
+          toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
+          return;
+        }
+
+        console.log("Card stolen data: ", data);
+        toast.success("Card marked as stolen successfully");
+        refreshCards();
+      })
+      .catch((error) => {
+        console.error("Error marking card as stolen: ", error);
+        toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
+      });
+  }, []);
+
+  const markCardAsLost = useCallback(async (cardId: string) => {
+    postApiV1CardsByCardIdLost({
+      path: {
+        cardId,
+      },
+    })
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error marking card as lost: ", error);
+          toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
+          return;
+        }
+
+        console.log("Card lost data: ", data);
+        toast.success("Card marked as lost successfully");
+        refreshCards();
+      })
+      .catch((error) => {
+        console.error("Error marking card as lost: ", error);
+        toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
       });
   }, []);
 
@@ -140,7 +191,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
   }, [isAuthenticated, refreshCards]);
 
   return (
-    <CardsContext.Provider value={{ cards, cardInfoMap, refreshCards, freezeCard, unfreezeCard }}>
+    <CardsContext.Provider
+      value={{ cards, cardInfoMap, refreshCards, freezeCard, unfreezeCard, markCardAsLost, markCardAsStolen }}
+    >
       {children}
     </CardsContext.Provider>
   );

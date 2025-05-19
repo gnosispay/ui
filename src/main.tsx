@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import { ThemeProvider } from "@/components/theme-provider.tsx";
+import { ThemeProvider } from "@/context/ThemeContext.tsx";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
@@ -45,7 +45,7 @@ ReactDOM.createRoot(rootElement).render(
             <UserContextProvider>
               <CardsContextProvider>
                 <App />
-                <Toaster />
+                <Toaster expand />
               </CardsContextProvider>
             </UserContextProvider>
           </AuthContextProvider>
