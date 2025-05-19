@@ -31,6 +31,7 @@ export type IUserContext = {
   safeConfig: SafeConfig | undefined;
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
+  refreshCards: () => void;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -83,8 +84,8 @@ const UserContextProvider = ({ children }: UserContextProps) => {
       .catch(console.error);
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    if (!isAuthenticated) return;
+  const refreshCards = useCallback(() => {
+    setCards(undefined);
 
     getApiV1Cards()
       .then(async ({ data, error }) => {
@@ -102,9 +103,16 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         setCards(data);
       })
       .catch(console.error);
-  }, [isAuthenticated, setCardsInfo]);
+  }, [setCardsInfo]);
 
   useEffect(() => {
+    if (!isAuthenticated) return;
+    refreshCards();
+  }, [isAuthenticated, refreshCards]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
     getApiV1SafeConfig()
       .then(({ data, error }) => {
         if (error) {
@@ -119,9 +127,13 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         setSafeConfig(data);
       })
       .catch(console.error);
-  }, []);
+  }, [isAuthenticated]);
 
-  return <UserContext.Provider value={{ user, safeConfig, cards, cardInfoMap }}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, safeConfig, cards, cardInfoMap, refreshCards }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 const useUser = () => {
