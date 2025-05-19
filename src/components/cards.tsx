@@ -1,4 +1,4 @@
-import { useUser } from "@/context/UserContext";
+import { useCards } from "@/context/CardsContext";
 import { CreditCard, OctagonX, Smartphone, EllipsisVertical } from "lucide-react";
 import {
   DropdownMenu,
@@ -10,7 +10,7 @@ import { Button } from "./ui/button";
 import { Skeleton } from "./ui/skeleton";
 
 export const Cards = () => {
-  const { cards, cardInfoMap } = useUser();
+  const { cards, cardInfoMap, freezeCard, unfreezeCard } = useCards();
 
   if (!!cards && cards.length === 0) {
     return <div className="text-center text-muted-foreground">No cards found.</div>;
@@ -58,9 +58,25 @@ export const Cards = () => {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
-                      <DropdownMenuItem onClick={() => console.log("View details")}>View Details</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => console.log("Edit card")}>Edit Card</DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => console.log("Delete card")}>Delete Card</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => console.log("View details")}>Report Lost</DropdownMenuItem>
+                      {cardInfo?.isFrozen && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            unfreezeCard(card.id);
+                          }}
+                        >
+                          Unfreeze
+                        </DropdownMenuItem>
+                      )}
+                      {!cardInfo?.isFrozen && (
+                        <DropdownMenuItem
+                          onClick={() => {
+                            freezeCard(card.id);
+                          }}
+                        >
+                          Freeze
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

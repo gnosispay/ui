@@ -1,23 +1,15 @@
 import { Button } from "../ui/button";
 import { useCallback, useState } from "react";
 import { postApiV1OrderCreate } from "../../client";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
-import { useUser } from "@/context/UserContext";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { useCards } from "@/context/CardsContext";
 
 export const VirtualCardsOrderModal = () => {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { refreshCards } = useUser();
+  const { refreshCards } = useCards();
   const [nameOnCard, setNameOnCard] = useState("");
 
   const onCardOrder = useCallback(async () => {
