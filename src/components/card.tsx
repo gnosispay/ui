@@ -1,5 +1,5 @@
 import { type CardInfo, useCards } from "@/context/CardsContext";
-import { CreditCard, OctagonX, Smartphone, EllipsisVertical, CircleX, Ban } from "lucide-react";
+import { CreditCard, Smartphone, EllipsisVertical, CircleX, Ban } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
