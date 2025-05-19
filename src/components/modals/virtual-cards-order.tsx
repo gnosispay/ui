@@ -45,10 +45,10 @@ export const VirtualCardsOrderModal = () => {
         <Button className="ml-6">Order Virtual Card</Button>
       </DialogTrigger>
       <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Virtual card order</DialogTitle>
-        </DialogHeader>
         <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Virtual card order</DialogTitle>
+          </DialogHeader>
           <div className="grid flex-1 gap-2">
             <Label htmlFor="nameOnCard">Name on the card</Label>
             <Input

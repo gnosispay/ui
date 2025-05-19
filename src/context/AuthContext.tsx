@@ -4,6 +4,7 @@ import { BASE_URL, LOCALSTORAGE_JWT_KEY } from "@/main";
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { SiweMessage } from "siwe";
+import { toast } from "sonner";
 import { useAccount, useConnections, useSignMessage } from "wagmi";
 
 type AuthContextProps = {
@@ -48,8 +49,8 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     return false;
   }, [jwt]);
   const isAuthenticated = useMemo(
-    () => !!jwt && !isTokenExpired && !isAuthenticating,
-    [jwt, isTokenExpired, isAuthenticating],
+    () => !!jwt && !isTokenExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0,
+    [jwt, isTokenExpired, isAuthenticating, address, chainId, connections],
   );
 
   // todo implement interceptor to refresh the jwt if it's expired
@@ -174,6 +175,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       })
       .catch((error) => {
         setIsAuthenticating(false);
+        toast.error("Error renewing token");
         console.error("Error renewing token", error);
       });
   }, [renewToken, isTokenExpired, jwt]);

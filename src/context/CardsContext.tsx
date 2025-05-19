@@ -7,6 +7,7 @@ import {
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
+import { toast } from "sonner";
 
 type CardContextProps = {
   children: ReactNode | ReactNode[];
@@ -55,6 +56,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
 
       if (!data) {
         console.error("Card status: No data returned for card", card);
+        toast.error(`Card status: No data returned for card ${card.id}`);
         return;
       }
 
@@ -74,14 +76,17 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ data, error }) => {
         if (error) {
           console.error("Error freezing card: ", error);
+          toast.error(`Error freezing card ${error}`);
           return;
         }
 
         console.log("Card freeze data: ", data);
+        toast.success("Card frozen successfully");
         refreshCards();
       })
       .catch((error) => {
         console.error("Error freezing card: ", error);
+        toast.error(`Error freezing card ${error}`);
       });
   }, []);
 
@@ -94,14 +99,17 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ data, error }) => {
         if (error) {
           console.error("Error unfreezing card: ", error);
+          toast.error(`Error unfreezing card ${error}`);
           return;
         }
 
         console.log("Card unfreeze data: ", data);
+        toast.success("Card unfrozen successfully");
         refreshCards();
       })
       .catch((error) => {
         console.error("Error unfreezing card: ", error);
+        toast.error(`Error unfreezing card ${error}`);
       });
   }, []);
 
