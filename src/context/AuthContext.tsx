@@ -1,9 +1,11 @@
 import { getApiV1AuthNonce, postApiV1AuthChallenge } from "@/client";
 import { client } from "@/client/client.gen";
+import { CollapsedError } from "@/components/collapsedError";
 import { BASE_URL, LOCALSTORAGE_JWT_KEY } from "@/main";
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { SiweMessage } from "siwe";
+import { toast } from "sonner";
 import { useAccount, useConnections, useSignMessage } from "wagmi";
 
 type AuthContextProps = {
@@ -12,20 +14,51 @@ type AuthContextProps = {
 
 export type IAuthContext = {
   renewToken: () => void;
+  isAuthenticated: boolean;
+  isAuthenticating: boolean;
 };
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [jwt, setJwt] = useState<string | null>(localStorage.getItem(LOCALSTORAGE_JWT_KEY));
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
+  const isTokenExpired = useMemo(() => {
+    if (!jwt) {
+      return false;
+    }
+
+    const decodedToken = jwtDecode(jwt);
+
+    if (!decodedToken.exp) {
+      return true;
+    }
+
+    const currentDate = new Date();
+
+    // JWT exp is in seconds
+    if (decodedToken.exp * 1000 < currentDate.getTime()) {
+      console.log("Token expired.");
+      setJwt(null);
+      return true;
+    }
+
+    console.log("Valid token");
+    return false;
+  }, [jwt]);
+  const isAuthenticated = useMemo(
+    () => !!jwt && !isTokenExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0,
+    [jwt, isTokenExpired, isAuthenticating, address, chainId, connections],
+  );
 
   // todo implement interceptor to refresh the jwt if it's expired
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
 
   const updateClient = useCallback(() => {
+    console.log("Updating client with jwt:", jwt);
     client.setConfig({
       baseUrl: BASE_URL,
       // set default headers for requests
@@ -33,6 +66,8 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         Authorization: `Bearer ${jwt}`,
       },
     });
+
+    setIsAuthenticating(false);
   }, [jwt]);
 
   useEffect(() => {
@@ -57,12 +92,14 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     const { data, error } = await getApiV1AuthNonce();
 
     if (error) {
+      toast.error(<CollapsedError title="Error getting nonce" error={error} />);
       console.error(error);
       return;
     }
 
     if (!data) {
       console.error("No nonce returned");
+      toast.error("No nonce returned");
       return;
     }
 
@@ -105,6 +142,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       });
 
       if (error) {
+        toast.error(<CollapsedError title="Error validating message" error={error} />);
         console.error(error);
         return;
       }
@@ -114,45 +152,41 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
-      localStorage.setItem(LOCALSTORAGE_JWT_KEY, data.token);
-      setJwt(data.token);
+      console.log("Token returned:", data.token);
+      return data.token;
     } catch (error) {
       console.error("Error validating message", error);
       return;
     }
   }, [address, chainId, signMessageAsync, connections]);
 
-  const isTokenExpired = useMemo(() => {
-    if (!jwt) {
-      return false;
-    }
-
-    const decodedToken = jwtDecode(jwt);
-    console.log("Decoded Token", decodedToken);
-
-    if (!decodedToken.exp) {
-      return true;
-    }
-
-    const currentDate = new Date();
-
-    // JWT exp is in seconds
-    if (decodedToken.exp * 1000 < currentDate.getTime()) {
-      console.log("Token expired.");
-      return true;
-    }
-
-    console.log("Valid token");
-    return false;
-  }, [jwt]);
-
   useEffect(() => {
-    if (isTokenExpired || !jwt) {
-      renewToken();
+    if (jwt !== null && !isTokenExpired) {
+      console.log("Token is valid");
+      return;
     }
+
+    setIsAuthenticating(true);
+
+    renewToken()
+      .then((token) => {
+        if (!token) {
+          console.error("No token returned");
+          return;
+        }
+        localStorage.setItem(LOCALSTORAGE_JWT_KEY, token);
+        setJwt(token);
+      })
+      .catch((error) => {
+        setIsAuthenticating(false);
+        toast.error(<CollapsedError title="Error renewing token" error={error} />);
+        console.error("Error renewing token", error);
+      });
   }, [renewToken, isTokenExpired, jwt]);
 
-  return <AuthContext.Provider value={{ renewToken }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ renewToken, isAuthenticated, isAuthenticating }}>{children}</AuthContext.Provider>
+  );
 };
 
 const useAuth = () => {

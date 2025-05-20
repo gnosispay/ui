@@ -4,7 +4,7 @@ React components and screens to kickstart your integration to the Gnosis Pay API
 
 # Environment variables
 Set this variables in a `.env` file
-- VITE_BASE_URL (optional)
+- VITE_BASE_URL (optional, production url is used per default)
 
 # Commands
 - `pnpm install` to install dependancies

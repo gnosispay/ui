@@ -5,8 +5,8 @@ import { Menu as MenuIcon } from "lucide-react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import darklogo from "../assets/GP-logo-white.png";
 import lightLogo from "../assets/GP-logo.png";
-import { ModeToggle } from "./mode-toggle";
-import { useTheme } from "./theme-provider";
+import { ModeToggle } from "./theme-toggle";
+import { useTheme } from "../context/ThemeContext";
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);

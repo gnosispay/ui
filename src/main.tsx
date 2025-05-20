@@ -1,5 +1,5 @@
 import { Buffer } from "buffer";
-import { ThemeProvider } from "@/components/theme-provider.tsx";
+import { ThemeProvider } from "@/context/ThemeContext.tsx";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
@@ -11,6 +11,9 @@ import { config } from "./wagmi.ts";
 import "./index.css";
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
+import { UserContextProvider } from "./context/UserContext.tsx";
+import { CardsContextProvider } from "./context/CardsContext.tsx";
+import { Toaster } from "sonner";
 
 const PROD_BASE_URL = "https://api.gnosispay.com/";
 export const BASE_URL = import.meta.env.VITE_BASE_URL || PROD_BASE_URL;
@@ -39,7 +42,12 @@ ReactDOM.createRoot(rootElement).render(
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
           <AuthContextProvider>
-            <App />
+            <UserContextProvider>
+              <CardsContextProvider>
+                <App />
+                <Toaster expand />
+              </CardsContextProvider>
+            </UserContextProvider>
           </AuthContextProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
