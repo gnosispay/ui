@@ -12,7 +12,7 @@ function App() {
     <div className="flex min-h-screen flex-col">
       <SiteHeader />
       <div className="grid grid-cols-6 gap-4 h-full mt-4">
-        {!isAuthenticated && (
+        {!isAuthenticated && !isAuthenticating && (
           <div className="col-span-4 col-start-2">
             <h2 className="text-xl">Welcome to Gnosis Pay</h2>
             <p className="text-muted-foreground">Connect your wallet to get started.</p>

@@ -37,7 +37,7 @@ export const VirtualCardsOrderModal = () => {
       })
       .catch((error) => {
         console.error("Error ordering card: ", error);
-        toast.error(`Error ordering card: ${JSON.stringify(error)}`);
+        toast.error(<CollapsedError title="Error ordering card" error={error} />);
       })
       .finally(() => {
         setIsLoading(false);
