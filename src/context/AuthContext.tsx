@@ -13,7 +13,7 @@ type AuthContextProps = {
 };
 
 export type IAuthContext = {
-  renewToken: () => void;
+  getJWT: () => Promise<string | undefined>;
   isAuthenticated: boolean;
   isAuthenticating: boolean;
 };
@@ -26,9 +26,10 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
-  const isTokenExpired = useMemo(() => {
+  const isTokenExpired = useCallback(() => {
+    console.log("Checking if token is expired", jwt);
     if (!jwt) {
-      return false;
+      return true;
     }
 
     const decodedToken = jwtDecode(jwt);
@@ -42,17 +43,18 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     // JWT exp is in seconds
     if (decodedToken.exp * 1000 < currentDate.getTime()) {
       console.log("Token expired.");
-      setJwt(null);
       return true;
     }
 
-    console.log("Valid token");
+    console.log("Token not expired.");
     return false;
   }, [jwt]);
-  const isAuthenticated = useMemo(
-    () => !!jwt && !isTokenExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0,
-    [jwt, isTokenExpired, isAuthenticating, address, chainId, connections],
-  );
+
+  const isAuthenticated = useMemo(() => {
+    const isExpired = isTokenExpired();
+
+    return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0;
+  }, [jwt, isTokenExpired, isAuthenticating, address, chainId, connections]);
 
   // todo implement interceptor to refresh the jwt if it's expired
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
@@ -79,6 +81,8 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   }, [jwt, updateClient]);
 
   const renewToken = useCallback(async () => {
+    console.log("Renewing token");
+
     if (!address || !chainId) {
       console.log("No address or chainId");
       return;
@@ -89,17 +93,20 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       return;
     }
 
+    setIsAuthenticating(true);
     const { data, error } = await getApiV1AuthNonce();
 
     if (error) {
       toast.error(<CollapsedError title="Error getting nonce" error={error} />);
       console.error(error);
+      setIsAuthenticating(false);
       return;
     }
 
     if (!data) {
       console.error("No nonce returned");
       toast.error("No nonce returned");
+      setIsAuthenticating(false);
       return;
     }
 
@@ -125,11 +132,13 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       });
     } catch (error) {
       console.error("Error signing message", error);
+      setIsAuthenticating(false);
       return;
     }
 
     if (!signature) {
       console.error("No signature returned");
+      setIsAuthenticating(false);
       return;
     }
 
@@ -144,49 +153,51 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       if (error) {
         toast.error(<CollapsedError title="Error validating message" error={error} />);
         console.error(error);
+        setIsAuthenticating(false);
         return;
       }
 
       if (!data?.token) {
         console.error("No token returned");
+        toast.error(<CollapsedError title="Error validating message" error={error} />);
+        setIsAuthenticating(false);
         return;
       }
 
       console.log("Token returned:", data.token);
+      localStorage.setItem(LOCALSTORAGE_JWT_KEY, data.token);
+      setJwt(data.token);
       return data.token;
     } catch (error) {
       console.error("Error validating message", error);
+      toast.error(<CollapsedError title="Error validating message" error={error} />);
+      setIsAuthenticating(false);
       return;
     }
   }, [address, chainId, signMessageAsync, connections]);
 
   useEffect(() => {
-    if (jwt !== null && !isTokenExpired) {
+    const isExpired = isTokenExpired();
+
+    if (jwt !== null && !isExpired) {
       console.log("Token is valid");
       return;
     }
 
-    setIsAuthenticating(true);
-
-    renewToken()
-      .then((token) => {
-        if (!token) {
-          console.error("No token returned");
-          return;
-        }
-        localStorage.setItem(LOCALSTORAGE_JWT_KEY, token);
-        setJwt(token);
-      })
-      .catch((error) => {
-        setIsAuthenticating(false);
-        toast.error(<CollapsedError title="Error renewing token" error={error} />);
-        console.error("Error renewing token", error);
-      });
+    renewToken();
   }, [renewToken, isTokenExpired, jwt]);
 
-  return (
-    <AuthContext.Provider value={{ renewToken, isAuthenticated, isAuthenticating }}>{children}</AuthContext.Provider>
-  );
+  const getJWT = useCallback(async () => {
+    const isExpired = isTokenExpired();
+
+    if (!jwt || isExpired) {
+      return renewToken();
+    }
+
+    return jwt;
+  }, [jwt, renewToken, isTokenExpired]);
+
+  return <AuthContext.Provider value={{ isAuthenticated, isAuthenticating, getJWT }}>{children}</AuthContext.Provider>;
 };
 
 const useAuth = () => {
