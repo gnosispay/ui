@@ -17,6 +17,7 @@ type CardContextProps = {
 };
 
 export interface CardInfo {
+  cardToken?: string;
   activatedAt?: string;
   statusCode: number;
   isFrozen: boolean;
@@ -66,7 +67,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       }
 
       console.log("Card status data: ", card.id, data);
-      newMap[card.id] = data;
+      newMap[card.id] = { cardToken: card.cardToken, ...data };
     }
 
     setCardInfoMap(newMap);
@@ -179,6 +180,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
+        console.log("Cards data: ", data);
         await setCardsInfo(data);
         setCards(data);
       })

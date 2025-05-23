@@ -10,7 +10,7 @@ import { Button } from "./ui/button";
 import type { Card as CardType } from "@/client";
 import { useCallback, useState } from "react";
 import { ConfirmDangerousActionModal } from "./modals/confirm-dangerous-action";
-import { usePCI } from "@/context/PCIContext";
+import { usePSE } from "@/context/PSEContext";
 import { toast } from "sonner";
 import type GPSDK from "@gnosispay/pci-sdk";
 import { ElementType } from "@gnosispay/pci-sdk";
@@ -26,28 +26,34 @@ export const Card = ({ card, cardInfo }: Props) => {
   const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost } = useCards();
   const [isConfirmingStolen, setIsConfirmingStolen] = useState(false);
   const [isConfirmingLost, setIsConfirmingLost] = useState(false);
-  const { getPciSdk } = usePCI();
+  const { getGpSdk } = usePSE();
   const [cardData, setCardData] = useState<ReturnType<GPSDK["init"]> | null>(null);
   const [cardPin, setCardPin] = useState<ReturnType<GPSDK["init"]> | null>(null);
 
   const showCardDetails = useCallback(
-    async (cardToken: string) => {
-      console.log("goo");
-      const pciSdk = await getPciSdk();
-      if (!pciSdk) {
-        const errorMessage = "PCI SDK not initialized";
+    async (cardToken: string | undefined) => {
+      if (!cardToken) {
+        const errorMessage = "No card token";
         console.error(errorMessage);
         toast.error(errorMessage);
         return;
       }
 
-      const cd = pciSdk.init(ElementType.CardData, `#${cardDataId}`, {
+      const gpSdk = await getGpSdk();
+      if (!gpSdk) {
+        const errorMessage = "PSE SDK not initialized";
+        console.error(errorMessage);
+        toast.error(errorMessage);
+        return;
+      }
+
+      const cd = gpSdk.init(ElementType.CardData, `#${cardDataId}`, {
         cardToken,
       });
 
       setCardData(cd);
     },
-    [getPciSdk],
+    [getGpSdk],
   );
 
   const hideCardDetails = useCallback(() => {
@@ -130,7 +136,7 @@ export const Card = ({ card, cardInfo }: Props) => {
       {!cardData && (
         <div className="flex items-center gap-2">
           <p className="font-medium text-card-foreground">●●●● ●●●● ●●●● {card.lastFourDigits}</p>
-          <Button variant="link" className="p-2 hover:bg-muted" onClick={() => showCardDetails(card.id)}>
+          <Button variant="link" className="p-2 hover:bg-muted" onClick={() => showCardDetails(card.cardToken)}>
             <EyeClosed size={16} />
           </Button>
         </div>

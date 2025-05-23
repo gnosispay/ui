@@ -4,18 +4,18 @@ import { type ReactNode, createContext, useCallback, useContext, useState } from
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 
-type PCIContextProps = {
+type PSEContextProps = {
   children: ReactNode | ReactNode[];
 };
 
-export type IPCIContext = {
-  getPciSdk: () => Promise<GPSDK | null | undefined>;
+export type IPSEContext = {
+  getGpSdk: () => Promise<GPSDK | null | undefined>;
   isLoading: boolean;
 };
 
 interface IGetEphemeralTokenResponse {
   data: {
-    token: string;
+    ephemeralToken: string;
     expiresAt: string;
   };
 }
@@ -27,18 +27,20 @@ interface ResponseData {
   statusCode: number;
 }
 
-const PCIContext = createContext<IPCIContext | undefined>(undefined);
+const PSEContext = createContext<IPSEContext | undefined>(undefined);
 
-const PCIContextProvider = ({ children }: PCIContextProps) => {
+const PSEContextProvider = ({ children }: PSEContextProps) => {
   const [ephemeralToken, setEphemeralToken] = useState<string | null>(null);
   const [expiredAt, setExpiredAt] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [pciSDK, setPciSDK] = useState<GPSDK | null>(null);
+  const [gpSDK, setGpSDK] = useState<GPSDK | null>(null);
   const { getJWT } = useAuth();
 
-  const getPciSdk = useCallback(async () => {
-    if (!!pciSDK && !isTokenExpired()) {
-      return pciSDK;
+  const getGpSdk = useCallback(async () => {
+    const tokenExpired = isTokenExpired();
+
+    if (!!gpSDK && !tokenExpired) {
+      return gpSDK;
     }
 
     const jwt = await getJWT();
@@ -47,10 +49,11 @@ const PCIContextProvider = ({ children }: PCIContextProps) => {
     if (!token || !jwt) {
       const errorMessage = "Error getting ephemeral token or JWT";
       console.error(errorMessage);
+      console.error("jwt", jwt);
+      console.error("token", token);
       toast.error(errorMessage);
       return;
     }
-
     const gp = new GPSDK({
       ephemeralToken: token,
       gnosisPayApiAuthToken: jwt,
@@ -76,54 +79,52 @@ const PCIContextProvider = ({ children }: PCIContextProps) => {
       },
     });
 
-    setPciSDK(gp);
-  }, [getJWT, pciSDK]);
+    setGpSDK(gp);
+    return gp;
+  }, [getJWT, gpSDK]);
 
   const renewEphemeralToken = useCallback(async () => {
-    const serverUrl = import.meta.env.VITE_PCI_RELAY_SERVER_URL;
+    const serverUrl = import.meta.env.VITE_PSE_RELAY_SERVER_URL;
+
     if (!serverUrl) {
-      const errorMessage = "VITE_PCI_RELAY_SERVER_URL is not set";
+      const errorMessage = "VITE_PSE_RELAY_SERVER_URL is not set";
       toast.error(errorMessage);
       console.error(errorMessage);
       return;
     }
 
-    setIsLoading(true);
-
-    const token = await fetch(serverUrl, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(async (response) => {
-        const res: ResponseData = await response.json();
-
-        if (!res.success) {
-          const errorMessage = "Error getting ephemeral token";
-          console.error(errorMessage, res);
-          toast.error(<CollapsedError title={errorMessage} error={res} />);
-          return;
-        }
-
-        const exp = new Date(res.responseObject.data.expiresAt).getTime();
-        const token = res.responseObject.data.token;
-
-        setEphemeralToken(token);
-        setExpiredAt(exp);
-        return token;
-      })
-      .catch((error) => {
-        const errorMessage = "Error getting ephemeral token";
-        console.error(errorMessage, error);
-        toast.error(<CollapsedError title={errorMessage} error={error} />);
-        return;
-      })
-      .finally(() => {
-        setIsLoading(false);
+    try {
+      setIsLoading(true);
+      const response = await fetch(serverUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
       });
+      const res: ResponseData = await response.json();
 
-    return token;
+      if (!res.success) {
+        const errorMessage = "Error getting ephemeral token";
+        console.error(errorMessage, res);
+        toast.error(<CollapsedError title={errorMessage} error={res} />);
+        return;
+      }
+
+      const exp = new Date(res.responseObject.data.expiresAt).getTime();
+      const token = res.responseObject.data.ephemeralToken;
+
+      setEphemeralToken(token);
+      setExpiredAt(exp);
+
+      return token;
+    } catch (error) {
+      const errorMessage = "Error getting ephemeral token";
+      console.error(errorMessage, error);
+      toast.error(<CollapsedError title={errorMessage} error={error} />);
+      return;
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const isTokenExpired = useCallback(() => {
@@ -139,22 +140,25 @@ const PCIContextProvider = ({ children }: PCIContextProps) => {
   }, [expiredAt, ephemeralToken]);
 
   const getEphemeralToken = useCallback(async () => {
-    if (!!ephemeralToken && !isTokenExpired()) {
+    const isExpired = isTokenExpired();
+
+    if (!!ephemeralToken && !isExpired) {
+      console.log("Using existing ephemeral token");
       return ephemeralToken;
     }
 
     return renewEphemeralToken();
   }, [ephemeralToken, renewEphemeralToken, isTokenExpired]);
 
-  return <PCIContext.Provider value={{ isLoading, getPciSdk }}>{children}</PCIContext.Provider>;
+  return <PSEContext.Provider value={{ isLoading, getGpSdk: getGpSdk }}>{children}</PSEContext.Provider>;
 };
 
-const usePCI = () => {
-  const context = useContext(PCIContext);
+const usePSE = () => {
+  const context = useContext(PSEContext);
   if (context === undefined) {
-    throw new Error("usePCI must be used within a PCIContextProvider");
+    throw new Error("usePSE must be used within a PSEContextProvider");
   }
   return context;
 };
 
-export { PCIContextProvider, usePCI };
+export { PSEContextProvider, usePSE };

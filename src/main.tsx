@@ -14,7 +14,7 @@ import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
 import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
-import { PCIContextProvider } from "./context/PCIContext.tsx";
+import { PSEContextProvider } from "./context/PSEContext.tsx";
 
 const PROD_BASE_URL = "https://api.gnosispay.com/";
 export const BASE_URL = import.meta.env.VITE_BASE_URL || PROD_BASE_URL;
@@ -45,10 +45,10 @@ ReactDOM.createRoot(rootElement).render(
           <AuthContextProvider>
             <UserContextProvider>
               <CardsContextProvider>
-                <PCIContextProvider>
+                <PSEContextProvider>
                   <App />
                   <Toaster expand />
-                </PCIContextProvider>
+                </PSEContextProvider>
               </CardsContextProvider>
             </UserContextProvider>
           </AuthContextProvider>
