@@ -14,9 +14,10 @@ import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
 import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
+import { PSEContextProvider } from "./context/PSEContext.tsx";
 
-const PROD_BASE_URL = "https://api.gnosispay.com/";
-export const BASE_URL = import.meta.env.VITE_BASE_URL || PROD_BASE_URL;
+const STAGING_BASE_URL = "https://api.stg.gnosispay.com/";
+export const BASE_URL = import.meta.env.VITE_BASE_URL || STAGING_BASE_URL;
 export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
 globalThis.Buffer = Buffer;
@@ -44,8 +45,10 @@ ReactDOM.createRoot(rootElement).render(
           <AuthContextProvider>
             <UserContextProvider>
               <CardsContextProvider>
-                <App />
-                <Toaster expand />
+                <PSEContextProvider>
+                  <App />
+                  <Toaster expand />
+                </PSEContextProvider>
               </CardsContextProvider>
             </UserContextProvider>
           </AuthContextProvider>

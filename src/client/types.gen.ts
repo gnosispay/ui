@@ -22,6 +22,7 @@ export type _Error = {
 
 export type Card = {
     id: string;
+    cardToken?: string;
     lastFourDigits: string;
     activatedAt?: string | null;
     virtual?: boolean;
@@ -224,6 +225,20 @@ export type BasePaymentish = {
      */
     transactionAmount?: string;
     transactionCurrency?: Currency;
+    /**
+     * First 2 digits of the DE3 field (ISO 8583), representing the transaction type code.
+     * Common values include (not limited to):
+     * - "00": Purchase (POS)
+     * - "01": Withdrawal (ATM)
+     * - "10": Account Funding
+     * - "20": Return of Goods
+     * - "28": Prepaid Load
+     * - "30": Balance Inquiry
+     * - "70": PIN Change
+     * - "72": PIN Unblock
+     *
+     */
+    transactionType?: string;
     transactions?: Array<Transaction>;
 };
 
@@ -519,6 +534,10 @@ export type GetApiV1AccountSignaturePayloadResponses = {
             [key: string]: unknown;
         };
         /**
+         * Primary type for EIP-712 signature
+         */
+        primaryType?: string;
+        /**
          * Type definitions for EIP-712 signature
          */
         types?: {
@@ -615,9 +634,7 @@ export type GetApiV1AuthNonceResponses = {
     /**
      * Nonce generated successfully
      */
-    200: {
-        nonce?: string;
-    };
+    200: string;
 };
 
 export type GetApiV1AuthNonceResponse = GetApiV1AuthNonceResponses[keyof GetApiV1AuthNonceResponses];
@@ -683,6 +700,10 @@ export type PostApiV1AuthSignupData = {
          * Marketing campaign identifier
          */
         marketingCampaign?: string;
+        /**
+         * Optional ID of the partner that referred the user
+         */
+        partnerId?: string;
     };
     path?: never;
     query?: never;
@@ -690,6 +711,12 @@ export type PostApiV1AuthSignupData = {
 };
 
 export type PostApiV1AuthSignupErrors = {
+    /**
+     * Invalid partner ID
+     */
+    400: {
+        error?: string;
+    };
     /**
      * Invalid or expired OTP
      */
@@ -1391,6 +1418,10 @@ export type GetApiV1TransactionsData = {
          * Filter by Merchant Category Code (MCC)
          */
         mcc?: string;
+        /**
+         * Filter by transaction type code (e.g., "00" for Purchase, "01" for Withdrawal)
+         */
+        transactionType?: string;
     };
     url: '/api/v1/transactions';
 };
@@ -1436,10 +1467,10 @@ export type PostApiV1VerificationCheckErrors = {
         message?: string;
     };
     /**
-     * Invalid phone number or phone number already validated.
+     * Validation error occurred.
      */
     422: {
-        error?: 'Invalid phone number' | 'Phone number already validated';
+        error?: 'User has no phone number' | 'Verification failed';
     };
     /**
      * Failed to send verification.
@@ -1691,6 +1722,10 @@ export type GetApiV1IbansDetailsResponses = {
             iban?: string | null;
             bic?: string | null;
             ibanStatus: 'NOTSTARTED' | 'PENDING' | 'PENDING_OAUTH' | 'ASSIGNED';
+            /**
+             * The blockchain address associated with this IBAN account
+             */
+            address?: string | null;
         };
     };
 };
@@ -2462,7 +2497,7 @@ export type PostApiV1OrderCreateErrors = {
     /**
      * Bad Request - One of several possible client errors
      */
-    400: unknown;
+    400: 'Error: There is already a pending card order' | 'Error: User is not approved through KYC' | 'Error: Unknown personalization source' | "Error: Shipping needs to be done to the user's country";
     /**
      * Unauthorized Error
      */
@@ -2516,7 +2551,7 @@ export type GetApiV1RewardsResponses = {
      */
     200: {
         /**
-         * Indicates if the user holds an OG NFT token
+         * Indicates if the user holds an OG NFT token. If true, the user gets an additional 1% cashback on top of the base cashbackRate.
          */
         isOg: boolean;
         /**
@@ -2524,7 +2559,7 @@ export type GetApiV1RewardsResponses = {
          */
         gnoBalance: number;
         /**
-         * Calculated cashback rate based on GNO balance (0-5%)
+         * Base cashback rate calculated from GNO balance (0-4%). For OG NFT holders, add 1% to this rate to get the total cashback rate.
          */
         cashbackRate: number;
     };

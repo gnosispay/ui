@@ -831,7 +831,7 @@ export const postApiV1OrderCreate = <ThrowOnError extends boolean = false>(optio
 
 /**
  * Retrieve user rewards information
- * Returns user's OG status, GNO balance of Safe, and calculated cashback rate
+ * Returns user's OG status, GNO balance of Safe, and calculated base cashback rate. Note that the cashbackRate returned does not include the +1% bonus for OG NFT holders - to get the total cashback rate, add 1% to the cashbackRate if isOg is true.
  */
 export const getApiV1Rewards = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1RewardsData, ThrowOnError>) => {
     return (options?.client ?? _heyApiClient).get<GetApiV1RewardsResponse, GetApiV1RewardsError, ThrowOnError>({
