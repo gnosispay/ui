@@ -5,7 +5,8 @@ React components and screens to kickstart your integration to the Gnosis Pay API
 # Environment variables
 Set this variables in a `.env` file
 - VITE_PSE_RELAY_SERVER_ROUTE the url of the relay server to request the PSE ephemeral token, e.g https://my-server.com/get-token
-- VITE_BASE_URL (optional, production url is used per default)
+- VITE_IFRAME_HOST (optional, staging is used per default) Gnosis pay Partner Secure Elements endpoint
+- VITE_BASE_URL (optional, staging url is used per default) Gnosis pay api endpoint
 
 # Commands
 - `pnpm install` to install dependancies

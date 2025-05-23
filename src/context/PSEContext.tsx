@@ -1,9 +1,10 @@
 import { CollapsedError } from "@/components/collapsedError";
-import GPSDK from "@gnosispay/pci-sdk";
+import GPSDK from "@gnosispay/pse-sdk";
 import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 
+const IFRAME_HOST = import.meta.env.VITE_IFRAME_HOST || "https://api-pse-public.stg.gnosispay.com";
 type PSEContextProps = {
   children: ReactNode | ReactNode[];
 };
@@ -55,6 +56,7 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
       return;
     }
     const gp = new GPSDK({
+      iframeHost: IFRAME_HOST,
       ephemeralToken: token,
       gnosisPayApiAuthToken: jwt,
       onActionSuccess: (action) => {

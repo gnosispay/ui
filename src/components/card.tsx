@@ -12,8 +12,8 @@ import { useCallback, useState } from "react";
 import { ConfirmDangerousActionModal } from "./modals/confirm-dangerous-action";
 import { usePSE } from "@/context/PSEContext";
 import { toast } from "sonner";
-import type GPSDK from "@gnosispay/pci-sdk";
-import { ElementType } from "@gnosispay/pci-sdk";
+import type GPSDK from "@gnosispay/pse-sdk";
+import { ElementType } from "@gnosispay/pse-sdk";
 
 interface Props {
   card: CardType;
