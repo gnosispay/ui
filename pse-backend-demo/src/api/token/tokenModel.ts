@@ -5,8 +5,8 @@ extendZodWithOpenApi(z);
 
 export type Token = z.infer<typeof TokenSchema>;
 export const TokenSchema = z.object({
-	data: z.object({
-		token: z.string(),
-		expiresAt: z.date(),
-	}),
+  data: z.object({
+    token: z.string(),
+    expiresAt: z.date(),
+  }),
 });

@@ -9,10 +9,10 @@ export const tokenRegistry = new OpenAPIRegistry();
 export const tokenRouter: Router = express.Router();
 
 tokenRegistry.registerPath({
-	method: "get",
-	path: "/token",
-	tags: ["Token"],
-	responses: createApiResponse(TokenSchema, "Success"),
+  method: "get",
+  path: "/token",
+  tags: ["Token"],
+  responses: createApiResponse(TokenSchema, "Success"),
 });
 
 tokenRouter.get("/", tokenController.getToken);
