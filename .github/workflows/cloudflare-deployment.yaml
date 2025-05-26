@@ -2,8 +2,8 @@ name: Cloudflare deployment gp-ui
 on:
   push:
     branches: ['main']
-  pull_request:
-    paths: ['!pse-backend-demo/**/*']
+  pull_request
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
