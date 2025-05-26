@@ -3,8 +3,7 @@ on:
   push:
     branches: ['main']
   pull_request:
-    branches: ['main']
-
+    paths: ['!pse-backend-demo/**/*']
 jobs:
   deploy:
     runs-on: ubuntu-latest
