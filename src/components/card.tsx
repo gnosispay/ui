@@ -28,7 +28,7 @@ export const Card = ({ card, cardInfo }: Props) => {
   const [isConfirmingLost, setIsConfirmingLost] = useState(false);
   const { getGpSdk } = usePSE();
   const [cardData, setCardData] = useState<ReturnType<GPSDK["init"]> | null>(null);
-  const [cardPin, setCardPin] = useState<ReturnType<GPSDK["init"]> | null>(null);
+  // const [cardPin, setCardPin] = useState<ReturnType<GPSDK["init"]> | null>(null);
 
   const showCardDetails = useCallback(
     async (cardToken: string | undefined) => {
