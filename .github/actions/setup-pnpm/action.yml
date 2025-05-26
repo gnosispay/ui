@@ -1,4 +1,4 @@
-name: "Setup pnpm"
+name: "Setup pnpm for backend"
 description: "Sets up pnpm with caching and installation"
 
 runs:
@@ -20,6 +20,7 @@ runs:
 
     - name: Get pnpm store directory
       shell: bash
+      working-directory: ./pse-backend-demo/
       run: echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
 
     - name: Restore pnpm cache
@@ -35,4 +36,5 @@ runs:
 
     - name: Install dependencies
       shell: bash
+      working-directory: ./pse-backend-demo/
       run: pnpm install --frozen-lockfile
