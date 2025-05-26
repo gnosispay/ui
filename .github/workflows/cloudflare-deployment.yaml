@@ -2,8 +2,8 @@ name: Cloudflare deployment gp-ui
 on:
   push:
     branches: ['main']
-on:
-  pull_request
+  pull_request:
+    branches: ['main']
 
 jobs:
   deploy:
