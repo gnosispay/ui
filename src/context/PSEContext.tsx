@@ -4,7 +4,7 @@ import { type ReactNode, createContext, useCallback, useContext, useState } from
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 
-const IFRAME_HOST = import.meta.env.VITE_IFRAME_HOST || "https://api-pse-public.stg.gnosispay.com";
+const IFRAME_HOST = import.meta.env.VITE_IFRAME_HOST || "https://api-pse-public.gnosispay.com";
 type PSEContextProps = {
   children: ReactNode | ReactNode[];
 };
