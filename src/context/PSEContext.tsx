@@ -1,5 +1,5 @@
 import { CollapsedError } from "@/components/collapsedError";
-import GPSDK, { Action, ElementType } from "@gnosispay/pse-sdk";
+import GPSDK, { Action } from "@gnosispay/pse-sdk";
 import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
