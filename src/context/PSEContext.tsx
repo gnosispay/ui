@@ -1,5 +1,5 @@
 import { CollapsedError } from "@/components/collapsedError";
-import GPSDK from "@gnosispay/pse-sdk";
+import GPSDK, { Action, ElementType } from "@gnosispay/pse-sdk";
 import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
@@ -60,7 +60,7 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
       ephemeralToken: token,
       gnosisPayApiAuthToken: jwt,
       onActionSuccess: (action) => {
-        if (action === "SetPin") {
+        if (action === Action.SetPin) {
           toast.success("PIN was successfully set");
           console.log("PIN was successfully set");
         } else {
