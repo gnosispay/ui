@@ -32,9 +32,11 @@ class TokenController {
         timeout: 10000,
       });
 
+      logger.info(`Authenticated api response: ${JSON.stringify(response, null, 2)}`);
       logger.info(response.data);
       serviceResponse = ServiceResponse.success("Success", response.data);
     } catch (error) {
+      logger.error(JSON.stringify(error, null, 2));
       let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
       let errorMessage = "An error occurred while fetching the token.";
 

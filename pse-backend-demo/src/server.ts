@@ -13,7 +13,7 @@ const CORS_CONFIG = {
   // Static origins that are always allowed
   staticOrigins: ["https://verified-pug-renewing.ngrok-free.app", "http://localhost"],
   // Pattern for dynamic subdomain matching
-  patterns: [/^https:\/\/[a-zA-Z0-9-]+\.gp-ui\.pages\.dev$/],
+  patterns: [/^https:\/\/[a-zA-Z0-9-]+\.gp-ui\.pages\.dev$/, /^http:\/\/localhost:[0-9-]+$/],
 };
 
 const logger = pino({ name: "server start" });

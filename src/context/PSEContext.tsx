@@ -56,6 +56,7 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
       return;
     }
     const gp = new GPSDK({
+      appId: "gp_d30b0cbdaf9649b6a4034f5b0624fdb3",
       iframeHost: IFRAME_HOST,
       ephemeralToken: token,
       gnosisPayApiAuthToken: jwt,
