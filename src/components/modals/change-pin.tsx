@@ -3,7 +3,7 @@ import type { Card } from "../../client";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { toast } from "sonner";
 import type GPSDK from "@gnosispay/pse-sdk";
-import { ElementType } from "@gnosispay/pse-sdk";
+import { ElementType, Action } from "@gnosispay/pse-sdk";
 import { usePSE } from "@/context/PSEContext";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export const ChangePinModal = ({ onClose, card }: Props) => {
-  const { getGpSdk } = usePSE();
+  const { getGpSdk, registerActionCallback, unregisterActionCallback } = usePSE();
   const setPinId = useMemo(() => `pse-setpin-${card.id}`, [card.id]);
   const [pinInputIframe, setPinInputIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
 
@@ -25,7 +25,15 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
     }
 
     showPinIframe(card.cardToken);
-  }, [card]);
+
+    registerActionCallback(Action.SetPin, () => {
+      onOpenChange(false);
+    });
+
+    return () => {
+      unregisterActionCallback(Action.SetPin);
+    };
+  }, [card, registerActionCallback, unregisterActionCallback]);
 
   const showPinIframe = useCallback(
     async (cardToken: string) => {
