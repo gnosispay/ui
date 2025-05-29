@@ -11,6 +11,35 @@ class TokenController {
   public getToken: RequestHandler = async (_req: Request, res: Response) => {
     let serviceResponse: ServiceResponse<Token | null>;
 
+    axios.interceptors.request.use((x) => {
+      const method = x.method?.toLowerCase();
+      const methodHeader = (method && x.headers[method]) || [];
+
+      const headers = {
+        ...x.headers.common,
+        ...methodHeader,
+        ...x.headers,
+      };
+
+      for (const header of ["common", "get", "post", "head", "put", "patch", "delete"]) {
+        delete headers[header];
+      }
+
+      const printable = `${new Date()} | Request: ${x.method?.toUpperCase()} | ${x.url} | ${JSON.stringify(headers, null, 2)}`;
+      console.log(printable);
+
+      return x;
+    });
+
+    axios.interceptors.response.use((x) => {
+      // only uncomment the data logging carefully, this is logging the ephemeral token
+      const printable = `${new Date()} | Response: ${x.status}`; // +  `| ${JSON.stringify(x.data, null, 2)}`;
+
+      console.log(printable);
+
+      return x;
+    });
+
     try {
       // Create an HTTPS agent with the certificates
       const httpsAgent = new https.Agent({
@@ -32,11 +61,10 @@ class TokenController {
         timeout: 10000,
       });
 
-      logger.info(`Authenticated api response: ${JSON.stringify(response, null, 2)}`);
-      logger.info(response.data);
       serviceResponse = ServiceResponse.success("Success", response.data);
     } catch (error) {
-      logger.error(JSON.stringify(error, null, 2));
+      console.log("=== Error:", error);
+
       let statusCode = StatusCodes.INTERNAL_SERVER_ERROR;
       let errorMessage = "An error occurred while fetching the token.";
 
@@ -45,7 +73,7 @@ class TokenController {
           // The request was made and the server responded with a status code
           // that falls out of the range of 2xx
           statusCode = error.response.status;
-          errorMessage = `API responded with status ${statusCode}: ${JSON.stringify(error.response.data)}`;
+          errorMessage = `API responded with status ${statusCode}: ${error.response.data}`;
         } else if (error.request) {
           // The request was made but no response was received
           errorMessage = "No response received from API";
@@ -54,7 +82,6 @@ class TokenController {
           errorMessage = error.message;
         }
       }
-      logger.error(errorMessage, error);
       serviceResponse = ServiceResponse.failure(errorMessage, null, statusCode);
     }
     res.status(serviceResponse.statusCode).send(serviceResponse);
