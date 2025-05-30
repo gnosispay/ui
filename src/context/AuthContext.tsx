@@ -27,10 +27,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
   const isTokenExpired = useCallback(() => {
-    // console.log("Checking if token is expired", jwt);
-    if (!jwt) {
-      return true;
-    }
+    if (!jwt) return true;
 
     const decodedToken = jwtDecode(jwt);
 
@@ -46,7 +43,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       return true;
     }
 
-    // console.log("Token not expired.");
     return false;
   }, [jwt]);
 
@@ -60,7 +56,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
 
   const updateClient = useCallback(() => {
-    // console.log("Updating client with jwt:", jwt);
     client.setConfig({
       baseUrl: BASE_URL,
       // set default headers for requests
@@ -81,8 +76,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   }, [jwt, updateClient]);
 
   const renewToken = useCallback(async () => {
-    // console.log("Renewing token");
-
     if (!address || !chainId) {
       console.info("No address or chainId");
       return;

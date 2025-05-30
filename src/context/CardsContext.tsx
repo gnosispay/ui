@@ -66,7 +66,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         return;
       }
 
-      // console.log("Card status data: ", card.id, data);
       newMap[card.id] = { cardToken: card.cardToken, ...data };
     }
 
@@ -86,7 +85,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
-        // console.log("Card freeze data: ", data);
         toast.success("Card frozen successfully");
         refreshCards();
       })
@@ -102,14 +100,13 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error unfreezing card: ", error);
           toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
           return;
         }
 
-        // console.log("Card unfreeze data: ", data);
         toast.success("Card unfrozen successfully");
         refreshCards();
       })
@@ -132,7 +129,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
-        // console.log("Card stolen data: ", data);
         toast.success("Card marked as stolen successfully");
         refreshCards();
       })
@@ -155,7 +151,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
-        // console.log("Card lost data: ", data);
         toast.success("Card marked as lost successfully");
         refreshCards();
       })
@@ -180,7 +175,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
-        // console.log("Cards data: ", data);
         await setCardsInfo(data);
         setCards(data);
       })

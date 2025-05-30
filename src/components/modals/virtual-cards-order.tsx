@@ -31,7 +31,6 @@ export const VirtualCardsOrderModal = () => {
           return;
         }
 
-        // console.log("Card order data: ", data);
         toast.success("Virtual card ordered successfully");
         refreshCards();
       })
