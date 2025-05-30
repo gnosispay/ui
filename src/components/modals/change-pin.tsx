@@ -26,12 +26,12 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
 
     showPinIframe(card.cardToken);
 
-    registerActionCallback(Action.SetPin, () => {
+    registerActionCallback(Action.DoneSettingPin, () => {
       onOpenChange(false);
     });
 
     return () => {
-      unregisterActionCallback(Action.SetPin);
+      unregisterActionCallback(Action.DoneSettingPin);
     };
   }, [card, registerActionCallback, unregisterActionCallback]);
 

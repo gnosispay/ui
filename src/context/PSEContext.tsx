@@ -91,7 +91,8 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
         const callback = actionCallbacks.get(action);
         if (action === Action.SetPin) {
           toast.success("PIN was successfully set");
-          console.log("PIN was successfully set");
+          callback?.();
+        } else if (action === Action.DoneSettingPin) {
           callback?.();
         } else {
           console.log("Unknown action successful", action);

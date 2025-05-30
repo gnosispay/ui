@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@gnosispay/pse-sdk':
         specifier: ^1.1.1
-        version: 1.1.1
+        version: 1.1.2
       '@hey-api/client-fetch':
         specifier: ^0.10.2
         version: 0.10.2(@hey-api/openapi-ts@0.67.4(typescript@5.8.3))
@@ -450,8 +450,8 @@ packages:
   '@floating-ui/utils@0.2.9':
     resolution: {integrity: sha512-MDWhGtE+eHw5JW7lq4qhc5yRLS11ERl1c7Z6Xd0a58DozHES6EnNNwUWbMiG4J9Cgj053Bhk8zvlhFYKVhULwg==}
 
-  '@gnosispay/pse-sdk@1.1.1':
-    resolution: {integrity: sha512-1SXxRpRDlsWJYyw0ErdpH5bXWtEGHObZGbW19wY8wtBXPr/3cFOzoebQA6OLMofYL43lXpBp+aZq6FRMKteGew==}
+  '@gnosispay/pse-sdk@1.1.2':
+    resolution: {integrity: sha512-Y3Kdi6hsNAtcD3yA+y/Omu4iZNmARNzXRAwr7M4I+DqepJAu7ddG3RKfOnU3+lUfVMleGfvKmuebTY9v6xd+4w==}
 
   '@hey-api/client-fetch@0.10.2':
     resolution: {integrity: sha512-AGiFYDx+y8VT1wlQ3EbzzZtfU8EfV+hLLRTtr8Y/tjYZaxIECwJagVZf24YzNbtEBXONFV50bwcU1wLVGXe1ow==}
@@ -3191,7 +3191,7 @@ snapshots:
 
   '@floating-ui/utils@0.2.9': {}
 
-  '@gnosispay/pse-sdk@1.1.1': {}
+  '@gnosispay/pse-sdk@1.1.2': {}
 
   '@hey-api/client-fetch@0.10.2(@hey-api/openapi-ts@0.67.4(typescript@5.8.3))':
     dependencies:
