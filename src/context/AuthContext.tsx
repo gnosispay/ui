@@ -27,7 +27,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
   const isTokenExpired = useCallback(() => {
-    console.log("Checking if token is expired", jwt);
+    // console.log("Checking if token is expired", jwt);
     if (!jwt) {
       return true;
     }
@@ -42,11 +42,11 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
 
     // JWT exp is in seconds
     if (decodedToken.exp * 1000 < currentDate.getTime()) {
-      console.log("Token expired.");
+      console.info("Token expired.");
       return true;
     }
 
-    console.log("Token not expired.");
+    // console.log("Token not expired.");
     return false;
   }, [jwt]);
 
@@ -60,7 +60,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
 
   const updateClient = useCallback(() => {
-    console.log("Updating client with jwt:", jwt);
+    // console.log("Updating client with jwt:", jwt);
     client.setConfig({
       baseUrl: BASE_URL,
       // set default headers for requests
@@ -81,15 +81,15 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   }, [jwt, updateClient]);
 
   const renewToken = useCallback(async () => {
-    console.log("Renewing token");
+    // console.log("Renewing token");
 
     if (!address || !chainId) {
-      console.log("No address or chainId");
+      console.info("No address or chainId");
       return;
     }
 
     if (connections.length === 0) {
-      console.log("No connections");
+      console.info("No connections");
       return;
     }
 
@@ -109,8 +109,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       setIsAuthenticating(false);
       return;
     }
-
-    console.log("using nonce:", data);
 
     const message = new SiweMessage({
       domain: "gnosispay.com",
@@ -164,7 +162,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
-      console.log("Token returned:", data.token);
       localStorage.setItem(LOCALSTORAGE_JWT_KEY, data.token);
       setJwt(data.token);
       return data.token;
@@ -180,7 +177,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     const isExpired = isTokenExpired();
 
     if (jwt !== null && !isExpired) {
-      console.log("Token is valid");
+      // token is valid, no need to renew
       return;
     }
 

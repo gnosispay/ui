@@ -66,7 +66,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         return;
       }
 
-      console.log("Card status data: ", card.id, data);
+      // console.log("Card status data: ", card.id, data);
       newMap[card.id] = { cardToken: card.cardToken, ...data };
     }
 
@@ -86,7 +86,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
-        console.log("Card freeze data: ", data);
+        // console.log("Card freeze data: ", data);
         toast.success("Card frozen successfully");
         refreshCards();
       })
@@ -109,7 +109,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
-        console.log("Card unfreeze data: ", data);
+        // console.log("Card unfreeze data: ", data);
         toast.success("Card unfrozen successfully");
         refreshCards();
       })
@@ -125,14 +125,14 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error marking card as stolen: ", error);
           toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
           return;
         }
 
-        console.log("Card stolen data: ", data);
+        // console.log("Card stolen data: ", data);
         toast.success("Card marked as stolen successfully");
         refreshCards();
       })
@@ -148,14 +148,14 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error marking card as lost: ", error);
           toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
           return;
         }
 
-        console.log("Card lost data: ", data);
+        // console.log("Card lost data: ", data);
         toast.success("Card marked as lost successfully");
         refreshCards();
       })
@@ -180,7 +180,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
           return;
         }
 
-        console.log("Cards data: ", data);
+        // console.log("Cards data: ", data);
         await setCardsInfo(data);
         setCards(data);
       })

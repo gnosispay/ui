@@ -33,6 +33,7 @@ jobs:
       - name: Build
         env:
           VITE_PSE_RELAY_SERVER_URL: 'http://localhost:8080/token'
+          VITE_PSE_APP_ID: 'gp_d30b0cbdaf9649b6a4034f5b0624fdb3'
         run: pnpm build
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1

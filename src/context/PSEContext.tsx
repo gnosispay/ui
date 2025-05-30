@@ -1,6 +1,6 @@
 import { CollapsedError } from "@/components/collapsedError";
 import GPSDK, { Action } from "@gnosispay/pse-sdk";
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 
@@ -35,10 +35,7 @@ interface ResponseData {
 const PSEContext = createContext<IPSEContext | undefined>(undefined);
 
 const PSEContextProvider = ({ children }: PSEContextProps) => {
-  const [ephemeralToken, setEphemeralToken] = useState<string | null>(null);
-  const [expiredAt, setExpiredAt] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [gpSDK, setGpSDK] = useState<GPSDK | null>(null);
   const { getJWT } = useAuth();
   const [actionCallbacks] = useState<Map<Action, ActionCallback>>(new Map());
 
@@ -56,19 +53,14 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
     [actionCallbacks],
   );
 
-  useEffect(() => {
-    if (ephemeralToken) {
-      setTimeout(() => {
-        setEphemeralToken(null);
-      }, expiredAt - new Date().getTime());
-    }
-  }, [ephemeralToken, expiredAt]);
-
   const getGpSdk = useCallback(async () => {
-    const tokenExpired = isTokenExpired();
+    const appId = import.meta.env.VITE_PSE_APP_ID;
 
-    if (!!gpSDK && !tokenExpired) {
-      return gpSDK;
+    if (!appId) {
+      const errorMessage = "VITE_PSE_APP_ID is not set";
+      console.error(errorMessage);
+      toast.error(errorMessage);
+      return;
     }
 
     const jwt = await getJWT();
@@ -82,8 +74,9 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
       toast.error(errorMessage);
       return;
     }
+
     const gp = new GPSDK({
-      appId: "gp_d30b0cbdaf9649b6a4034f5b0624fdb3",
+      appId,
       iframeHost: IFRAME_HOST,
       ephemeralToken: token,
       gnosisPayApiAuthToken: jwt,
@@ -95,7 +88,7 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
         } else if (action === Action.DoneSettingPin) {
           callback?.();
         } else {
-          console.log("Unknown action successful", action);
+          console.info("Unknown action successful", action);
           callback?.();
         }
       },
@@ -113,11 +106,10 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
       },
     });
 
-    setGpSDK(gp);
     return gp;
-  }, [getJWT, gpSDK, actionCallbacks]);
+  }, [getJWT, actionCallbacks]);
 
-  const renewEphemeralToken = useCallback(async () => {
+  const getEphemeralToken = useCallback(async () => {
     const serverUrl = import.meta.env.VITE_PSE_RELAY_SERVER_URL;
 
     if (!serverUrl) {
@@ -144,11 +136,7 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
         return;
       }
 
-      const exp = new Date(res.responseObject.data.expiresAt).getTime();
       const token = res.responseObject.data.ephemeralToken;
-
-      setEphemeralToken(token);
-      setExpiredAt(exp);
 
       return token;
     } catch (error) {
@@ -160,29 +148,6 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
       setIsLoading(false);
     }
   }, []);
-
-  const isTokenExpired = useCallback(() => {
-    if (!ephemeralToken) {
-      return true;
-    }
-
-    if (expiredAt === 0) {
-      return true;
-    }
-
-    return expiredAt > new Date().getTime();
-  }, [expiredAt, ephemeralToken]);
-
-  const getEphemeralToken = useCallback(async () => {
-    const isExpired = isTokenExpired();
-
-    if (!!ephemeralToken && !isExpired) {
-      console.log("Using existing ephemeral token");
-      return ephemeralToken;
-    }
-
-    return renewEphemeralToken();
-  }, [ephemeralToken, renewEphemeralToken, isTokenExpired]);
 
   return (
     <PSEContext.Provider value={{ isLoading, getGpSdk, registerActionCallback, unregisterActionCallback }}>

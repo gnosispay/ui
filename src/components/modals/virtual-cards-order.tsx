@@ -24,14 +24,14 @@ export const VirtualCardsOrderModal = () => {
         personalizationSource: "ENS",
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error ordering card: ", error);
           toast.error(<CollapsedError title="Error ordering card" error={error} />);
           return;
         }
 
-        console.log("Card order data: ", data);
+        // console.log("Card order data: ", data);
         toast.success("Virtual card ordered successfully");
         refreshCards();
       })

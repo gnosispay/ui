@@ -26,7 +26,7 @@ class TokenController {
       }
 
       const printable = `${new Date()} | Request: ${x.method?.toUpperCase()} | ${x.url} | ${JSON.stringify(headers, null, 2)}`;
-      console.log(printable);
+      logger.info(printable);
 
       return x;
     });
@@ -35,7 +35,7 @@ class TokenController {
       // only uncomment the data logging carefully, this is logging the ephemeral token
       const printable = `${new Date()} | Response: ${x.status}`; // +  `| ${JSON.stringify(x.data, null, 2)}`;
 
-      console.log(printable);
+      logger.info(printable);
 
       return x;
     });
