@@ -2,7 +2,7 @@ import { getApiV1AuthNonce, postApiV1AuthChallenge } from "@/client";
 import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
 import { BASE_URL, LOCALSTORAGE_JWT_KEY } from "@/main";
-import { jwtDecode } from "jwt-decode";
+import { isTokenExpired } from "@/utils/isTokenExpired";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
@@ -26,31 +26,12 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
-  const isTokenExpired = useCallback(() => {
-    if (!jwt) return true;
-
-    const decodedToken = jwtDecode(jwt);
-
-    if (!decodedToken.exp) {
-      return true;
-    }
-
-    const currentDate = new Date();
-
-    // JWT exp is in seconds
-    if (decodedToken.exp * 1000 < currentDate.getTime()) {
-      console.info("Token expired.");
-      return true;
-    }
-
-    return false;
-  }, [jwt]);
 
   const isAuthenticated = useMemo(() => {
-    const isExpired = isTokenExpired();
+    const isExpired = isTokenExpired(jwt);
 
     return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0;
-  }, [jwt, isTokenExpired, isAuthenticating, address, chainId, connections]);
+  }, [jwt, isAuthenticating, address, chainId, connections]);
 
   // todo implement interceptor to refresh the jwt if it's expired
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
@@ -167,25 +148,25 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   }, [address, chainId, signMessageAsync, connections]);
 
   useEffect(() => {
-    const isExpired = isTokenExpired();
+    const expired = isTokenExpired(jwt);
 
-    if (jwt !== null && !isExpired) {
+    if (jwt !== null && !expired) {
       // token is valid, no need to renew
       return;
     }
 
     renewToken();
-  }, [renewToken, isTokenExpired, jwt]);
+  }, [renewToken, jwt]);
 
   const getJWT = useCallback(async () => {
-    const isExpired = isTokenExpired();
+    const expired = isTokenExpired(jwt);
 
-    if (!jwt || isExpired) {
+    if (!jwt || expired) {
       return renewToken();
     }
 
     return jwt;
-  }, [jwt, renewToken, isTokenExpired]);
+  }, [jwt, renewToken]);
 
   return <AuthContext.Provider value={{ isAuthenticated, isAuthenticating, getJWT }}>{children}</AuthContext.Provider>;
 };

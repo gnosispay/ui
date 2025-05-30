@@ -78,7 +78,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error freezing card: ", error);
           toast.error(<CollapsedError title="Error freezing card" error={error} />);
