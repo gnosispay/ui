@@ -1,12 +1,11 @@
 {
-  "name": "express-typescript-boilerplate",
-  "version": "1.0.14",
-  "description": "An Express boilerplate backend",
-  "author": "Edwin Hernandez",
-  "repository": "edwinhern/express-typescript-2024",
-  "license": "MIT",
+  "name": "pse-backend-demo",
+  "version": "1.0.0",
+  "description": "A demo backend for the PSE SDK",
   "main": "index.ts",
   "private": true,
+  "repository": "gnosispay/pse-backend-demo",
+  "license": "MIT",
   "scripts": {
     "build": "tsc && tsup",
     "dev": "node --import=tsx --watch src/index.ts",

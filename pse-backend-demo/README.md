@@ -1,68 +1,28 @@
-# Express TypeScript Server
+# PSE backend demo
 
+This is a reference implementation of a backend relaying a front-end request to `/token` to a mTLS authenticated `/ephemeral-token` of the Gnosis Pay PSE service. The ephemeral-token is then returned back.
+
+More info [in the Partner Secure Elements guide](https://docs.gnosispay.com/pse-integration).
+
+This server exposes the following routes:
+- `/token` to relay an ephemeral-token request
+- `/health-check` to verify the liveness of the sever
 
 ## 🛠️ Getting Started
 
-### Video Demo
-
-For a visual guide, watch the [video demo](https://github.com/token-attachments/assets/b1698dac-d582-45a0-8d61-31131732b74e) to see the setup and running of the project.
-
 #### ⚙️ Environment Configuration
 
-- Create `.env`: Copy `.env.template` to `.env`
-- Update `.env`: Fill in necessary environment variables
+Copy `.env.template` to `.env` to get started
+
+- `NODE_ENV` Options: 'development', 'production'
+- `PORT` The port your server will listen on
+- `HOST` Hostname for the server e.g "localhost"
+- `CLIENT_CERT` the certificate signed by Gnosis Pay
+- `CLIENT_KEY` your private key
+- `GNOSIS_PSE_PRIVATE_API_BASE_URL` the authenticated api of the PSE service, e.g "https://api-pse.stg.gnosispay.com"
 
 #### 🏃‍♂️ Running the Project
 
 - Development Mode: `pnpm dev`
 - Building: `pnpm build`
 - Production Mode: Set `NODE_ENV="production"` in `.env` then `pnpm build && pnpm start:prod`
-
-## 📁 Folder Structure
-
-```code
-├── biome.json
-├── Dockerfile
-├── LICENSE
-├── package.json
-├── pnpm-lock.yaml
-├── README.md
-├── src
-│   ├── api
-│   │   ├── healthCheck
-│   │   │   ├── __tests__
-│   │   │   │   └── healthCheckRouter.test.ts
-│   │   │   └── healthCheckRouter.ts
-│   │   └── token
-│   │       ├── __tests__
-│   │       │   ├── tokenRouter.test.ts
-│   │       │   └── tokenService.test.ts
-│   │       ├── tokenController.ts
-│   │       ├── tokenModel.ts
-│   │       ├── tokenRepository.ts
-│   │       ├── tokenRouter.ts
-│   │       └── tokenService.ts
-│   ├── api-docs
-│   │   ├── __tests__
-│   │   │   └── openAPIRouter.test.ts
-│   │   ├── openAPIDocumentGenerator.ts
-│   │   ├── openAPIResponseBuilders.ts
-│   │   └── openAPIRouter.ts
-│   ├── common
-│   │   ├── __tests__
-│   │   │   ├── errorHandler.test.ts
-│   │   │   └── requestLogger.test.ts
-│   │   ├── middleware
-│   │   │   ├── errorHandler.ts
-│   │   │   └── requestLogger.ts
-│   │   ├── models
-│   │   │   └── serviceResponse.ts
-│   │   └── utils
-│   │       ├── commonValidation.ts
-│   │       ├── envConfig.ts
-│   │       └── httpHandlers.ts
-│   ├── index.ts
-│   └── server.ts
-├── tsconfig.json
-└── vite.config.mts
-```

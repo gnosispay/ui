@@ -16,8 +16,7 @@ import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
 import { PSEContextProvider } from "./context/PSEContext.tsx";
 
-const STAGING_BASE_URL = "https://api.gnosispay.com/";
-export const BASE_URL = import.meta.env.VITE_BASE_URL || STAGING_BASE_URL;
+export const BASE_URL = import.meta.env.VITE_BASE_URL || "https://api.gnosispay.com/";
 export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
 globalThis.Buffer = Buffer;
