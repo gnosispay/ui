@@ -58,7 +58,6 @@ class TokenController {
         },
         httpsAgent: httpsAgent,
         // Add a timeout to prevent hanging requests
-        timeout: 10000,
       });
 
       serviceResponse = ServiceResponse.success("Success", response.data);
