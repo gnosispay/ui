@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { toast } from "sonner";
 import type GPSDK from "@gnosispay/pse-sdk";
 import { ElementType, Action } from "@gnosispay/pse-sdk";
-import { usePSE } from "@/context/PSEContext";
+import { useGpSdk } from "@/hooks/useGpSdk";
 
 interface Props {
   onClose: () => void;
@@ -12,9 +12,22 @@ interface Props {
 }
 
 export const ChangePinModal = ({ onClose, card }: Props) => {
-  const { getGpSdk, registerActionCallback, unregisterActionCallback } = usePSE();
   const setPinId = useMemo(() => `pse-setpin-${card.id}`, [card.id]);
   const [pinInputIframe, setPinInputIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
+  const actionCallback = useCallback(
+    (action?: Action) => {
+      if (action === Action.DoneSettingPin) {
+        onClose();
+      }
+
+      if (action === Action.SetPin) {
+        toast.success("Pin changed successfully");
+      }
+    },
+    [onClose],
+  );
+
+  const { getGpSdk } = useGpSdk({ actionCallback });
 
   useEffect(() => {
     if (!card.cardToken) {
@@ -25,15 +38,7 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
     }
 
     showPinIframe(card.cardToken);
-
-    registerActionCallback(Action.DoneSettingPin, () => {
-      onOpenChange(false);
-    });
-
-    return () => {
-      unregisterActionCallback(Action.DoneSettingPin);
-    };
-  }, [card, registerActionCallback, unregisterActionCallback]);
+  }, [card]);
 
   const showPinIframe = useCallback(
     async (cardToken: string) => {

@@ -10,11 +10,11 @@ import { Button } from "./ui/button";
 import type { Card as CardType } from "@/client";
 import { useCallback, useMemo, useState } from "react";
 import { ConfirmDangerousActionModal } from "./modals/confirm-dangerous-action";
-import { usePSE } from "@/context/PSEContext";
 import { toast } from "sonner";
 import type GPSDK from "@gnosispay/pse-sdk";
 import { ElementType } from "@gnosispay/pse-sdk";
 import { ChangePinModal } from "./modals/change-pin";
+import { useGpSdk } from "@/hooks/useGpSdk";
 
 interface Props {
   card: CardType;
@@ -26,7 +26,7 @@ export const Card = ({ card, cardInfo }: Props) => {
   const [isConfirmingStolen, setIsConfirmingStolen] = useState(false);
   const [isConfirmingLost, setIsConfirmingLost] = useState(false);
   const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
-  const { getGpSdk } = usePSE();
+  const { getGpSdk } = useGpSdk();
   const [cardDataIframe, setCardDataIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
   const [pinIframe, setPinIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
   const cardDataId = useMemo(() => `pse-card-data-${card.id}`, [card.id]);

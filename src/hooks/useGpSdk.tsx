@@ -1,22 +1,14 @@
 import { CollapsedError } from "@/components/collapsedError";
-import GPSDK, { Action } from "@gnosispay/pse-sdk";
-import { type ReactNode, createContext, useCallback, useContext, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
+import GPSDK, { type Action } from "@gnosispay/pse-sdk";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { useAuth } from "./AuthContext";
 
 const IFRAME_HOST = import.meta.env.VITE_IFRAME_HOST || "https://api-pse-public.gnosispay.com";
-type PSEContextProps = {
-  children: ReactNode | ReactNode[];
-};
 
-type ActionCallback = () => void;
-
-export type IPSEContext = {
-  getGpSdk: () => Promise<GPSDK | null | undefined>;
-  isLoading: boolean;
-  registerActionCallback: (action: Action, callback: ActionCallback) => void;
-  unregisterActionCallback: (action: Action) => void;
-};
+interface Params {
+  actionCallback?: (action?: Action) => void;
+}
 
 interface IGetEphemeralTokenResponse {
   data: {
@@ -32,26 +24,9 @@ interface ResponseData {
   statusCode: number;
 }
 
-const PSEContext = createContext<IPSEContext | undefined>(undefined);
-
-const PSEContextProvider = ({ children }: PSEContextProps) => {
+export const useGpSdk = ({ actionCallback }: Params = {}) => {
   const [isLoading, setIsLoading] = useState(false);
   const { getJWT } = useAuth();
-  const [actionCallbacks] = useState<Map<Action, ActionCallback>>(new Map());
-
-  const registerActionCallback = useCallback(
-    (action: Action, callback: ActionCallback) => {
-      actionCallbacks.set(action, callback);
-    },
-    [actionCallbacks],
-  );
-
-  const unregisterActionCallback = useCallback(
-    (action: Action) => {
-      actionCallbacks.delete(action);
-    },
-    [actionCallbacks],
-  );
 
   const getGpSdk = useCallback(async () => {
     const appId = import.meta.env.VITE_PSE_APP_ID;
@@ -74,23 +49,13 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
       toast.error(errorMessage);
       return;
     }
-
     const gp = new GPSDK({
       appId,
       iframeHost: IFRAME_HOST,
       ephemeralToken: token,
       gnosisPayApiAuthToken: jwt,
       onActionSuccess: (action) => {
-        const callback = actionCallbacks.get(action);
-        if (action === Action.SetPin) {
-          toast.success("PIN was successfully set");
-          callback?.();
-        } else if (action === Action.DoneSettingPin) {
-          callback?.();
-        } else {
-          console.info("Unknown action successful", action);
-          callback?.();
-        }
+        actionCallback?.(action);
       },
       onInvalidToken: (message) => {
         const errorMessage = "Ephemeral token is invalid";
@@ -107,7 +72,7 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
     });
 
     return gp;
-  }, [getJWT, actionCallbacks]);
+  }, [getJWT, actionCallback]);
 
   const getEphemeralToken = useCallback(async () => {
     const serverUrl = import.meta.env.VITE_PSE_RELAY_SERVER_URL;
@@ -149,19 +114,5 @@ const PSEContextProvider = ({ children }: PSEContextProps) => {
     }
   }, []);
 
-  return (
-    <PSEContext.Provider value={{ isLoading, getGpSdk, registerActionCallback, unregisterActionCallback }}>
-      {children}
-    </PSEContext.Provider>
-  );
+  return { getGpSdk, isLoading };
 };
-
-const usePSE = () => {
-  const context = useContext(PSEContext);
-  if (context === undefined) {
-    throw new Error("usePSE must be used within a PSEContextProvider");
-  }
-  return context;
-};
-
-export { PSEContextProvider, usePSE };
