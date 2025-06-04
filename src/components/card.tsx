@@ -1,5 +1,5 @@
 import { type CardInfo, useCards } from "@/context/CardsContext";
-import { CreditCard, Smartphone, EllipsisVertical, CircleX, Ban } from "lucide-react";
+import { CreditCard, Smartphone, EllipsisVertical, CircleX, Ban, EyeIcon, EyeClosed } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -8,8 +8,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "./ui/button";
 import type { Card as CardType } from "@/client";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ConfirmDangerousActionModal } from "./modals/confirm-dangerous-action";
+import { toast } from "sonner";
+import type GPSDK from "@gnosispay/pse-sdk";
+import { ElementType } from "@gnosispay/pse-sdk";
+import { ChangePinModal } from "./modals/change-pin";
+import { useGpSdk } from "@/hooks/useGpSdk";
 
 interface Props {
   card: CardType;
@@ -20,6 +25,82 @@ export const Card = ({ card, cardInfo }: Props) => {
   const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost } = useCards();
   const [isConfirmingStolen, setIsConfirmingStolen] = useState(false);
   const [isConfirmingLost, setIsConfirmingLost] = useState(false);
+  const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
+  const { getGpSdk } = useGpSdk();
+  const [cardDataIframe, setCardDataIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
+  const [pinIframe, setPinIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
+  const cardDataId = useMemo(() => `pse-card-data-${card.id}`, [card.id]);
+  const pinId = useMemo(() => `pse-pin-data-${card.id}`, [card.id]);
+
+  const showCardDetails = useCallback(
+    async (cardToken: string | undefined) => {
+      if (!cardToken) {
+        const errorMessage = "No card token";
+        console.error(errorMessage);
+        toast.error(errorMessage);
+        return;
+      }
+
+      const gpSdk = await getGpSdk();
+      if (!gpSdk) {
+        const errorMessage = "PSE SDK not initialized";
+        console.error(errorMessage);
+        toast.error(errorMessage);
+        return;
+      }
+
+      const cd = gpSdk.init(ElementType.CardData, `#${cardDataId}`, {
+        cardToken,
+      });
+
+      setCardDataIframe(cd);
+    },
+    [getGpSdk, cardDataId],
+  );
+
+  const hideCardDetails = useCallback(() => {
+    if (!cardDataIframe) {
+      return;
+    }
+
+    cardDataIframe.destroy();
+    setCardDataIframe(null);
+  }, [cardDataIframe]);
+
+  const showPin = useCallback(
+    async (cardToken: string | undefined) => {
+      if (!cardToken) {
+        const errorMessage = "No card token";
+        console.error(errorMessage);
+        toast.error(errorMessage);
+        return;
+      }
+
+      const gpSdk = await getGpSdk();
+      if (!gpSdk) {
+        const errorMessage = "PSE SDK not initialized";
+        console.error(errorMessage);
+        toast.error(errorMessage);
+        return;
+      }
+
+      const pin = gpSdk.init(ElementType.CardPin, `#${pinId}`, {
+        cardToken,
+      });
+
+      setPinIframe(pin);
+    },
+    [getGpSdk, pinId],
+  );
+
+  const hidePinDetails = useCallback(() => {
+    if (!pinIframe) {
+      return;
+    }
+
+    pinIframe.destroy();
+    setPinIframe(null);
+  }, [pinIframe]);
 
   const markAsStolen = useCallback(async () => {
     await markCardAsStolen(card.id);
@@ -54,6 +135,15 @@ export const Card = ({ card, cardInfo }: Props) => {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
+            {!card.virtual && (
+              <DropdownMenuItem
+                onClick={() => {
+                  setIsChangePinModalOpen(true);
+                }}
+              >
+                Change pin
+              </DropdownMenuItem>
+            )}
             {cardInfo?.isFrozen && (
               <DropdownMenuItem
                 onClick={() => {
@@ -89,19 +179,59 @@ export const Card = ({ card, cardInfo }: Props) => {
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-      <p className="font-medium text-card-foreground">●●●● ●●●● ●●●● {card.lastFourDigits}</p>
+
       <p className="flex items-center gap-2 text-muted-foreground">
         {card.virtual ? <Smartphone /> : <CreditCard />} {card.virtual ? "Virtual" : "Physical"}
       </p>
+
+      {/* ---------CARD ITEM--------- */}
+      {!cardDataIframe && (
+        <div className="flex items-center gap-2">
+          <p className="font-medium text-card-foreground">●●●● ●●●● ●●●● {card.lastFourDigits}</p>
+          <Button variant="link" className="p-2 hover:bg-muted" onClick={() => showCardDetails(card.cardToken)}>
+            <EyeClosed size={16} />
+          </Button>
+        </div>
+      )}
+      <div className={`flex items-center gap-2 ${cardDataIframe ? "mt-2" : "mt-0"}`}>
+        <p id={cardDataId} />
+        {cardDataIframe && (
+          <Button variant="link" className="p-2 hover:bg-muted" onClick={hideCardDetails}>
+            <EyeIcon size={16} />
+          </Button>
+        )}
+      </div>
+
+      {/* ---------PIN ITEM--------- */}
+      {!card.virtual && (
+        <>
+          {!pinIframe && (
+            <div className="flex items-center gap-2">
+              <p className="font-medium text-card-foreground">Pin: ●●●●</p>
+              <Button variant="link" className="p-2 hover:bg-muted" onClick={() => showPin(card.cardToken)}>
+                <EyeClosed size={16} />
+              </Button>
+            </div>
+          )}
+          <div className={`flex items-center gap-2 ${pinIframe ? "h-5" : "h-0"}`}>
+            <p id={pinId} className={pinIframe ? "h-5" : "h-0"} />
+            {pinIframe && (
+              <Button variant="link" className="p-2 hover:bg-muted" onClick={hidePinDetails}>
+                <EyeIcon size={16} />
+              </Button>
+            )}
+          </div>
+        </>
+      )}
+
       {!card.activatedAt && (
-        <p className="flex items-center gap-2 text-muted-foreground">
+        <p className="flex items-center gap-2 text-muted-foreground mt-2">
           <Ban /> Inactive
         </p>
       )}
       {cardProblem && (
-        <p className="flex items-center gap-2 text-destructive">
-          <CircleX />
-          {cardProblem}
+        <p className="flex items-center gap-2 text-destructive mt-2">
+          <CircleX /> {cardProblem}
         </p>
       )}
       {isConfirmingStolen && (
@@ -118,6 +248,7 @@ export const Card = ({ card, cardInfo }: Props) => {
           action={markAsLost}
         />
       )}
+      {isChangePinModalOpen && <ChangePinModal onClose={() => setIsChangePinModalOpen(false)} card={card} />}
     </div>
   );
 };

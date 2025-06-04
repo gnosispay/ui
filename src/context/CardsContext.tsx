@@ -17,6 +17,7 @@ type CardContextProps = {
 };
 
 export interface CardInfo {
+  cardToken?: string;
   activatedAt?: string;
   statusCode: number;
   isFrozen: boolean;
@@ -65,8 +66,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         return;
       }
 
-      console.log("Card status data: ", card.id, data);
-      newMap[card.id] = data;
+      newMap[card.id] = { cardToken: card.cardToken, ...data };
     }
 
     setCardInfoMap(newMap);
@@ -78,14 +78,13 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error freezing card: ", error);
           toast.error(<CollapsedError title="Error freezing card" error={error} />);
           return;
         }
 
-        console.log("Card freeze data: ", data);
         toast.success("Card frozen successfully");
         refreshCards();
       })
@@ -101,14 +100,13 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error unfreezing card: ", error);
           toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
           return;
         }
 
-        console.log("Card unfreeze data: ", data);
         toast.success("Card unfrozen successfully");
         refreshCards();
       })
@@ -124,14 +122,13 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error marking card as stolen: ", error);
           toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
           return;
         }
 
-        console.log("Card stolen data: ", data);
         toast.success("Card marked as stolen successfully");
         refreshCards();
       })
@@ -147,14 +144,13 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cardId,
       },
     })
-      .then(({ data, error }) => {
+      .then(({ error }) => {
         if (error) {
           console.error("Error marking card as lost: ", error);
           toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
           return;
         }
 
-        console.log("Card lost data: ", data);
         toast.success("Card marked as lost successfully");
         refreshCards();
       })
