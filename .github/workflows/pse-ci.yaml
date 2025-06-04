@@ -64,17 +64,17 @@ jobs:
       #     github_deployment: true
       #     deployment_environment: 'production'
       #     github_token: ${{ secrets.GITHUB_TOKEN }}
-  # test:
-  #   defaults:
-  #     run:
-  #       working-directory: ./pse-backend-demo/
-  #   name: Test
-  #   needs: setup
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-  #     - uses: ./.github/actions/setup-pnpm
-  #     - run: pnpm test
+  test:
+    defaults:
+      run:
+        working-directory: ./pse-backend-demo/
+    name: Test
+    needs: setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      - uses: ./.github/actions/setup-pnpm
+      - run: pnpm test
 
   # docker:
   #   defaults:
@@ -134,7 +134,7 @@ jobs:
       run:
         working-directory: ./pse-backend-demo/
     name: Workflow Summary
-    needs: [setup, build]
+    needs: [setup, test, build]
     runs-on: ubuntu-latest
     if: always() # Run even if previous jobs fail
     steps:
