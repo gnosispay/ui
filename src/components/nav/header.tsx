@@ -3,8 +3,8 @@ import darklogo from "../../assets/GP-logo-white.png";
 import lightLogo from "../../assets/GP-logo.png";
 import { ModeToggle } from "../theme-toggle";
 import { useTheme } from "../../context/ThemeContext";
-import { Home, CreditCard } from "lucide-react";
 import { NavLink } from "react-router";
+import { routes } from "@/App";
 
 export const HeaderNavBar = () => {
   const { effectiveTheme } = useTheme();
@@ -18,29 +18,20 @@ export const HeaderNavBar = () => {
           </div>
           {/* Navigation */}
           <div className="flex items-center gap-8">
-            <NavLink
-              to="/"
-              className={({ isActive }) =>
-                `flex items-center gap-2 text-base font-medium transition-colors ${
-                  isActive ? "text-link-active font-normal" : "text-muted-foreground"
-                }`
-              }
-              end
-            >
-              <Home size={22} />
-              Home
-            </NavLink>
-            <NavLink
-              to="/cards"
-              className={({ isActive }) =>
-                `flex items-center gap-2 text-base font-medium transition-colors ${
-                  isActive ? "text-link-active font-normal" : "text-muted-foreground"
-                }`
-              }
-            >
-              <CreditCard size={22} />
-              Cards
-            </NavLink>
+            {routes.map((route) => (
+              <NavLink
+                key={route.path}
+                to={route.path}
+                className={({ isActive }) =>
+                  `flex items-center gap-2 text-base font-medium transition-colors ${
+                    isActive ? "text-link-active font-normal" : "text-muted-foreground"
+                  }`
+                }
+              >
+                <route.icon size={22} />
+                {route.label}
+              </NavLink>
+            ))}
           </div>
           {/* Actions */}
           <div className="col-start-4 col-span-2 flex gap-2 items-center justify-end">
