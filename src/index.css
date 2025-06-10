@@ -53,7 +53,7 @@
   --popover-foreground: var(--neutral-900);
   --primary: var(--neutral-900);
   --primary-foreground: var(--neutral-50);
-  --secondary: var(--neutral-200);
+  --secondary: var(--neutral-500);
   --secondary-foreground: var(--neutral-900);
   --muted: var(--neutral-200);
   --muted-foreground: var(--neutral-500);
@@ -142,9 +142,9 @@
   --card-foreground: var(--neutral-50);
   --popover: var(--neutral-800);
   --popover-foreground: var(--neutral-50);
-  --primary: var(--neutral-900);
+  --primary: var(--neutral-50);
   --primary-foreground: var(--neutral-50);
-  --secondary: var(--neutral-800);
+  --secondary: var(--neutral-400);
   --secondary-foreground: var(--neutral-50);
   --muted: var(--neutral-800);
   --muted-foreground: var(--neutral-400);

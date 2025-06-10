@@ -111,8 +111,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       uri: "https://www.gnosispay.com",
       version: "1",
       chainId,
-      // nonce is not properly typed in our api
-      nonce: data as string,
+      nonce: data,
     });
 
     const preparedMessage = message.prepareMessage();
