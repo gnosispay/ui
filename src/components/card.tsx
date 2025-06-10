@@ -12,7 +12,7 @@ import { useCallback, useMemo, useState } from "react";
 import { ConfirmDangerousActionModal } from "./modals/confirm-dangerous-action";
 import { toast } from "sonner";
 import type GPSDK from "@gnosispay/pse-sdk";
-import { ElementType } from "@gnosispay/pse-sdk";
+import { Action, ElementType } from "@gnosispay/pse-sdk";
 import { ChangePinModal } from "./modals/change-pin";
 import { useGpSdk } from "@/hooks/useGpSdk";
 
@@ -26,7 +26,16 @@ export const Card = ({ card, cardInfo }: Props) => {
   const [isConfirmingStolen, setIsConfirmingStolen] = useState(false);
   const [isConfirmingLost, setIsConfirmingLost] = useState(false);
   const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
-  const { getGpSdk } = useGpSdk();
+  const { getGpSdk } = useGpSdk({
+    actionCallback: (action) => {
+      if (
+        action &&
+        [Action.CardExpirationCopied, Action.CardNumberCopied, Action.CardSecurityCodeCopied].includes(action)
+      ) {
+        toast.success("Copied to clipboard");
+      }
+    },
+  });
   const [cardDataIframe, setCardDataIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
   const [pinIframe, setPinIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
   const cardDataId = useMemo(() => `pse-card-data-${card.id}`, [card.id]);
@@ -121,12 +130,7 @@ export const Card = ({ card, cardInfo }: Props) => {
           : null;
 
   return (
-    <div
-      key={card.id}
-      className={`relative border rounded-lg p-4 shadow-sm bg-card border-border ${
-        !card.activatedAt ? "opacity-50" : ""
-      }`}
-    >
+    <div key={card.id} className={`relative rounded-lg p-4 shadow-sm bg-card ${!card.activatedAt ? "opacity-50" : ""}`}>
       <div className="absolute top-2 right-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

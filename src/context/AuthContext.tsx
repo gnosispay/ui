@@ -1,12 +1,13 @@
 import { getApiV1AuthNonce, postApiV1AuthChallenge } from "@/client";
 import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
-import { BASE_URL, LOCALSTORAGE_JWT_KEY } from "@/main";
 import { isTokenExpired } from "@/utils/isTokenExpired";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
 import { useAccount, useConnections, useSignMessage } from "wagmi";
+
+export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
 type AuthContextProps = {
   children: ReactNode | ReactNode[];
@@ -21,11 +22,27 @@ export type IAuthContext = {
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: AuthContextProps) => {
-  const [jwt, setJwt] = useState<string | null>(localStorage.getItem(LOCALSTORAGE_JWT_KEY));
+  const [jwt, setJwt] = useState<string | null>(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
+  const jwtAddressKey = useMemo(() => {
+    if (!address) return "";
+    return `${LOCALSTORAGE_JWT_KEY}.${address}`;
+  }, [address]);
+
+  useEffect(() => {
+    if (!jwtAddressKey) {
+      return;
+    }
+
+    const storedJwt = localStorage.getItem(jwtAddressKey);
+
+    if (storedJwt) {
+      setJwt(storedJwt);
+    }
+  }, [jwtAddressKey]);
 
   const isAuthenticated = useMemo(() => {
     const isExpired = isTokenExpired(jwt);
@@ -38,8 +55,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
 
   const updateClient = useCallback(() => {
     client.setConfig({
-      baseUrl: BASE_URL,
-      // set default headers for requests
       headers: {
         Authorization: `Bearer ${jwt}`,
       },
@@ -59,6 +74,11 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const renewToken = useCallback(async () => {
     if (!address || !chainId) {
       console.info("No address or chainId");
+      return;
+    }
+
+    if (!jwtAddressKey) {
+      console.info("No jwtAddressKey");
       return;
     }
 
@@ -136,7 +156,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
-      localStorage.setItem(LOCALSTORAGE_JWT_KEY, data.token);
+      localStorage.setItem(jwtAddressKey, data.token);
       setJwt(data.token);
       return data.token;
     } catch (error) {
@@ -145,7 +165,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       setIsAuthenticating(false);
       return;
     }
-  }, [address, chainId, signMessageAsync, connections]);
+  }, [address, chainId, signMessageAsync, connections, jwtAddressKey]);
 
   useEffect(() => {
     const expired = isTokenExpired(jwt);
