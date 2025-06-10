@@ -81,6 +81,7 @@
   --sidebar-ring: var(--brand-500);
   --color-button-bg: var(--brand-500);
   --color-button-bg-hover: var(--brand-600);
+  --color-link-active: var(--neutral-900);
 }
 
 @media (prefers-color-scheme: light) {
@@ -130,13 +131,14 @@
   --color-button-black: var(--neutral-900);
   --color-button-bg: var(--color-button-bg);
   --color-button-bg-hover: var(--color-button-bg-hover);
+  --color-link-active: var(--color-link-active);
 }
 
 .dark {
   /* Theme Variables - Dark Mode */
   --background: var(--neutral-800); 
   --foreground: var(--neutral-50); 
-  --card: var(--neutral-800); 
+  --card: var(--neutral-700); 
   --card-foreground: var(--neutral-50); 
   --popover: var(--neutral-800); 
   --popover-foreground: var(--neutral-50); 
@@ -170,6 +172,7 @@
   --sidebar-ring: var(--brand-500);
   --color-button-bg: var(--brand-500);
   --color-button-bg-hover: var(--brand-600);
+  --color-link-active: var(--brand-500);
 }
 
 @layer base {

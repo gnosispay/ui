@@ -4,6 +4,7 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
 import { WagmiProvider } from "wagmi";
+import { BrowserRouter } from "react-router";
 
 import App from "./App.tsx";
 import { config } from "./wagmi.ts";
@@ -16,7 +17,6 @@ import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
-export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
 globalThis.Buffer = Buffer;
 
@@ -30,26 +30,25 @@ if (!rootElement) {
 client.setConfig({
   // set default base url for requests
   baseUrl: BASE_URL,
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem(LOCALSTORAGE_JWT_KEY) || ""}`,
-  },
 });
 
 ReactDOM.createRoot(rootElement).render(
-  <ThemeProvider defaultTheme="system" storageKey="gp-ui-theme">
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider>
-          <AuthContextProvider>
-            <UserContextProvider>
-              <CardsContextProvider>
-                <App />
-                <Toaster expand />
-              </CardsContextProvider>
-            </UserContextProvider>
-          </AuthContextProvider>
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
-  </ThemeProvider>,
+  <BrowserRouter>
+    <ThemeProvider defaultTheme="system" storageKey="gp-ui-theme">
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider>
+            <AuthContextProvider>
+              <UserContextProvider>
+                <CardsContextProvider>
+                  <App />
+                  <Toaster expand />
+                </CardsContextProvider>
+              </UserContextProvider>
+            </AuthContextProvider>
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ThemeProvider>
+  </BrowserRouter>,
 );

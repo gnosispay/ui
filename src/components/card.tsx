@@ -130,12 +130,7 @@ export const Card = ({ card, cardInfo }: Props) => {
           : null;
 
   return (
-    <div
-      key={card.id}
-      className={`relative border rounded-lg p-4 shadow-sm bg-card border-border ${
-        !card.activatedAt ? "opacity-50" : ""
-      }`}
-    >
+    <div key={card.id} className={`relative rounded-lg p-4 shadow-sm bg-card ${!card.activatedAt ? "opacity-50" : ""}`}>
       <div className="absolute top-2 right-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
