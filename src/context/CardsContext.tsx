@@ -2,6 +2,7 @@ import {
   type Card,
   getApiV1Cards,
   getApiV1CardsByCardIdStatus,
+  postApiV1CardsByCardIdActivate,
   postApiV1CardsByCardIdFreeze,
   postApiV1CardsByCardIdLost,
   postApiV1CardsByCardIdStolen,
@@ -37,6 +38,7 @@ export type ICardContext = {
   unfreezeCard: (cardId: string) => void;
   markCardAsStolen: (cardId: string) => void;
   markCardAsLost: (cardId: string) => void;
+  activateCard: (cardId: string) => void;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -160,6 +162,25 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       });
   }, []);
 
+  const activateCard = useCallback(async (cardId: string) => {
+    postApiV1CardsByCardIdActivate({
+      path: { cardId },
+    })
+      .then(({ error }) => {
+        if (error) {
+          console.error("Error activating card: ", error);
+          toast.error(<CollapsedError title="Error activating card" error={error} />);
+          return;
+        }
+        toast.success("Card activated successfully");
+        refreshCards();
+      })
+      .catch((error) => {
+        toast.error(<CollapsedError title="Error activating card" error={error} />);
+        console.error("Error activating card:", error);
+      });
+  }, []);
+
   const refreshCards = useCallback(() => {
     setCards(undefined);
 
@@ -188,7 +209,16 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
 
   return (
     <CardsContext.Provider
-      value={{ cards, cardInfoMap, refreshCards, freezeCard, unfreezeCard, markCardAsLost, markCardAsStolen }}
+      value={{
+        cards,
+        cardInfoMap,
+        refreshCards,
+        freezeCard,
+        unfreezeCard,
+        markCardAsLost,
+        markCardAsStolen,
+        activateCard,
+      }}
     >
       {children}
     </CardsContext.Provider>
