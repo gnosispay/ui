@@ -2,6 +2,7 @@ import { Cards } from "../components/cards";
 import { LoaderCircle } from "lucide-react";
 import { VirtualCardsOrderModal } from "../components/modals/virtual-cards-order";
 import { useAuth } from "@/context/AuthContext";
+import { Balances } from "@/components/balances";
 
 export const Home = () => {
   const { isAuthenticating, isAuthenticated } = useAuth();
@@ -25,6 +26,7 @@ export const Home = () => {
       <div className="col-span-4 col-start-2">
         {!isAuthenticating && isAuthenticated && (
           <div>
+            <Balances />
             <Cards />
             <VirtualCardsOrderModal />
           </div>
