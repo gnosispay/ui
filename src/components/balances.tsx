@@ -24,8 +24,8 @@ export const Balances = () => {
   const { balances, safeConfig } = useUser();
   const currencyInfo = useMemo(() => {
     if (!safeConfig?.fiatSymbol) {
-      return
-    };
+      return;
+    }
 
     return currencies[safeConfig.fiatSymbol];
   }, [safeConfig?.fiatSymbol]);
