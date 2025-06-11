@@ -26,7 +26,7 @@ export const Balances = () => {
     if (!safeConfig?.fiatSymbol) {
       return
     };
-    
+
     return currencies[safeConfig.fiatSymbol];
   }, [safeConfig?.fiatSymbol]);
 
@@ -34,7 +34,7 @@ export const Balances = () => {
     () => formatCurrency(balances?.total, currencyInfo),
     [balances?.total, currencyInfo],
   );
-  
+
   const formattedPending = useMemo(
     () => formatCurrency(balances?.pending, currencyInfo),
     [balances?.pending, currencyInfo],
