@@ -2,11 +2,13 @@ import {
   type Card,
   getApiV1Cards,
   getApiV1CardsByCardIdStatus,
+  getApiV1Transactions,
   postApiV1CardsByCardIdActivate,
   postApiV1CardsByCardIdFreeze,
   postApiV1CardsByCardIdLost,
   postApiV1CardsByCardIdStolen,
   postApiV1CardsByCardIdUnfreeze,
+  type BasePaymentish,
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
@@ -39,6 +41,7 @@ export type ICardContext = {
   markCardAsStolen: (cardId: string) => void;
   markCardAsLost: (cardId: string) => void;
   activateCard: (cardId: string) => void;
+  getTransactions: (cardTokens: string[] | undefined) => Promise<BasePaymentish[] | undefined>;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -202,6 +205,21 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .catch(console.error);
   }, [setCardsInfo]);
 
+  const getTransactions = useCallback(async (cardTokens?: string[]) => {
+    const { data, error } = await getApiV1Transactions({
+      query: {
+        cardTokens: cardTokens?.join(","),
+      },
+    });
+
+    if (error) {
+      console.error("Error getting transactions: ", error);
+      return;
+    }
+
+    return data;
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticated) return;
     refreshCards();
@@ -218,6 +236,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         markCardAsLost,
         markCardAsStolen,
         activateCard,
+        getTransactions,
       }}
     >
       {children}
