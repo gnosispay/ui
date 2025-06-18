@@ -1,6 +1,5 @@
 import { Cards } from "../components/cards";
 import { LoaderCircle } from "lucide-react";
-import { VirtualCardsOrderModal } from "../components/modals/virtual-cards-order";
 import { useAuth } from "@/context/AuthContext";
 import { Balances } from "@/components/balances";
 import { Transactions } from "@/components/transactions";
@@ -34,7 +33,6 @@ export const Home = () => {
               </div>
               <div className="col-span-3 lg:col-span-1 lg:col-start-3">
                 <Cards />
-                <VirtualCardsOrderModal />
               </div>
             </div>
           </>

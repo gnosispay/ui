@@ -82,6 +82,8 @@
   --color-button-bg: var(--brand-500);
   --color-button-bg-hover: var(--brand-600);
   --color-link-active: var(--neutral-900);
+  --color-icon-card-bg: var(--neutral-200);
+  --color-icon-card: var(--neutral-500);
 }
 
 @media (prefers-color-scheme: light) {
@@ -132,6 +134,8 @@
   --color-button-bg: var(--color-button-bg);
   --color-button-bg-hover: var(--color-button-bg-hover);
   --color-link-active: var(--color-link-active);
+  --color-icon-card-bg: var(--color-icon-card-bg);
+  --color-icon-card: var(--color-icon-card)
 }
 
 .dark {
@@ -173,6 +177,8 @@
   --color-button-bg: var(--brand-500);
   --color-button-bg-hover: var(--brand-600);
   --color-link-active: var(--brand-500);
+  --color-icon-card-bg: var(--neutral-600);
+  --color-icon-card: var(--neutral-400);
 }
 
 @layer base {

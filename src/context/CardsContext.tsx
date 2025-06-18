@@ -8,7 +8,7 @@ import {
   postApiV1CardsByCardIdLost,
   postApiV1CardsByCardIdStolen,
   postApiV1CardsByCardIdUnfreeze,
-  type BasePaymentish,
+  type Event,
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
@@ -32,6 +32,11 @@ export interface CardInfo {
 
 type CardInfoMap = Record<string, CardInfo>;
 
+interface GetTxParams {
+  cardTokens?: string[];
+  fromDate?: string;
+}
+
 export type ICardContext = {
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
@@ -41,7 +46,7 @@ export type ICardContext = {
   markCardAsStolen: (cardId: string) => void;
   markCardAsLost: (cardId: string) => void;
   activateCard: (cardId: string) => void;
-  getTransactions: (cardTokens: string[] | undefined) => Promise<BasePaymentish[] | undefined>;
+  getTransactions: (params?: GetTxParams) => Promise<Event[] | undefined>;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -205,10 +210,11 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .catch(console.error);
   }, [setCardsInfo]);
 
-  const getTransactions = useCallback(async (cardTokens?: string[]) => {
+  const getTransactions = useCallback(async ({ cardTokens, fromDate }: GetTxParams = {}) => {
     const { data, error } = await getApiV1Transactions({
       query: {
         cardTokens: cardTokens?.join(","),
+        after: fromDate,
       },
     });
 
