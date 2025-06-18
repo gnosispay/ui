@@ -135,7 +135,7 @@
   --color-button-bg-hover: var(--color-button-bg-hover);
   --color-link-active: var(--color-link-active);
   --color-icon-card-bg: var(--color-icon-card-bg);
-  --color-icon-card: var(--color-icon-card)
+  --color-icon-card: var(--color-icon-card);
 }
 
 .dark {
