@@ -47,7 +47,7 @@ export const VirtualCardsOrderModal = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="ml-6">
+        <Button variant="default" className="mt-6">
           Order Virtual Card
         </Button>
       </DialogTrigger>

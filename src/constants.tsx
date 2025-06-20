@@ -1,9 +1,9 @@
 export interface CurrencyInfo {
-  tokenSymbol: string;
-  address: string;
-  decimals: number;
-  symbol: string;
-  fiatSymbol: string;
+  tokenSymbol?: string;
+  address?: string;
+  decimals?: number;
+  symbol?: string;
+  fiatSymbol?: string;
 }
 
 export const currencies: Record<string, CurrencyInfo> = {
