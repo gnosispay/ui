@@ -97,6 +97,8 @@ export const Transactions = () => {
             <div className="text-xs text-secondary mb-2">{date}</div>
             {grouped[date].map((transaction, idx) => {
               const approved = transaction.kind === "Payment" && transaction.status === "Approved";
+              const refundOrReversal = transaction.kind === "Refund" || transaction.kind === "Reversal";
+              const pending = transaction.isPending;
               const sign = transaction.kind === "Payment" ? "-" : "+";
               const Icon = getIconForMcc(transaction.mcc);
               const merchant = transaction.merchant?.name || "Unknown";
@@ -127,6 +129,8 @@ export const Transactions = () => {
                       <div className="text-xs text-secondary">
                         {time}
                         {!approved && <span> • {fromPascalCase((transaction as Payment).status)}</span>}
+                        {refundOrReversal && <span> • Refund</span>}
+                        {pending && <span> • Pending</span>}
                       </div>
                     </div>
                   </div>
