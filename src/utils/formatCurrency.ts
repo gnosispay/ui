@@ -4,9 +4,10 @@ export const formatCurrency = (
   value: string | undefined,
   currencyInfo: CurrencyInfo | undefined,
 ): string | undefined => {
-  if (!value || !currencyInfo) {
+  if (!value || !currencyInfo || !currencyInfo.decimals) {
     return undefined;
   }
+
   try {
     const bigIntValue = BigInt(value);
     const valueInUnits = Number(bigIntValue) / 10 ** currencyInfo.decimals;

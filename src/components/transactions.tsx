@@ -34,13 +34,7 @@ function groupByDate(transactions: Event[]) {
 
 export const Transactions = () => {
   const { getTransactions } = useCards();
-  const { safeConfig } = useUser();
   const [transactions, setTransactions] = useState<Event[] | undefined>(undefined);
-
-  const currencyInfo = useMemo(() => {
-    if (!safeConfig?.fiatSymbol) return undefined;
-    return currencies[safeConfig.fiatSymbol];
-  }, [safeConfig?.fiatSymbol]);
 
   useEffect(() => {
     // 7 days ago
@@ -60,7 +54,7 @@ export const Transactions = () => {
   const grouped = groupByDate(sorted);
   const dateOrder = Object.keys(grouped).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-  if (!transactions || transactions.length === 0 || !currencyInfo) {
+  if (!transactions || transactions.length === 0) {
     return (
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
         {[1, 2].map((numb) => (
@@ -109,7 +103,17 @@ export const Transactions = () => {
               const time = transaction.createdAt
                 ? new Date(transaction.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
                 : "";
-              const amount = formatCurrency(transaction.billingAmount, { ...currencyInfo, decimals: 2 });
+              const amount = formatCurrency(transaction.billingAmount, {
+                decimals: transaction.billingCurrency?.decimals,
+                fiatSymbol: transaction.billingCurrency?.symbol,
+              });
+              const fxAmount =
+                transaction.billingCurrency?.name !== transaction.transactionCurrency?.name
+                  ? formatCurrency(transaction.transactionAmount, {
+                      decimals: transaction.transactionCurrency?.decimals,
+                      fiatSymbol: transaction.transactionCurrency?.symbol,
+                    })
+                  : "";
               const rowKey =
                 (transaction.createdAt ? transaction.createdAt : "") + (transaction.merchant?.name || "") + idx;
               return (
@@ -130,6 +134,7 @@ export const Transactions = () => {
                     <div className={`text-xl text-primary ${!approved && "line-through"}`}>
                       {amount ? `${sign} ${amount}` : "-"}
                     </div>
+                    {fxAmount && <div className="text-xs text-secondary mt-1">{`${sign} ${fxAmount}`}</div>}
                   </div>
                 </div>
               );
