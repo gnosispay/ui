@@ -26,7 +26,7 @@ export const Balances = () => {
   );
 
   return (
-    <div className="flex flex-col gap-2 mb-4">
+    <div className="flex flex-col gap-2 mb-4 mx-4 lg:mx-0">
       <h1 className="font-bold text-secondary">Balance</h1>
       {formattedBalance ? (
         <div className="text-4xl text-primary font-bold">

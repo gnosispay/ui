@@ -2,7 +2,7 @@ import { Cards } from "../components/cards";
 import { LoaderCircle } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { Balances } from "@/components/balances";
-import { Transactions } from "@/components/transactions";
+import { Transactions } from "@/components/transactions/transactions";
 
 export const Home = () => {
   const { isAuthenticating, isAuthenticated } = useAuth();
@@ -28,7 +28,7 @@ export const Home = () => {
           <>
             <Balances />
             <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-3 lg:col-span-2">
+              <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
                 <Transactions />
               </div>
               <div className="col-span-3 lg:col-span-1 lg:col-start-3">
