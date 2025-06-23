@@ -2,23 +2,8 @@ import { useUser } from "@/context/UserContext";
 import { useMemo } from "react";
 import { Clock } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
-import { currencies, type CurrencyInfo } from "../constants";
-
-const formatCurrency = (value: string | undefined, currencyInfo: CurrencyInfo | undefined): string | undefined => {
-  if (!value || !currencyInfo) {
-    return undefined;
-  }
-  try {
-    const bigIntValue = BigInt(value);
-    const valueInUnits = Number(bigIntValue) / 10 ** currencyInfo.decimals;
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: currencyInfo.fiatSymbol }).format(
-      valueInUnits,
-    );
-  } catch (e) {
-    console.error("Error formatting currency:", e);
-    return `"${currencyInfo.symbol}NaN`;
-  }
-};
+import { currencies } from "../constants";
+import { formatCurrency } from "@/utils/formatCurrency";
 
 export const Balances = () => {
   const { balances, safeConfig } = useUser();
@@ -41,7 +26,7 @@ export const Balances = () => {
   );
 
   return (
-    <div className="flex flex-col gap-2 p-4">
+    <div className="flex flex-col gap-2 mb-4 mx-4 lg:mx-0">
       <h1 className="font-bold text-secondary">Balance</h1>
       {formattedBalance ? (
         <div className="text-4xl text-primary font-bold">
