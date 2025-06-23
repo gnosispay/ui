@@ -20,24 +20,20 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
     transactionCurrency,
   } = transaction;
 
-  const approved = kind === "Payment" && transaction.status === "Approved";
-  const refundOrReversal = kind === "Refund" || kind === "Reversal";
-  const pending = isPending;
+  const isApproved = kind === "Payment" && transaction.status === "Approved";
+  const isRefundOrReversal = kind === "Refund" || kind === "Reversal";
   const sign = kind === "Payment" ? "-" : "+";
   const Icon = getIconForMcc(mcc);
   const merchantName = merchant?.name || "Unknown";
-  const time = createdAt ? new Date(createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+  const time = createdAt ? new Date(createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "unknown";
   const billAmount = formatCurrency(billingAmount, {
     decimals: billingCurrency?.decimals,
     fiatSymbol: billingCurrency?.symbol,
   });
-  const txAmount =
-    billingCurrency?.name !== transactionCurrency?.name
-      ? formatCurrency(transactionAmount, {
+  const txAmount = formatCurrency(transactionAmount, {
           decimals: transactionCurrency?.decimals,
           fiatSymbol: transactionCurrency?.symbol,
-        })
-      : "";
+        });
 
   return (
     <div className="flex items-center justify-between py-3">
@@ -49,17 +45,17 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
           <div className="text-xl text-primary">{merchantName}</div>
           <div className="text-xs text-secondary">
             {time}
-            {!approved && <span> • {fromPascalCase(status)}</span>}
-            {refundOrReversal && <span> • Refund</span>}
-            {pending && <span> • Pending</span>}
+            {!isApproved && <span> • {fromPascalCase(status)}</span>}
+            {isRefundOrReversal && <span> • Refund</span>}
+            {isPending && <span> • Pending</span>}
           </div>
         </div>
       </div>
       <div className="text-right">
-        <div className={`text-xl text-primary ${!approved && "line-through"}`}>
+        <div className={`text-xl text-primary ${!isApproved && "line-through"}`}>
           {billAmount ? `${sign} ${billAmount}` : "-"}
         </div>
-        {txAmount && <div className="text-xs text-secondary mt-1">{`${sign} ${txAmount}`}</div>}
+        {txAmount !== billAmount && <div className="text-xs text-secondary mt-1">{`${sign} ${txAmount}`}</div>}
       </div>
     </div>
   );
