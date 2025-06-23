@@ -1,4 +1,4 @@
-**[Ticket](https://linear.app/gnosis-pay/issue/ENG-XX/)**
+**Closes [#TICKET-NUMBER](https://github.com/gnosispay/ui/issues/TICKET-NUMBER)**
 
 ## 📝 Description
 
