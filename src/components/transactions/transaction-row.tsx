@@ -25,15 +25,17 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
   const sign = kind === "Payment" ? "-" : "+";
   const Icon = getIconForMcc(mcc);
   const merchantName = merchant?.name || "Unknown";
-  const time = createdAt ? new Date(createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "unknown";
+  const time = createdAt
+    ? new Date(createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+    : "unknown";
   const billAmount = formatCurrency(billingAmount, {
     decimals: billingCurrency?.decimals,
     fiatSymbol: billingCurrency?.symbol,
   });
   const txAmount = formatCurrency(transactionAmount, {
-          decimals: transactionCurrency?.decimals,
-          fiatSymbol: transactionCurrency?.symbol,
-        });
+    decimals: transactionCurrency?.decimals,
+    fiatSymbol: transactionCurrency?.symbol,
+  });
 
   return (
     <div className="flex items-center justify-between py-3">
