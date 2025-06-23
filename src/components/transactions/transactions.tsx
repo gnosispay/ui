@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { TransactionSkeleton } from "./transaction-skeleton";
 import { TransactionRow } from "./transaction-row";
 import { groupByDate } from "@/utils/transactionUtils";
+import { TransactionFetchingAlert } from "./transaction-fetching-alert";
 
 export const Transactions = () => {
   const { getTransactions } = useCards();
   const [transactions, setTransactions] = useState<Event[] | undefined>(undefined);
+  const [isTransactionFetchError, setIsTransactionFetchError] = useState(false);
 
   useEffect(() => {
     // 7 days ago
@@ -18,6 +20,7 @@ export const Transactions = () => {
         setTransactions(t);
       })
       .catch((e) => {
+        setIsTransactionFetchError(true);
         console.error("Error getting transactions: ", e);
       });
   }, [getTransactions]);
@@ -26,6 +29,10 @@ export const Transactions = () => {
   const sorted = [...(transactions || [])].sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
   const grouped = groupByDate(sorted);
   const dateOrder = Object.keys(grouped).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+
+  if (isTransactionFetchError) {
+    return <TransactionFetchingAlert />;
+  }
 
   if (!transactions || transactions.length === 0) {
     return <TransactionSkeleton />;
