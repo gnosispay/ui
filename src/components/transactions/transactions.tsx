@@ -30,7 +30,7 @@ export const Transactions = () => {
   const grouped = groupByDate(sorted);
   const dateOrder = Object.keys(grouped).sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
 
-  if (isTransactionFetchError) {
+  if (!isTransactionFetchError) {
     return <TransactionFetchingAlert />;
   }
 
