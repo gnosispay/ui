@@ -1,0 +1,33 @@
+# Stage 1: Build the app
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy package files and install dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the source code
+COPY . .
+
+# Build the app
+RUN pnpm build
+
+# Stage 2: Serve with nginx
+FROM nginx:alpine
+
+# Copy built files to nginx html directory
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy custom nginx config if needed (optional)
+# COPY nginx.conf /etc/nginx/nginx.conf
+
+# Expose port 80
+EXPOSE 80
+
+# Start nginx
+CMD ["nginx", "-g", "daemon off;"] 
