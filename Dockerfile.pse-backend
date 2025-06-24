@@ -1,0 +1,41 @@
+# Stage 1: Build the app
+FROM node:20-alpine AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm
+
+# Copy package files and install dependencies
+COPY pse-backend-demo/package.json pse-backend-demo/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the source code
+COPY pse-backend-demo .
+
+# Build the app
+RUN pnpm build
+
+# Stage 2: Run the app
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+# Install pnpm in the runtime image
+RUN npm install -g pnpm
+
+# Copy only the built output and production dependencies
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/node_modules ./node_modules
+
+# Optionally copy any other needed files (e.g., public, migrations, etc.)
+# COPY --from=builder /app/public ./public
+
+# Expose the port (default 3000, can be overridden by env)
+EXPOSE 3000
+
+# Start the server
+CMD ["pnpm", "start:prod"] 
