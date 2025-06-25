@@ -4,12 +4,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { CollapsedError } from "@/components/collapsedError";
 
-// Registration steps (expandable for future steps)
 enum RegisterStep {
   Email = "email",
-  // Otp = "otp", // for future steps
+  Otp = "otp",
 }
 
 export const NewUserRoute = () => {
@@ -17,26 +15,25 @@ export const NewUserRoute = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [otpSentSuccessfully, setOtpSentSuccessfully] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    setOtpSentSuccessfully(false);
     try {
       const { error, data } = await postApiV1AuthSignupOtp({
         body: { email },
       });
       if (error) {
-        setError("Error while requesting the OTP");
-        console.error(error)
-      } else {
-        setOtpSentSuccessfully(true);
-        // setStep(RegisterStep.Otp); // for future steps
+        const message = "error" in error ? error.error : "message" in error ? error.message : "unkown";
+        setError(`Error while requesting the OTP: ${message}`);
+        console.error(error);
       }
+
+      data?.ok && setStep(RegisterStep.Otp);
     } catch (err) {
       setError("Error while requesting the OTP");
+      console.log(err);
     } finally {
       setIsLoading(false);
     }
@@ -44,21 +41,19 @@ export const NewUserRoute = () => {
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
-      <div className="col-span-4 col-start-2">
+      <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
         <h2 className="text-xl">Register</h2>
-        <p className="text-muted-foreground">Register by typing in your email</p>
-      </div>
-      <div className="col-span-4 col-start-2">
+        <div>Type your email to receive a 1 time code.</div>
         {step === RegisterStep.Email && (
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <Label htmlFor="register-email">Email</Label>
+            <div className="mt-4">
               <Input
+                className="lg:w-1/2"
                 id="register-email"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
                 disabled={isLoading}
@@ -70,17 +65,7 @@ export const NewUserRoute = () => {
             {error && (
               <Alert variant="destructive">
                 <AlertTitle>Error</AlertTitle>
-                <AlertDescription>
-                  {error}
-                </AlertDescription>
-              </Alert>
-            )}
-            {otpSentSuccessfully && (
-              <Alert>
-                <AlertTitle>Success</AlertTitle>
-                <AlertDescription>
-                  Verification code sent to your email.
-                </AlertDescription>
+                <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
           </form>

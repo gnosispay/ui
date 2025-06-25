@@ -18,20 +18,26 @@ export const HeaderNavBar = () => {
           </div>
           {/* Navigation */}
           <div className="flex items-center gap-8">
-            {routes.map((route) => (
-              <NavLink
-                key={route.path}
-                to={route.path}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 text-base font-medium transition-colors ${
-                    isActive ? "text-link-active font-normal" : "text-muted-foreground"
-                  }`
-                }
-              >
-                <route.icon size={22} />
-                {route.label}
-              </NavLink>
-            ))}
+            {routes.map((route) => {
+              if (route.inNavBar || !route.icon || !route.label) {
+                return;
+              }
+
+              return (
+                <NavLink
+                  key={route.path}
+                  to={route.path}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2 text-base font-medium transition-colors ${
+                      isActive ? "text-link-active font-normal" : "text-muted-foreground"
+                    }`
+                  }
+                >
+                  <route.icon size={22} />
+                  {route.label}
+                </NavLink>
+              );
+            })}
           </div>
           {/* Actions */}
           <div className="col-start-4 col-span-2 flex gap-2 items-center justify-end">

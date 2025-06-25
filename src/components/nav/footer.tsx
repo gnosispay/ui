@@ -13,20 +13,26 @@ export const FooterNavBar = () => {
           <div />
           {/* Center cell with nav links */}
           <div className="flex items-center justify-center gap-8">
-            {routes.map((route) => (
-              <NavLink
-                to={route.path}
-                key={route.path}
-                className={({ isActive }) =>
-                  `flex flex-col items-center gap-1 text-base font-medium transition-colors ${
-                    isActive ? "text-link-active font-normal" : "text-muted-foreground"
-                  }`
-                }
-              >
-                <route.icon size={28} />
-                <span className="text-sm">{route.label}</span>
-              </NavLink>
-            ))}
+            {routes.map((route) => {
+              if (route.inNavBar || !route.icon || !route.label) {
+                return;
+              }
+
+              return (
+                <NavLink
+                  to={route.path}
+                  key={route.path}
+                  className={({ isActive }) =>
+                    `flex flex-col items-center gap-1 text-base font-medium transition-colors ${
+                      isActive ? "text-link-active font-normal" : "text-muted-foreground"
+                    }`
+                  }
+                >
+                  <route.icon size={28} />
+                  <span className="text-sm">{route.label}</span>
+                </NavLink>
+              );
+            })}
           </div>
           {/* Right cell with ModeToggle */}
           <div className="flex justify-end">
