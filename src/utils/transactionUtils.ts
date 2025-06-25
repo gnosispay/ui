@@ -14,18 +14,18 @@ export function formatDate(dateString?: string) {
 }
 
 export function groupByDate(transactions: Transaction[]) {
-  return transactions.reduce(
-    (acc, tx) => {
-      const date = formatDate(tx.createdAt);
-      if (!acc[date]) acc[date] = [];
-      acc[date].push(tx);
-      return acc;
-    },
-    {} as Record<string, Transaction[]>,
-  );
+  return transactions.reduce((acc, tx) => {
+    const date = formatDate(tx.createdAt);
+    if (!acc[date]) acc[date] = [];
+    acc[date].push(tx);
+    return acc;
+  }, {} as Record<string, Transaction[]>);
 }
 
-export function mergeAndSortTransactions(cardTransactions: Event[] = [], ibanOrders: IbanOrder[] = []): Transaction[] {
+export function mergeAndSortTransactions(
+  cardTransactions: Event[] = [],
+  ibanOrders: IbanOrder[] = []
+): Transaction[] {
   const cardTransactionsMapped = cardTransactions.map((tx) => ({
     id: `${tx.createdAt}${tx.merchant?.name || ""}`,
     createdAt: tx.createdAt || "",
@@ -41,6 +41,6 @@ export function mergeAndSortTransactions(cardTransactions: Event[] = [], ibanOrd
   }));
 
   return [...cardTransactionsMapped, ...ibanOrdersMapped].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
