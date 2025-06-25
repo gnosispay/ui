@@ -12,7 +12,14 @@ import {
   type Event,
   type IbanOrder,
 } from "@/client";
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
@@ -68,7 +75,8 @@ const CardsContext = createContext<ICardContext | undefined>(undefined);
 const CardsContextProvider = ({ children }: CardContextProps) => {
   const { isAuthenticated } = useAuth();
   const [cards, setCards] = useState<ICardContext["cards"]>(undefined);
-  const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
+  const [cardInfoMap, setCardInfoMap] =
+    useState<ICardContext["cardInfoMap"]>(undefined);
 
   const setCardsInfo = useCallback(async (cards: Card[]) => {
     const newMap: CardInfoMap = {};
@@ -105,7 +113,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ error }) => {
         if (error) {
           console.error("Error freezing card: ", error);
-          toast.error(<CollapsedError title="Error freezing card" error={error} />);
+          toast.error(
+            <CollapsedError title="Error freezing card" error={error} />
+          );
           return;
         }
 
@@ -114,7 +124,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch((error) => {
         console.error("Error freezing card: ", error);
-        toast.error(<CollapsedError title="Error freezing card" error={error} />);
+        toast.error(
+          <CollapsedError title="Error freezing card" error={error} />
+        );
       });
   }, []);
 
@@ -127,7 +139,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ error }) => {
         if (error) {
           console.error("Error unfreezing card: ", error);
-          toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
+          toast.error(
+            <CollapsedError title="Error unfreezing card" error={error} />
+          );
           return;
         }
 
@@ -136,7 +150,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch((error) => {
         console.error("Error unfreezing card: ", error);
-        toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
+        toast.error(
+          <CollapsedError title="Error unfreezing card" error={error} />
+        );
       });
   }, []);
 
@@ -149,7 +165,12 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ error }) => {
         if (error) {
           console.error("Error marking card as stolen: ", error);
-          toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
+          toast.error(
+            <CollapsedError
+              title="Error marking card as stolen"
+              error={error}
+            />
+          );
           return;
         }
 
@@ -158,7 +179,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch((error) => {
         console.error("Error marking card as stolen: ", error);
-        toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
+        toast.error(
+          <CollapsedError title="Error marking card as stolen" error={error} />
+        );
       });
   }, []);
 
@@ -171,7 +194,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ error }) => {
         if (error) {
           console.error("Error marking card as lost: ", error);
-          toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
+          toast.error(
+            <CollapsedError title="Error marking card as lost" error={error} />
+          );
           return;
         }
 
@@ -180,7 +205,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch((error) => {
         console.error("Error marking card as lost: ", error);
-        toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
+        toast.error(
+          <CollapsedError title="Error marking card as lost" error={error} />
+        );
       });
   }, []);
 
@@ -191,14 +218,18 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .then(({ error }) => {
         if (error) {
           console.error("Error activating card: ", error);
-          toast.error(<CollapsedError title="Error activating card" error={error} />);
+          toast.error(
+            <CollapsedError title="Error activating card" error={error} />
+          );
           return;
         }
         toast.success("Card activated successfully");
         refreshCards();
       })
       .catch((error) => {
-        toast.error(<CollapsedError title="Error activating card" error={error} />);
+        toast.error(
+          <CollapsedError title="Error activating card" error={error} />
+        );
         console.error("Error activating card:", error);
       });
   }, []);
@@ -224,20 +255,34 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .catch(console.error);
   }, [setCardsInfo]);
 
-  const getTransactions = useCallback(async ({ cardTokens, fromDate }: GetTxParams = {}) => {
-    const { data, error } = await getApiV1Transactions({
-      query: {
-        cardTokens: cardTokens?.join(","),
-        after: fromDate,
-      },
-    });
+  const getTransactions = useCallback(
+    async ({ cardTokens, fromDate }: GetTxParams = {}) => {
+      const { data, error } = await getApiV1Transactions({
+        query: {
+          cardTokens: cardTokens?.join(","),
+          after: fromDate,
+        },
+      });
+
+      if (error) {
+        console.error("Error getting transactions: ", error);
+        return;
+      }
+
+      return data;
+    },
+    []
+  );
+
+  const getIbanOrders = useCallback(async () => {
+    const { data, error } = await getApiV1IbansOrders();
 
     if (error) {
-      console.error("Error getting transactions: ", error);
+      console.error("Error getting IBAN orders: ", error);
       return;
     }
 
-    return data;
+    return data?.data;
   }, []);
 
   const getIbanOrders = useCallback(async () => {
