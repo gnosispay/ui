@@ -26,16 +26,11 @@ export const useTransactions = ({ fromDate }: UseTransactionsParams): UseTransac
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchAllTransactions = async () => {
-      try {
-        setIsLoading(true);
-        setIsError(false);
+    setIsLoading(true);
+    setIsError(false);
 
-        const [fetchedCardTransactions, fetchedIbanOrders] = await Promise.all([
-          getTransactions({ fromDate: fromDate?.toISOString() }),
-          getIbanOrders(),
-        ]);
-
+    Promise.all([getTransactions({ fromDate: fromDate?.toISOString() }), getIbanOrders()])
+      .then(([fetchedCardTransactions, fetchedIbanOrders]) => {
         /**
          * For now, we're manually filtering IBAN orders by the placement date before setting
          * them in the state as this API endpoint still doesn't support filtering by date.
@@ -56,15 +51,14 @@ export const useTransactions = ({ fromDate }: UseTransactionsParams): UseTransac
         setTransactions(processedTransactions);
         setDateGroupedTransactions(processedDateGroupedTransactions);
         setOrderedTransactions(processedOrderedTransactions);
-      } catch (error) {
+      })
+      .catch((error) => {
         setIsError(true);
         console.error("Error getting transactions: ", error);
-      } finally {
+      })
+      .finally(() => {
         setIsLoading(false);
-      }
-    };
-
-    fetchAllTransactions();
+      });
   }, [getTransactions, getIbanOrders, fromDate]);
 
   return {
