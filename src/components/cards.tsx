@@ -13,7 +13,6 @@ export const Cards = () => {
 
   return (
     <>
-      <h1 className="font-bold text-secondary my-4">Cards</h1>
       <div className="grid grid-cols-1 gap-6">
         {loading && (
           <>
