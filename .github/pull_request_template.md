@@ -15,6 +15,7 @@
 ## 📸 Visual Changes
 
 <!-- If this PR includes UI changes, please add screenshots or demo videos here -->
+<!-- Make sure to test your PR with dark and light theme, and on mobile view --> 
 
 ## 📝 Additional Notes
 
