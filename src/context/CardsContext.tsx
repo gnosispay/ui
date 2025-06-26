@@ -3,12 +3,14 @@ import {
   getApiV1Cards,
   getApiV1CardsByCardIdStatus,
   getApiV1Transactions,
+  getApiV1IbansOrders,
   postApiV1CardsByCardIdActivate,
   postApiV1CardsByCardIdFreeze,
   postApiV1CardsByCardIdLost,
   postApiV1CardsByCardIdStolen,
   postApiV1CardsByCardIdUnfreeze,
   type Event,
+  type IbanOrder,
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
@@ -47,6 +49,7 @@ export type ICardContext = {
   markCardAsLost: (cardId: string) => void;
   activateCard: (cardId: string) => void;
   getTransactions: (params?: GetTxParams) => Promise<Event[] | undefined>;
+  getIbanOrders: () => Promise<IbanOrder[] | undefined>;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -226,6 +229,17 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     return data;
   }, []);
 
+  const getIbanOrders = useCallback(async () => {
+    const { data, error } = await getApiV1IbansOrders();
+
+    if (error) {
+      console.error("Error getting IBAN orders: ", error);
+      return;
+    }
+
+    return data?.data;
+  }, []);
+
   useEffect(() => {
     if (!isAuthenticated) return;
     refreshCards();
@@ -243,6 +257,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         markCardAsStolen,
         activateCard,
         getTransactions,
+        getIbanOrders,
       }}
     >
       {children}

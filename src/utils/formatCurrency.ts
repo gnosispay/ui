@@ -11,11 +11,16 @@ export const formatCurrency = (
   try {
     const bigIntValue = BigInt(value);
     const valueInUnits = Number(bigIntValue) / 10 ** currencyInfo.decimals;
-    return new Intl.NumberFormat("en-US", { style: "currency", currency: currencyInfo.fiatSymbol }).format(
-      valueInUnits,
-    );
+    return formatDisplayAmount(valueInUnits, currencyInfo);
   } catch (e) {
     console.error("Error formatting currency:", e);
     return `"${currencyInfo.symbol}NaN`;
   }
+};
+
+export const formatDisplayAmount = (value: number, currencyInfo: CurrencyInfo) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: currencyInfo.fiatSymbol,
+  }).format(value);
 };
