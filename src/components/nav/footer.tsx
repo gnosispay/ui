@@ -14,7 +14,7 @@ export const FooterNavBar = () => {
           {/* Center cell with nav links */}
           <div className="flex items-center justify-center gap-8">
             {routes.map((route) => {
-              if (route.inNavBar || !route.icon || !route.label) {
+              if (!route.inNavBar || !route.icon || !route.label) {
                 return;
               }
 

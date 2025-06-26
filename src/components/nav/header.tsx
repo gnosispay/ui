@@ -22,7 +22,7 @@ export const HeaderNavBar = () => {
             {/* Navigation */}
             <div className="flex items-center gap-8">
               {routes.map((route) => {
-                if (route.inNavBar || !route.icon || !route.label) {
+                if (!route.inNavBar || !route.icon || !route.label) {
                   return;
                 }
 
