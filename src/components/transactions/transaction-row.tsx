@@ -2,6 +2,7 @@ import { getIconForMcc } from "@/utils/mccUtils";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { fromPascalCase } from "@/utils/convertFromPascalCase";
 import type { Event } from "@/client";
+import { format, parseISO } from "date-fns";
 
 interface TransactionRowProps {
   transaction: Event;
@@ -25,9 +26,7 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
   const sign = kind === "Payment" ? "-" : "+";
   const Icon = getIconForMcc(mcc);
   const merchantName = merchant?.name || "Unknown";
-  const time = createdAt
-    ? new Date(createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-    : "unknown";
+  const time = createdAt ? format(parseISO(createdAt), "HH:mm") : "unknown";
   const billAmount = formatCurrency(billingAmount, {
     decimals: billingCurrency?.decimals,
     fiatSymbol: billingCurrency?.symbol,
