@@ -12,7 +12,7 @@ import { subDays } from "date-fns";
  *
  * This value will come from the date picker when that logic is implemented.
  */
-const fromDate = subDays(new Date(), 30);
+const fromDate = subDays(new Date(), 7);
 
 export const Transactions = () => {
   const { transactions, dateGroupedTransactions, orderedTransactions, isLoading, isError } = useTransactions({
