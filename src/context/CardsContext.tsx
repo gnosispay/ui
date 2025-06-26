@@ -11,9 +11,9 @@ import {
   type Event,
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
-import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
+import { useUser } from "./UserContext";
 
 type CardContextProps = {
   children: ReactNode | ReactNode[];
@@ -52,7 +52,7 @@ export type ICardContext = {
 const CardsContext = createContext<ICardContext | undefined>(undefined);
 
 const CardsContextProvider = ({ children }: CardContextProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isUserSignedUp } = useUser();
   const [cards, setCards] = useState<ICardContext["cards"]>(undefined);
   const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
 
@@ -227,9 +227,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isUserSignedUp) return;
     refreshCards();
-  }, [isAuthenticated, refreshCards]);
+  }, [isUserSignedUp, refreshCards]);
 
   return (
     <CardsContext.Provider

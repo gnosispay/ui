@@ -1,22 +1,30 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { postApiV1AuthSignup, postApiV1AuthSignupOtp } from "@/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { OtpInput } from "@/components/otpInput";
+import { useAuth } from "@/context/AuthContext";
+import { LoaderCircle } from "lucide-react";
 
 enum RegisterStep {
+  eoaAuthentication = "eoa-authentication",
   Email = "email",
   Otp = "otp",
 }
 
 export const NewUserRoute = () => {
-  const [step, setStep] = useState<RegisterStep>(RegisterStep.Email);
+  const { isAuthenticated, isAuthenticating } = useAuth();
+  const [step, setStep] = useState<RegisterStep>(RegisterStep.eoaAuthentication);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [otp, setOtp] = useState("");
+
+  useEffect(() => {
+    isAuthenticated && setStep(RegisterStep.Email);
+  }, [isAuthenticated]);
 
   const handleSubmitOtpRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -67,10 +75,26 @@ export const NewUserRoute = () => {
     }
   };
 
+  console.log("step", step);
+  console.log("isAuthenticated", isAuthenticated);
+  console.log("isAuthenticating", isAuthenticating);
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
-        <h2 className="text-xl">Register</h2>
+        {step === RegisterStep.eoaAuthentication && !isAuthenticated && !isAuthenticating && (
+          <div className="col-span-6 lg:col-start-2 lg:col-span-4">
+            <h2 className="text-xl">Welcome to Gnosis Pay</h2>
+            <p className="text-muted-foreground">Connect your wallet to get started.</p>
+          </div>
+        )}
+        {step === RegisterStep.eoaAuthentication && isAuthenticating && (
+          <div className="col-span-6 lg:col-start-2 lg:col-span-4">
+            <h2 className="flex items-center text-xl">
+              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Authenticating...
+            </h2>
+            <p>Please sign the message request.</p>
+          </div>
+        )}
         {step === RegisterStep.Email && (
           <form className="space-y-4 mt-8" onSubmit={handleSubmitOtpRequest}>
             <Label htmlFor="register-email">Type your email to receive a 1 time code.</Label>

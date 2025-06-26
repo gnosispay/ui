@@ -2,6 +2,7 @@ import { getApiV1AuthNonce, postApiV1AuthChallenge } from "@/client";
 import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
 import { isTokenExpired } from "@/utils/isTokenExpired";
+import { isTokenWithUserId } from "@/utils/isTokenWithUserId";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
@@ -17,12 +18,14 @@ export type IAuthContext = {
   getJWT: () => Promise<string | undefined>;
   isAuthenticated: boolean;
   isAuthenticating: boolean;
+  jwtContainsUserId: boolean;
 };
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
 
 const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [jwt, setJwt] = useState<string | null>(null);
+  const [jwtContainsUserId, setJwtContainsUserId] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
@@ -31,6 +34,15 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     if (!address) return "";
     return `${LOCALSTORAGE_JWT_KEY}.${address}`;
   }, [address]);
+
+  useEffect(() => {
+    if (!jwt) {
+      setJwtContainsUserId(false);
+      return;
+    }
+
+    setJwtContainsUserId(isTokenWithUserId(jwt));
+  }, [jwt]);
 
   useEffect(() => {
     if (!jwtAddressKey) {
@@ -187,7 +199,11 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     return jwt;
   }, [jwt, renewToken]);
 
-  return <AuthContext.Provider value={{ isAuthenticated, isAuthenticating, getJWT }}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, isAuthenticating, getJWT, jwtContainsUserId }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 const useAuth = () => {
