@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import darklogo from "../../assets/GP-logo-white.png";
-import lightLogo from "../../assets/GP-logo.png";
+import darklogo from "../../assets/GP-logo-white.svg";
+import lightLogo from "../../assets/GP-logo-black.svg";
 import { ModeToggle } from "../theme-toggle";
 import { useTheme } from "../../context/ThemeContext";
 import { NavLink } from "react-router";
@@ -14,7 +14,9 @@ export const HeaderNavBar = () => {
         <div className="grid grid-cols-6 w-full items-center">
           {/* Logo */}
           <div className="flex items-center gap-2 col-start-2">
-            <img src={effectiveTheme === "light" ? lightLogo : darklogo} alt="Gnosis Pay logo" />
+            <a href="/">
+              <img src={effectiveTheme === "light" ? lightLogo : darklogo} alt="Gnosis Pay logo" />
+            </a>
           </div>
           {/* Navigation */}
           <div className="flex items-center gap-8">
