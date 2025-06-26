@@ -32,6 +32,8 @@ export const Home = () => {
                 <Transactions />
               </div>
               <div className="col-span-3 lg:col-span-1 lg:col-start-3">
+                <h1 className="font-bold text-secondary my-4">Cards</h1>
+
                 <Cards />
               </div>
             </div>
