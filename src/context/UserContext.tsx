@@ -6,7 +6,7 @@ import {
   type SafeConfig,
   type User,
 } from "@/client";
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 type UserContextProps = {
@@ -17,17 +17,20 @@ export type IUserContext = {
   user: User | undefined;
   safeConfig: SafeConfig | undefined;
   balances: GetApiV1AccountBalancesResponse | undefined;
+  isUserSignedUp?: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
 
 const UserContextProvider = ({ children }: UserContextProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, jwtContainsUserId } = useAuth();
   const [user, setUser] = useState<IUserContext["user"]>(undefined);
   const [safeConfig, setSafeConfig] = useState<IUserContext["safeConfig"]>(undefined);
   const [balances, setBalance] = useState<IUserContext["balances"]>(undefined);
+  const isUserSignedUp = useMemo(() => jwtContainsUserId, [jwtContainsUserId]);
+
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !isUserSignedUp) return;
 
     getApiV1User()
       .then(({ data, error }) => {
@@ -39,10 +42,10 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         setUser(data);
       })
       .catch(console.error);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isUserSignedUp]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !isUserSignedUp) return;
 
     getApiV1SafeConfig()
       .then(({ data, error }) => {
@@ -58,7 +61,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         setSafeConfig(data);
       })
       .catch(console.error);
-  }, [isAuthenticated]);
+  }, [isAuthenticated, isUserSignedUp]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
@@ -99,7 +102,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
       });
   }, [isAuthenticated, user]);
 
-  return <UserContext.Provider value={{ user, safeConfig, balances: balances }}>{children}</UserContext.Provider>;
+  return <UserContext.Provider value={{ user, safeConfig, balances, isUserSignedUp }}>{children}</UserContext.Provider>;
 };
 
 const useUser = () => {

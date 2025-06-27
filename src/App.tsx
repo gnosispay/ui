@@ -5,6 +5,8 @@ import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
 import { FooterNavBar } from "./components/nav/footer";
 import { Home as HomeIcon, CreditCard } from "lucide-react";
+import { SignUpRoute } from "./pages/SignUp";
+import { KycRoute } from "./pages/Kyc";
 
 export const routes = [
   {
@@ -12,12 +14,22 @@ export const routes = [
     element: <Home />,
     icon: HomeIcon,
     label: "Home",
+    inNavBar: true,
   },
   {
     path: "/cards",
     element: <CardsRoute />,
     icon: CreditCard,
     label: "Cards",
+    inNavBar: true,
+  },
+  {
+    path: "/register",
+    element: <SignUpRoute />,
+  },
+  {
+    path: "/kyc",
+    element: <KycRoute />,
   },
 ];
 
