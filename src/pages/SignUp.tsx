@@ -8,25 +8,38 @@ import { OtpInput } from "@/components/otpInput";
 import { useAuth } from "@/context/AuthContext";
 import { LoaderCircle } from "lucide-react";
 import { userTerms } from "@/constants";
+import { useUser } from "@/context/UserContext";
+import { useNavigate } from "react-router";
 
-enum RegisterStep {
-  eoaAuthentication = "eoa-authentication",
+enum ScreenStep {
+  SIWEAuthentication = "siwe-authentication",
   EmailAndTos = "email-and-tos",
-  Otp = "otp",
+  OtpVerification = "otp-verification",
 }
 
-export const NewUserRoute = () => {
+export const SignUpRoute = () => {
   const { isAuthenticated, isAuthenticating, updateJwt, updateClient } = useAuth();
-  const [step, setStep] = useState<RegisterStep>(RegisterStep.eoaAuthentication);
+  const { isUserSignedUp } = useUser();
+  const [step, setStep] = useState<ScreenStep>(ScreenStep.SIWEAuthentication);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [otp, setOtp] = useState("");
-  const [acceptedTos, setAcceptedTos] = useState(false);
+  const [isAcceptedTos, setIsAcceptedTos] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    isAuthenticated && setStep(RegisterStep.EmailAndTos);
-  }, [isAuthenticated]);
+    // if the user is authenticated and not signed up, it means they
+    // need to go through the email otp and terms of service step
+    isAuthenticated && !isUserSignedUp && setStep(ScreenStep.EmailAndTos);
+  }, [isAuthenticated, isUserSignedUp]);
+
+  useEffect(() => {
+    // if the user is authenticated and signed up, we should go to kyc
+    if (isAuthenticated && isUserSignedUp) {
+      navigate("/kyc");
+    }
+  }, [isAuthenticated, isUserSignedUp, navigate]);
 
   const acceptAllUserTerms = useCallback(async () => {
     try {
@@ -56,15 +69,12 @@ export const NewUserRoute = () => {
               "error" in termsError ? termsError.error : "message" in termsError ? termsError.message : "unkown";
             setError(`Error accepting terms (${term.type}): ${message}`);
             console.error(termsError);
-            return false;
           }
         }
       }
-      return true;
     } catch (termsErr) {
       setError("Error while accepting user terms");
       console.error(termsErr);
-      return false;
     }
   }, []);
 
@@ -85,7 +95,7 @@ export const NewUserRoute = () => {
           console.error(error);
         }
 
-        data?.ok && setStep(RegisterStep.Otp);
+        data?.ok && setStep(ScreenStep.OtpVerification);
       } catch (err) {
         setError("Error while requesting the OTP");
         console.error(err);
@@ -119,8 +129,8 @@ export const NewUserRoute = () => {
         updateJwt(data.token);
         updateClient(data.token);
 
-        // Accept user terms after updating client with new JWT
-        const accepted = await acceptAllUserTerms();
+        await acceptAllUserTerms();
+        navigate("/kyc");
       } catch (err) {
         setError("Error while signing up");
         console.error(err);
@@ -128,19 +138,19 @@ export const NewUserRoute = () => {
         setIsLoading(false);
       }
     },
-    [email, otp, updateJwt, acceptAllUserTerms, updateClient],
+    [email, otp, updateJwt, acceptAllUserTerms, updateClient, navigate],
   );
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
-        {step === RegisterStep.eoaAuthentication && !isAuthenticated && !isAuthenticating && (
+        {step === ScreenStep.SIWEAuthentication && !isAuthenticated && !isAuthenticating && (
           <>
             <h2 className="text-xl">Welcome to Gnosis Pay</h2>
             <p className="text-muted-foreground">Connect your wallet to get started.</p>
           </>
         )}
-        {step === RegisterStep.eoaAuthentication && isAuthenticating && (
+        {step === ScreenStep.SIWEAuthentication && isAuthenticating && (
           <>
             <h2 className="flex items-center text-xl">
               <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Authenticating...
@@ -148,9 +158,9 @@ export const NewUserRoute = () => {
             <p>Please sign the message request.</p>
           </>
         )}
-        {step === RegisterStep.EmailAndTos && (
+        {step === ScreenStep.EmailAndTos && (
           <form className="space-y-4 mt-8" onSubmit={handleSubmitOtpRequest}>
-            <Label htmlFor="register-email">Type your email to receive a 1 time code.</Label>
+            <Label htmlFor="register-email">Type your email to receive a one time code.</Label>
             <div className="mt-4">
               <Input
                 className="lg:w-1/2"
@@ -168,8 +178,8 @@ export const NewUserRoute = () => {
               <input
                 id="accept-tos"
                 type="checkbox"
-                checked={acceptedTos}
-                onChange={(e) => setAcceptedTos(e.target.checked)}
+                checked={isAcceptedTos}
+                onChange={(e) => setIsAcceptedTos(e.target.checked)}
                 disabled={isLoading}
                 required
               />
@@ -185,7 +195,7 @@ export const NewUserRoute = () => {
                 ))}
               </Label>
             </div>
-            <Button type="submit" loading={isLoading} disabled={isLoading || !email || !acceptedTos}>
+            <Button type="submit" loading={isLoading} disabled={isLoading || !email || !isAcceptedTos}>
               Get code
             </Button>
             {error && (
@@ -196,7 +206,7 @@ export const NewUserRoute = () => {
             )}
           </form>
         )}
-        {step === RegisterStep.Otp && (
+        {step === ScreenStep.OtpVerification && (
           <form className="space-y-4 mt-8" onSubmit={handleOtpSubmit}>
             <Label htmlFor="otp">Enter the 6-digit code sent to your email</Label>
             <OtpInput value={otp} onChange={setOtp} isLoading={isLoading} disabled={isLoading} />
