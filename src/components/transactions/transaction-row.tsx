@@ -22,6 +22,7 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
   } = transaction;
 
   const isApproved = kind === "Payment" && transaction.status === "Approved";
+  const failedTxStatus = !isApproved && kind === "Payment" && fromPascalCase(transaction.status);
   const isRefundOrReversal = kind === "Refund" || kind === "Reversal";
   const sign = kind === "Payment" ? "-" : "+";
   const Icon = getIconForMcc(mcc);
@@ -46,7 +47,7 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
           <div className="text-xl text-primary">{merchantName}</div>
           <div className="text-xs text-secondary">
             {time}
-            {!isApproved && <span> • {fromPascalCase(status)}</span>}
+            {failedTxStatus && <span> • {failedTxStatus}</span>}
             {isRefundOrReversal && <span> • Refund</span>}
             {isPending && <span> • Pending</span>}
           </div>
