@@ -19,6 +19,8 @@ export type IAuthContext = {
   isAuthenticated: boolean;
   isAuthenticating: boolean;
   jwtContainsUserId: boolean;
+  updateJwt: (newJwt: string) => void;
+  updateClient: (optionalJwt?: string) => void;
 };
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
@@ -65,15 +67,19 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   // todo implement interceptor to refresh the jwt if it's expired
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
 
-  const updateClient = useCallback(() => {
-    client.setConfig({
-      headers: {
-        Authorization: `Bearer ${jwt}`,
-      },
-    });
+  const updateClient = useCallback(
+    (optionalJwt?: string) => {
+      const updatedJwt = optionalJwt || jwt;
+      client.setConfig({
+        headers: {
+          Authorization: `Bearer ${updatedJwt}`,
+        },
+      });
 
-    setIsAuthenticating(false);
-  }, [jwt]);
+      setIsAuthenticating(false);
+    },
+    [jwt],
+  );
 
   useEffect(() => {
     if (!jwt) {
@@ -167,8 +173,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
-      localStorage.setItem(jwtAddressKey, data.token);
-      setJwt(data.token);
+      updateJwt(data.token);
       return data.token;
     } catch (error) {
       console.error("Error validating message", error);
@@ -177,6 +182,14 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       return;
     }
   }, [address, chainId, signMessageAsync, connections, jwtAddressKey]);
+
+  const updateJwt = useCallback(
+    (newJwt: string) => {
+      localStorage.setItem(jwtAddressKey, newJwt);
+      setJwt(newJwt);
+    },
+    [jwtAddressKey],
+  );
 
   useEffect(() => {
     const expired = isTokenExpired(jwt);
@@ -200,7 +213,9 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   }, [jwt, renewToken]);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isAuthenticating, getJWT, jwtContainsUserId }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, isAuthenticating, getJWT, jwtContainsUserId, updateJwt, updateClient }}
+    >
       {children}
     </AuthContext.Provider>
   );

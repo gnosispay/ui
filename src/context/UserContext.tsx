@@ -8,7 +8,6 @@ import {
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { isTokenWithUserId } from "@/utils/isTokenWithUserId";
 
 type UserContextProps = {
   children: ReactNode | ReactNode[];
