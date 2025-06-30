@@ -15,18 +15,21 @@ export function formatDate(dateString?: string) {
 }
 
 export function groupByDate(transactions: Transaction[]) {
-  return transactions.reduce((acc, tx) => {
-    const date = formatDate(tx.createdAt);
-    if (!acc[date]) acc[date] = [];
-    acc[date].push(tx);
-    return acc;
-  }, {} as Record<string, Transaction[]>);
+  return transactions.reduce(
+    (acc, tx) => {
+      const date = formatDate(tx.createdAt);
+      if (!acc[date]) acc[date] = [];
+      acc[date].push(tx);
+      return acc;
+    },
+    {} as Record<string, Transaction[]>,
+  );
 }
 
 export function mergeAndSortTransactions(
   cardTransactions: Event[] = [],
   ibanOrders: IbanOrder[] = [],
-  onchainSafeTransfers: Erc20TokenEvent[] = []
+  onchainSafeTransfers: Erc20TokenEvent[] = [],
 ): Transaction[] {
   const cardTransactionsMapped = cardTransactions.map((tx) => ({
     id: `${tx.createdAt}${tx.merchant?.name || ""}`,
@@ -49,11 +52,7 @@ export function mergeAndSortTransactions(
     data: tx,
   }));
 
-  return [
-    ...cardTransactionsMapped,
-    ...ibanOrdersMapped,
-    ...onchainSafeTransfersMapped,
-  ].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  return [...cardTransactionsMapped, ...ibanOrdersMapped, ...onchainSafeTransfersMapped].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
   );
 }
