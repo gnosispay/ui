@@ -87,6 +87,7 @@
   --color-link-secondary: var(--neutral-500);
   --color-icon-card-bg: var(--neutral-200);
   --color-icon-card: var(--neutral-500);
+  --color-success: var(--success-600);
 }
 
 @media (prefers-color-scheme: light) {
@@ -140,6 +141,7 @@
   --color-link-secondary: var(--color-link-secondary);
   --color-icon-card-bg: var(--color-icon-card-bg);
   --color-icon-card: var(--color-icon-card);
+  --color-success: var(--color-success);
 }
 
 .dark {
@@ -184,6 +186,7 @@
   --color-link-secondary: var(--neutral-50);
   --color-icon-card-bg: var(--neutral-600);
   --color-icon-card: var(--neutral-400);
+  --color-success: var(--success-600);
 }
 
 @layer base {
