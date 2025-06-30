@@ -7,6 +7,7 @@ import { FooterNavBar } from "./components/nav/footer";
 import { Home as HomeIcon, CreditCard } from "lucide-react";
 import { SignUpRoute } from "./pages/SignUp";
 import { KycRoute } from "./pages/Kyc";
+import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 
 export const routes = [
   {
@@ -30,6 +31,10 @@ export const routes = [
   {
     path: "/kyc",
     element: <KycRoute />,
+  },
+  {
+    path: "/safe-deployment",
+    element: <SafeDeploymentRoute />,
   },
 ];
 

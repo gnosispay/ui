@@ -2,13 +2,29 @@ import { getApiV1KycIntegration, type KycStatus } from "@/client";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 
 export const KycRoute = () => {
   const { isAuthenticated } = useAuth();
-  const { isUserSignedUp, user } = useUser();
+  const { isUserSignedUp, user, refetchUser } = useUser();
   const [error, setError] = useState("");
   const [kycUrl, setKycUrl] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user?.kycStatus) return;
+
+    // regularly check the kyc status as sumsub has hooks integration
+    // with gnosispay api
+    if (["documentsRequested", "pending", "processing"].includes(user.kycStatus)) {
+      const timeout = setTimeout(() => {
+        refetchUser();
+      }, 5000);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [refetchUser, user]);
 
   useEffect(() => {
     if (isAuthenticated && isUserSignedUp) {
@@ -31,13 +47,36 @@ export const KycRoute = () => {
   }, [isAuthenticated, isUserSignedUp]);
 
   useEffect(() => {
-    const notStartedOrRequested: KycStatus[] = ["notStarted", "documentsRequested"];
-    if (isUserSignedUp && user?.kycStatus && notStartedOrRequested.includes(user.kycStatus)) {
-      console.log("lets go");
-    }
-  }, [isUserSignedUp, user?.kycStatus]);
+    if (!user || !user.safeWallets) return;
 
-  // todo make this better
+    // an issue happened  during the KYC process, sumsub rejected the application
+    // they need to contact your support
+    if (user.kycStatus === "rejected") {
+      setError("Your KYC application was rejected. Please contact support at help@gnosispay.com");
+      return;
+    }
+
+    // the kyc probably just got approved, it's not time to deploy and
+    // setup the safe
+    if (user.kycStatus === "approved" && user.safeWallets.length === 0) {
+      navigate("/safe-deployment");
+    }
+
+    // the user has nothing to do here, they're all set up
+    if (user.kycStatus === "approved" && user.safeWallets.length > 0) {
+      navigate("/");
+    }
+  }, [navigate, user]);
+
+  // users will see the sumsub iframe in case their kyc status
+  // is one of the following:
+  // - notStarted
+  // - documentsRequested
+  // - pending
+  // - processing
+  // - resubmissionRequested
+  // - requiresAction
+
   if (!isAuthenticated || !isUserSignedUp) {
     return <div>Error, not authenticated...</div>;
   }

@@ -18,6 +18,7 @@ export type IUserContext = {
   safeConfig: SafeConfig | undefined;
   balances: GetApiV1AccountBalancesResponse | undefined;
   isUserSignedUp?: boolean;
+  refetchUser: () => void;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -32,16 +33,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   useEffect(() => {
     if (!isAuthenticated || !isUserSignedUp) return;
 
-    getApiV1User()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error(error);
-          return;
-        }
-
-        setUser(data);
-      })
-      .catch(console.error);
+    refetchUser();
   }, [isAuthenticated, isUserSignedUp]);
 
   useEffect(() => {
@@ -77,6 +69,21 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     return () => clearInterval(interval);
   }, [isAuthenticated, user]);
 
+  const refetchUser = useCallback(() => {
+    if (!isAuthenticated || !isUserSignedUp) return;
+
+    getApiV1User()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        setUser(data);
+      })
+      .catch(console.error);
+  }, [isAuthenticated, isUserSignedUp]);
+
   const getAccountBalance = useCallback(() => {
     if (!isAuthenticated || !user) {
       return;
@@ -102,7 +109,11 @@ const UserContextProvider = ({ children }: UserContextProps) => {
       });
   }, [isAuthenticated, user]);
 
-  return <UserContext.Provider value={{ user, safeConfig, balances, isUserSignedUp }}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, safeConfig, balances, isUserSignedUp, refetchUser }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 const useUser = () => {
