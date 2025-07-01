@@ -9,12 +9,12 @@ import { Button } from "@/components/ui/button";
 
 export const Home = () => {
   const { isAuthenticating, isAuthenticated } = useAuth();
-  const { isUserSignedUp } = useUser();
+  const { isUserSignedUp, isKycApproved, isSafeConfigured } = useUser();
   const navigate = useNavigate();
 
-  return (
-    <div className="grid grid-cols-6 gap-4 h-full mt-4">
-      {isAuthenticated && !isUserSignedUp && (
+  if (isAuthenticated && (!isUserSignedUp || !isKycApproved || !isSafeConfigured)) {
+    return (
+      <div className="grid grid-cols-6 gap-4 h-full mt-4">
         <div className="col-span-6 lg:col-start-2 lg:col-span-4">
           <h2 className="text-xl">Welcome to Gnosis Pay</h2>
           <div className="text-muted-foreground">You need to complete the signup process to use the app.</div>
@@ -22,7 +22,12 @@ export const Home = () => {
             Complete Signup
           </Button>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-6 gap-4 h-full mt-4">
       {!isAuthenticated && !isAuthenticating && (
         <div className="col-span-6 lg:col-start-2 lg:col-span-4">
           <h2 className="text-xl">Welcome to Gnosis Pay</h2>

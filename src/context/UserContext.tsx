@@ -20,6 +20,8 @@ export type IUserContext = {
   isUserSignedUp?: boolean;
   refreshUser: () => void;
   refreshSafeConfig: () => void;
+  isKycApproved: boolean;
+  isSafeConfigured: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -30,6 +32,19 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   const [safeConfig, setSafeConfig] = useState<IUserContext["safeConfig"]>(undefined);
   const [balances, setBalance] = useState<IUserContext["balances"]>(undefined);
   const isUserSignedUp = useMemo(() => jwtContainsUserId, [jwtContainsUserId]);
+  const [isKycApproved, setIsKycApproved] = useState(false);
+  const [isSafeConfigured, setIsSafeConfigured] = useState(false);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isUserSignedUp || !user) return;
+    setIsKycApproved(user.kycStatus === "approved");
+  }, [isAuthenticated, isUserSignedUp, user]);
+
+  useEffect(() => {
+    if (safeConfig?.accountStatus === 0) {
+      setIsSafeConfigured(true);
+    }
+  }, [safeConfig]);
 
   useEffect(() => {
     if (!isAuthenticated || !isUserSignedUp) return;
@@ -115,7 +130,18 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   }, [isAuthenticated, user]);
 
   return (
-    <UserContext.Provider value={{ user, safeConfig, balances, isUserSignedUp, refreshUser, refreshSafeConfig }}>
+    <UserContext.Provider
+      value={{
+        user,
+        safeConfig,
+        balances,
+        isUserSignedUp,
+        refreshUser,
+        refreshSafeConfig,
+        isKycApproved,
+        isSafeConfigured,
+      }}
+    >
       {children}
     </UserContext.Provider>
   );
