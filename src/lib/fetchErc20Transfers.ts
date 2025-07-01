@@ -6,6 +6,7 @@ import {
   http,
   getAddress,
   parseEventLogs,
+  type Address,
 } from "viem";
 import { gnosis } from "viem/chains";
 import { fromUnixTime } from "date-fns";
@@ -49,7 +50,7 @@ export const encodeErc20Transfer = (recipient: string, amount: bigint) => {
   });
 };
 
-export const decodeErc20Transfer = (data: `0x${string}`) => {
+export const decodeErc20Transfer = (data: Address) => {
   return decodeFunctionData({
     abi: ERC20Abi,
     data,
@@ -62,8 +63,8 @@ export const fetchErc20Transfers = async ({
   fromDate,
   skipSettlementTransfers,
 }: {
-  address: `0x${string}`;
-  tokenAddress: `0x${string}`;
+  address: Address;
+  tokenAddress: Address;
   fromDate?: string;
   skipSettlementTransfers: boolean;
 }): Promise<{ data?: Erc20TokenEvent[]; error?: Error | null }> => {

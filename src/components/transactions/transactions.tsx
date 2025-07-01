@@ -22,7 +22,7 @@ export const Transactions = () => {
   const { safeConfig } = useUser();
 
   const { transactions, dateGroupedTransactions, orderedTransactions, isLoading, isError } = useTransactions({
-    safeConfig: safeConfig as SafeConfig,
+    safeConfig,
     fromDate,
   });
 
@@ -32,12 +32,6 @@ export const Transactions = () => {
 
   if (isError) {
     return <TransactionFetchingAlert />;
-  }
-
-  const safeCurrency = safeConfig?.fiatSymbol;
-  if (!safeCurrency) {
-    console.warn("No valid Safe config found");
-    return <div>No valid Safe config found</div>;
   }
 
   return (
@@ -57,12 +51,12 @@ export const Transactions = () => {
                 return <BankTransferRow key={transaction.id} ibanOrder={transaction.data as IbanOrder} />;
               }
 
-              if (transaction.type === TransactionType.ONCHAIN) {
+              if (transaction.type === TransactionType.ONCHAIN && !!safeConfig.fiatSymbol) {
                 return (
                   <OnchainTransferRow
                     key={transaction.id}
                     transfer={transaction.data as Erc20TokenEvent}
-                    currency={currencies[safeCurrency]}
+                    currency={currencies[safeConfig.fiatSymbol]}
                   />
                 );
               }

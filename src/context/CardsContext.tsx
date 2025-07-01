@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
 import type { Erc20TokenEvent } from "@/types/transaction";
+import type { Address } from "viem";
 
 type CardContextProps = {
   children: ReactNode | ReactNode[];
@@ -42,8 +43,8 @@ interface GetTxParams {
 }
 
 interface GetOnchainTransfersParams {
-  address: `0x${string}`;
-  tokenAddress: `0x${string}`;
+  address: Address;
+  tokenAddress: Address;
   fromDate?: string;
   skipSettlementTransfers: boolean;
 }
@@ -250,23 +251,24 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     return data?.data;
   }, []);
 
-  const getOnchainTransfers = useCallback(async (params: GetOnchainTransfersParams) => {
-    const { address, tokenAddress, fromDate, skipSettlementTransfers } = params;
+  const getOnchainTransfers = useCallback(
+    async ({ address, tokenAddress, fromDate, skipSettlementTransfers }: GetOnchainTransfersParams) => {
+      const { data, error } = await fetchErc20Transfers({
+        address,
+        tokenAddress,
+        fromDate,
+        skipSettlementTransfers,
+      });
 
-    const { data, error } = await fetchErc20Transfers({
-      address,
-      tokenAddress,
-      fromDate,
-      skipSettlementTransfers,
-    });
+      if (error) {
+        console.error("Error getting onchain Safe transfers: ", error);
+        return;
+      }
 
-    if (error) {
-      console.error("Error getting onchain Safe transfers: ", error);
-      return;
-    }
-
-    return data;
-  }, []);
+      return data;
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!isAuthenticated) return;

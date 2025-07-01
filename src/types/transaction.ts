@@ -1,4 +1,5 @@
 import type { Event, IbanOrder } from "@/client";
+import type { Address } from "viem";
 
 export enum Erc20TokenEventDirection {
   Incoming = "Incoming",
@@ -8,9 +9,9 @@ export enum Erc20TokenEventDirection {
 export interface Erc20TokenEvent {
   direction: Erc20TokenEventDirection;
   date: Date;
-  hash: `0x${string}`;
-  from: `0x${string}`;
-  to: `0x${string}`;
+  hash: Address;
+  from: Address;
+  to: Address;
   value: bigint;
 }
 

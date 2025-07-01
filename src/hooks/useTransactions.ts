@@ -5,6 +5,7 @@ import { isAfter, parseISO, formatISO } from "date-fns";
 import type { Transaction } from "@/types/transaction";
 import { currencies } from "@/constants";
 import type { SafeConfig } from "@/client";
+import type { Address } from "viem";
 
 interface UseTransactionsPayload {
   transactions: Transaction[];
@@ -16,7 +17,7 @@ interface UseTransactionsPayload {
 
 interface UseTransactionsParams {
   fromDate?: Date;
-  safeConfig: SafeConfig;
+  safeConfig: SafeConfig | undefined;
 }
 
 export const useTransactions = ({ fromDate, safeConfig }: UseTransactionsParams): UseTransactionsPayload => {
@@ -53,8 +54,8 @@ export const useTransactions = ({ fromDate, safeConfig }: UseTransactionsParams)
       }),
       getIbanOrders(),
       getOnchainTransfers({
-        address: memoizedSafeAddress as `0x${string}`,
-        tokenAddress: memoizedTokenAddress as `0x${string}`,
+        address: memoizedSafeAddress as Address,
+        tokenAddress: memoizedTokenAddress as Address,
         fromDate: formattedFromDate,
         skipSettlementTransfers: true,
       }),
