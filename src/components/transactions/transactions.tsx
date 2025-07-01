@@ -1,4 +1,4 @@
-import type { Event, IbanOrder, SafeConfig } from "@/client";
+import type { Event, IbanOrder } from "@/client";
 import { TransactionSkeleton } from "./transaction-skeleton";
 import { TransactionRow } from "./transaction-row";
 import { BankTransferRow } from "./bank-transfer-row";
