@@ -34,8 +34,8 @@ export const Transactions = () => {
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
         {transactions.length === 0 && (
           <div className="flex flex-col items-center justify-center">
-            <InboxIcon className="w-10 h-10 mb-2 text-muted-foreground" />
-            <div className="text-center">No transactions yet</div>
+            <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
+            <div className="text-center text-secondary">No transactions yet</div>
           </div>
         )}
         {orderedTransactions.map((date) => (

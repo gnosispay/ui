@@ -1,4 +1,4 @@
-import { getApiV1KycIntegration, type KycStatus } from "@/client";
+import { getApiV1KycIntegration } from "@/client";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
