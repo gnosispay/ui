@@ -2,7 +2,6 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router";
 import SourceOfFundsStep from "@/components/safe-deployment/SourceOfFundsStep";
 import PhoneVerificationStep from "@/components/safe-deployment/PhoneVerificationStep";
 import DeploySafeStep from "@/components/safe-deployment/DeploySafeStep";
@@ -15,9 +14,8 @@ enum ScreenStep {
 export const SafeDeploymentRoute = () => {
   const [step, setStep] = useState<ScreenStep>(ScreenStep.AnswerSourceOfFunds);
   const { isAuthenticated } = useAuth();
-  const { isUserSignedUp, user, safeConfig, refetchUser } = useUser();
+  const { isUserSignedUp, user, safeConfig, refreshUser: refetchUser } = useUser();
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user || !safeConfig) return;
@@ -29,13 +27,7 @@ export const SafeDeploymentRoute = () => {
     if (user.isPhoneValidated === true && step === ScreenStep.VerifyPhoneNumber) {
       setStep(ScreenStep.DeploySafe);
     }
-
-    if (safeConfig.isDeployed) {
-      // if the safe is already deployed, we can redirect to the home page
-      navigate("/");
-      return;
-    }
-  }, [user, safeConfig, step, navigate]);
+  }, [user, safeConfig, step]);
 
   // todo make this better
   if (!isAuthenticated || !isUserSignedUp) {

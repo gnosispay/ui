@@ -18,7 +18,8 @@ export type IUserContext = {
   safeConfig: SafeConfig | undefined;
   balances: GetApiV1AccountBalancesResponse | undefined;
   isUserSignedUp?: boolean;
-  refetchUser: () => void;
+  refreshUser: () => void;
+  refreshSafeConfig: () => void;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -33,26 +34,13 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   useEffect(() => {
     if (!isAuthenticated || !isUserSignedUp) return;
 
-    refetchUser();
+    refreshUser();
   }, [isAuthenticated, isUserSignedUp]);
 
   useEffect(() => {
     if (!isAuthenticated || !isUserSignedUp) return;
 
-    getApiV1SafeConfig()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error(error);
-          return;
-        }
-        if (!data) {
-          console.error("No safe config data returned");
-          return;
-        }
-
-        setSafeConfig(data);
-      })
-      .catch(console.error);
+    refreshSafeConfig();
   }, [isAuthenticated, isUserSignedUp]);
 
   useEffect(() => {
@@ -69,7 +57,24 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     return () => clearInterval(interval);
   }, [isAuthenticated, user]);
 
-  const refetchUser = useCallback(() => {
+  const refreshSafeConfig = useCallback(() => {
+    getApiV1SafeConfig()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error(error);
+          return;
+        }
+        if (!data) {
+          console.error("No safe config data returned");
+          return;
+        }
+
+        setSafeConfig(data);
+      })
+      .catch(console.error);
+  }, []);
+
+  const refreshUser = useCallback(() => {
     if (!isAuthenticated || !isUserSignedUp) return;
 
     getApiV1User()
@@ -110,7 +115,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   }, [isAuthenticated, user]);
 
   return (
-    <UserContext.Provider value={{ user, safeConfig, balances, isUserSignedUp, refetchUser }}>
+    <UserContext.Provider value={{ user, safeConfig, balances, isUserSignedUp, refreshUser, refreshSafeConfig }}>
       {children}
     </UserContext.Provider>
   );

@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
 /**
- * useResendTimer - A hook for managing a resend code timer with countdown.
+ * useTimer - A hook for managing a resend code timer with countdown.
  * @param initialSeconds Number of seconds for the timer (default: 60)
  */
 export function useTimer(initialSeconds = 60) {
@@ -11,14 +11,6 @@ export function useTimer(initialSeconds = 60) {
   const start = useCallback(() => {
     setTimer(initialSeconds);
   }, [initialSeconds]);
-
-  const clear = useCallback(() => {
-    setTimer(0);
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-  }, []);
 
   useEffect(() => {
     if (timer > 0) {
@@ -53,5 +45,5 @@ export function useTimer(initialSeconds = 60) {
     };
   }, []);
 
-  return { timer, start, clear };
+  return { timer, start };
 }

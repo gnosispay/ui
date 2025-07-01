@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 
 export const KycRoute = () => {
   const { isAuthenticated } = useAuth();
-  const { isUserSignedUp, user, refetchUser } = useUser();
+  const { isUserSignedUp, user, refreshUser: refetchUser } = useUser();
   const [error, setError] = useState("");
   const [kycUrl, setKycUrl] = useState("");
   const navigate = useNavigate();
@@ -56,15 +56,9 @@ export const KycRoute = () => {
       return;
     }
 
-    // the kyc probably just got approved, it's not time to deploy and
-    // setup the safe
-    if (user.kycStatus === "approved" && user.safeWallets.length === 0) {
+    // the user has nothing to do here any more, they're all set up
+    if (user.kycStatus === "approved") {
       navigate("/safe-deployment");
-    }
-
-    // the user has nothing to do here, they're all set up
-    if (user.kycStatus === "approved" && user.safeWallets.length > 0) {
-      navigate("/");
     }
   }, [navigate, user]);
 
