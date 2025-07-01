@@ -6,6 +6,7 @@ import { type Transaction, TransactionType } from "@/types/transaction";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
 import { useTransactions } from "@/hooks/useTransactions";
 import { subDays } from "date-fns";
+import { InboxIcon } from "lucide-react";
 
 /**
  * We are currently hardcoding the `fromDate` to 7 days ago.
@@ -19,7 +20,7 @@ export const Transactions = () => {
     fromDate,
   });
 
-  if (isLoading || !transactions || transactions.length === 0) {
+  if (isLoading || !transactions) {
     return <TransactionSkeleton />;
   }
 
@@ -31,6 +32,12 @@ export const Transactions = () => {
     <>
       <h1 className="font-bold text-secondary my-4">Transactions</h1>
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+        {transactions.length === 0 && (
+          <div className="flex flex-col items-center justify-center">
+            <InboxIcon className="w-10 h-10 mb-2 text-muted-foreground" />
+            <div className="text-center">No transactions yet</div>
+          </div>
+        )}
         {orderedTransactions.map((date) => (
           <div key={date}>
             <div className="text-xs text-secondary mb-2">{date}</div>
