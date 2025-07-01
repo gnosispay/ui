@@ -53,3 +53,5 @@ export const userTerms: Record<UserTermsType, { title: string; version: string; 
     url: "https://forum.gnosis.io/t/gip-110-should-the-gnosis-dao-create-and-fund-a-gnosis-pay-rewards-program-with-10k-gno/8837",
   },
 };
+
+export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";
