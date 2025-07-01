@@ -6,6 +6,10 @@ import { type Transaction, TransactionType } from "@/types/transaction";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
 import { useTransactions } from "@/hooks/useTransactions";
 import { subDays } from "date-fns";
+import { OnchainTransferRow } from "./onchain-transfer-row";
+import type { Erc20TokenEvent } from "@/types/transaction";
+import { useUser } from "@/context/UserContext";
+import { currencies } from "@/constants";
 
 /**
  * We are currently hardcoding the `fromDate` to 7 days ago.
@@ -15,11 +19,14 @@ import { subDays } from "date-fns";
 const fromDate = subDays(new Date(), 7);
 
 export const Transactions = () => {
+  const { safeConfig } = useUser();
+
   const { transactions, dateGroupedTransactions, orderedTransactions, isLoading, isError } = useTransactions({
+    safeConfig,
     fromDate,
   });
 
-  if (isLoading || !transactions || transactions.length === 0) {
+  if (!safeConfig || isLoading || !transactions || transactions.length === 0) {
     return <TransactionSkeleton />;
   }
 
@@ -42,6 +49,16 @@ export const Transactions = () => {
 
               if (transaction.type === TransactionType.IBAN) {
                 return <BankTransferRow key={transaction.id} ibanOrder={transaction.data as IbanOrder} />;
+              }
+
+              if (transaction.type === TransactionType.ONCHAIN && !!safeConfig.fiatSymbol) {
+                return (
+                  <OnchainTransferRow
+                    key={transaction.id}
+                    transfer={transaction.data as Erc20TokenEvent}
+                    currency={currencies[safeConfig.fiatSymbol]}
+                  />
+                );
               }
             })}
           </div>

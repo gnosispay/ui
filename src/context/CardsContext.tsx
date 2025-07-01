@@ -16,6 +16,9 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useS
 import { useAuth } from "./AuthContext";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
+import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
+import type { Erc20TokenEvent } from "@/types/transaction";
+import type { Address } from "viem";
 
 type CardContextProps = {
   children: ReactNode | ReactNode[];
@@ -39,6 +42,13 @@ interface GetTxParams {
   fromDate?: string;
 }
 
+interface GetOnchainTransfersParams {
+  address: Address;
+  tokenAddress: Address;
+  fromDate?: string;
+  skipSettlementTransfers: boolean;
+}
+
 export type ICardContext = {
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
@@ -50,6 +60,7 @@ export type ICardContext = {
   activateCard: (cardId: string) => void;
   getTransactions: (params?: GetTxParams) => Promise<Event[] | undefined>;
   getIbanOrders: () => Promise<IbanOrder[] | undefined>;
+  getOnchainTransfers: (params: GetOnchainTransfersParams) => Promise<Erc20TokenEvent[] | undefined>;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -240,6 +251,25 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     return data?.data;
   }, []);
 
+  const getOnchainTransfers = useCallback(
+    async ({ address, tokenAddress, fromDate, skipSettlementTransfers }: GetOnchainTransfersParams) => {
+      const { data, error } = await fetchErc20Transfers({
+        address,
+        tokenAddress,
+        fromDate,
+        skipSettlementTransfers,
+      });
+
+      if (error) {
+        console.error("Error getting onchain Safe transfers: ", error);
+        return;
+      }
+
+      return data;
+    },
+    [],
+  );
+
   useEffect(() => {
     if (!isAuthenticated) return;
     refreshCards();
@@ -258,6 +288,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         activateCard,
         getTransactions,
         getIbanOrders,
+        getOnchainTransfers,
       }}
     >
       {children}

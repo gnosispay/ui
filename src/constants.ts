@@ -29,3 +29,5 @@ export const currencies: Record<string, CurrencyInfo> = {
     fiatSymbol: "USD",
   },
 };
+
+export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";
