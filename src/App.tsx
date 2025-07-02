@@ -8,22 +8,22 @@ import { Home as HomeIcon, CreditCard } from "lucide-react";
 import { SignUpRoute } from "./pages/SignUp";
 import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
-
-export const routes = [
+export const menuRoutes = [
   {
     path: "/",
     element: <Home />,
     icon: HomeIcon,
     label: "Home",
-    inNavBar: true,
   },
   {
     path: "/cards",
     element: <CardsRoute />,
     icon: CreditCard,
     label: "Cards",
-    inNavBar: true,
   },
+];
+const allRoutes = [
+  ...menuRoutes,
   {
     path: "/register",
     element: <SignUpRoute />,
@@ -43,7 +43,7 @@ function App() {
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />
       <Routes>
-        {routes.map((route) => (
+        {allRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element} />
         ))}
       </Routes>

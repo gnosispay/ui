@@ -49,7 +49,7 @@ export const KycRoute = () => {
   useEffect(() => {
     if (!user || !user.safeWallets) return;
 
-    // an issue happened  during the KYC process, sumsub rejected the application
+    // an issue happened during the KYC process, sumsub rejected the application
     // they need to contact your support
     if (user.kycStatus === "rejected") {
       setError("Your KYC application was rejected. Please contact support at help@gnosispay.com");

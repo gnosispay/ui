@@ -46,8 +46,8 @@ const SourceOfFundsStep = ({ onComplete, setError }: SourceOfFundsStepProps) => 
       try {
         await postApiV1SourceOfFunds({
           body: sourceOfFunds.map((q, idx) => ({
-            question: q.question || "",
-            answer: answers[idx] || "",
+            question: q.question,
+            answer: answers[idx],
           })),
         });
         onComplete();

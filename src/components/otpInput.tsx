@@ -1,5 +1,6 @@
 import { useRef, useId } from "react";
 import { Input } from "@/components/ui/input";
+import { removeSpaces } from "@/utils/removeSpaces";
 
 interface Props {
   value: string;
@@ -7,8 +8,6 @@ interface Props {
   isLoading?: boolean;
   disabled?: boolean;
 }
-
-const removeSpaces = (str: string) => str.replace(/\D/g, "");
 
 export const OtpInput = ({ value, onChange, isLoading, disabled }: Props) => {
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
