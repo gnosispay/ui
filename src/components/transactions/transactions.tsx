@@ -19,7 +19,11 @@ import { currencies } from "@/constants";
  */
 const fromDate = subDays(new Date(), 7);
 
-export const Transactions = () => {
+interface TransactionsProps {
+  showHeader?: boolean;
+}
+
+export const Transactions = ({ showHeader = true }: TransactionsProps) => {
   const { safeConfig } = useUser();
 
   const { transactions, dateGroupedTransactions, orderedTransactions, isLoading, isError } = useTransactions({
@@ -37,7 +41,7 @@ export const Transactions = () => {
 
   return (
     <>
-      <h1 className="font-bold text-secondary my-4">Transactions</h1>
+      {showHeader && <h1 className="font-bold text-secondary my-4">Transactions</h1>}
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
         {transactions.length === 0 && (
           <div className="flex flex-col items-center justify-center">
