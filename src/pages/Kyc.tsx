@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 export const KycRoute = () => {
   const { isAuthenticated } = useAuth();
@@ -32,8 +33,8 @@ export const KycRoute = () => {
         .then(({ data, error }) => {
           if (error) {
             console.error("Error fetching KYC integration:", error);
-            const errorMessage = "error" in error ? error.error : error.message;
-            setError(`Error fetching KYC integration: ${errorMessage || "Unknown error"}`);
+            const errorMessage = extractErrorMessage(error, "Unknown error");
+            setError(`Error fetching KYC integration: ${errorMessage}`);
             return;
           }
 

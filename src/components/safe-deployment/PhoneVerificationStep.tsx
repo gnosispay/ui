@@ -4,6 +4,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { OtpInput } from "@/components/otpInput";
 import { postApiV1Verification, postApiV1VerificationCheck } from "@/client";
 import { useTimer } from "@/hooks/useTimer";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 export type PhoneVerificationStepProps = {
   onComplete: () => void;
@@ -35,15 +36,7 @@ const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepPr
     try {
       const { error, data } = await postApiV1Verification({ body: { phoneNumber: phone } });
       if (error || !data?.ok) {
-        let message = "Unknown error";
-        if (error && typeof error === "object") {
-          message =
-            "error" in error
-              ? (error.error as string)
-              : "message" in error
-                ? (error.message as string)
-                : "Unknown error";
-        }
+        const message = extractErrorMessage(error, "Unknown error");
         setError(`Error sending code: ${message}`);
         return false;
       }
@@ -71,11 +64,7 @@ const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepPr
     try {
       const { error, data } = await postApiV1VerificationCheck({ body: { code: otp } });
       if (error || !data?.ok) {
-        let message = "Unknown error";
-        if (error && typeof error === "object") {
-          if ("error" in error && typeof error.error === "string") message = error.error;
-          else if ("message" in error && typeof error.message === "string") message = error.message;
-        }
+        const message = extractErrorMessage(error, "Unknown error");
         setError(`Error verifying code: ${message}`);
         return;
       }

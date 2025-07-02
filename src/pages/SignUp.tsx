@@ -10,6 +10,7 @@ import { LoaderCircle } from "lucide-react";
 import { userTerms } from "@/constants";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 enum ScreenStep {
   SIWEAuthentication = "siwe-authentication",
@@ -58,17 +59,16 @@ export const SignUpRoute = () => {
           termAccepted.version === term.currentVersion &&
           !term.accepted
         ) {
-          const { error: termsError } = await postApiV1UserTerms({
+          const { error } = await postApiV1UserTerms({
             body: {
               terms: term.type,
               version: term.currentVersion,
             },
           });
-          if (termsError) {
-            const message =
-              "error" in termsError ? termsError.error : "message" in termsError ? termsError.message : "unkown";
+          if (error) {
+            const message = extractErrorMessage(error, "unknown");
             setError(`Error accepting terms (${term.type}): ${message}`);
-            console.error(termsError);
+            console.error(error);
           }
         }
       }
@@ -90,7 +90,7 @@ export const SignUpRoute = () => {
           body: { email },
         });
         if (error) {
-          const message = "error" in error ? error.error : "message" in error ? error.message : "unkown";
+          const message = extractErrorMessage(error, "unknown");
           setError(`Error while requesting the OTP: ${message}`);
           console.error(error);
         }
@@ -118,7 +118,7 @@ export const SignUpRoute = () => {
         });
 
         if (error || !data) {
-          const message = "error" in error ? error.error : "message" in error ? error.message : "unkown";
+          const message = extractErrorMessage(error, "unknown");
           setError(`Error while signin up: ${message}`);
           console.error(error);
           return;

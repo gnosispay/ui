@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 import { getApiV1SourceOfFunds, postApiV1SourceOfFunds, type KycQuestion } from "@/client";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 export type SourceOfFundsStepProps = {
   onComplete: () => void;
@@ -17,8 +18,8 @@ const SourceOfFundsStep = ({ onComplete, setError }: SourceOfFundsStepProps) => 
     getApiV1SourceOfFunds().then(({ data, error }) => {
       if (error) {
         console.error("Error fetching source of funds:", error);
-        const errorMessage = "error" in error ? error.error : "message" in error ? error.message : "unkown";
-        setError(`Error fetching source of funds: ${errorMessage || "Unknown error"}`);
+        const errorMessage = extractErrorMessage(error, "Unknown error");
+        setError(`Error fetching source of funds: ${errorMessage}`);
         return;
       }
       setSourceOfFunds(data);
