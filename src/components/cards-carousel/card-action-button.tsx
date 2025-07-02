@@ -15,6 +15,6 @@ export const CardActionButton: FC<CardActionButtonProps> = ({ icon, label, onCli
     >
       {icon}
     </button>
-    <span className="text-xs text-black">{label}</span>
+    <span className="text-xs text-foreground">{label}</span>
   </div>
 );
