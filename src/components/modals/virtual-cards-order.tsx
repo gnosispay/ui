@@ -7,6 +7,7 @@ import { Input } from "../ui/input";
 import { useCards } from "@/context/CardsContext";
 import { toast } from "sonner";
 import { CollapsedError } from "../collapsedError";
+import { PlusIcon } from "lucide-react";
 
 export const VirtualCardsOrderModal = () => {
   const [open, setOpen] = useState(false);
@@ -48,7 +49,8 @@ export const VirtualCardsOrderModal = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="default" className="mt-6">
-          Order Virtual Card
+          <PlusIcon className="w-4 h-4" />
+          Add Card
         </Button>
       </DialogTrigger>
       <DialogContent aria-describedby={undefined}>
