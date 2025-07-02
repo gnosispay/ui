@@ -3,8 +3,9 @@ import { HeaderNavBar } from "./components/nav/header";
 import { Route, Routes } from "react-router";
 import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
+import { TransactionsRoute } from "./pages/Transactions";
 import { FooterNavBar } from "./components/nav/footer";
-import { Home as HomeIcon, CreditCard } from "lucide-react";
+import { Home as HomeIcon, CreditCard, List } from "lucide-react";
 
 export const routes = [
   {
@@ -18,6 +19,12 @@ export const routes = [
     element: <CardsRoute />,
     icon: CreditCard,
     label: "Cards",
+  },
+  {
+    path: "/transactions",
+    element: <TransactionsRoute />,
+    icon: List,
+    label: "Transactions",
   },
 ];
 
