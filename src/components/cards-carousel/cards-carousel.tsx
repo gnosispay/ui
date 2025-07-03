@@ -49,7 +49,7 @@ export const CardsCarousel = () => {
   return (
     <div className="w-full flex flex-col lg:flex-row gap-6">
       {/* Cards Section */}
-      <div className="w-sm flex flex-col gap-4 mx-auto lg:mx-0">
+      <div className="w-full sm:w-sm flex flex-col gap-4 lg:mx-0 mx-auto">
         {/* Cards Container */}
         <div className="overflow-hidden">
           <div
@@ -61,7 +61,7 @@ export const CardsCarousel = () => {
                 key={card.id}
                 className={`flex-shrink-0 transition-opacity duration-300 ${
                   index === currentIndex ? "opacity-100" : "opacity-40"
-                }`}
+                } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : ""}`}
               >
                 <CardPreview
                   cardType={card.virtual ? "Virtual" : "Physical"}
@@ -74,7 +74,7 @@ export const CardsCarousel = () => {
         </div>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center px-4 sm:px-0">
           {/* Arrows */}
           <div className="flex gap-1 text-brand">
             <button
