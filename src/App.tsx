@@ -6,8 +6,11 @@ import { Home } from "./pages/Home";
 import { TransactionsRoute } from "./pages/Transactions";
 import { FooterNavBar } from "./components/nav/footer";
 import { Home as HomeIcon, CreditCard, List } from "lucide-react";
+import { SignUpRoute } from "./pages/SignUp";
+import { KycRoute } from "./pages/Kyc";
+import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 
-export const routes = [
+export const menuRoutes = [
   {
     path: "/",
     element: <Home />,
@@ -28,12 +31,28 @@ export const routes = [
   },
 ];
 
+const allRoutes = [
+  ...menuRoutes,
+  {
+    path: "/register",
+    element: <SignUpRoute />,
+  },
+  {
+    path: "/kyc",
+    element: <KycRoute />,
+  },
+  {
+    path: "/safe-deployment",
+    element: <SafeDeploymentRoute />,
+  },
+];
+
 function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />
       <Routes>
-        {routes.map((route) => (
+        {allRoutes.map((route) => (
           <Route key={route.path} path={route.path} element={route.element} />
         ))}
       </Routes>

@@ -4,7 +4,7 @@ import lightLogo from "../../assets/GP-logo-black.svg";
 import { ModeToggle } from "../theme-toggle";
 import { useTheme } from "../../context/ThemeContext";
 import { NavLink } from "react-router";
-import { routes } from "@/App";
+import { menuRoutes } from "@/App";
 
 export const HeaderNavBar = () => {
   const { effectiveTheme } = useTheme();
@@ -21,7 +21,7 @@ export const HeaderNavBar = () => {
             </div>
             {/* Navigation */}
             <div className="flex items-center gap-8">
-              {routes.map((route) => (
+              {menuRoutes.map((route) => (
                 <NavLink
                   key={route.path}
                   to={route.path}

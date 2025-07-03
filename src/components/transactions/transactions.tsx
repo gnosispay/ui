@@ -6,6 +6,7 @@ import { type Transaction, TransactionType } from "@/types/transaction";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
 import { useTransactions } from "@/hooks/useTransactions";
 import { subDays } from "date-fns";
+import { InboxIcon } from "lucide-react";
 import { OnchainTransferRow } from "./onchain-transfer-row";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useUser } from "@/context/UserContext";
@@ -30,7 +31,7 @@ export const Transactions = ({ showHeader = true }: TransactionsProps) => {
     fromDate,
   });
 
-  if (!safeConfig || isLoading || !transactions || transactions.length === 0) {
+  if (!safeConfig || isLoading || !transactions) {
     return <TransactionSkeleton />;
   }
 
@@ -42,6 +43,12 @@ export const Transactions = ({ showHeader = true }: TransactionsProps) => {
     <>
       {showHeader && <h1 className="font-bold text-secondary my-4">Transactions</h1>}
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+        {transactions.length === 0 && (
+          <div className="flex flex-col items-center justify-center">
+            <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
+            <div className="text-center text-secondary">No transactions yet</div>
+          </div>
+        )}
         {orderedTransactions.map((date) => (
           <div key={date}>
             <div className="text-xs text-secondary mb-2">{date}</div>
