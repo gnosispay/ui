@@ -47,9 +47,9 @@ export const CardsCarousel = () => {
   };
 
   return (
-    <div className="w-full flex gap-6">
+    <div className="w-full flex flex-col lg:flex-row gap-6">
       {/* Cards Section */}
-      <div className="w-sm flex flex-col gap-4">
+      <div className="w-sm flex flex-col gap-4 mx-auto lg:mx-0">
         {/* Cards Container */}
         <div className="overflow-hidden">
           <div

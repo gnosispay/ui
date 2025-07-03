@@ -50,7 +50,7 @@ export const CardPSE = ({ card }: { card: Card }) => {
 
   return (
     <>
-      <div className="flex gap-8">
+      <div className="flex flex-wrap gap-4 lg:gap-8 justify-center">
         <IconButton
           icon={<CreditCard size={22} className="text-white" />}
           label="Show details"
@@ -58,15 +58,14 @@ export const CardPSE = ({ card }: { card: Card }) => {
           size="lg"
           variant="default"
         />
-        {!card?.virtual && (
-          <IconButton
-            icon={<Eye size={22} className="text-white" />}
-            label="See PIN"
-            onClick={() => onShowPin(card.cardToken)}
-            size="lg"
-            variant="default"
-          />
-        )}
+        <IconButton
+          icon={<Eye size={22} className="text-white" />}
+          label="See PIN"
+          onClick={() => onShowPin(card.cardToken)}
+          size="lg"
+          variant="default"
+          disabled={card.virtual}
+        />
         {cardInfo?.isFrozen ? (
           <IconButton
             icon={<Sun size={22} className="text-white" />}
