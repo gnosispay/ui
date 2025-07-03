@@ -47,7 +47,7 @@ export const ReportCardModal = ({ onClose, onReportAsLost, onReportAsStolen }: R
         open={true}
         onOpenChange={() => setShowLostConfirmation(false)}
         title="Report Card as Lost"
-        iconColor="text-orange-500"
+        iconColor="text-destructive"
         message="Please note that this is a non-reversible action. Once a card is reported as lost, it cannot be undone."
         confirmText="Report as Lost"
         onConfirm={handleReportAsLost}
@@ -62,7 +62,7 @@ export const ReportCardModal = ({ onClose, onReportAsLost, onReportAsStolen }: R
         open={true}
         onOpenChange={() => setShowStolenConfirmation(false)}
         title="Report Card as Stolen"
-        iconColor="text-red-500"
+        iconColor="text-destructive"
         message="Please note that this is a non-reversible action. Once a card is reported as stolen, it cannot be undone."
         confirmText="Report as Stolen"
         onConfirm={handleReportAsStolen}

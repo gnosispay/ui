@@ -8,6 +8,8 @@ import { useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { ReportCardModal } from "../modals/report-card";
 
+const PSE_IFRAME_ID = "pse-iframe";
+
 export const CardPSE = ({ card }: { card: Card }) => {
   const { showCardDetails, showPin, isLoading } = useGpSdk();
   const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap } = useCards();
@@ -21,7 +23,7 @@ export const CardPSE = ({ card }: { card: Card }) => {
     }
 
     try {
-      showCardDetails(cardToken, "pse-iframe");
+      showCardDetails(cardToken, PSE_IFRAME_ID);
       setIsPSEModalOpen(true);
     } catch (error) {
       console.error(error);
@@ -36,7 +38,7 @@ export const CardPSE = ({ card }: { card: Card }) => {
     }
 
     try {
-      showPin(cardToken, "pse-iframe");
+      showPin(cardToken, PSE_IFRAME_ID);
       setIsPSEModalOpen(true);
     } catch (error) {
       console.error(error);
@@ -56,13 +58,15 @@ export const CardPSE = ({ card }: { card: Card }) => {
           size="lg"
           variant="default"
         />
-        <IconButton
-          icon={<Eye size={22} className="text-white" />}
-          label="See PIN"
-          onClick={() => onShowPin(card.cardToken)}
-          size="lg"
-          variant="default"
-        />
+        {!card?.virtual && (
+          <IconButton
+            icon={<Eye size={22} className="text-white" />}
+            label="See PIN"
+            onClick={() => onShowPin(card.cardToken)}
+            size="lg"
+            variant="default"
+          />
+        )}
         {cardInfo?.isFrozen ? (
           <IconButton
             icon={<Sun size={22} className="text-white" />}
@@ -93,7 +97,7 @@ export const CardPSE = ({ card }: { card: Card }) => {
         <DialogContent aria-describedby={undefined}>
           <DialogTitle>Card Details</DialogTitle>
           <div className="grid flex-1 gap-2">
-            <div id="pse-iframe" />
+            <div id={PSE_IFRAME_ID} />
           </div>
           {isLoading && (
             <div className="flex h-full items-center justify-center">
