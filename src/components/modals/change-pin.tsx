@@ -27,7 +27,7 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
     [onClose],
   );
 
-  const { getGpSdk } = useGpSdk({ actionCallback });
+  const { getGpSdk } = useGpSdk();
 
   useEffect(() => {
     if (!card.cardToken) {
@@ -42,7 +42,7 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
 
   const showPinIframe = useCallback(
     async (cardToken: string) => {
-      const gpSdk = await getGpSdk();
+      const gpSdk = await getGpSdk({ actionCallback });
       if (!gpSdk) {
         const errorMessage = "PSE SDK not initialized";
         console.error(errorMessage);
@@ -56,7 +56,7 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
 
       setPinInputIframe(sp);
     },
-    [getGpSdk, setPinId],
+    [getGpSdk, setPinId, actionCallback],
   );
 
   const onOpenChange = useCallback(

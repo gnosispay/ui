@@ -26,16 +26,7 @@ export const Card = ({ card, cardInfo }: Props) => {
   const [isConfirmingStolen, setIsConfirmingStolen] = useState(false);
   const [isConfirmingLost, setIsConfirmingLost] = useState(false);
   const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
-  const { getGpSdk } = useGpSdk({
-    actionCallback: (action) => {
-      if (
-        action &&
-        [Action.CardExpirationCopied, Action.CardNumberCopied, Action.CardSecurityCodeCopied].includes(action)
-      ) {
-        toast.success("Copied to clipboard");
-      }
-    },
-  });
+  const { getGpSdk } = useGpSdk();
   const [cardDataIframe, setCardDataIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
   const [pinIframe, setPinIframe] = useState<ReturnType<GPSDK["init"]> | null>(null);
   const cardDataId = useMemo(() => `pse-card-data-${card.id}`, [card.id]);
@@ -50,7 +41,17 @@ export const Card = ({ card, cardInfo }: Props) => {
         return;
       }
 
-      const gpSdk = await getGpSdk();
+      const gpSdk = await getGpSdk({
+        actionCallback: (action) => {
+          if (
+            action &&
+            [Action.CardExpirationCopied, Action.CardNumberCopied, Action.CardSecurityCodeCopied].includes(action)
+          ) {
+            toast.success("Copied to clipboard");
+          }
+        },
+      });
+
       if (!gpSdk) {
         const errorMessage = "PSE SDK not initialized";
         console.error(errorMessage);
