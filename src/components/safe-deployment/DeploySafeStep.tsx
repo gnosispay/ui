@@ -11,20 +11,11 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router";
 import StepList from "./StepList";
+import { DeploySteps } from "./deploySteps";
 
-export type DeploySafeStepProps = {
+interface DeploySafeStepProps {
   setError: (err: string) => void;
-};
-
-export enum DeploySteps {
-  SafeCreation = "safe-creation",
-  SetCurrency = "set-currency",
-  GetSignaturePayload = "get-signature-payload",
-  Signing = "signing",
-  DeployModules = "deploy-modules",
-  Done = "done",
 }
-
 interface PayloadSate {
   domain: Record<string, unknown>;
   types: Record<string, unknown>;

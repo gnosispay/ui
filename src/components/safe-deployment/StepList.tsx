@@ -1,24 +1,6 @@
 import { CheckCircle2, LoaderCircle, CircleIcon } from "lucide-react";
-import { DeploySteps } from "./DeploySafeStep";
+import { DeploySteps, stepLabels, stepOrder } from "./deploySteps";
 import type React from "react";
-
-const stepOrder = [
-  DeploySteps.SafeCreation,
-  DeploySteps.SetCurrency,
-  DeploySteps.GetSignaturePayload,
-  DeploySteps.Signing,
-  DeploySteps.DeployModules,
-  DeploySteps.Done,
-] as const;
-
-const stepLabels: Record<DeploySteps, string> = {
-  [DeploySteps.SafeCreation]: "Create Safe account",
-  [DeploySteps.SetCurrency]: "Set Safe currency",
-  [DeploySteps.GetSignaturePayload]: "Prepare signature data",
-  [DeploySteps.Signing]: "Sign setup message",
-  [DeploySteps.DeployModules]: "Deploy Safe modules",
-  [DeploySteps.Done]: "Done",
-};
 
 type StepListProps = {
   step: DeploySteps;
