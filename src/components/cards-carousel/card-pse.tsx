@@ -1,5 +1,5 @@
 import { CreditCard, Eye, Snowflake, AlertOctagon, Loader2, Sun } from "lucide-react";
-import { CardActionButton } from "./card-action-button";
+import { IconButton } from "../ui/icon-button";
 import type { Card } from "@/client";
 import { useGpSdk } from "@/hooks/useGpSdk";
 import { toast } from "sonner";
@@ -49,33 +49,43 @@ export const CardPSE = ({ card }: { card: Card }) => {
   return (
     <>
       <div className="flex gap-8">
-        <CardActionButton
+        <IconButton
           icon={<CreditCard size={22} className="text-white" />}
           label="Show details"
           onClick={() => onShowCardDetails(card.cardToken)}
+          size="lg"
+          variant="default"
         />
-        <CardActionButton
+        <IconButton
           icon={<Eye size={22} className="text-white" />}
           label="See PIN"
           onClick={() => onShowPin(card.cardToken)}
+          size="lg"
+          variant="default"
         />
         {cardInfo?.isFrozen ? (
-          <CardActionButton
+          <IconButton
             icon={<Sun size={22} className="text-white" />}
             label="Unfreeze"
             onClick={() => unfreezeCard(card.id)}
+            size="lg"
+            variant="default"
           />
         ) : (
-          <CardActionButton
+          <IconButton
             icon={<Snowflake size={22} className="text-white" />}
             label="Freeze"
             onClick={() => freezeCard(card.id)}
+            size="lg"
+            variant="default"
           />
         )}
-        <CardActionButton
+        <IconButton
           icon={<AlertOctagon size={22} className="text-white" />}
           label="Report"
           onClick={() => setIsReportModalOpen(true)}
+          size="lg"
+          variant="default"
         />
       </div>
 
