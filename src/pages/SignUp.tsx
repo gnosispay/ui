@@ -73,7 +73,7 @@ export const SignUpRoute = () => {
       if (!tosForUser) return;
 
       // accept all terms that are not already accepted
-      // and that we display in the UI with their respective link
+      // since we displayed all of them in the UI with their respective link
       for (const term of tosForUser) {
         if (!term.type || !term.currentVersion) continue;
 
