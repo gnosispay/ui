@@ -55,7 +55,7 @@ export const CardsCarousel = () => {
       {/* Cards Section */}
       <div className="w-full sm:w-sm flex flex-col gap-4 lg:mx-0 mx-auto">
         {/* Cards Container */}
-        <div className="overflowloading-hidden">
+        <div className="overflow-hidden">
           <div
             ref={scrollContainerRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide select-none pointer-events-none"
@@ -105,7 +105,7 @@ export const CardsCarousel = () => {
 
           {/* Dots indicator */}
           <div className="flex gap-2">
-            {cards?.map((card, index) => (
+            {cards.map((card, index) => (
               <button
                 key={card.id}
                 type="button"
@@ -120,7 +120,7 @@ export const CardsCarousel = () => {
 
       {/* Action Buttons Section */}
       <div className="flex-1 flex items-center justify-center">
-        {cards?.[currentIndex] ? <CardPSE card={cards[currentIndex]} /> : null}
+        <CardPSE card={cards[currentIndex]} />
       </div>
     </div>
   );
