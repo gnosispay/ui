@@ -1,5 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
-import { postApiV1AuthSignup, postApiV1AuthSignupOtp, getApiV1UserTerms, postApiV1UserTerms } from "@/client";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import {
+  postApiV1AuthSignup,
+  postApiV1AuthSignupOtp,
+  getApiV1UserTerms,
+  postApiV1UserTerms,
+  type GetApiV1UserTermsResponse,
+} from "@/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -7,10 +13,10 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { OtpInput } from "@/components/otpInput";
 import { useAuth } from "@/context/AuthContext";
 import { LoaderCircle } from "lucide-react";
-import { userTerms } from "@/constants";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { userTermsTitle, type UserTermsTypeFromApi } from "@/constants";
 
 enum ScreenStep {
   SIWEAuthentication = "siwe-authentication",
@@ -28,6 +34,9 @@ export const SignUpRoute = () => {
   const [otp, setOtp] = useState("");
   const [isAcceptedTos, setIsAcceptedTos] = useState(false);
   const navigate = useNavigate();
+  // list of terms that the user has not accepted or that have a different version than the current one
+  const [tosToBeAccepted, setTosToBeAccepted] = useState<GetApiV1UserTermsResponse["terms"]>([]);
+  const atLeastOneToSMustBeAccepted = useMemo(() => tosToBeAccepted && tosToBeAccepted.length > 0, [tosToBeAccepted]);
 
   useEffect(() => {
     // if the user is authenticated and not signed up, it means they
@@ -42,41 +51,53 @@ export const SignUpRoute = () => {
     }
   }, [isAuthenticated, isUserSignedUp, navigate]);
 
+  useEffect(() => {
+    if (step !== ScreenStep.EmailAndTos || !isAuthenticated || !isUserSignedUp) return;
+
+    getApiV1UserTerms()
+      .then(({ data, error }) => {
+        const termsList = data?.terms || [];
+
+        setTosToBeAccepted(termsList.filter((term) => !term.accepted || term.currentVersion !== term.acceptedVersion));
+
+        if (error) {
+          const message = extractErrorMessage(error, "unknown");
+          setError(`Error getting terms: ${message}`);
+          console.error(error);
+        }
+      })
+      .catch((err) => {
+        setError("Error while getting user terms");
+        console.error(err);
+      });
+  }, [step, isAuthenticated, isUserSignedUp]);
+
   const acceptAllUserTerms = useCallback(async () => {
     try {
-      // verify what terms the user has accepted
-      const termsRes = await getApiV1UserTerms();
-      const termsList = termsRes?.data?.terms || [];
+      if (!tosToBeAccepted) return;
 
       // accept all terms that are not already accepted
-      // and that we display in the UI with their respective link
-      for (const term of termsList) {
-        const termAccepted = !!term.type && userTerms[term.type];
-        if (
-          termAccepted &&
-          term.type &&
-          term.currentVersion &&
-          termAccepted.version === term.currentVersion &&
-          !term.accepted
-        ) {
-          const { error } = await postApiV1UserTerms({
-            body: {
-              terms: term.type,
-              version: term.currentVersion,
-            },
-          });
-          if (error) {
-            const message = extractErrorMessage(error, "unknown");
-            setError(`Error accepting terms (${term.type}): ${message}`);
-            console.error(error);
-          }
+      // since we displayed all of them in the UI with their respective link
+      for (const term of tosToBeAccepted) {
+        if (!term.type || !term.currentVersion) continue;
+
+        const { error } = await postApiV1UserTerms({
+          body: {
+            terms: term.type,
+            version: term.currentVersion,
+          },
+        });
+        if (error) {
+          const message = extractErrorMessage(error, "unknown");
+          setError(`Error accepting terms (${term.type}): ${message}`);
+          console.error(error);
         }
       }
     } catch (termsErr) {
       setError("Error while accepting user terms");
       console.error(termsErr);
     }
-  }, []);
+  }, [tosToBeAccepted]);
 
   const handleSubmitOtpRequest = useCallback(
     async (e: React.FormEvent) => {
@@ -174,28 +195,34 @@ export const SignUpRoute = () => {
                 disabled={isLoading}
               />
             </div>
-            <div className="flex items-center space-x-2 mt-2">
-              <input
-                id="accept-tos"
-                type="checkbox"
-                checked={isAcceptedTos}
-                onChange={(e) => setIsAcceptedTos(e.target.checked)}
-                disabled={isLoading}
-                required
-              />
-              <Label htmlFor="accept-tos" className="text-sm">
-                I have read and agree to the{" "}
-                {Object.entries(userTerms).map(([type, term], idx, arr) => (
-                  <span key={type}>
-                    <a href={term.url} target="_blank" rel="noopener noreferrer" className="underline">
-                      {term.title}
-                    </a>
-                    {idx < arr.length - 1 ? ", " : ""}
-                  </span>
-                ))}
-              </Label>
-            </div>
-            <Button type="submit" loading={isLoading} disabled={isLoading || !email || !isAcceptedTos}>
+            {atLeastOneToSMustBeAccepted && (
+              <div className="flex items-center space-x-2 mt-2">
+                <input
+                  id="accept-tos"
+                  type="checkbox"
+                  checked={isAcceptedTos}
+                  onChange={(e) => setIsAcceptedTos(e.target.checked)}
+                  disabled={isLoading}
+                  required
+                />
+                <Label htmlFor="accept-tos" className="text-sm">
+                  I have read and agree to the{" "}
+                  {(tosToBeAccepted || []).map(({ type, url }, idx, arr) => (
+                    <span key={type}>
+                      <a href={url} target="_blank" rel="noopener noreferrer" className="underline">
+                        {userTermsTitle[type as UserTermsTypeFromApi]}
+                      </a>
+                      {idx < arr.length - 1 ? ", " : ""}
+                    </span>
+                  ))}
+                </Label>
+              </div>
+            )}
+            <Button
+              type="submit"
+              loading={isLoading}
+              disabled={isLoading || !email || (!isAcceptedTos && atLeastOneToSMustBeAccepted)}
+            >
               Get code
             </Button>
             {error && (
