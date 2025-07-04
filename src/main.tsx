@@ -4,7 +4,7 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
 import { WagmiProvider } from "wagmi";
-import { BrowserRouter } from "react-router";
+import { BrowserRouter } from "react-router-dom";
 
 import App from "./App.tsx";
 import { config } from "./wagmi.ts";

@@ -11,13 +11,7 @@ import { OnchainTransferRow } from "./onchain-transfer-row";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useUser } from "@/context/UserContext";
 import { currencies } from "@/constants";
-
-/**
- * We are currently hardcoding the `fromDate` to 7 days ago.
- *
- * This value will come from the date picker when that logic is implemented.
- */
-const fromDate = subDays(new Date(), 7);
+import { useMemo } from "react";
 
 interface TransactionsProps {
   showHeader?: boolean;
@@ -25,7 +19,7 @@ interface TransactionsProps {
 
 export const Transactions = ({ showHeader = true }: TransactionsProps) => {
   const { safeConfig } = useUser();
-
+  const fromDate = useMemo(() => (showHeader ? subDays(new Date(), 7) : subDays(new Date(), 30)), [showHeader]);
   const { transactions, dateGroupedTransactions, orderedTransactions, isLoading, isError } = useTransactions({
     safeConfig,
     fromDate,

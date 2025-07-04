@@ -1,5 +1,5 @@
 import { ModeToggle } from "../theme-toggle";
-import { NavLink } from "react-router";
+import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
 
 export const FooterNavBar = () => {

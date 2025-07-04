@@ -1,6 +1,6 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import { HeaderNavBar } from "./components/nav/header";
-import { Route, Routes } from "react-router";
+import { Route, Routes, Outlet } from "react-router-dom";
 import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
 import { TransactionsRoute } from "./pages/Transactions";
@@ -9,6 +9,7 @@ import { Home as HomeIcon, CreditCard, List } from "lucide-react";
 import { SignUpRoute } from "./pages/SignUp";
 import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
+import { AuthGuard } from "@/components/AuthGuard";
 
 export const menuRoutes = [
   {
@@ -31,8 +32,7 @@ export const menuRoutes = [
   },
 ];
 
-const allRoutes = [
-  ...menuRoutes,
+const publicRoutes = [
   {
     path: "/register",
     element: <SignUpRoute />,
@@ -47,14 +47,29 @@ const allRoutes = [
   },
 ];
 
+function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
+  return (
+    <AuthGuard checkForSignup={checkForSignup}>
+      <Outlet />
+    </AuthGuard>
+  );
+}
+
 function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />
       <Routes>
-        {allRoutes.map((route) => (
-          <Route key={route.path} path={route.path} element={route.element} />
-        ))}
+        <Route element={<ProtectedLayout checkForSignup={false} />}>
+          {publicRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+        <Route element={<ProtectedLayout checkForSignup={true} />}>
+          {menuRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
       </Routes>
       <FooterNavBar />
     </div>

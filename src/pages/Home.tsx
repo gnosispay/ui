@@ -1,70 +1,21 @@
 import { Cards } from "../components/cards";
-import { LoaderCircle } from "lucide-react";
-import { useAuth } from "@/context/AuthContext";
 import { Balances } from "@/components/balances";
 import { Transactions } from "@/components/transactions/transactions";
-import { useUser } from "@/context/UserContext";
-import { useNavigate } from "react-router";
-import { Button } from "@/components/ui/button";
 
 export const Home = () => {
-  const { isAuthenticating, isAuthenticated } = useAuth();
-  const { isUserSignedUp, isKycApproved, isSafeConfigured } = useUser();
-  const navigate = useNavigate();
-
-  if (isAuthenticated && (!isUserSignedUp || !isKycApproved || !isSafeConfigured))
-    return (
-      <div className="grid grid-cols-6 gap-4 h-full mt-4">
-        <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-          <h2 className="text-xl">Welcome to Gnosis Pay</h2>
-          <div className="text-muted-foreground">You need to complete the signup process to use the app.</div>
-          <Button className="mt-4" onClick={() => navigate("/register")}>
-            Complete Signup
-          </Button>
-        </div>
-      </div>
-    );
-
-  if (!isAuthenticated && !isAuthenticating)
-    return (
-      <div className="grid grid-cols-6 gap-4 h-full mt-4">
-        <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-          <h2 className="text-xl">Welcome to Gnosis Pay</h2>
-          <p className="text-muted-foreground">Connect your wallet to get started.</p>
-        </div>
-      </div>
-    );
-
-  if (isAuthenticating)
-    return (
-      <div className="grid grid-cols-6 gap-4 h-full mt-4">
-        <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-          <h2 className="flex items-center text-xl">
-            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Authenticating...
-          </h2>
-          <p>Please sign the message request.</p>
-        </div>
-      </div>
-    );
-
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-        {!isAuthenticating && isUserSignedUp && isAuthenticated && (
-          <>
-            <Balances />
-            <div className="grid grid-cols-3 gap-4">
-              <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
-                <Transactions />
-              </div>
-              <div className="col-span-3 lg:col-span-1 lg:col-start-3">
-                <h1 className="font-bold text-secondary my-4">Cards</h1>
-
-                <Cards />
-              </div>
-            </div>
-          </>
-        )}
+        <Balances />
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
+            <Transactions />
+          </div>
+          <div className="col-span-3 lg:col-span-1 lg:col-start-3">
+            <h1 className="font-bold text-secondary my-4">Cards</h1>
+            <Cards />
+          </div>
+        </div>
       </div>
     </div>
   );
