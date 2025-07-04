@@ -1,5 +1,5 @@
 import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { CardPreview } from "./card-preview";
 import { useCards } from "@/context/CardsContext";
 import { CardSkeleton } from "./card-skeleton";
@@ -8,27 +8,9 @@ import { CardPSE } from "./card-pse";
 export const CardsCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
   const { cards, cardInfoMap } = useCards();
-  const loading = !cards || !cardInfoMap;
 
-  if (loading) {
-    return <CardSkeleton />;
-  }
-
-  const nextCard = () => {
-    const nextIndex = (currentIndex + 1) % cards.length;
-    setCurrentIndex(nextIndex);
-    scrollToCard(nextIndex);
-  };
-
-  const prevCard = () => {
-    const prevIndex = (currentIndex - 1 + cards.length) % cards.length;
-    setCurrentIndex(prevIndex);
-    scrollToCard(prevIndex);
-  };
-
-  const scrollToCard = (index: number) => {
+  const scrollToCard = useCallback((index: number) => {
     if (scrollContainerRef.current) {
       const cardElement = scrollContainerRef.current.children[index] as HTMLElement;
       if (cardElement) {
@@ -39,37 +21,63 @@ export const CardsCarousel = () => {
         });
       }
     }
-  };
+  }, []);
 
-  const goToCard = (index: number) => {
-    setCurrentIndex(index);
-    scrollToCard(index);
-  };
+  const nextCard = useCallback(() => {
+    if (!cards || cards.length === 0) return;
+    const nextIndex = (currentIndex + 1) % cards.length;
+    setCurrentIndex(nextIndex);
+    scrollToCard(nextIndex);
+  }, [cards, currentIndex, scrollToCard]);
+
+  const prevCard = useCallback(() => {
+    if (!cards || cards.length === 0) return;
+    const prevIndex = (currentIndex - 1 + cards.length) % cards.length;
+    setCurrentIndex(prevIndex);
+    scrollToCard(prevIndex);
+  }, [cards, currentIndex, scrollToCard]);
+
+  const goToCard = useCallback(
+    (index: number) => {
+      if (!cards || cards.length === 0) return;
+      setCurrentIndex(index);
+      scrollToCard(index);
+    },
+    [cards, scrollToCard],
+  );
+
+  if (!cards || !cardInfoMap) {
+    return <CardSkeleton />;
+  }
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-6">
       {/* Cards Section */}
       <div className="w-full sm:w-sm flex flex-col gap-4 lg:mx-0 mx-auto">
         {/* Cards Container */}
-        <div className="overflow-hidden">
+        <div className="overflowloading-hidden">
           <div
             ref={scrollContainerRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide select-none pointer-events-none"
           >
-            {cards.map((card, index) => (
-              <div
-                key={card.id}
-                className={`flex-shrink-0 transition-opacity duration-300 ${
-                  index === currentIndex ? "opacity-100" : "opacity-40"
-                } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : ""}`}
-              >
-                <CardPreview
-                  cardType={card.virtual ? "Virtual" : "Physical"}
-                  cardInfo={cardInfoMap?.[card.id]}
-                  last4={card.lastFourDigits}
-                />
-              </div>
-            ))}
+            {cards.map((card, index) => {
+              const cardInfo = cardInfoMap[card.id];
+              if (!cardInfo) return null;
+              return (
+                <div
+                  key={card.id}
+                  className={`flex-shrink-0 transition-opacity duration-300 ${
+                    index === currentIndex ? "opacity-100" : "opacity-40"
+                  } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : ""}`}
+                >
+                  <CardPreview
+                    cardType={card.virtual ? "Virtual" : "Physical"}
+                    cardInfo={cardInfo}
+                    last4={card.lastFourDigits}
+                  />
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -97,7 +105,7 @@ export const CardsCarousel = () => {
 
           {/* Dots indicator */}
           <div className="flex gap-2">
-            {cards.map((card, index) => (
+            {cards?.map((card, index) => (
               <button
                 key={card.id}
                 type="button"
@@ -112,7 +120,7 @@ export const CardsCarousel = () => {
 
       {/* Action Buttons Section */}
       <div className="flex-1 flex items-center justify-center">
-        <CardPSE card={cards[currentIndex]} />
+        {cards?.[currentIndex] ? <CardPSE card={cards[currentIndex]} /> : null}
       </div>
     </div>
   );
