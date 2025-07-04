@@ -1,5 +1,11 @@
 import { useEffect, useState, useCallback } from "react";
-import { postApiV1AuthSignup, postApiV1AuthSignupOtp, getApiV1UserTerms, postApiV1UserTerms } from "@/client";
+import {
+  postApiV1AuthSignup,
+  postApiV1AuthSignupOtp,
+  getApiV1UserTerms,
+  postApiV1UserTerms,
+  type GetApiV1UserTermsResponse,
+} from "@/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -7,10 +13,10 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { OtpInput } from "@/components/otpInput";
 import { useAuth } from "@/context/AuthContext";
 import { LoaderCircle } from "lucide-react";
-import { userTerms } from "@/constants";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { userTermsTitle, type UserTermsTypeFromApi } from "@/constants";
 
 enum ScreenStep {
   SIWEAuthentication = "siwe-authentication",
@@ -28,6 +34,7 @@ export const SignUpRoute = () => {
   const [otp, setOtp] = useState("");
   const [isAcceptedTos, setIsAcceptedTos] = useState(false);
   const navigate = useNavigate();
+  const [tosForUser, setTosForUser] = useState<GetApiV1UserTermsResponse["terms"]>([]);
 
   useEffect(() => {
     // if the user is authenticated and not signed up, it means they
@@ -42,23 +49,35 @@ export const SignUpRoute = () => {
     }
   }, [isAuthenticated, isUserSignedUp, navigate]);
 
+  useEffect(() => {
+    if (step !== ScreenStep.EmailAndTos || !isAuthenticated || !isUserSignedUp) return;
+
+    getApiV1UserTerms()
+      .then(({ data, error }) => {
+        const termsList = data?.terms || [];
+        setTosForUser(termsList);
+        if (error) {
+          const message = extractErrorMessage(error, "unknown");
+          setError(`Error getting terms: ${message}`);
+          console.error(error);
+        }
+      })
+      .catch((err) => {
+        setError("Error while getting user terms");
+        console.error(err);
+      });
+  }, [step, isAuthenticated, isUserSignedUp]);
+
   const acceptAllUserTerms = useCallback(async () => {
     try {
-      // verify what terms the user has accepted
-      const termsRes = await getApiV1UserTerms();
-      const termsList = termsRes?.data?.terms || [];
+      if (!tosForUser) return;
 
       // accept all terms that are not already accepted
       // and that we display in the UI with their respective link
-      for (const term of termsList) {
-        const termAccepted = !!term.type && userTerms[term.type];
-        if (
-          termAccepted &&
-          term.type &&
-          term.currentVersion &&
-          termAccepted.version === term.currentVersion &&
-          !term.accepted
-        ) {
+      for (const term of tosForUser) {
+        if (!term.type || !term.currentVersion) continue;
+
+        if (!term.accepted || term.currentVersion === term.acceptedVersion) {
           const { error } = await postApiV1UserTerms({
             body: {
               terms: term.type,
@@ -76,7 +95,7 @@ export const SignUpRoute = () => {
       setError("Error while accepting user terms");
       console.error(termsErr);
     }
-  }, []);
+  }, [tosForUser]);
 
   const handleSubmitOtpRequest = useCallback(
     async (e: React.FormEvent) => {
@@ -185,10 +204,10 @@ export const SignUpRoute = () => {
               />
               <Label htmlFor="accept-tos" className="text-sm">
                 I have read and agree to the{" "}
-                {Object.entries(userTerms).map(([type, term], idx, arr) => (
+                {Object.entries(tosForUser || []).map(([type, term], idx, arr) => (
                   <span key={type}>
                     <a href={term.url} target="_blank" rel="noopener noreferrer" className="underline">
-                      {term.title}
+                      {userTermsTitle[type as UserTermsTypeFromApi]}
                     </a>
                     {idx < arr.length - 1 ? ", " : ""}
                   </span>
