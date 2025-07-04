@@ -52,14 +52,14 @@ export const CardPSE = ({ card }: { card: Card }) => {
     <>
       <div className="flex flex-wrap gap-4 lg:gap-8 justify-center">
         <IconButton
-          icon={<CreditCard size={22} className="text-white" />}
+          icon={<CreditCard size={22} />}
           label="Show details"
           onClick={() => onShowCardDetails(card.cardToken)}
           size="lg"
           variant="default"
         />
         <IconButton
-          icon={<Eye size={22} className="text-white" />}
+          icon={<Eye size={22} />}
           label="See PIN"
           onClick={() => onShowPin(card.cardToken)}
           size="lg"
@@ -68,7 +68,7 @@ export const CardPSE = ({ card }: { card: Card }) => {
         />
         {cardInfo?.isFrozen ? (
           <IconButton
-            icon={<Sun size={22} className="text-white" />}
+            icon={<Sun size={22} />}
             label="Unfreeze"
             onClick={() => unfreezeCard(card.id)}
             size="lg"
@@ -76,7 +76,7 @@ export const CardPSE = ({ card }: { card: Card }) => {
           />
         ) : (
           <IconButton
-            icon={<Snowflake size={22} className="text-white" />}
+            icon={<Snowflake size={22} />}
             label="Freeze"
             onClick={() => freezeCard(card.id)}
             size="lg"
@@ -84,7 +84,7 @@ export const CardPSE = ({ card }: { card: Card }) => {
           />
         )}
         <IconButton
-          icon={<AlertOctagon size={22} className="text-white" />}
+          icon={<AlertOctagon size={22} />}
           label="Report"
           onClick={() => setIsReportModalOpen(true)}
           size="lg"
