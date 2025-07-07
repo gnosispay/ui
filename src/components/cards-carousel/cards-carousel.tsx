@@ -5,10 +5,42 @@ import { useCards } from "@/context/CardsContext";
 import { CardSkeleton } from "./card-skeleton";
 import { CardPSE } from "./card-pse";
 
+const minSwipeDistance = 50;
+
 export const CardsCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { cards, cardInfoMap } = useCards();
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEndX(null);
+    setTouchStartX(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEndX(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (touchStartX === null || touchEndX === null) return;
+    const distance = touchStartX - touchEndX;
+    if (Math.abs(distance) > minSwipeDistance) {
+      if (distance > 0) {
+        // Swiped left
+        nextCard();
+      } else {
+        // Swiped right
+        prevCard();
+      }
+    } else {
+      // Small swipe: revert to current card smoothly
+      scrollToCard(currentIndex);
+    }
+    setTouchStartX(null);
+    setTouchEndX(null);
+  };
 
   const scrollToCard = useCallback((index: number) => {
     if (scrollContainerRef.current) {
@@ -61,8 +93,7 @@ export const CardsCarousel = () => {
             <button
               type="button"
               onClick={prevCard}
-              className="absolute left-2 top-1/2 -translate-y-1/2 text-primary z-10 bg-background opacity-80 rounded-full p-1
-                block lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
+              className="hidden lg:block absolute left-2 top-1/2 -translate-y-1/2 text-primary z-10 bg-background opacity-80 rounded-full p-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
               aria-label="Previous card"
             >
               <ChevronLeft strokeWidth={1} size={24} />
@@ -71,7 +102,10 @@ export const CardsCarousel = () => {
           {/* Cards Row */}
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide select-none pointer-events-none"
+            className="flex gap-4 overflow-x-auto scrollbar-hide select-none"
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
             {cards.map((card, index) => {
               const cardInfo = cardInfoMap[card.id];
@@ -81,7 +115,7 @@ export const CardsCarousel = () => {
                   key={card.id}
                   className={`flex-shrink-0 transition-opacity duration-300 ${
                     index === currentIndex ? "opacity-100" : "opacity-40"
-                  } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : ""}`}
+                  } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : index === cards.length - 1 ? "mr-[calc(50%-10rem)] sm:mr-0" : ""}`}
                 >
                   <CardPreview
                     cardType={card.virtual ? "Virtual" : "Physical"}
@@ -97,8 +131,7 @@ export const CardsCarousel = () => {
             <button
               type="button"
               onClick={nextCard}
-              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-primary bg-background opacity-80 rounded-full p-1 shadow-md
-                block lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
+              className="hidden lg:block absolute right-2 top-1/2 -translate-y-1/2 z-10 text-primary bg-background opacity-80 rounded-full p-1 shadow-md lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
               aria-label="Next card"
             >
               <ChevronRight strokeWidth={1} size={24} />
