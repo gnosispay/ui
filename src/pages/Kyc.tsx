@@ -1,4 +1,4 @@
-import { getApiV1KycIntegration } from "@/client";
+import { getApiV1KycIntegration, type KycStatus } from "@/client";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { useUser } from "@/context/UserContext";
 import { useState, useEffect } from "react";
@@ -35,9 +35,32 @@ export const KycRoute = () => {
   useEffect(() => {
     if (!user?.kycStatus) return;
 
+    // an issue happened during the KYC process, sumsub rejected the application
+    // or an action is required, they need to contact your support
+    const kycStatusesRequiringContact: KycStatus[] = ["rejected", "requiresAction"];
+    if (kycStatusesRequiringContact.includes(user.kycStatus)) {
+      setError("Your KYC application has encountered an issue. Please contact support at help@gnosispay.com");
+      return;
+    }
+
+    // the user is not signed up, they need to sign up first
+    if (!isUserSignedUp) {
+      navigate("/register");
+    }
+
+    // the user is all set up, they can go to the safe deployment page
+    if (user.kycStatus === "approved") {
+      navigate("/safe-deployment");
+    }
+  }, [navigate, user, isUserSignedUp]);
+
+  useEffect(() => {
+    if (!user?.kycStatus) return;
+
     // regularly check the kyc status as sumsub has hooks integration
     // with gnosispay api
-    if (["documentsRequested", "pending", "processing"].includes(user.kycStatus)) {
+    const refreshStatuses: KycStatus[] = ["documentsRequested", "pending", "processing"];
+    if (refreshStatuses.includes(user.kycStatus)) {
       const timeout = setTimeout(() => {
         refreshUser();
       }, 5000);

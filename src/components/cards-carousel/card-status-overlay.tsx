@@ -23,7 +23,7 @@ export const CardStatusOverlay = ({ status }: CardStatusOverlayProps) => {
   const config = statusConfig[status];
 
   return (
-    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-10">
+    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-1">
       {config.icon}
       <span className="text-white text-sm font-semibold tracking-widest">{config.text}</span>
     </div>
