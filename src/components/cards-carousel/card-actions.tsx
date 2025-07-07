@@ -1,4 +1,4 @@
-import { CreditCard, Eye, Snowflake, AlertOctagon, Loader2, Sun } from "lucide-react";
+import { CreditCard, Eye, Snowflake, AlertOctagon, Loader2, Sun, MoreHorizontal, KeyRound } from "lucide-react";
 import { IconButton } from "../ui/icon-button";
 import type { Card } from "@/client";
 import { useGpSdk } from "@/hooks/useGpSdk";
@@ -7,14 +7,21 @@ import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
 import { useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { ReportCardModal } from "../modals/report-card";
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
+import { ChangePinModal } from "../modals/change-pin";
 
 const PSE_IFRAME_ID = "pse-iframe";
 
-export const CardPSE = ({ card }: { card: Card }) => {
+export const CardActions = ({ card }: { card: Card }) => {
   const { showCardDetails, showPin, isLoading } = useGpSdk();
   const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap } = useCards();
   const [isPSEModalOpen, setIsPSEModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
+  const cardInfo = cardInfoMap?.[card.id];
+  const canReport = card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost;
+  const canChangePin =
+    !card.virtual && card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost;
 
   const onShowCardDetails = (cardToken?: string) => {
     if (!cardToken) {
@@ -45,8 +52,6 @@ export const CardPSE = ({ card }: { card: Card }) => {
       toast.error("Error showing PIN");
     }
   };
-
-  const cardInfo = cardInfoMap?.[card.id];
 
   return (
     <>
@@ -83,13 +88,27 @@ export const CardPSE = ({ card }: { card: Card }) => {
             variant="default"
           />
         )}
-        <IconButton
-          icon={<AlertOctagon size={22} />}
-          label="Report"
-          onClick={() => setIsReportModalOpen(true)}
-          size="lg"
-          variant="default"
-        />
+        {(canChangePin || canReport) && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <span>
+                <IconButton icon={<MoreHorizontal size={22} />} label="More" size="lg" variant="default" />
+              </span>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              {canChangePin && (
+                <DropdownMenuItem onClick={() => setIsChangePinModalOpen(true)}>
+                  <KeyRound size={22} /> Change PIN
+                </DropdownMenuItem>
+              )}
+              {canReport && (
+                <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
+                  <AlertOctagon size={22} /> Report
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <Dialog open={isPSEModalOpen} onOpenChange={setIsPSEModalOpen}>
@@ -113,6 +132,8 @@ export const CardPSE = ({ card }: { card: Card }) => {
           onReportAsStolen={() => markCardAsStolen(card.id)}
         />
       )}
+
+      {isChangePinModalOpen && <ChangePinModal onClose={() => setIsChangePinModalOpen(false)} card={card} />}
     </>
   );
 };

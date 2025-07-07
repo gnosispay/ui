@@ -3,7 +3,7 @@ import { useState, useRef, useCallback } from "react";
 import { CardPreview } from "./card-preview";
 import { useCards } from "@/context/CardsContext";
 import { CardSkeleton } from "./card-skeleton";
-import { CardPSE } from "./card-pse";
+import { CardActions } from "./card-actions";
 
 const minSwipeDistance = 50;
 
@@ -157,7 +157,7 @@ export const CardsCarousel = () => {
 
       {/* Action Buttons Section */}
       <div className="flex-1 flex items-center justify-center">
-        <CardPSE card={cards[currentIndex]} />
+        <CardActions card={cards[currentIndex]} />
       </div>
     </div>
   );

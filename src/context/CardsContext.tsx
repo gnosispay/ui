@@ -15,7 +15,7 @@ import {
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
-import { useUser } from "./UserContext";
+import { useAuth } from "./AuthContext";
 import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import type { Address } from "viem";
@@ -66,9 +66,9 @@ export type ICardContext = {
 const CardsContext = createContext<ICardContext | undefined>(undefined);
 
 const CardsContextProvider = ({ children }: CardContextProps) => {
-  const { isUserSignedUp } = useUser();
   const [cards, setCards] = useState<ICardContext["cards"]>(undefined);
   const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
+  const { isAuthenticated } = useAuth();
 
   const setCardsInfo = useCallback(async (cards: Card[]) => {
     const newMap: CardInfoMap = {};
@@ -205,7 +205,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
 
   const refreshCards = useCallback(() => {
     setCards(undefined);
-
     getApiV1Cards()
       .then(async ({ data, error }) => {
         if (error) {
@@ -271,9 +270,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
   );
 
   useEffect(() => {
-    if (!isUserSignedUp) return;
+    if (!isAuthenticated) return;
     refreshCards();
-  }, [isUserSignedUp, refreshCards]);
+  }, [refreshCards, isAuthenticated]);
 
   return (
     <CardsContext.Provider
