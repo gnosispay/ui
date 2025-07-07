@@ -147,7 +147,7 @@ export const CardsCarousel = () => {
                 key={card.id}
                 type="button"
                 onClick={() => goToCard(index)}
-                className={`w-3 h-3 rounded-full transition-colors cursor-pointer border ${index === currentIndex ? "border-brand" : "border-gray-300"}`}
+                className={`w-3 h-3 rounded-full transition-colors cursor-pointer border ${index === currentIndex ? "border-primary" : "bg-border"}`}
                 aria-label={`Go to card ${index + 1}`}
               />
             ))}
