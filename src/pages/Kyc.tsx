@@ -12,6 +12,27 @@ export const KycRoute = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    if (!user) return;
+
+    // an issue happened during the KYC process, sumsub rejected the application
+    // or an action is required, they need to contact your support
+    if (["rejected", "requiresAction"].includes(user.kycStatus || "")) {
+      setError("Your KYC application has encountered an issue. Please contact support at help@gnosispay.com");
+      return;
+    }
+
+    // the user is not signed up, they need to sign up first
+    if (!isUserSignedUp) {
+      navigate("/register");
+    }
+
+    // the user is all set up, they can go to the safe deployment page
+    if (user.kycStatus === "approved") {
+      navigate("/safe-deployment");
+    }
+  }, [navigate, user, isUserSignedUp]);
+
+  useEffect(() => {
     if (!user?.kycStatus) return;
 
     // an issue happened during the KYC process, sumsub rejected the application
