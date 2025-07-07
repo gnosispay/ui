@@ -14,12 +14,12 @@ import { currencies } from "@/constants";
 import { useMemo } from "react";
 
 interface TransactionsProps {
-  showHeader?: boolean;
+  history?: number;
 }
 
-export const Transactions = ({ showHeader = true }: TransactionsProps) => {
+export const Transactions = ({ history = 7 }: TransactionsProps) => {
   const { safeConfig } = useUser();
-  const fromDate = useMemo(() => (showHeader ? subDays(new Date(), 7) : subDays(new Date(), 30)), [showHeader]);
+  const fromDate = useMemo(() => subDays(new Date(), history), [history]);
   const { transactions, dateGroupedTransactions, orderedTransactions, isLoading, isError } = useTransactions({
     safeConfig,
     fromDate,
@@ -35,7 +35,6 @@ export const Transactions = ({ showHeader = true }: TransactionsProps) => {
 
   return (
     <>
-      {showHeader && <h1 className="font-bold text-secondary my-4">Transactions</h1>}
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
         {transactions.length === 0 && (
           <div className="flex flex-col items-center justify-center">

@@ -7,7 +7,7 @@ export const TransactionsRoute = () => {
         <h1 className="text-xl">Transactions</h1>
       </div>
       <div className="col-span-4 col-start-2">
-        <Transactions showHeader={false} />
+        <Transactions history={30} />
       </div>
     </div>
   );
