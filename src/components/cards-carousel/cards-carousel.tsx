@@ -1,4 +1,4 @@
-import { ArrowLeftCircle, ArrowRightCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
 import { CardPreview } from "./card-preview";
 import { useCards } from "@/context/CardsContext";
@@ -54,8 +54,21 @@ export const CardsCarousel = () => {
     <div className="w-full flex flex-col lg:flex-row gap-6">
       {/* Cards Section */}
       <div className="w-full sm:w-sm flex flex-col gap-4 lg:mx-0 mx-auto">
-        {/* Cards Container */}
-        <div className="overflow-hidden">
+        {/* Cards Container with Side Arrows */}
+        <div className="relative group">
+          {/* Left Arrow */}
+          {currentIndex > 0 && (
+            <button
+              type="button"
+              onClick={prevCard}
+              className="absolute left-2 top-1/2 -translate-y-1/2 text-primary z-10 bg-background opacity-80 rounded-full p-1
+                block lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Previous card"
+            >
+              <ChevronLeft strokeWidth={1} size={24} />
+            </button>
+          )}
+          {/* Cards Row */}
           <div
             ref={scrollContainerRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide select-none pointer-events-none"
@@ -79,31 +92,22 @@ export const CardsCarousel = () => {
               );
             })}
           </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex justify-between items-center px-4 sm:px-0">
-          {/* Arrows */}
-          <div className="flex gap-1 text-brand">
-            <button
-              type="button"
-              onClick={prevCard}
-              className="hover:opacity-70 transition-opacity cursor-pointer"
-              aria-label="Previous card"
-            >
-              <ArrowLeftCircle strokeWidth={1} size={36} />
-            </button>
+          {/* Right Arrow */}
+          {currentIndex < cards.length - 1 && (
             <button
               type="button"
               onClick={nextCard}
-              className="hover:opacity-70 transition-opacity cursor-pointer"
+              className="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-primary bg-background opacity-80 rounded-full p-1 shadow-md
+                block lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
               aria-label="Next card"
             >
-              <ArrowRightCircle strokeWidth={1} size={36} />
+              <ChevronRight strokeWidth={1} size={24} />
             </button>
-          </div>
+          )}
+        </div>
 
-          {/* Dots indicator */}
+        {/* Dots indicator */}
+        <div className="flex justify-center items-center px-4 sm:px-0 mt-2">
           <div className="flex gap-2">
             {cards.map((card, index) => (
               <button
