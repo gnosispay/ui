@@ -12,22 +12,20 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { OtpInput } from "@/components/otpInput";
 import { useAuth } from "@/context/AuthContext";
-import { LoaderCircle } from "lucide-react";
 import { useUser } from "@/context/UserContext";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { userTermsTitle, type UserTermsTypeFromApi } from "@/constants";
 
 enum ScreenStep {
-  SIWEAuthentication = "siwe-authentication",
   EmailAndTos = "email-and-tos",
   OtpVerification = "otp-verification",
 }
 
 export const SignUpRoute = () => {
-  const { isAuthenticated, isAuthenticating, updateJwt, updateClient } = useAuth();
+  const { updateJwt, updateClient } = useAuth();
   const { isUserSignedUp } = useUser();
-  const [step, setStep] = useState<ScreenStep>(ScreenStep.SIWEAuthentication);
+  const [step, setStep] = useState<ScreenStep>(ScreenStep.EmailAndTos);
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -39,20 +37,14 @@ export const SignUpRoute = () => {
   const atLeastOneToSMustBeAccepted = useMemo(() => tosToBeAccepted && tosToBeAccepted.length > 0, [tosToBeAccepted]);
 
   useEffect(() => {
-    // if the user is authenticated and not signed up, it means they
-    // need to go through the email otp and terms of service step
-    isAuthenticated && !isUserSignedUp && setStep(ScreenStep.EmailAndTos);
-  }, [isAuthenticated, isUserSignedUp]);
-
-  useEffect(() => {
     // if the user is authenticated and signed up, we should go to kyc
-    if (isAuthenticated && isUserSignedUp) {
+    if (isUserSignedUp) {
       navigate("/kyc");
     }
-  }, [isAuthenticated, isUserSignedUp, navigate]);
+  }, [isUserSignedUp, navigate]);
 
   useEffect(() => {
-    if (step !== ScreenStep.EmailAndTos || !isAuthenticated || !isUserSignedUp) return;
+    if (step !== ScreenStep.EmailAndTos) return;
 
     getApiV1UserTerms()
       .then(({ data, error }) => {
@@ -70,7 +62,7 @@ export const SignUpRoute = () => {
         setError("Error while getting user terms");
         console.error(err);
       });
-  }, [step, isAuthenticated, isUserSignedUp]);
+  }, [step]);
 
   const acceptAllUserTerms = useCallback(async () => {
     try {
@@ -165,20 +157,6 @@ export const SignUpRoute = () => {
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
-        {step === ScreenStep.SIWEAuthentication && !isAuthenticated && !isAuthenticating && (
-          <>
-            <h2 className="text-xl">Welcome to Gnosis Pay</h2>
-            <p className="text-muted-foreground">Connect your wallet to get started.</p>
-          </>
-        )}
-        {step === ScreenStep.SIWEAuthentication && isAuthenticating && (
-          <>
-            <h2 className="flex items-center text-xl">
-              <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Authenticating...
-            </h2>
-            <p>Please sign the message request.</p>
-          </>
-        )}
         {step === ScreenStep.EmailAndTos && (
           <form className="space-y-4 mt-8" onSubmit={handleSubmitOtpRequest}>
             <Label htmlFor="register-email">Type your email to receive a one time code.</Label>

@@ -1,10 +1,10 @@
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useEffect, useState } from "react";
 import SourceOfFundsStep from "@/components/safe-deployment/SourceOfFundsStep";
 import PhoneVerificationStep from "@/components/safe-deployment/PhoneVerificationStep";
 import DeploySafeStep from "@/components/safe-deployment/DeploySafeStep";
+import { useNavigate } from "react-router-dom";
 
 enum ScreenStep {
   AnswerSourceOfFunds = "answer-source-of-funds",
@@ -13,9 +13,17 @@ enum ScreenStep {
 }
 export const SafeDeploymentRoute = () => {
   const [step, setStep] = useState<ScreenStep>(ScreenStep.AnswerSourceOfFunds);
-  const { isAuthenticated } = useAuth();
-  const { isUserSignedUp, user, safeConfig, refreshUser: refetchUser } = useUser();
+  const { user, safeConfig, refreshUser: refetchUser } = useUser();
   const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) return;
+
+    if (user.kycStatus !== "approved") {
+      navigate("/kyc");
+    }
+  }, [user, navigate]);
 
   useEffect(() => {
     if (!user || !safeConfig) return;
@@ -28,11 +36,6 @@ export const SafeDeploymentRoute = () => {
       setStep(ScreenStep.DeploySafe);
     }
   }, [user, safeConfig, step]);
-
-  // todo make this better
-  if (!isAuthenticated || !isUserSignedUp) {
-    return <div>Error, not authenticated...</div>;
-  }
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full">

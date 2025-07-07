@@ -9,7 +9,7 @@ import { useSignTypedData } from "wagmi";
 import { useUser } from "@/context/UserContext";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { Button } from "../ui/button";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import StepList from "./StepList";
 import { DeploySteps } from "./deploySteps";
 
