@@ -4,26 +4,37 @@ import { TransactionRow } from "./transaction-row";
 import { BankTransferRow } from "./bank-transfer-row";
 import { type Transaction, TransactionType } from "@/types/transaction";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
-import { useTransactions } from "@/hooks/useTransactions";
-import { subDays } from "date-fns";
+import { useTransactions } from "@/context/TransactionsContext";
 import { InboxIcon } from "lucide-react";
 import { OnchainTransferRow } from "./onchain-transfer-row";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useUser } from "@/context/UserContext";
 import { currencies } from "@/constants";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 interface TransactionsProps {
   history?: number;
+  cardTokens?: string[];
+  withIban?: boolean;
+  withOnchain?: boolean;
 }
 
-export const Transactions = ({ history = 7 }: TransactionsProps) => {
+export const Transactions = ({ history = 7, cardTokens, withIban = true, withOnchain = true }: TransactionsProps) => {
   const { safeConfig } = useUser();
-  const fromDate = useMemo(() => subDays(new Date(), history), [history]);
-  const { transactions, dateGroupedTransactions, orderedTransactions, isLoading, isError } = useTransactions({
-    safeConfig,
-    fromDate,
-  });
+  const { isLoading, isError, fetchTransactions } = useTransactions();
+  const [transactions, setTransactions] = useState<Record<string, Transaction[]>>({});
+
+  useEffect(() => {
+    fetchTransactions({ history, cardTokens, withIban, withOnchain })
+      .then((result) => {
+        if (result) {
+          setTransactions(result.dateGroupedTransactions);
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching transactions: ", error);
+      });
+  }, [fetchTransactions, history, cardTokens, withIban, withOnchain]);
 
   if (!safeConfig || isLoading || !transactions) {
     return <TransactionSkeleton />;
@@ -36,17 +47,17 @@ export const Transactions = ({ history = 7 }: TransactionsProps) => {
   return (
     <>
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
-        {transactions.length === 0 && (
+        {Object.keys(transactions).length === 0 && (
           <div className="flex flex-col items-center justify-center">
             <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
             <div className="text-center text-secondary">No transactions yet</div>
           </div>
         )}
-        {orderedTransactions.map((date) => (
+        {Object.keys(transactions).map((date) => (
           <div key={date}>
             <div className="text-xs text-secondary mb-2">{date}</div>
 
-            {dateGroupedTransactions[date].map((transaction: Transaction) => {
+            {transactions[date].map((transaction: Transaction) => {
               if (transaction.type === TransactionType.CARD) {
                 return <TransactionRow key={transaction.id} transaction={transaction.data as Event} />;
               }

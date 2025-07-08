@@ -2,23 +2,16 @@ import {
   type Card,
   getApiV1Cards,
   getApiV1CardsByCardIdStatus,
-  getApiV1Transactions,
-  getApiV1IbansOrders,
   postApiV1CardsByCardIdActivate,
   postApiV1CardsByCardIdFreeze,
   postApiV1CardsByCardIdLost,
   postApiV1CardsByCardIdStolen,
   postApiV1CardsByCardIdUnfreeze,
-  type Event,
-  type IbanOrder,
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 import { useAuth } from "./AuthContext";
-import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
-import type { Erc20TokenEvent } from "@/types/transaction";
-import type { Address } from "viem";
 
 type CardContextProps = {
   children: ReactNode | ReactNode[];
@@ -37,18 +30,6 @@ export interface CardInfo {
 
 type CardInfoMap = Record<string, CardInfo>;
 
-interface GetTxParams {
-  cardTokens?: string[];
-  fromDate?: string;
-}
-
-interface GetOnchainTransfersParams {
-  address: Address;
-  tokenAddress: Address;
-  fromDate?: string;
-  skipSettlementTransfers: boolean;
-}
-
 export type ICardContext = {
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
@@ -58,9 +39,6 @@ export type ICardContext = {
   markCardAsStolen: (cardId: string) => void;
   markCardAsLost: (cardId: string) => void;
   activateCard: (cardId: string) => void;
-  getTransactions: (params?: GetTxParams) => Promise<Event[] | undefined>;
-  getIbanOrders: () => Promise<IbanOrder[] | undefined>;
-  getOnchainTransfers: (params: GetOnchainTransfersParams) => Promise<Erc20TokenEvent[] | undefined>;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -223,52 +201,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       .catch(console.error);
   }, [setCardsInfo]);
 
-  const getTransactions = useCallback(async ({ cardTokens, fromDate }: GetTxParams = {}) => {
-    const { data, error } = await getApiV1Transactions({
-      query: {
-        cardTokens: cardTokens?.join(","),
-        after: fromDate,
-      },
-    });
-
-    if (error) {
-      console.error("Error getting transactions: ", error);
-      return;
-    }
-
-    return data;
-  }, []);
-
-  const getIbanOrders = useCallback(async () => {
-    const { data, error } = await getApiV1IbansOrders();
-
-    if (error) {
-      console.error("Error getting IBAN orders: ", error);
-      return;
-    }
-
-    return data?.data;
-  }, []);
-
-  const getOnchainTransfers = useCallback(
-    async ({ address, tokenAddress, fromDate, skipSettlementTransfers }: GetOnchainTransfersParams) => {
-      const { data, error } = await fetchErc20Transfers({
-        address,
-        tokenAddress,
-        fromDate,
-        skipSettlementTransfers,
-      });
-
-      if (error) {
-        console.error("Error getting onchain Safe transfers: ", error);
-        return;
-      }
-
-      return data;
-    },
-    [],
-  );
-
   useEffect(() => {
     if (!isAuthenticated) return;
     refreshCards();
@@ -285,9 +217,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         markCardAsLost,
         markCardAsStolen,
         activateCard,
-        getTransactions,
-        getIbanOrders,
-        getOnchainTransfers,
       }}
     >
       {children}

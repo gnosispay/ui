@@ -5,6 +5,7 @@ import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { CardActions } from "@/components/cards-carousel/card-actions";
+import { Transactions } from "@/components/transactions/transactions";
 
 export const CardsRoute = () => {
   const [open, setOpen] = useState(false);
@@ -30,6 +31,19 @@ export const CardsRoute = () => {
           </div>
         </div>
       </div>
+      {/* <div className="grid grid-cols-6 gap-4 h-full mt-4"> */}
+      <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
+        <h1 className="text-xl">Transactions</h1>
+      </div>
+      <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
+        <Transactions
+          history={30}
+          cardTokens={selectedCard?.cardToken ? [selectedCard.cardToken] : undefined}
+          withIban={false}
+          withOnchain={false}
+        />
+      </div>
+      {/* </div> */}
       <VirtualCardsOrderModal open={open} onOpenChange={setOpen} />
     </div>
   );
