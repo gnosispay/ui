@@ -1,3 +1,5 @@
+import type { GetApiV1UserTermsResponse } from "./client";
+
 export interface CurrencyInfo {
   tokenSymbol?: string;
   address?: string;
@@ -28,6 +30,16 @@ export const currencies: Record<string, CurrencyInfo> = {
     symbol: "$",
     fiatSymbol: "USD",
   },
+};
+
+// Helper type to extract the 'type' property from the array element of GetApiV1UserTermsResponse["terms"]
+export type UserTermsTypeFromApi = NonNullable<NonNullable<GetApiV1UserTermsResponse["terms"]>[number]["type"]>;
+
+// this is strongly typed to the API response
+export const userTermsTitle: Record<UserTermsTypeFromApi, string> = {
+  "general-tos": "Gnosis Pay Terms of Service",
+  "card-monavate-tos": "Cardholder Terms of Service",
+  "cashback-tos": "Cardholder Cashback Terms of Service",
 };
 
 export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";

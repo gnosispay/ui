@@ -1,15 +1,19 @@
 import { Button } from "../ui/button";
 import { useCallback, useState } from "react";
 import { postApiV1OrderCreate } from "../../client";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "../ui/dialog";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useCards } from "@/context/CardsContext";
 import { toast } from "sonner";
 import { CollapsedError } from "../collapsedError";
 
-export const VirtualCardsOrderModal = () => {
-  const [open, setOpen] = useState(false);
+interface VirtualCardsOrderModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export const VirtualCardsOrderModal = ({ open, onOpenChange }: VirtualCardsOrderModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { refreshCards } = useCards();
   const [nameOnCard, setNameOnCard] = useState("");
@@ -40,17 +44,12 @@ export const VirtualCardsOrderModal = () => {
       })
       .finally(() => {
         setIsLoading(false);
-        setOpen(false);
+        onOpenChange(false);
       });
-  }, [refreshCards, nameOnCard]);
+  }, [refreshCards, nameOnCard, onOpenChange]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default" className="mt-6">
-          Order Virtual Card
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Virtual card order</DialogTitle>

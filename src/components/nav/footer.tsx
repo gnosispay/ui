@@ -1,6 +1,6 @@
 import { ModeToggle } from "../theme-toggle";
-import { NavLink } from "react-router";
-import { routes } from "@/App";
+import { NavLink } from "react-router-dom";
+import { menuRoutes } from "@/App";
 
 export const FooterNavBar = () => {
   return (
@@ -13,7 +13,7 @@ export const FooterNavBar = () => {
           <div />
           {/* Center cell with nav links */}
           <div className="flex items-center justify-center gap-8">
-            {routes.map((route) => (
+            {menuRoutes.map((route) => (
               <NavLink
                 to={route.path}
                 key={route.path}

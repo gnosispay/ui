@@ -6,7 +6,7 @@ import {
   type SafeConfig,
   type User,
 } from "@/client";
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
 
 type UserContextProps = {
@@ -17,48 +17,46 @@ export type IUserContext = {
   user: User | undefined;
   safeConfig: SafeConfig | undefined;
   balances: GetApiV1AccountBalancesResponse | undefined;
+  isUserSignedUp?: boolean;
+  refreshUser: () => void;
+  refreshSafeConfig: () => void;
+  isKycApproved: boolean;
+  isSafeConfigured: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
 
 const UserContextProvider = ({ children }: UserContextProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, jwtContainsUserId } = useAuth();
   const [user, setUser] = useState<IUserContext["user"]>(undefined);
   const [safeConfig, setSafeConfig] = useState<IUserContext["safeConfig"]>(undefined);
   const [balances, setBalance] = useState<IUserContext["balances"]>(undefined);
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    getApiV1User()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error(error);
-          return;
-        }
-
-        setUser(data);
-      })
-      .catch(console.error);
-  }, [isAuthenticated]);
+  const isUserSignedUp = useMemo(() => jwtContainsUserId, [jwtContainsUserId]);
+  const [isKycApproved, setIsKycApproved] = useState(false);
+  const [isSafeConfigured, setIsSafeConfigured] = useState(false);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !isUserSignedUp || !user) return;
+    setIsKycApproved(user.kycStatus === "approved");
+  }, [isAuthenticated, isUserSignedUp, user]);
 
-    getApiV1SafeConfig()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error(error);
-          return;
-        }
-        if (!data) {
-          console.error("No safe config data returned");
-          return;
-        }
+  useEffect(() => {
+    if (safeConfig?.accountStatus === 0) {
+      setIsSafeConfigured(true);
+    }
+  }, [safeConfig]);
 
-        setSafeConfig(data);
-      })
-      .catch(console.error);
-  }, [isAuthenticated]);
+  useEffect(() => {
+    if (!isAuthenticated || !isUserSignedUp) return;
+
+    refreshUser();
+  }, [isAuthenticated, isUserSignedUp]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isUserSignedUp) return;
+
+    refreshSafeConfig();
+  }, [isAuthenticated, isUserSignedUp]);
 
   useEffect(() => {
     if (!isAuthenticated || !user) return;
@@ -73,6 +71,38 @@ const UserContextProvider = ({ children }: UserContextProps) => {
 
     return () => clearInterval(interval);
   }, [isAuthenticated, user]);
+
+  const refreshSafeConfig = useCallback(() => {
+    getApiV1SafeConfig()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error(error);
+          return;
+        }
+        if (!data) {
+          console.error("No safe config data returned");
+          return;
+        }
+
+        setSafeConfig(data);
+      })
+      .catch(console.error);
+  }, []);
+
+  const refreshUser = useCallback(() => {
+    if (!isAuthenticated || !isUserSignedUp) return;
+
+    getApiV1User()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error(error);
+          return;
+        }
+
+        setUser(data);
+      })
+      .catch(console.error);
+  }, [isAuthenticated, isUserSignedUp]);
 
   const getAccountBalance = useCallback(() => {
     if (!isAuthenticated || !user) {
@@ -99,7 +129,22 @@ const UserContextProvider = ({ children }: UserContextProps) => {
       });
   }, [isAuthenticated, user]);
 
-  return <UserContext.Provider value={{ user, safeConfig, balances: balances }}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider
+      value={{
+        user,
+        safeConfig,
+        balances,
+        isUserSignedUp,
+        refreshUser,
+        refreshSafeConfig,
+        isKycApproved,
+        isSafeConfigured,
+      }}
+    >
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 const useUser = () => {
