@@ -34,11 +34,14 @@ jobs:
       - name: Login to AWS Container Registry
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+        with:
+          registries: "${{ secrets.AWS_ACCOUNT_ID_STG }},${{ secrets.AWS_ACCOUNT_ID_PROD }}"
 
       - name: Configure and check image name
         id: docker_image
         env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          # ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID_PROD }}.dkr.ecr.eu-central-1.amazonaws.com
           ECR_REPOSITORY: ui
           IMAGE_TAG: ${{ github.sha }}
         run: |
