@@ -41,7 +41,6 @@ export const CardsRoute = () => {
         </div>
         <CardTransactions cardToken={selectedCard?.cardToken} />
       </div>
-      {/* </div> */}
       <VirtualCardsOrderModal open={open} onOpenChange={setOpen} />
     </div>
   );
