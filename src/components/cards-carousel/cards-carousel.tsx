@@ -147,19 +147,21 @@ export const CardsCarousel = ({
       </div>
 
       {/* Dots indicator */}
-      <div className="flex justify-center items-center px-4 sm:px-0 mt-2">
-        <div className="flex gap-2">
-          {cards.map((card, index) => (
-            <button
-              key={card.id}
-              type="button"
-              onClick={() => goToCard(index)}
-              className={`w-3 h-3 rounded-full transition-colors cursor-pointer border ${index === currentIndex ? "border-primary" : "bg-border"}`}
-              aria-label={`Go to card ${index + 1}`}
-            />
-          ))}
+      {cards.length > 1 && (
+        <div className="flex justify-center items-center px-4 sm:px-0 mt-2">
+          <div className="flex gap-2">
+            {cards.map((card, index) => (
+              <button
+                key={card.id}
+                type="button"
+                onClick={() => goToCard(index)}
+                className={`w-3 h-3 rounded-full transition-colors cursor-pointer border ${index === currentIndex ? "border-primary" : "bg-border"}`}
+                aria-label={`Go to card ${index + 1}`}
+              />
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
