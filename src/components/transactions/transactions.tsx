@@ -4,37 +4,30 @@ import { TransactionRow } from "./transaction-row";
 import { BankTransferRow } from "./bank-transfer-row";
 import { type Transaction, TransactionType } from "@/types/transaction";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
-import { useTransactions } from "@/context/TransactionsContext";
 import { InboxIcon } from "lucide-react";
 import { OnchainTransferRow } from "./onchain-transfer-row";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useUser } from "@/context/UserContext";
 import { currencies } from "@/constants";
-import { useEffect, useState } from "react";
+import { useFilteredTransactions } from "@/hooks/useFilteredTransactions";
 
 interface TransactionsProps {
   history?: number;
-  cardTokens?: string[];
   withIban?: boolean;
   withOnchain?: boolean;
 }
 
-export const Transactions = ({ history = 7, cardTokens, withIban = true, withOnchain = true }: TransactionsProps) => {
+export const Transactions = ({ history = 7, withIban = true, withOnchain = true }: TransactionsProps) => {
   const { safeConfig } = useUser();
-  const { isLoading, isError, fetchTransactions } = useTransactions();
-  const [transactions, setTransactions] = useState<Record<string, Transaction[]>>({});
-
-  useEffect(() => {
-    fetchTransactions({ history, cardTokens, withIban, withOnchain })
-      .then((result) => {
-        if (result) {
-          setTransactions(result.dateGroupedTransactions);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching transactions: ", error);
-      });
-  }, [fetchTransactions, history, cardTokens, withIban, withOnchain]);
+  const {
+    isLoading,
+    isError,
+    filteredTransactions: transactions,
+  } = useFilteredTransactions({
+    withIban,
+    history,
+    withOnchain,
+  });
 
   if (!safeConfig || isLoading || !transactions) {
     return <TransactionSkeleton />;
@@ -45,40 +38,38 @@ export const Transactions = ({ history = 7, cardTokens, withIban = true, withOnc
   }
 
   return (
-    <>
-      <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
-        {Object.keys(transactions).length === 0 && (
-          <div className="flex flex-col items-center justify-center">
-            <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
-            <div className="text-center text-secondary">No transactions yet</div>
-          </div>
-        )}
-        {Object.keys(transactions).map((date) => (
-          <div key={date}>
-            <div className="text-xs text-secondary mb-2">{date}</div>
+    <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+      {Object.keys(transactions).length === 0 && (
+        <div className="flex flex-col items-center justify-center">
+          <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
+          <div className="text-center text-secondary">No transactions in the past {history} days</div>
+        </div>
+      )}
+      {Object.keys(transactions).map((date) => (
+        <div key={date}>
+          <div className="text-xs text-secondary mb-2">{date}</div>
 
-            {transactions[date].map((transaction: Transaction) => {
-              if (transaction.type === TransactionType.CARD) {
-                return <TransactionRow key={transaction.id} transaction={transaction.data as Event} />;
-              }
+          {transactions[date].map((transaction: Transaction) => {
+            if (transaction.type === TransactionType.CARD) {
+              return <TransactionRow key={transaction.id} transaction={transaction.data as Event} />;
+            }
 
-              if (transaction.type === TransactionType.IBAN) {
-                return <BankTransferRow key={transaction.id} ibanOrder={transaction.data as IbanOrder} />;
-              }
+            if (transaction.type === TransactionType.IBAN) {
+              return <BankTransferRow key={transaction.id} ibanOrder={transaction.data as IbanOrder} />;
+            }
 
-              if (transaction.type === TransactionType.ONCHAIN && !!safeConfig.fiatSymbol) {
-                return (
-                  <OnchainTransferRow
-                    key={transaction.id}
-                    transfer={transaction.data as Erc20TokenEvent}
-                    currency={currencies[safeConfig.fiatSymbol]}
-                  />
-                );
-              }
-            })}
-          </div>
-        ))}
-      </div>
-    </>
+            if (transaction.type === TransactionType.ONCHAIN && !!safeConfig.fiatSymbol) {
+              return (
+                <OnchainTransferRow
+                  key={transaction.id}
+                  transfer={transaction.data as Erc20TokenEvent}
+                  currency={currencies[safeConfig.fiatSymbol]}
+                />
+              );
+            }
+          })}
+        </div>
+      ))}
+    </div>
   );
 };

@@ -9,6 +9,8 @@ import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
 import type { Address } from "viem";
 import { getApiV1Transactions, getApiV1IbansOrders } from "@/client";
 
+const DEFAULT_TRANSACTIONS_HISTORY = 30;
+
 type TransactionsContextProps = {
   children: ReactNode | ReactNode[];
 };
@@ -28,18 +30,10 @@ interface GetOnchainTransfersParams {
 export type ITransactionsContext = {
   isLoading: boolean;
   isError: boolean;
-  fetchTransactions: (params: GetTransactionsParams) => Promise<
-    | {
-        // transactions: Transaction[];
-        dateGroupedTransactions: Record<string, Transaction[]>;
-        // orderedTransactions: string[];
-      }
-    | undefined
-  >;
+  transactions: Record<string, Transaction[]>;
 };
 
 type GetTransactionsParams = {
-  cardTokens?: string[];
   history: number;
   withIban: boolean;
   withOnchain: boolean;
@@ -50,9 +44,7 @@ const TransactionsContext = createContext<ITransactionsContext | undefined>(unde
 const TransactionsContextProvider = ({ children }: TransactionsContextProps) => {
   const { isAuthenticated } = useAuth();
   const { safeConfig } = useUser();
-  // const [transactions, setTransactions] = useState<Transaction[]>([]);
-  // const [dateGroupedTransactions, setDateGroupedTransactions] = useState<Record<string, Transaction[]>>({});
-  // const [orderedTransactions, setOrderedTransactions] = useState<string[]>([]);
+  const [transactions, setTransactions] = useState<Record<string, Transaction[]>>({});
   const [isError, setIsError] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -111,7 +103,7 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
   );
 
   const fetchTransactions = useCallback(
-    async ({ history = 30, cardTokens, withIban, withOnchain }: GetTransactionsParams) => {
+    ({ history = DEFAULT_TRANSACTIONS_HISTORY, withIban, withOnchain }: GetTransactionsParams) => {
       if (!safeConfig || !safeConfig.address || !tokenAddress) {
         return;
       }
@@ -122,11 +114,7 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
       setIsLoading(true);
       setIsError(false);
 
-      const result = await Promise.all([
-        getCardTransactions({
-          fromDate: formattedFromDate,
-          cardTokens,
-        }),
+      Promise.all([
         withIban && getIbanOrders(),
         withOnchain
           ? getOnchainTransfers({
@@ -136,8 +124,11 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
               skipSettlementTransfers: true,
             })
           : undefined,
+        getCardTransactions({
+          fromDate: formattedFromDate,
+        }),
       ])
-        .then(([fetchedCardTransactions, fetchedIbanOrders, fetchedOnchainSafeTransfers]) => {
+        .then(([fetchedIbanOrders, fetchedOnchainSafeTransfers, fetchedCardTransactions]) => {
           /**
            * For now, we're manually filtering IBAN orders by the placement date before setting
            * them in the state as this API endpoint still doesn't support filtering by date.
@@ -155,20 +146,7 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
             fetchedOnchainSafeTransfers,
           );
           const processedDateGroupedTransactions = groupByDate(processedTransactions);
-          console.log("processedDateGroupedTransactions", processedDateGroupedTransactions);
-          // const processedOrderedTransactions = Object.keys(processedDateGroupedTransactions).sort(
-          //   (firstTxDate, secondTxDate) => new Date(secondTxDate).getTime() - new Date(firstTxDate).getTime(),
-          // );
-
-          // setTransactions(processedTransactions);
-          // setDateGroupedTransactions(processedDateGroupedTransactions);
-          // setOrderedTransactions(processedOrderedTransactions);
-
-          return {
-            // transactions: processedTransactions,
-            dateGroupedTransactions: processedDateGroupedTransactions,
-            // orderedTransactions: processedOrderedTransactions,
-          };
+          setTransactions(processedDateGroupedTransactions);
         })
         .catch((error) => {
           setIsError(true);
@@ -178,22 +156,36 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
         .finally(() => {
           setIsLoading(false);
         });
-
-      return result;
     },
     [getCardTransactions, getIbanOrders, getOnchainTransfers, tokenAddress, safeConfig],
   );
 
   useEffect(() => {
-    if (isAuthenticated) {
-      fetchTransactions({ history: 30, withIban: true, withOnchain: true });
-    }
+    if (!isAuthenticated) return;
+
+    // Initial fetch
+    fetchTransactions({
+      history: DEFAULT_TRANSACTIONS_HISTORY,
+      withIban: true,
+      withOnchain: true,
+    });
+
+    const interval = 5 * 60 * 1000; // 5 minutes
+    const intervalId = setInterval(() => {
+      fetchTransactions({
+        history: DEFAULT_TRANSACTIONS_HISTORY,
+        withIban: true,
+        withOnchain: true,
+      });
+    }, interval);
+
+    return () => {
+      clearInterval(intervalId);
+    };
   }, [isAuthenticated, fetchTransactions]);
 
   return (
-    <TransactionsContext.Provider value={{ isLoading, isError, fetchTransactions }}>
-      {children}
-    </TransactionsContext.Provider>
+    <TransactionsContext.Provider value={{ isLoading, isError, transactions }}>{children}</TransactionsContext.Provider>
   );
 };
 
