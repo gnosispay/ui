@@ -1,4 +1,7 @@
 import type { GetApiV1UserTermsResponse } from "./client";
+import eurLogo from "./assets/eure.png";
+import gbpLogo from "./assets/gbpe.png";
+import usdcLogo from "./assets/usdce.png";
 
 export interface CurrencyInfo {
   tokenSymbol?: string;
@@ -6,6 +9,7 @@ export interface CurrencyInfo {
   decimals?: number;
   symbol?: string;
   fiatSymbol?: string;
+  logo?: string;
 }
 
 export const currencies: Record<string, CurrencyInfo> = {
@@ -15,6 +19,7 @@ export const currencies: Record<string, CurrencyInfo> = {
     decimals: 18,
     symbol: "€",
     fiatSymbol: "EUR",
+    logo: eurLogo,
   },
   GPB: {
     tokenSymbol: "GBPe",
@@ -22,6 +27,7 @@ export const currencies: Record<string, CurrencyInfo> = {
     decimals: 18,
     symbol: "£",
     fiatSymbol: "GPB",
+    logo: gbpLogo,
   },
   USD: {
     tokenSymbol: "USDCe",
@@ -29,11 +35,14 @@ export const currencies: Record<string, CurrencyInfo> = {
     decimals: 6,
     symbol: "$",
     fiatSymbol: "USD",
+    logo: usdcLogo,
   },
 };
 
 // Helper type to extract the 'type' property from the array element of GetApiV1UserTermsResponse["terms"]
-export type UserTermsTypeFromApi = NonNullable<NonNullable<GetApiV1UserTermsResponse["terms"]>[number]["type"]>;
+export type UserTermsTypeFromApi = NonNullable<
+  NonNullable<GetApiV1UserTermsResponse["terms"]>[number]["type"]
+>;
 
 // this is strongly typed to the API response
 export const userTermsTitle: Record<UserTermsTypeFromApi, string> = {
@@ -42,4 +51,5 @@ export const userTermsTitle: Record<UserTermsTypeFromApi, string> = {
   "cashback-tos": "Cardholder Cashback Terms of Service",
 };
 
-export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";
+export const GNOSIS_PAY_SETTLEMENT_ADDRESS =
+  "0x4822521E6135CD2599199c83Ea35179229A172EE";

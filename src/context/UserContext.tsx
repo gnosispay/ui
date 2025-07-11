@@ -8,6 +8,7 @@ import {
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./AuthContext";
+import { AccountIntegrityStatus } from "@gnosispay/account-kit";
 
 type UserContextProps = {
   children: ReactNode | ReactNode[];
@@ -41,7 +42,10 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   }, [isAuthenticated, isUserSignedUp, user]);
 
   useEffect(() => {
-    if (safeConfig?.accountStatus === 0) {
+    if (
+      safeConfig?.accountStatus === AccountIntegrityStatus.Ok ||
+      safeConfig?.accountStatus === AccountIntegrityStatus.DelayQueueNotEmpty
+    ) {
       setIsSafeConfigured(true);
     }
   }, [safeConfig]);
