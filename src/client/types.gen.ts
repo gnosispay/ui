@@ -32,6 +32,9 @@ export type CardOrder = {
     id: string;
     transactionHash?: string;
     createdAt: string;
+    /**
+     * Current order status in the state machine. See the state transition diagram in the documentation for valid transitions.
+     */
     status: 'PENDINGTRANSACTION' | 'TRANSACTIONCOMPLETE' | 'CONFIRMATIONREQUIRED' | 'READY' | 'CARDCREATED' | 'FAILEDTRANSACTION' | 'CANCELLED';
     personalizationSource: 'KYC' | 'ENS';
     embossedName?: string;
@@ -1079,10 +1082,60 @@ export type PostApiV1CardsByCardIdUnfreezeResponses = {
 
 export type PostApiV1CardsByCardIdUnfreezeResponse = PostApiV1CardsByCardIdUnfreezeResponses[keyof PostApiV1CardsByCardIdUnfreezeResponses];
 
+export type PostApiV1CardsByCardIdVoidData = {
+    body?: never;
+    path: {
+        cardId: string;
+    };
+    query?: never;
+    url: '/api/v1/cards/{cardId}/void';
+};
+
+export type PostApiV1CardsByCardIdVoidErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * No card found
+     */
+    404: unknown;
+    /**
+     * Only virtual cards can be voided
+     */
+    422: {
+        error: 'Only virtual cards can be voided';
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1CardsByCardIdVoidError = PostApiV1CardsByCardIdVoidErrors[keyof PostApiV1CardsByCardIdVoidErrors];
+
+export type PostApiV1CardsByCardIdVoidResponses = {
+    /**
+     * Card marked as void successfully
+     */
+    200: {
+        status: 'Card marked as void successfully';
+    };
+};
+
+export type PostApiV1CardsByCardIdVoidResponse = PostApiV1CardsByCardIdVoidResponses[keyof PostApiV1CardsByCardIdVoidResponses];
+
 export type GetApiV1CardsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Exclude voided cards from the response
+         */
+        exclude_voided?: boolean;
+    };
     url: '/api/v1/cards';
 };
 
@@ -1109,7 +1162,49 @@ export type GetApiV1CardsResponses = {
     /**
      * The list of cards for a user
      */
-    200: Array<Card>;
+    200: Array<{
+        id: string;
+        cardToken: string;
+        lastFourDigits: string;
+        activatedAt: string | null;
+        virtual: boolean;
+        /**
+         * Card status code from payment processor. Possible values:
+         * - 1000: Active
+         * - 1001: Refer to Issuer
+         * - 1004: Capture
+         * - 1005: Declined
+         * - 1006: Pin Blocked
+         * - 1007: Declined
+         * - 1008: Honour with ID
+         * - 1009: Void
+         * - 1041: Lost
+         * - 1043: Stolen
+         * - 1054: Expired
+         * - 1154: Expired
+         * - 1062: Restricted
+         * - 1199: Void
+         *
+         */
+        statusCode: 1000 | 1001 | 1004 | 1005 | 1006 | 1007 | 1008 | 1009 | 1041 | 1043 | 1054 | 1154 | 1062 | 1199;
+        /**
+         * Human-readable card status name corresponding to statusCode:
+         * - "Active": Card is active and can be used
+         * - "Refer to Issuer": Transaction requires issuer approval
+         * - "Capture": Card should be captured/retained
+         * - "Declined": All transactions are declined
+         * - "Pin Blocked": Card PIN is blocked due to incorrect attempts
+         * - "Honour with ID": Transaction requires ID verification
+         * - "Void": Card is voided/cancelled
+         * - "Lost": Card is reported as lost
+         * - "Stolen": Card is reported as stolen
+         * - "Expired": Card has expired
+         * - "Restricted": Card has restrictions applied
+         * - "Unknown": Status code not recognized
+         *
+         */
+        statusName: string;
+    }>;
 };
 
 export type GetApiV1CardsResponse = GetApiV1CardsResponses[keyof GetApiV1CardsResponses];
@@ -1140,6 +1235,72 @@ export type GetApiV1DelayRelayResponses = {
 };
 
 export type GetApiV1DelayRelayResponse = GetApiV1DelayRelayResponses[keyof GetApiV1DelayRelayResponses];
+
+export type PostApiV1DelayRelayData = {
+    body: {
+        /**
+         * Chain ID for the transaction (only 100 supported)
+         */
+        chainId: 100;
+        /**
+         * Target address for the transaction
+         */
+        target: string;
+        /**
+         * Signed transaction data
+         */
+        signedData: string;
+        /**
+         * The Safe contract address
+         */
+        safeAddress: string;
+        /**
+         * Type of operation (optional)
+         */
+        operationType?: 'CALL' | 'DELEGATECALL';
+        transactionData: {
+            /**
+             * Recipient address
+             */
+            to: string;
+            /**
+             * Transaction value (optional)
+             */
+            value?: string;
+            /**
+             * Transaction data
+             */
+            data: string;
+        };
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/delay-relay';
+};
+
+export type PostApiV1DelayRelayErrors = {
+    /**
+     * Invalid request body
+     */
+    400: unknown;
+    /**
+     * Unauthorized, missing or invalid token
+     */
+    401: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostApiV1DelayRelayResponses = {
+    /**
+     * Successfully created delayed transaction
+     */
+    200: DelayTransaction;
+};
+
+export type PostApiV1DelayRelayResponse = PostApiV1DelayRelayResponses[keyof PostApiV1DelayRelayResponses];
 
 export type GetApiV1OrderData = {
     body?: never;
@@ -1520,6 +1681,12 @@ export type PostApiV1VerificationErrors = {
         error?: 'Invalid phone number' | 'Phone number already validated' | 'User needs to be KYC approved';
     };
     /**
+     * Maximum verification attempts reached. Please try again later.
+     */
+    429: {
+        error?: string;
+    };
+    /**
      * Failed to send verification.
      */
     500: unknown;
@@ -1537,6 +1704,222 @@ export type PostApiV1VerificationResponses = {
 };
 
 export type PostApiV1VerificationResponse = PostApiV1VerificationResponses[keyof PostApiV1VerificationResponses];
+
+export type GetApiV1AccountsOnchainDailyLimitData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/onchain-daily-limit';
+};
+
+export type GetApiV1AccountsOnchainDailyLimitErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitError = GetApiV1AccountsOnchainDailyLimitErrors[keyof GetApiV1AccountsOnchainDailyLimitErrors];
+
+export type GetApiV1AccountsOnchainDailyLimitResponses = {
+    /**
+     * Successfully retrieved the current onchain daily limit.
+     */
+    200: {
+        data: {
+            /**
+             * The current daily spending limit in the Safe token's base units.
+             */
+            onchainDailyLimit: number;
+        };
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitResponse = GetApiV1AccountsOnchainDailyLimitResponses[keyof GetApiV1AccountsOnchainDailyLimitResponses];
+
+export type PutApiV1AccountsOnchainDailyLimitData = {
+    body: {
+        /**
+         * The new daily spending limit to set (must be an integer).
+         */
+        onchainDailyLimit: number;
+        /**
+         * The wallet signature authorizing this limit change.
+         */
+        signature: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/onchain-daily-limit';
+};
+
+export type PutApiV1AccountsOnchainDailyLimitErrors = {
+    /**
+     * Bad request - invalid signature.
+     */
+    400: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable Entity - validation errors in request body.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type PutApiV1AccountsOnchainDailyLimitError = PutApiV1AccountsOnchainDailyLimitErrors[keyof PutApiV1AccountsOnchainDailyLimitErrors];
+
+export type PutApiV1AccountsOnchainDailyLimitResponses = {
+    /**
+     * Successfully submitted the daily limit update request.
+     */
+    200: {
+        data: {
+            /**
+             * The daily limit value that was requested to be set.
+             */
+            requestedOnchainDailyLimit: number;
+        };
+    };
+};
+
+export type PutApiV1AccountsOnchainDailyLimitResponse = PutApiV1AccountsOnchainDailyLimitResponses[keyof PutApiV1AccountsOnchainDailyLimitResponses];
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The new daily spending limit to set (1-5000, must be an integer).
+         */
+        onchainDailyLimit: string;
+    };
+    url: '/api/v1/accounts/onchain-daily-limit/transaction-data';
+};
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable Entity - validation errors in query parameters.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataError = GetApiV1AccountsOnchainDailyLimitTransactionDataErrors[keyof GetApiV1AccountsOnchainDailyLimitTransactionDataErrors];
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataResponses = {
+    /**
+     * Successfully retrieved transaction data for signing.
+     */
+    200: {
+        data: {
+            transaction: {
+                /**
+                 * The target contract address for the transaction.
+                 */
+                to: string;
+                /**
+                 * The amount of native tokens to send with the transaction (usually 0).
+                 */
+                value: number;
+                /**
+                 * The encoded transaction data containing the function call.
+                 */
+                data: string;
+            };
+        };
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataResponse = GetApiV1AccountsOnchainDailyLimitTransactionDataResponses[keyof GetApiV1AccountsOnchainDailyLimitTransactionDataResponses];
 
 export type GetApiV1EoaAccountsData = {
     body?: never;
@@ -2097,14 +2480,21 @@ export type PostApiV1KycImportPartnerApplicantResponse = PostApiV1KycImportPartn
 
 export type PostApiV1OrderByOrderIdCardData = {
     body: {
-        encryptedKey?: string;
-        encryptedPin?: string;
-        iv?: string;
-        options?: {
+        encryptedKey: string;
+        encryptedPin: string;
+        iv: string;
+        options: {
             /**
-             * If set to `true`, `encryptedKey`, `encryptedPin` and `iv` need to be provided.
+             * Discriminator property, must be true for this schema.
              */
-            setPin?: boolean;
+            setPin: boolean;
+        };
+    } | {
+        options: {
+            /**
+             * Discriminator property, must be false for this schema.
+             */
+            setPin: boolean;
         };
     };
     path: {
@@ -2464,6 +2854,58 @@ export type PutApiV1OrderByOrderIdConfirmPaymentResponses = {
 };
 
 export type PutApiV1OrderByOrderIdConfirmPaymentResponse = PutApiV1OrderByOrderIdConfirmPaymentResponses[keyof PutApiV1OrderByOrderIdConfirmPaymentResponses];
+
+export type PostApiV1OrderByOrderIdCancelData = {
+    body?: never;
+    path: {
+        /**
+         * The unique identifier of the card order to cancel.
+         */
+        orderId: string;
+    };
+    query?: never;
+    url: '/api/v1/order/{orderId}/cancel';
+};
+
+export type PostApiV1OrderByOrderIdCancelErrors = {
+    /**
+     * Invalid order transition or order not in cancellable state.
+     */
+    400: {
+        message?: string;
+    };
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Card order not found.
+     */
+    404: {
+        message?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        message?: string;
+    };
+};
+
+export type PostApiV1OrderByOrderIdCancelError = PostApiV1OrderByOrderIdCancelErrors[keyof PostApiV1OrderByOrderIdCancelErrors];
+
+export type PostApiV1OrderByOrderIdCancelResponses = {
+    /**
+     * Card order successfully cancelled.
+     */
+    200: {
+        ok?: boolean;
+    };
+};
+
+export type PostApiV1OrderByOrderIdCancelResponse = PostApiV1OrderByOrderIdCancelResponses[keyof PostApiV1OrderByOrderIdCancelResponses];
 
 export type PostApiV1OrderCreateData = {
     body: {

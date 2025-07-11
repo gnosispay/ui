@@ -12,6 +12,7 @@ import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import StepList from "./StepList";
 import { DeploySteps } from "./deploySteps";
+import { AccountIntegrityStatus } from "@gnosispay/account-kit";
 
 interface DeploySafeStepProps {
   setError: (err: string) => void;
@@ -67,7 +68,7 @@ const DeploySafeStep = ({ setError }: DeploySafeStepProps) => {
 
         // Step 3: Get Signature Payload
         if (step === DeploySteps.GetSignaturePayload) {
-          if (safeConfig?.accountStatus === 0) {
+          if (safeConfig?.accountStatus === AccountIntegrityStatus.Ok) {
             setStep(DeploySteps.Done);
             return;
           }
@@ -83,7 +84,7 @@ const DeploySafeStep = ({ setError }: DeploySafeStepProps) => {
 
         // Step 4: Signing
         if (step === DeploySteps.Signing && payloadState) {
-          if (safeConfig?.accountStatus === 0) {
+          if (safeConfig?.accountStatus === AccountIntegrityStatus.Ok) {
             setStep(DeploySteps.Done);
             return;
           }
@@ -100,7 +101,7 @@ const DeploySafeStep = ({ setError }: DeploySafeStepProps) => {
 
         // Step 5: Deploy Modules
         if (step === DeploySteps.DeployModules && signatureState) {
-          if (safeConfig?.accountStatus === 0) {
+          if (safeConfig?.accountStatus === AccountIntegrityStatus.Ok) {
             setStep(DeploySteps.Done);
             return;
           }
