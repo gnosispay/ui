@@ -65,6 +65,10 @@
   --destructive: var(--error-500);
   --destructive-foreground: var(--neutral-50);
   --destructive-hover: var(--error-900);
+  --warning: var(--warning-500);
+  --warning-foreground: var(--neutral-50);
+  --info: var(--info-500);
+  --info-foreground: var(--neutral-50);
   --primary-hover: var(--brand-600);
   --border: var(--neutral-300);
   --input: var(--neutral-200);
@@ -90,6 +94,9 @@
   --color-icon-card-bg: var(--neutral-200);
   --color-icon-card: var(--neutral-500);
   --color-success: var(--success-600);
+  --color-warning: var(--warning-600);
+  --dialog-background: var(--neutral-50);
+  --alert-background: var(--neutral-200);
 }
 
 @media (prefers-color-scheme: light) {
@@ -120,6 +127,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -145,6 +156,8 @@
   --color-icon-card-bg: var(--color-icon-card-bg);
   --color-icon-card: var(--color-icon-card);
   --color-success: var(--color-success);
+  --color-dialog-background: var(--dialog-background);
+  --color-alert-background: var(--alert-background);
 }
 
 .dark {
@@ -166,6 +179,10 @@
   --destructive: var(--error-500);
   --destructive-foreground: var(--neutral-50);
   --destructive-hover: var(--error-900);
+  --warning: var(--warning-500);
+  --warning-foreground: var(--neutral-50);
+  --info: var(--info-500);
+  --info-foreground: var(--neutral-50);
   --primary-hover: var(--brand-400);
   --border: var(--neutral-600);
   --input: var(--neutral-700);
@@ -191,6 +208,9 @@
   --color-icon-card-bg: var(--neutral-600);
   --color-icon-card: var(--neutral-400);
   --color-success: var(--success-600);
+  --color-warning: var(--warning-600);
+  --dialog-background: var(--neutral-900);
+  --alert-background: var(--neutral-600);
 }
 
 @layer base {
