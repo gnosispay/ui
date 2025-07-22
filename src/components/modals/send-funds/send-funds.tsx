@@ -5,14 +5,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TriangleAlert, Clock, AlertCircle } from "lucide-react";
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { formatUnits, isAddress } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, useSignTypedData } from "wagmi";
 import { toast } from "sonner";
 import type { CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./token-amount-input";
 import { AddressInput } from "./address-input";
-import { encodeErc20Transfer } from "@/lib/fetchErc20Transfers";
 import { useUser } from "@/context/UserContext";
-import { useDelayRelay } from "@/hooks/useDelayRelay";
+import { getApiV1AccountsWithdrawTransactionData, postApiV1AccountsWithdraw } from "@/client";
+import { useDelayRelay } from "@/context/DelayRelayContext";
 
 interface AddFundsModalProps {
   open: boolean;
@@ -31,19 +31,12 @@ export const SendFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
   const [selectedToken, setSelectedToken] = useState<CurrencyInfoWithBalance | undefined>();
   const [amount, setAmount] = useState<bigint>(0n);
   const [isLoading, setIsLoading] = useState(false);
+  const { signTypedDataAsync } = useSignTypedData();
+  const { queue } = useDelayRelay();
+  const isQueueNotEmpty = useMemo(() => queue.length > 0, [queue]);
 
   const { address: connectedAddress, isConnected } = useAccount();
   const { safeConfig } = useUser();
-  const {
-    delayRelay,
-    isLoading: isDelayRelayPending,
-    queue,
-    error: delayRelayError,
-  } = useDelayRelay(safeConfig?.address || "");
-
-  const isQueueNotEmpty = useMemo(() => {
-    return queue.length > 0;
-  }, [queue]);
 
   const clearAndClose = useCallback(() => {
     onOpenChange(false);
@@ -70,31 +63,78 @@ export const SendFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
 
     setIsLoading(true);
 
-    try {
-      // Encode the ERC20 transfer function call
-      const data = encodeErc20Transfer(toAddress, amount);
+    getApiV1AccountsWithdrawTransactionData({
+      query: {
+        to: toAddress,
+        amount: amount.toString(),
+        tokenAddress: selectedToken.address,
+      },
+    })
+      .then(async ({ data, error }) => {
+        if (error) {
+          console.error("Error fetching transaction data:", error);
+          toast.error("Failed to fetch transaction data");
+          setIsLoading(false);
+          return;
+        }
+        const typedData = data.data;
 
-      // Submit the transaction via delay relay
-      await delayRelay({
-        to: selectedToken.address,
-        data,
-        value: 0, // ERC20 transfers don't send ETH
+        signTypedDataAsync({
+          ...typedData,
+          domain: {
+            ...typedData.domain,
+            verifyingContract: typedData.domain.verifyingContract as `0x${string}`,
+          },
+        })
+          .then(async (signature) => {
+            if (!signature) {
+              toast.error("Failed to sign transaction");
+              return;
+            }
+
+            if (!selectedToken.address) {
+              return;
+            }
+
+            postApiV1AccountsWithdraw({
+              body: {
+                signature,
+                to: toAddress,
+                amount: amount.toString(),
+                tokenAddress: selectedToken.address,
+                message: typedData.message,
+              },
+            })
+              .then(({ data, error }) => {
+                if (error) {
+                  console.error("Error submitting transaction:", error);
+                  toast.error("Failed to submit transaction");
+                  return;
+                }
+
+                toast.success("Transaction submitted successfully and will be processed after the delay period");
+                console.log("Transaction submitted:", data);
+              })
+              .catch((error) => {
+                console.error("Error submitting transaction:", error);
+                toast.error("Failed to submit transaction");
+                return;
+              });
+          })
+          .catch((error) => {
+            console.error("Error signing transaction:", error);
+            toast.error("Failed to sign transaction");
+            return;
+          });
+      })
+      .catch((error) => {
+        console.error("Error fetching transaction data:", error);
+        toast.error("Failed to fetch transaction data");
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
-
-      // toast.success("Transaction submitted successfully and will be processed after the delay period");
-      // clearAndClose();
-    } catch (error) {
-      console.error("Error submitting transaction:", error);
-      // Error handling is done in the hook
-    } finally {
-      setIsLoading(false);
-    }
-  }, [amount, toAddress, addressError, selectedToken?.address, safeConfig?.address, delayRelay]);
-
-  // Update loading state based on delay relay status
-  useEffect(() => {
-    setIsLoading(isDelayRelayPending);
-  }, [isDelayRelayPending]);
+  }, [amount, toAddress, addressError, selectedToken?.address, safeConfig?.address, signTypedDataAsync]);
 
   const isFormValid = useMemo(() => {
     return toAddress && !addressError && amount && amount > 0n && selectedToken;
@@ -172,14 +212,6 @@ export const SendFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
                 As a security measure, your card will be temporarily frozen for 3 minutes.
               </AlertDescription>
             </Alert>
-
-            {delayRelayError && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>Error submitting transaction. {delayRelayError}</AlertDescription>
-              </Alert>
-            )}
-
             <div className="flex gap-3">
               <Button variant="outline" onClick={() => setStep(Step.Form)} disabled={isLoading}>
                 Back
