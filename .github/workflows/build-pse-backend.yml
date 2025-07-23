@@ -1,0 +1,69 @@
+name: PSE Backend CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    paths: ['pse-backend-demo/**/*', '.github/workflows/pse-ci.yaml']
+
+jobs:
+
+  build-and-push-image:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    # If we had concurrent builds, the deployment stage could fail because the current task definition might not match the expected one on ECR.
+    # By scoping the pse-backend builds in a single group, each build would depend on the finality of the previous one in the group.
+    # The likelihood of a conflicting task definition is then reduced (as they are created once the image finishes building)
+    concurrency:
+      group: pse-backend
+      cancel-in-progress: false
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID_PROD }}:role/github-actions-role
+          aws-region: eu-central-1
+
+      - name: Login to AWS Container Registry
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Configure and check image name
+        id: docker_image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: pse-backend
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          set +e
+          image_name="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          aws ecr describe-images --repository-name=$ECR_REPOSITORY --image-ids=imageTag=$IMAGE_TAG
+          if [[ $? == "0" ]]; then image_exists=true; else image_exists=false; fi
+          echo "image_name=$image_name" >> $GITHUB_OUTPUT
+          echo "image_exists=$image_exists" >> $GITHUB_OUTPUT
+
+      - name: Build, tag, and push image to AWS Container Registry
+        env:
+          IMAGE_NAME: ${{ steps.docker_image.outputs.image_name }}
+        if: steps.docker_image.outputs.image_exists == 'false'
+        run: |
+          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.pse-backend
+          docker push $IMAGE_NAME
+
+  # deploy-on-staging:
+  #   name: Deploy on Staging
+  #   if: github.ref == 'refs/heads/main'
+  #   uses: ./.github/workflows/deploy.yml
+  #   needs: build-and-push-image
+  #   with:
+  #     environment: stg
+  #     image_tag: ${{ github.sha }}
+  #   secrets: inherit

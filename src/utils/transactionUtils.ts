@@ -26,17 +26,21 @@ export function groupByDate(transactions: Transaction[]) {
   );
 }
 
-export function mergeAndSortTransactions(
-  cardTransactions: Event[] = [],
-  ibanOrders: IbanOrder[] = [],
-  onchainSafeTransfers: Erc20TokenEvent[] = [],
-): Transaction[] {
-  const cardTransactionsMapped = cardTransactions.map((tx) => ({
+export const getCardTransactionsFromCardEvents = (cardEvents: Event[]): Transaction[] => {
+  return cardEvents.map((tx) => ({
     id: `${tx.createdAt}${tx.merchant?.name || ""}`,
     createdAt: tx.createdAt || "",
     type: TransactionType.CARD,
     data: tx,
   }));
+};
+
+export function mergeAndSortTransactions(
+  cardTransactions: Event[] = [],
+  ibanOrders: IbanOrder[] = [],
+  onchainSafeTransfers: Erc20TokenEvent[] = [],
+): Transaction[] {
+  const cardTransactionsMapped = getCardTransactionsFromCardEvents(cardTransactions);
 
   const ibanOrdersMapped = ibanOrders.map((order) => ({
     id: order.id,

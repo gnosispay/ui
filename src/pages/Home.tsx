@@ -27,7 +27,7 @@ export const Home = () => {
             </div>
             <Transactions history={7} />
           </div>
-          <div className="col-span-3 lg:col-span-1 lg:col-start-3">
+          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
             <div className="flex items-center justify-between mb-4">
               <h1 className="font-bold text-secondary">Cards</h1>
               <Link to="/cards" className="flex items-center gap-2">

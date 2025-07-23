@@ -56,3 +56,13 @@ jobs:
         run: |
           docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.ui
           docker push $IMAGE_NAME
+
+  # deploy-on-staging:
+  #   name: Deploy on Staging
+  #   if: github.ref == 'refs/heads/main'
+  #   uses: ./.github/workflows/deploy.yml
+  #   needs: build-and-push-image
+  #   with:
+  #     environment: stg
+  #     image_tag: ${{ github.sha }}
+  #   secrets: inherit

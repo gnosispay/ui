@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@gnosispay/account-kit':
-        specifier: ^4.6.0
-        version: 4.6.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^4.7.0
+        version: 4.7.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@gnosispay/pse-sdk':
         specifier: ^1.1.4
         version: 1.1.4
@@ -581,8 +581,8 @@ packages:
   '@gnosis.pm/zodiac@3.5.2':
     resolution: {integrity: sha512-ra4iGOF8gPhYFZTQeH6mRC9TinY0eZ/l+uGhyskR46+IHjH3OFQbmfRu+UYJedYBka3vT3ai0iidKGDKRt61yA==}
 
-  '@gnosispay/account-kit@4.6.0':
-    resolution: {integrity: sha512-rIT2vzeY0GtDceEPZ/hbNVFk/ZmOo1v7u4KN2YxQqNVXGzlPlFGAdZgHC9rPwMUQj8sFdWLfwhozj8ezisdZog==}
+  '@gnosispay/account-kit@4.7.0':
+    resolution: {integrity: sha512-lXWlqV3qrk/386ylLlinsRL7yVWjprTb+ZH+XFhJhB5kV5do3uoeNGPWApL018Ix9pu9h9sL7sl6fNYxNwROYQ==}
 
   '@gnosispay/pse-sdk@1.1.4':
     resolution: {integrity: sha512-0+5Ujz1I4mbChxGQKesb6O07kev6MV51RUVakqNzUzA8VmLwHNXdSaZ4QMHZndNcnPFSp/RonftALghhj3AaIQ==}
@@ -1603,8 +1603,8 @@ packages:
       zod:
         optional: true
 
-  acorn@8.14.1:
-    resolution: {integrity: sha512-OvQ/2pUDKmgfCg++xsTX1wGxfTaszcHVcTctW4UJB4hibJx2HXxxO5UmVgyjMa+ZDsiaf5wWLXYpRWMmBI0QHg==}
+  acorn@8.15.0:
+    resolution: {integrity: sha512-NZyJarBfL7nWwIq+FDL6Zp/yHEhePMNnnJ0y3qfieCrmNvYct8uvtiV41UvlSe6apAfk0fY1FbWx+NwfmpvtTg==}
     engines: {node: '>=0.4.0'}
     hasBin: true
 
@@ -1939,6 +1939,10 @@ packages:
     resolution: {integrity: sha512-m/C+AwOAr9/W1UOIZUo232ejMNnJAJtYQjUbHoNTBNTJSvqzzDh7vnrei3o3r3m9blf6ZoDkvcw0VmozNRFJxg==}
     engines: {node: '>=12'}
 
+  dotenv@16.6.1:
+    resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+    engines: {node: '>=12'}
+
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
     engines: {node: '>= 0.4'}
@@ -2201,6 +2205,9 @@ packages:
 
   isarray@1.0.0:
     resolution: {integrity: sha512-VLghIWNM6ELQzo7zwmcg0NmTVyWKYjvIeM83yjp0wRDTmUnrM678fQbcKBo6n2CJEF0szoG//ytg+TKla89ALQ==}
+
+  isarray@2.0.5:
+    resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
 
   isexe@2.0.0:
     resolution: {integrity: sha512-RHxMLp9lnKHGHRng9QFhRCMbYAcVpn69smSGcq3f36xjgVVWThj4qqLbTLlq7Ssj8B+fIQ1EuCEGI2lKsyQeIw==}
@@ -2601,6 +2608,9 @@ packages:
   preact@10.26.8:
     resolution: {integrity: sha512-1nMfdFjucm5hKvq0IClqZwK4FJkGXhRrQstOQ3P4vp8HxKrJEMFcY6RdBRVTdfQS/UlnX6gfbPuTvaqx/bDoeQ==}
 
+  preact@10.26.9:
+    resolution: {integrity: sha512-SSjF9vcnF27mJK1XyFMNJzFd5u3pQiATFqoaDy03XuN00u4ziveVVEGt5RKJrDR8MHE/wJo9Nnad56RLzS2RMA==}
+
   prettier@3.5.3:
     resolution: {integrity: sha512-QQtaxnoDJeAkDvDKWCLiwIXkTgRhwYDEQCghU9Z6q03iyek/rxRh/2lC3HB7P8sWT2xC/y5JDctPLBIGzHKbhw==}
     engines: {node: '>=14'}
@@ -2792,8 +2802,9 @@ packages:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
 
-  sha.js@2.4.11:
-    resolution: {integrity: sha512-QMEp5B7cftE7APOjk5Y6xgrbWu+WkLVQwk8JNjZ8nKRciZaByEW6MubieAiToS7+dwvrjGhH8jRXz3MVd0AYqQ==}
+  sha.js@2.4.12:
+    resolution: {integrity: sha512-8LzC5+bvI45BjpfXU8V5fdU2mfeKiQe1D1gIMn7XUlF3OTUrpdJpPPH4EMAnF0DsHHdSZqCdSss5qCmJKuiO3w==}
+    engines: {node: '>= 0.10'}
     hasBin: true
 
   shebang-command@2.0.0:
@@ -2910,6 +2921,10 @@ packages:
     resolution: {integrity: sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==}
     engines: {node: '>=12.0.0'}
 
+  to-buffer@1.2.1:
+    resolution: {integrity: sha512-tB82LpAIWjhLYbqjx3X4zEeHN6M8CiuOEy2JY8SEQVdYRe3CCHOFaqrBW1doLDrfpWhplcW7BL+bO3/6S3pcDQ==}
+    engines: {node: '>= 0.4'}
+
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
 
@@ -2928,6 +2943,10 @@ packages:
 
   tw-animate-css@1.3.1:
     resolution: {integrity: sha512-Z6tgVNW3em81PoF5+L5jRBuVvmhwN7bvyB76aQK0o3tWqe9Qp/yc7SUm+ZZK4beyj4XaCsD6e9gCS1avOfGhWA==}
+
+  typed-array-buffer@1.0.3:
+    resolution: {integrity: sha512-nAYYwfY3qnzX30IkA6AQZjVbtK6duGontcQm1WSG1MD94YLqK0515GNApXkoxKOWMusVssAHWLh9SeaoefYFGw==}
+    engines: {node: '>= 0.4'}
 
   typescript@5.3.2:
     resolution: {integrity: sha512-6l+RyNy7oAHDfxC4FzSJcz9vnjTKxrLpDG5M2Vu4SHRVNg6xzqZp6LYSR9zjqQTu8DU/f5xwxUdADOkbrIX2gQ==}
@@ -3470,8 +3489,8 @@ snapshots:
       eth-json-rpc-filters: 6.0.1
       eventemitter3: 5.0.1
       keccak: 3.0.4
-      preact: 10.26.8
-      sha.js: 2.4.11
+      preact: 10.26.9
+      sha.js: 2.4.12
     transitivePeerDependencies:
       - supports-color
 
@@ -3876,7 +3895,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@gnosispay/account-kit@4.6.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@gnosispay/account-kit@4.7.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@gnosis.pm/safe-contracts': 1.3.0(ethers@6.14.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@gnosis.pm/zodiac': 3.5.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -5660,7 +5679,7 @@ snapshots:
       typescript: 5.8.3
       zod: 3.25.36
 
-  acorn@8.14.1: {}
+  acorn@8.15.0: {}
 
   aes-js@3.0.0: {}
 
@@ -5741,7 +5760,7 @@ snapshots:
       chokidar: 4.0.3
       confbox: 0.1.8
       defu: 6.1.4
-      dotenv: 16.5.0
+      dotenv: 16.6.1
       giget: 1.2.5
       jiti: 2.4.2
       mlly: 1.7.4
@@ -5955,6 +5974,8 @@ snapshots:
   dotenv-expand@10.0.0: {}
 
   dotenv@16.5.0: {}
+
+  dotenv@16.6.1: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -6317,6 +6338,8 @@ snapshots:
 
   isarray@1.0.0: {}
 
+  isarray@2.0.5: {}
+
   isexe@2.0.0: {}
 
   isows@1.0.6(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)):
@@ -6488,7 +6511,7 @@ snapshots:
 
   mlly@1.7.4:
     dependencies:
-      acorn: 8.14.1
+      acorn: 8.15.0
       pathe: 2.0.3
       pkg-types: 1.3.1
       ufo: 1.6.1
@@ -6675,6 +6698,8 @@ snapshots:
       source-map-js: 1.2.1
 
   preact@10.26.8: {}
+
+  preact@10.26.9: {}
 
   prettier@3.5.3: {}
 
@@ -6884,10 +6909,11 @@ snapshots:
       gopd: 1.2.0
       has-property-descriptors: 1.0.2
 
-  sha.js@2.4.11:
+  sha.js@2.4.12:
     dependencies:
       inherits: 2.0.4
       safe-buffer: 5.2.1
+      to-buffer: 1.2.1
 
   shebang-command@2.0.0:
     dependencies:
@@ -7007,6 +7033,12 @@ snapshots:
       fdir: 6.4.5(picomatch@4.0.2)
       picomatch: 4.0.2
 
+  to-buffer@1.2.1:
+    dependencies:
+      isarray: 2.0.5
+      safe-buffer: 5.2.1
+      typed-array-buffer: 1.0.3
+
   tr46@0.0.3: {}
 
   tree-kill@1.2.2: {}
@@ -7018,6 +7050,12 @@ snapshots:
   tslib@2.8.1: {}
 
   tw-animate-css@1.3.1: {}
+
+  typed-array-buffer@1.0.3:
+    dependencies:
+      call-bound: 1.0.4
+      es-errors: 1.3.0
+      is-typed-array: 1.1.15
 
   typescript@5.3.2: {}
 
