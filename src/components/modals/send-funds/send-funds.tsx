@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { TriangleAlert, Clock, AlertCircle } from "lucide-react";
-import { useState, useMemo, useCallback, useEffect } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { formatUnits, isAddress } from "viem";
 import { useAccount, useSignTypedData } from "wagmi";
 import { toast } from "sonner";
