@@ -170,8 +170,8 @@ export const SendFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
               <Alert variant="warning">
                 <TriangleAlert className="h-4 w-4" />
                 <AlertDescription>
-                  Please ensure you enter a Gnosis Chain address. You are solely responsible for accuracy of the address
-                  and safety of your funds.
+                  Please ensure you enter a Gnosis Chain address. You are solely responsible for the accuracy of the
+                  address and the safety of your funds.
                 </AlertDescription>
               </Alert>
             )}
