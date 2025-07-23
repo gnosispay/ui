@@ -40,9 +40,7 @@ export const currencies: Record<string, CurrencyInfo> = {
 };
 
 // Helper type to extract the 'type' property from the array element of GetApiV1UserTermsResponse["terms"]
-export type UserTermsTypeFromApi = NonNullable<
-  NonNullable<GetApiV1UserTermsResponse["terms"]>[number]["type"]
->;
+export type UserTermsTypeFromApi = NonNullable<NonNullable<GetApiV1UserTermsResponse["terms"]>[number]["type"]>;
 
 // this is strongly typed to the API response
 export const userTermsTitle: Record<UserTermsTypeFromApi, string> = {
@@ -51,5 +49,4 @@ export const userTermsTitle: Record<UserTermsTypeFromApi, string> = {
   "cashback-tos": "Cardholder Cashback Terms of Service",
 };
 
-export const GNOSIS_PAY_SETTLEMENT_ADDRESS =
-  "0x4822521E6135CD2599199c83Ea35179229A172EE";
+export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";

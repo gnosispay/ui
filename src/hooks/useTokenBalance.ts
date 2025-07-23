@@ -20,8 +20,7 @@ export interface UseTokenBalanceResult {
 
 export const useTokenBalance = (): UseTokenBalanceResult => {
   const { safeConfig } = useUser();
-  const [currenciesWithBalance, setCurrenciesWithBalance] =
-    useState<CurrencyWithBalance>({});
+  const [currenciesWithBalance, setCurrenciesWithBalance] = useState<CurrencyWithBalance>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -43,18 +42,16 @@ export const useTokenBalance = (): UseTokenBalanceResult => {
     setIsError(false);
 
     try {
-      const balancePromises = Object.values(currencies).map(
-        async (currency) => {
-          if (!currency.address) {
-            return Promise.resolve({ value: 0n });
-          }
-
-          return getBalance(config, {
-            address: safeConfig.address as Address,
-            token: currency.address as Address,
-          });
+      const balancePromises = Object.values(currencies).map(async (currency) => {
+        if (!currency.address) {
+          return Promise.resolve({ value: 0n });
         }
-      );
+
+        return getBalance(config, {
+          address: safeConfig.address as Address,
+          token: currency.address as Address,
+        });
+      });
 
       const balanceResults = await Promise.all(balancePromises);
       const newCurrencies: CurrencyWithBalance = {};
