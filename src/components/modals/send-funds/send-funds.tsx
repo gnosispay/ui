@@ -32,7 +32,7 @@ export const SendFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
   const [amount, setAmount] = useState<bigint>(0n);
   const [isLoading, setIsLoading] = useState(false);
   const { signTypedDataAsync } = useSignTypedData();
-  const { queue } = useDelayRelay();
+  const { queue, fetchDelayQueue } = useDelayRelay();
   const isQueueNotEmpty = useMemo(() => queue.length > 0, [queue]);
 
   const { address: connectedAddress, isConnected } = useAccount();
@@ -111,9 +111,9 @@ export const SendFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
                   toast.error("Failed to submit transaction");
                   return;
                 }
-
-                toast.success("Transaction submitted successfully and will be processed after the delay period");
-                console.log("Transaction submitted:", data);
+                clearAndClose();
+                fetchDelayQueue();
+                console.info("Transaction submitted:", data);
               })
               .catch((error) => {
                 console.error("Error submitting transaction:", error);
@@ -125,16 +125,25 @@ export const SendFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
             console.error("Error signing transaction:", error);
             toast.error("Failed to sign transaction");
             return;
+          })
+          .finally(() => {
+            setIsLoading(false);
           });
       })
       .catch((error) => {
         console.error("Error fetching transaction data:", error);
         toast.error("Failed to fetch transaction data");
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
-  }, [amount, toAddress, addressError, selectedToken?.address, safeConfig?.address, signTypedDataAsync]);
+  }, [
+    amount,
+    toAddress,
+    addressError,
+    selectedToken?.address,
+    safeConfig?.address,
+    signTypedDataAsync,
+    clearAndClose,
+    fetchDelayQueue,
+  ]);
 
   const isFormValid = useMemo(() => {
     return toAddress && !addressError && amount && amount > 0n && selectedToken;

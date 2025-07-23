@@ -1,7 +1,7 @@
 import { type DelayTransaction, getApiV1DelayRelay } from "@/client";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { formatDistanceToNowStrict } from "date-fns";
-import { type ReactNode, createContext, use, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { formatCountdown } from "@/utils/timeUtils";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
 
@@ -23,58 +23,192 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
   const [queue, setQueue] = useState<DelayTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Refs for tracking transactions with active toasts (to avoid dependency cycles)
+  const executingTxsRef = useRef<Set<string>>(new Set());
+  const countDownTxsRef = useRef<Set<string>>(new Set());
+  const processingTxsRef = useRef<Set<string>>(new Set());
+
+  // Refs only for intervals (necessary to avoid stale closures)
+  const fetchIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const countdownIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
   const nonExecutedQueue = useMemo(() => {
     return queue.filter((tx) => tx.status !== "EXECUTED");
   }, [queue]);
-  const [txWithCounter, setTxWithCounter] = useState<Set<string>>(() => new Set());
 
-  console.log("queue", queue);
-  console.log("txWithCounter", txWithCounter);
-  console.log("nonExecutedQueue", nonExecutedQueue);
+  const executingQueue = useMemo(() => {
+    return queue.filter((tx) => tx.status === "EXECUTING");
+  }, [queue]);
+
+  const hasExecutingTransactions = useMemo(() => executingQueue.length > 0, [executingQueue]);
+
+  const countDownQueue = useMemo(() => {
+    return nonExecutedQueue.filter((tx) => {
+      if (!tx.id || (tx.status !== "WAITING" && tx.status !== "QUEUING") || !tx.readyAt) return false;
+
+      // Only include transactions with readyAt in the future
+      const readyDate = new Date(tx.readyAt);
+      const now = new Date();
+      return readyDate.getTime() > now.getTime();
+    });
+  }, [nonExecutedQueue]);
+
+  const processingQueue = useMemo(() => {
+    return nonExecutedQueue.filter((tx) => {
+      if (!tx.id) return false;
+
+      if (tx.status !== "QUEUING" && tx.status !== "WAITING") return false;
+
+      if (!tx.readyAt) return true;
+
+      // Include transactions with readyAt in the past (ready to execute)
+      const readyDate = new Date(tx.readyAt);
+      const now = new Date();
+      return readyDate.getTime() <= now.getTime();
+    });
+  }, [nonExecutedQueue]);
+
+  // Dynamic fetch interval management
   useEffect(() => {
-    if (txWithCounter.size === 0) return;
+    if (!isAuthenticated) return;
 
-    const interval = setInterval(() => {
+    // Clear existing interval
+    if (fetchIntervalRef.current) {
+      clearInterval(fetchIntervalRef.current);
+    }
+
+    // Initial fetch
+    fetchDelayQueue();
+
+    // Set interval based on whether we have executing transactions
+    // if we have an executing tx: 1s, if we have a waiting tx 5s, otherwise 30s
+    const intervalTime = hasExecutingTransactions ? 1000 : nonExecutedQueue.length > 0 ? 5000 : 30000;
+    fetchIntervalRef.current = setInterval(fetchDelayQueue, intervalTime);
+
+    return () => {
+      if (fetchIntervalRef.current) {
+        clearInterval(fetchIntervalRef.current);
+      }
+    };
+  }, [isAuthenticated, hasExecutingTransactions, nonExecutedQueue.length]);
+
+  // Executing transactions
+  useEffect(() => {
+    const prefix = "executing";
+    const currentExecutingIds = new Set(executingQueue.map((tx) => tx.id).filter((id): id is string => Boolean(id)));
+
+    // Show toasts for new executing transactions
+    for (const tx of executingQueue) {
+      if (tx.id && !executingTxsRef.current.has(tx.id)) {
+        toast.loading(`Transaction ${tx.id.slice(0, 6)}... executing`, {
+          id: `${prefix}-${tx.id}`,
+          description: "Processing on-chain...",
+          duration: Number.POSITIVE_INFINITY,
+        });
+      }
+    }
+
+    // Remove toasts for transactions that are no longer executing
+    for (const txId of executingTxsRef.current) {
+      if (!currentExecutingIds.has(txId)) {
+        toast.dismiss(`${prefix}-${txId}`);
+        toast.success(`Transaction ${txId.slice(0, 6)}... completed`);
+      }
+    }
+
+    executingTxsRef.current = currentExecutingIds;
+  }, [executingQueue]);
+
+  // Processing transactions (QUEUING/WAITING without readyAt or with past readyAt)
+  useEffect(() => {
+    const prefix = "processing";
+    const currentProcessingIds = new Set(processingQueue.map((tx) => tx.id).filter((id): id is string => Boolean(id)));
+
+    // Show toasts for new processing transactions
+    for (const tx of processingQueue) {
+      if (tx.id && !processingTxsRef.current.has(tx.id)) {
+        toast.loading(`Transaction ${tx.id.slice(0, 6)}... processing`, {
+          id: `${prefix}-${tx.id}`,
+          description: "Processing...",
+          duration: Number.POSITIVE_INFINITY,
+        });
+      }
+    }
+
+    // Remove toasts for transactions that are no longer processing
+    for (const txId of processingTxsRef.current) {
+      if (!currentProcessingIds.has(txId)) {
+        toast.dismiss(`${prefix}-${txId}`);
+      }
+    }
+
+    processingTxsRef.current = currentProcessingIds;
+  }, [processingQueue]);
+
+  // Transactions with countdown (future readyAt)
+  useEffect(() => {
+    const prefix = "countdown";
+    const currentCountDownIds = new Set(countDownQueue.map((tx) => tx.id).filter((id): id is string => Boolean(id)));
+
+    for (const tx of countDownQueue) {
+      const readyDate = new Date(tx.readyAt || "");
+      const diff = readyDate.getTime() - new Date().getTime();
+
+      if (tx.id && !countDownTxsRef.current.has(tx.id)) {
+        toast.loading(`Transaction ${tx.id.slice(0, 6)}... queued`, {
+          id: `${prefix}-${tx.id}`,
+          description: `Executing in ${formatCountdown(diff)}`,
+          duration: Number.POSITIVE_INFINITY,
+        });
+      }
+    }
+
+    // Remove toasts for transactions that are no longer in the countdown queue
+    for (const txId of countDownTxsRef.current) {
+      if (!currentCountDownIds.has(txId)) {
+        toast.dismiss(`${prefix}-${txId}`);
+      }
+    }
+
+    countDownTxsRef.current = currentCountDownIds;
+
+    // Clear existing countdown interval
+    if (countdownIntervalRef.current) {
+      clearInterval(countdownIntervalRef.current);
+    }
+
+    // Set up interval to update toast descriptions
+    countdownIntervalRef.current = setInterval(() => {
       let activeTransactions = false;
 
-      for (const tx of nonExecutedQueue) {
-        if (tx.readyAt && txWithCounter.has(tx.id || "")) {
+      for (const tx of countDownQueue) {
+        if (tx.readyAt && tx.id && countDownTxsRef.current.has(tx.id)) {
           const readyDate = new Date(tx.readyAt);
-          if (readyDate > new Date()) {
+          const diff = readyDate.getTime() - new Date().getTime();
+          if (diff > 0) {
             activeTransactions = true;
-            toast.loading(`Transaction ${tx.id} is in the delay queue`, {
-              id: tx.id,
-              description: `Executing in ${formatDistanceToNowStrict(readyDate)}`,
-            });
-          } else {
-            toast.dismiss(tx.id);
-            setTxWithCounter((prev) => {
-              const newSet = new Set(prev);
-              newSet.delete(tx.id || "");
-              return newSet;
+            // Update toast with fresh countdown
+            toast.loading(`Transaction ${tx.id.slice(0, 6)}... queued`, {
+              id: `${prefix}-${tx.id}`,
+              description: `Executing in ${formatCountdown(diff)}`,
             });
           }
         }
       }
 
-      // If no active transactions are left, clear the interval
-      if (!activeTransactions) {
-        clearInterval(interval);
-        setTxWithCounter(new Set());
+      // Clear interval if no active transactions remain
+      if (!activeTransactions && countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
       }
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [nonExecutedQueue, txWithCounter]);
-
-  useEffect(() => {
-    if (!isAuthenticated) return;
-
-    fetchDelayQueue();
-
-    const interval = setInterval(fetchDelayQueue, 30000); // Fetch every 10 seconds
-    return () => clearInterval(interval);
-  }, [isAuthenticated]);
+    return () => {
+      if (countdownIntervalRef.current) {
+        clearInterval(countdownIntervalRef.current);
+      }
+    };
+  }, [countDownQueue]);
 
   const fetchDelayQueue = useCallback(async () => {
     setIsLoading(true);
@@ -86,58 +220,16 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
           return;
         }
 
-        setQueue([
-          {
-            id: "cmd91g24o0000wh340s5zs4x0",
-            safeAddress: "0xD637C95af1333170DCf661e5548319788AAbd188",
-            transactionData:
-              '{"to":"0xcB444e90D8198415266c6a2724b7900fb12FC56E","value":"0","data":"0xa9059cbb000000000000000000000000f85e52d8d9827d94a6109f67948bea6883083d9300000000000000000000000000000000000000000000000000071afd498d0000"}',
-            enqueueTaskId: "0xe9cc42c1872e0776f42a3cc7f98ae54be244f304310fee7a06065f82e2fedbf7",
-            dispatchTaskId: null,
-            readyAt: "2025-07-22T19:02:58.330Z",
-            operationType: "CALL",
-            userId: "cmcv0h9730000avs6l7le0jtu",
-            status: "QUEUING",
-            createdAt: "2025-07-22T19:54:58.330Z",
-          },
-        ]);
+        setQueue(data || []);
       })
       .catch((error) => {
         console.error("Error fetching delay queue", error);
+        setError(extractErrorMessage(error, "Failed to fetch delay queue"));
       })
       .finally(() => {
         setIsLoading(false);
       });
   }, []);
-
-  useEffect(() => {
-    if (!nonExecutedQueue.length) return;
-
-    const inQueue = nonExecutedQueue.filter((tx) => tx.status === "WAITING" || tx.status === "QUEUING");
-
-    console.log("inQueue", inQueue);
-    for (const tx of inQueue) {
-      console.log(
-        'tx.status !== "EXECUTING" && tx.readyAt && tx.id && !txWithCounter.has(tx.id)',
-        tx.status !== "EXECUTING",
-        tx.readyAt,
-        tx.id,
-        txWithCounter,
-      );
-      if (tx.status !== "EXECUTING" && tx.readyAt && tx.id && !txWithCounter.has(tx.id)) {
-        toast.loading(`Transaction ${tx.id} is in the delay queue`, {
-          id: tx.id,
-          description: `Executing in ${formatDistanceToNowStrict(new Date(tx.readyAt))}`,
-        });
-
-        if (!tx.id) return;
-
-        const newSet = new Set(txWithCounter);
-        newSet.add(tx.id);
-        setTxWithCounter(newSet);
-      }
-    }
-  }, [nonExecutedQueue, txWithCounter]);
 
   return (
     <DelayRelayContext.Provider value={{ queue: nonExecutedQueue, isLoading, error, fetchDelayQueue }}>
