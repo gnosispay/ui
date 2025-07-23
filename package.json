@@ -9,7 +9,7 @@
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "preview": "vite preview",
-    "generate-api-types": "pnpm dlx @hey-api/openapi-ts -i http://localhost:3001/api-docs/spec.json -o src/client -c @hey-api/client-fetch",
+    "generate-api-types": "pnpm dlx @hey-api/openapi-ts -i https://api.gnosispay.com/api-docs/spec.json -o src/client -c @hey-api/client-fetch",
     "dev:all:local": "concurrently \"dotenv -e .env.local -- pnpm dev\" \"cd pse-backend-demo && dotenv -e .env.local -- pnpm dev\"",
     "dev:all": "concurrently \"dotenv -e .env -- pnpm dev\" \"cd pse-backend-demo && dotenv -e .env -- pnpm dev\""
   },
