@@ -10,6 +10,7 @@ import { AddressInput } from "./address-input";
 import { useAccount } from "wagmi";
 import { useDelayRelay } from "@/context/DelayRelayContext";
 import { QueueNotEmptyAlert } from "@/components/QueueNotEmptyAlert";
+import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
 
 interface ValidatedFormData {
   toAddress: string;
@@ -30,6 +31,7 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
   const [selectedToken, setSelectedToken] = useState<CurrencyInfoWithBalance | undefined>();
   const [amount, setAmount] = useState<bigint>(0n);
   const [amountError, setAmountError] = useState("");
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
 
   const handleAddressChange = useCallback((value: string) => {
     setAddressError("");
@@ -41,18 +43,18 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
   }, []);
 
   const isFormValid = useMemo(() => {
-    return !!(toAddress && amount && amount > 0n && selectedToken && !amountError && !addressError);
-  }, [toAddress, addressError, amount, selectedToken, amountError]);
+    return !!(toAddress && amount && amount > 0n && selectedToken && !amountError && !addressError && !signerError);
+  }, [toAddress, addressError, amount, selectedToken, amountError, signerError]);
 
   const handleNext = useCallback(() => {
-    if (!isFormValid || !selectedToken) return;
+    if (!isFormValid || !selectedToken || !isSignerConnected) return;
 
     onNext({
       toAddress,
       selectedToken,
       amount,
     });
-  }, [isFormValid, selectedToken, toAddress, amount, onNext]);
+  }, [isFormValid, selectedToken, toAddress, amount, onNext, isSignerConnected]);
 
   return (
     <div className="space-y-6">
@@ -64,6 +66,22 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
           <AlertDescription>
             Please ensure you enter a Gnosis Chain address. You are solely responsible for the accuracy of the address
             and the safety of your funds.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {signerError && (
+        <Alert variant="destructive">
+          <TriangleAlert className="h-4 w-4" />
+          <AlertDescription>{signerError.message}</AlertDescription>
+        </Alert>
+      )}
+
+      {!isSignerConnected && !isDataLoading && (
+        <Alert variant="destructive">
+          <TriangleAlert className="h-4 w-4" />
+          <AlertDescription>
+            Please make sure to be connected with an account that is a signer of the Gnosis Pay account
           </AlertDescription>
         </Alert>
       )}
@@ -89,7 +107,7 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
         )}
       </div>
 
-      <Button onClick={handleNext} disabled={!isFormValid || isQueueNotEmpty} className="w-full">
+      <Button onClick={handleNext} disabled={!isFormValid || isQueueNotEmpty || !isSignerConnected} className="w-full">
         Next
       </Button>
     </div>

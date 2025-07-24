@@ -5,6 +5,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { formatUnits, parseUnits } from "viem";
 import { useTokenBalance, type CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
 import { useUser } from "@/context/UserContext";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface TokenAmountInputProps {
   onTokenChange: (token: CurrencyInfoWithBalance) => void;
@@ -80,7 +81,7 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
   };
 
   if (!selectedToken?.decimals) {
-    return null;
+    return <Skeleton className="h-20 w-full" />;
   }
 
   return (
