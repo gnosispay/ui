@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TriangleAlert, AlertCircle, Coins } from "lucide-react";
+import { TriangleAlert, Coins } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { isAddress } from "viem";
 import type { CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
@@ -9,6 +9,7 @@ import { TokenAmountInput } from "./token-amount-input";
 import { AddressInput } from "./address-input";
 import { useAccount } from "wagmi";
 import { useDelayRelay } from "@/context/DelayRelayContext";
+import { QueueNotEmptyAlert } from "@/components/QueueNotEmptyAlert";
 
 interface ValidatedFormData {
   toAddress: string;
@@ -55,14 +56,7 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
 
   return (
     <div className="space-y-6">
-      {isQueueNotEmpty && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Another transaction is already in the queue. Please wait for it to complete before submitting another one.
-          </AlertDescription>
-        </Alert>
-      )}
+      {isQueueNotEmpty && <QueueNotEmptyAlert />}
 
       {!isQueueNotEmpty && (
         <Alert variant="warning">
