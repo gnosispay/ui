@@ -39,6 +39,12 @@ export const currencies: Record<string, CurrencyInfo> = {
   },
 };
 
+export const ADD_FUNDS_CONSTANTS = {
+  GNOSIS_PAY_HELP_URL: "https://help.gnosispay.com/en/articles/8896057-how-to-get-eure-or-gbpe-on-gnosis-chain",
+  DEBRIDGE_LICENSE_URL: "https://docs.debridge.finance/legal/sdk-and-api-license-agreement",
+  MONERIUM_AUTHORISED_URL: "https://cb.is/financial-supervision/regulated-activities/supervised-entities/",
+} as const;
+
 // Helper type to extract the 'type' property from the array element of GetApiV1UserTermsResponse["terms"]
 export type UserTermsTypeFromApi = NonNullable<NonNullable<GetApiV1UserTermsResponse["terms"]>[number]["type"]>;
 
