@@ -15,6 +15,7 @@ import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
 import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
+import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
 import { TransactionsContextProvider } from "./context/TransactionsContext.tsx";
 import { TransactionsByCardContextProvider } from "./context/TransactionsByCardContext.tsx";
 
@@ -45,8 +46,10 @@ ReactDOM.createRoot(rootElement).render(
                 <CardsContextProvider>
                   <TransactionsContextProvider>
                     <TransactionsByCardContextProvider>
-                      <App />
-                      <Toaster expand />
+                      <DelayRelayContextProvider>
+                        <App />
+                        <Toaster expand />
+                      </DelayRelayContextProvider>
                     </TransactionsByCardContextProvider>
                   </TransactionsContextProvider>
                 </CardsContextProvider>

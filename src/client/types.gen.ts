@@ -32,6 +32,9 @@ export type CardOrder = {
     id: string;
     transactionHash?: string;
     createdAt: string;
+    /**
+     * Current order status in the state machine. See the state transition diagram in the documentation for valid transitions.
+     */
     status: 'PENDINGTRANSACTION' | 'TRANSACTIONCOMPLETE' | 'CONFIRMATIONREQUIRED' | 'READY' | 'CARDCREATED' | 'FAILEDTRANSACTION' | 'CANCELLED';
     personalizationSource: 'KYC' | 'ENS';
     embossedName?: string;
@@ -355,6 +358,11 @@ export type User = {
     email?: string | null;
     firstName?: string | null;
     lastName?: string | null;
+    address1?: string | null;
+    address2?: string | null;
+    city?: string | null;
+    postalCode?: string | null;
+    state?: string | null;
     country?: string | null;
     nationalityCountry?: string | null;
     signInWallets?: Array<EoaAccount>;
@@ -1079,10 +1087,60 @@ export type PostApiV1CardsByCardIdUnfreezeResponses = {
 
 export type PostApiV1CardsByCardIdUnfreezeResponse = PostApiV1CardsByCardIdUnfreezeResponses[keyof PostApiV1CardsByCardIdUnfreezeResponses];
 
+export type PostApiV1CardsByCardIdVoidData = {
+    body?: never;
+    path: {
+        cardId: string;
+    };
+    query?: never;
+    url: '/api/v1/cards/{cardId}/void';
+};
+
+export type PostApiV1CardsByCardIdVoidErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * No card found
+     */
+    404: unknown;
+    /**
+     * Card cannot be voided / Card is already voided
+     */
+    422: {
+        error: 'Only virtual cards can be voided' | 'Card is already voided';
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1CardsByCardIdVoidError = PostApiV1CardsByCardIdVoidErrors[keyof PostApiV1CardsByCardIdVoidErrors];
+
+export type PostApiV1CardsByCardIdVoidResponses = {
+    /**
+     * Card marked as void successfully
+     */
+    200: {
+        status: 'Card marked as void successfully';
+    };
+};
+
+export type PostApiV1CardsByCardIdVoidResponse = PostApiV1CardsByCardIdVoidResponses[keyof PostApiV1CardsByCardIdVoidResponses];
+
 export type GetApiV1CardsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Exclude voided cards from the response
+         */
+        exclude_voided?: boolean;
+    };
     url: '/api/v1/cards';
 };
 
@@ -1109,10 +1167,102 @@ export type GetApiV1CardsResponses = {
     /**
      * The list of cards for a user
      */
-    200: Array<Card>;
+    200: Array<{
+        id: string;
+        cardToken: string;
+        lastFourDigits: string;
+        activatedAt: string | null;
+        virtual: boolean;
+        /**
+         * Card status code from payment processor. Possible values:
+         * - 1000: Active
+         * - 1001: Refer to Issuer
+         * - 1004: Capture
+         * - 1005: Declined
+         * - 1006: Pin Blocked
+         * - 1007: Declined
+         * - 1008: Honour with ID
+         * - 1009: Void
+         * - 1041: Lost
+         * - 1043: Stolen
+         * - 1054: Expired
+         * - 1154: Expired
+         * - 1062: Restricted
+         * - 1199: Void
+         *
+         */
+        statusCode: 1000 | 1001 | 1004 | 1005 | 1006 | 1007 | 1008 | 1009 | 1041 | 1043 | 1054 | 1154 | 1062 | 1199;
+        /**
+         * Human-readable card status name corresponding to statusCode:
+         * - "Active": Card is active and can be used
+         * - "Refer to Issuer": Transaction requires issuer approval
+         * - "Capture": Card should be captured/retained
+         * - "Declined": All transactions are declined
+         * - "Pin Blocked": Card PIN is blocked due to incorrect attempts
+         * - "Honour with ID": Transaction requires ID verification
+         * - "Void": Card is voided/cancelled
+         * - "Lost": Card is reported as lost
+         * - "Stolen": Card is reported as stolen
+         * - "Expired": Card has expired
+         * - "Restricted": Card has restrictions applied
+         * - "Unknown": Status code not recognized
+         *
+         */
+        statusName: string;
+    }>;
 };
 
 export type GetApiV1CardsResponse = GetApiV1CardsResponses[keyof GetApiV1CardsResponses];
+
+export type PostApiV1CardsVirtualData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cards/virtual';
+};
+
+export type PostApiV1CardsVirtualErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * User already has a card or card order in progress
+     */
+    409: unknown;
+    /**
+     * Unprocessable Entity - User validation failed. Possible reasons:
+     * - User has reached the maximum number of active cards (10)
+     * - User needs to complete KYC successfully
+     * - User has incompatible risk score
+     * - User does not have a verified phone number
+     * - User's name is not set or contains invalid characters
+     * - User's address is not set
+     * - User's country is not supported
+     * - Could not create virtual card due to safe misconfiguration
+     *
+     */
+    422: unknown;
+    /**
+     * Internal server error
+     */
+    500: unknown;
+};
+
+export type PostApiV1CardsVirtualError = PostApiV1CardsVirtualErrors[keyof PostApiV1CardsVirtualErrors];
+
+export type PostApiV1CardsVirtualResponses = {
+    /**
+     * Virtual card created successfully
+     */
+    201: {
+        cardId?: string;
+    };
+};
+
+export type PostApiV1CardsVirtualResponse = PostApiV1CardsVirtualResponses[keyof PostApiV1CardsVirtualResponses];
 
 export type GetApiV1DelayRelayData = {
     body?: never;
@@ -1520,6 +1670,12 @@ export type PostApiV1VerificationErrors = {
         error?: 'Invalid phone number' | 'Phone number already validated' | 'User needs to be KYC approved';
     };
     /**
+     * Maximum verification attempts reached. Please try again later.
+     */
+    429: {
+        error?: string;
+    };
+    /**
      * Failed to send verification.
      */
     500: unknown;
@@ -1537,6 +1693,464 @@ export type PostApiV1VerificationResponses = {
 };
 
 export type PostApiV1VerificationResponse = PostApiV1VerificationResponses[keyof PostApiV1VerificationResponses];
+
+export type GetApiV1AccountsOnchainDailyLimitData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/onchain-daily-limit';
+};
+
+export type GetApiV1AccountsOnchainDailyLimitErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitError = GetApiV1AccountsOnchainDailyLimitErrors[keyof GetApiV1AccountsOnchainDailyLimitErrors];
+
+export type GetApiV1AccountsOnchainDailyLimitResponses = {
+    /**
+     * Successfully retrieved the current onchain daily limit.
+     */
+    200: {
+        data: {
+            /**
+             * The current daily spending limit in the Safe token's base units.
+             */
+            onchainDailyLimit: number;
+        };
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitResponse = GetApiV1AccountsOnchainDailyLimitResponses[keyof GetApiV1AccountsOnchainDailyLimitResponses];
+
+export type PutApiV1AccountsOnchainDailyLimitData = {
+    body: {
+        /**
+         * The new daily spending limit to set (must be an integer).
+         */
+        onchainDailyLimit: number;
+        /**
+         * The wallet signature authorizing this limit change.
+         */
+        signature: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/onchain-daily-limit';
+};
+
+export type PutApiV1AccountsOnchainDailyLimitErrors = {
+    /**
+     * Bad request - invalid signature.
+     */
+    400: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable Entity - validation errors in request body.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type PutApiV1AccountsOnchainDailyLimitError = PutApiV1AccountsOnchainDailyLimitErrors[keyof PutApiV1AccountsOnchainDailyLimitErrors];
+
+export type PutApiV1AccountsOnchainDailyLimitResponses = {
+    /**
+     * Successfully submitted the daily limit update request.
+     */
+    200: {
+        data: {
+            /**
+             * The daily limit value that was requested to be set.
+             */
+            requestedOnchainDailyLimit: number;
+        };
+    };
+};
+
+export type PutApiV1AccountsOnchainDailyLimitResponse = PutApiV1AccountsOnchainDailyLimitResponses[keyof PutApiV1AccountsOnchainDailyLimitResponses];
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The new daily spending limit to set (1-5000, must be an integer).
+         */
+        onchainDailyLimit: string;
+    };
+    url: '/api/v1/accounts/onchain-daily-limit/transaction-data';
+};
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable Entity - validation errors in query parameters.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataError = GetApiV1AccountsOnchainDailyLimitTransactionDataErrors[keyof GetApiV1AccountsOnchainDailyLimitTransactionDataErrors];
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataResponses = {
+    /**
+     * Successfully retrieved transaction data for signing.
+     */
+    200: {
+        data: {
+            transaction: {
+                /**
+                 * The target contract address for the transaction.
+                 */
+                to: string;
+                /**
+                 * The amount of native tokens to send with the transaction (usually 0).
+                 */
+                value: number;
+                /**
+                 * The encoded transaction data containing the function call.
+                 */
+                data: string;
+            };
+        };
+    };
+};
+
+export type GetApiV1AccountsOnchainDailyLimitTransactionDataResponse = GetApiV1AccountsOnchainDailyLimitTransactionDataResponses[keyof GetApiV1AccountsOnchainDailyLimitTransactionDataResponses];
+
+export type PostApiV1AccountsWithdrawData = {
+    body: {
+        /**
+         * The amount to withdraw in the token's base units.
+         */
+        amount: string;
+        /**
+         * The address to withdraw to.
+         */
+        to: string;
+        /**
+         * The address of the token to withdraw.
+         */
+        tokenAddress: string;
+        /**
+         * The wallet signature authorizing this withdraw.
+         */
+        signature: string;
+        /**
+         * The message object containing transaction data and salt.
+         */
+        message: {
+            /**
+             * The salt value used in the EIP-712 typed data.
+             */
+            salt: string;
+            /**
+             * The encoded transaction data from the typed data message.
+             */
+            data: string;
+        };
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/withdraw';
+};
+
+export type PostApiV1AccountsWithdrawErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable Entity - validation errors in request body.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type PostApiV1AccountsWithdrawError = PostApiV1AccountsWithdrawErrors[keyof PostApiV1AccountsWithdrawErrors];
+
+export type PostApiV1AccountsWithdrawResponses = {
+    /**
+     * Successfully submitted the withdraw request.
+     */
+    200: {
+        data: {
+            /**
+             * Unique identifier for the delayed transaction.
+             */
+            id: string;
+            /**
+             * The Safe contract address associated with the transaction.
+             */
+            safeAddress: string;
+            /**
+             * JSON stringified data payload of the transaction.
+             */
+            transactionData: string;
+            /**
+             * Identifier of the task that enqueued this transaction.
+             */
+            enqueueTaskId: string;
+            /**
+             * Identifier of the task responsible for dispatching this transaction.
+             */
+            dispatchTaskId?: string | null;
+            /**
+             * Timestamp indicating when the transaction is ready for processing.
+             */
+            readyAt?: string | null;
+            /**
+             * Type of operation being performed.
+             */
+            operationType: 'CALL' | 'DELEGATECALL';
+            /**
+             * Identifier of the user associated with the transaction.
+             */
+            userId: string;
+            /**
+             * Current status of the transaction.
+             */
+            status: 'QUEUING' | 'WAITING' | 'EXECUTING' | 'EXECUTED' | 'FAILED';
+            /**
+             * Timestamp of when the transaction was created.
+             */
+            createdAt: string;
+        };
+    };
+};
+
+export type PostApiV1AccountsWithdrawResponse = PostApiV1AccountsWithdrawResponses[keyof PostApiV1AccountsWithdrawResponses];
+
+export type GetApiV1AccountsWithdrawTransactionDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The address of the token to withdraw.
+         */
+        tokenAddress: string;
+        /**
+         * The address to withdraw to.
+         */
+        to: string;
+        /**
+         * The amount to withdraw in the token's base units.
+         */
+        amount: string;
+    };
+    url: '/api/v1/accounts/withdraw/transaction-data';
+};
+
+export type GetApiV1AccountsWithdrawTransactionDataErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable Entity - validation errors in query parameters.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type GetApiV1AccountsWithdrawTransactionDataError = GetApiV1AccountsWithdrawTransactionDataErrors[keyof GetApiV1AccountsWithdrawTransactionDataErrors];
+
+export type GetApiV1AccountsWithdrawTransactionDataResponses = {
+    /**
+     * Successfully retrieved EIP-712 typed data for signing.
+     */
+    200: {
+        data: {
+            domain: {
+                /**
+                 * The contract address that will verify the signature.
+                 */
+                verifyingContract: string;
+                /**
+                 * The chain ID for the network.
+                 */
+                chainId: number;
+            };
+            /**
+             * The primary type for EIP-712 typed data signing.
+             */
+            primaryType: 'ModuleTx';
+            types: {
+                /**
+                 * Array of type definitions for the ModuleTx structure.
+                 */
+                ModuleTx: Array<{
+                    /**
+                     * The field type.
+                     */
+                    type: string;
+                    /**
+                     * The field name.
+                     */
+                    name: string;
+                }>;
+            };
+            message: {
+                /**
+                 * The encoded transaction data for the withdrawal.
+                 */
+                data: string;
+                /**
+                 * The salt value for the typed data.
+                 */
+                salt: string;
+            };
+        };
+    };
+};
+
+export type GetApiV1AccountsWithdrawTransactionDataResponse = GetApiV1AccountsWithdrawTransactionDataResponses[keyof GetApiV1AccountsWithdrawTransactionDataResponses];
 
 export type GetApiV1EoaAccountsData = {
     body?: never;
@@ -2095,18 +2709,8 @@ export type PostApiV1KycImportPartnerApplicantResponses = {
 
 export type PostApiV1KycImportPartnerApplicantResponse = PostApiV1KycImportPartnerApplicantResponses[keyof PostApiV1KycImportPartnerApplicantResponses];
 
-export type PostApiV1OrderByOrderIdCardData = {
-    body: {
-        encryptedKey?: string;
-        encryptedPin?: string;
-        iv?: string;
-        options?: {
-            /**
-             * If set to `true`, `encryptedKey`, `encryptedPin` and `iv` need to be provided.
-             */
-            setPin?: boolean;
-        };
-    };
+export type PostApiV1OrderByOrderIdCreateCardData = {
+    body?: never;
     path: {
         /**
          * The unique identifier of the card order.
@@ -2114,10 +2718,10 @@ export type PostApiV1OrderByOrderIdCardData = {
         orderId: string;
     };
     query?: never;
-    url: '/api/v1/order/{orderId}/card';
+    url: '/api/v1/order/{orderId}/create-card';
 };
 
-export type PostApiV1OrderByOrderIdCardErrors = {
+export type PostApiV1OrderByOrderIdCreateCardErrors = {
     /**
      * Not authorised
      */
@@ -2136,7 +2740,7 @@ export type PostApiV1OrderByOrderIdCardErrors = {
     500: unknown;
 };
 
-export type PostApiV1OrderByOrderIdCardResponses = {
+export type PostApiV1OrderByOrderIdCreateCardResponses = {
     /**
      * The card was created
      */
@@ -2145,7 +2749,7 @@ export type PostApiV1OrderByOrderIdCardResponses = {
     };
 };
 
-export type PostApiV1OrderByOrderIdCardResponse = PostApiV1OrderByOrderIdCardResponses[keyof PostApiV1OrderByOrderIdCardResponses];
+export type PostApiV1OrderByOrderIdCreateCardResponse = PostApiV1OrderByOrderIdCreateCardResponses[keyof PostApiV1OrderByOrderIdCreateCardResponses];
 
 export type PutApiV1OrderByOrderIdAttachTransactionData = {
     body: {
@@ -2464,6 +3068,58 @@ export type PutApiV1OrderByOrderIdConfirmPaymentResponses = {
 };
 
 export type PutApiV1OrderByOrderIdConfirmPaymentResponse = PutApiV1OrderByOrderIdConfirmPaymentResponses[keyof PutApiV1OrderByOrderIdConfirmPaymentResponses];
+
+export type PostApiV1OrderByOrderIdCancelData = {
+    body?: never;
+    path: {
+        /**
+         * The unique identifier of the card order to cancel.
+         */
+        orderId: string;
+    };
+    query?: never;
+    url: '/api/v1/order/{orderId}/cancel';
+};
+
+export type PostApiV1OrderByOrderIdCancelErrors = {
+    /**
+     * Invalid order transition or order not in cancellable state.
+     */
+    400: {
+        message?: string;
+    };
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Card order not found.
+     */
+    404: {
+        message?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        message?: string;
+    };
+};
+
+export type PostApiV1OrderByOrderIdCancelError = PostApiV1OrderByOrderIdCancelErrors[keyof PostApiV1OrderByOrderIdCancelErrors];
+
+export type PostApiV1OrderByOrderIdCancelResponses = {
+    /**
+     * Card order successfully cancelled.
+     */
+    200: {
+        ok?: boolean;
+    };
+};
+
+export type PostApiV1OrderByOrderIdCancelResponse = PostApiV1OrderByOrderIdCancelResponses[keyof PostApiV1OrderByOrderIdCancelResponses];
 
 export type PostApiV1OrderCreateData = {
     body: {

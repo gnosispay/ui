@@ -1,4 +1,7 @@
 import type { GetApiV1UserTermsResponse } from "./client";
+import eurLogo from "./assets/eure.png";
+import gbpLogo from "./assets/gbpe.png";
+import usdcLogo from "./assets/usdce.png";
 
 export interface CurrencyInfo {
   tokenSymbol?: string;
@@ -6,6 +9,7 @@ export interface CurrencyInfo {
   decimals?: number;
   symbol?: string;
   fiatSymbol?: string;
+  logo?: string;
 }
 
 export const currencies: Record<string, CurrencyInfo> = {
@@ -15,6 +19,7 @@ export const currencies: Record<string, CurrencyInfo> = {
     decimals: 18,
     symbol: "€",
     fiatSymbol: "EUR",
+    logo: eurLogo,
   },
   GPB: {
     tokenSymbol: "GBPe",
@@ -22,6 +27,7 @@ export const currencies: Record<string, CurrencyInfo> = {
     decimals: 18,
     symbol: "£",
     fiatSymbol: "GPB",
+    logo: gbpLogo,
   },
   USD: {
     tokenSymbol: "USDCe",
@@ -29,6 +35,7 @@ export const currencies: Record<string, CurrencyInfo> = {
     decimals: 6,
     symbol: "$",
     fiatSymbol: "USD",
+    logo: usdcLogo,
   },
 };
 
