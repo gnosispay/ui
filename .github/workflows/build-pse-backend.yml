@@ -29,7 +29,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID_STG }}:role/github-actions-gnosispay-v2-pse-backend-stg
+          # Assumes the role in the PROD account for ECR push
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID_PROD }}:role/github-actions-gnosispay-v2-pse-backend-prod
           aws-region: eu-central-1
 
       - name: Login to AWS Container Registry
