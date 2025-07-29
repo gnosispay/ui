@@ -46,18 +46,20 @@ jobs:
         run: |
           set +e
           image_name="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          image_name_latest="$ECR_REGISTRY/$ECR_REPOSITORY:latest"
           aws ecr describe-images --repository-name=$ECR_REPOSITORY --image-ids=imageTag=$IMAGE_TAG
           if [[ $? == "0" ]]; then image_exists=true; else image_exists=false; fi
           echo "image_name=$image_name" >> $GITHUB_OUTPUT
+          echo "image_name_latest=$image_name_latest" >> $GITHUB_OUTPUT
           echo "image_exists=$image_exists" >> $GITHUB_OUTPUT
 
       - name: Build, tag, and push image to AWS Container Registry
         env:
           IMAGE_NAME: ${{ steps.docker_image.outputs.image_name }}
+          IMAGE_NAME_LATEST: ${{ steps.docker_image.outputs.image_name_latest }}
         if: steps.docker_image.outputs.image_exists == 'false'
         run: |
-          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.pse-backend
-          docker push $IMAGE_NAME
+          docker buildx build -t $IMAGE_NAME -t $IMAGE_NAME_LATEST . -f ./Dockerfile.pse-backend --push
 
   # deploy-on-staging:
   #   name: Deploy on Staging
