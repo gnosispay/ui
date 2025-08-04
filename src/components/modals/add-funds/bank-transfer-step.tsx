@@ -2,6 +2,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ADD_FUNDS_CONSTANTS } from "@/constants";
 import { useUser } from "@/context/UserContext";
+import { useUserFullName } from "@/hooks/useUserFullName";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { ArrowLeft, Info, Copy } from "lucide-react";
 import { useMemo } from "react";
@@ -12,10 +13,11 @@ interface BankTransferStepProps {
 
 export const BankTransferStep = ({ onBack }: BankTransferStepProps) => {
   const { user } = useUser();
+  const fullName = useUserFullName();
   const { copyToClipboard } = useCopyToClipboard();
   const beneficiaryName = useMemo(() => {
-    return user?.firstName && user?.lastName ? `${user.firstName} ${user.lastName}`.toUpperCase() : "";
-  }, [user]);
+    return fullName.toUpperCase();
+  }, [fullName]);
 
   const handleCopyBeneficiary = () => {
     copyToClipboard(beneficiaryName, {

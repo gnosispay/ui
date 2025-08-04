@@ -356,6 +356,7 @@ export type BankingDetails = {
 export type User = {
     id?: string;
     email?: string | null;
+    phone?: string | null;
     firstName?: string | null;
     lastName?: string | null;
     address1?: string | null;
@@ -1694,6 +1695,74 @@ export type PostApiV1VerificationResponses = {
 
 export type PostApiV1VerificationResponse = PostApiV1VerificationResponses[keyof PostApiV1VerificationResponses];
 
+export type GetApiV2TransactionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Comma-separated list of card tokens
+         */
+        cardTokens?: string;
+        /**
+         * Maximum number of transactions to return
+         */
+        limit?: number;
+        /**
+         * Number of transactions to skip
+         */
+        offset?: number;
+        /**
+         * Filter transactions before this date (ISO 8601 format, e.g., "2023-04-01T00:00:00Z")
+         */
+        before?: string;
+        /**
+         * Filter transactions after this date (ISO 8601 format, e.g., "2023-03-01T00:00:00Z")
+         */
+        after?: string;
+        /**
+         * Filter by billing currency code
+         */
+        billingCurrency?: string;
+        /**
+         * Filter by transaction currency code
+         */
+        transactionCurrency?: string;
+        /**
+         * Filter by Merchant Category Code (MCC)
+         */
+        mcc?: string;
+        /**
+         * Filter by transaction type code (e.g., "00" for Purchase, "01" for Withdrawal)
+         */
+        transactionType?: string;
+    };
+    url: '/api/v2/transactions';
+};
+
+export type GetApiV2TransactionsErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type GetApiV2TransactionsError = GetApiV2TransactionsErrors[keyof GetApiV2TransactionsErrors];
+
+export type GetApiV2TransactionsResponses = {
+    /**
+     * Successful response
+     */
+    200: Array<Event>;
+};
+
+export type GetApiV2TransactionsResponse = GetApiV2TransactionsResponses[keyof GetApiV2TransactionsResponses];
+
 export type GetApiV1AccountsOnchainDailyLimitData = {
     body?: never;
     path?: never;
@@ -2347,7 +2416,7 @@ export type GetApiV1IbansDetailsResponses = {
 export type GetApiV1IbansDetailsResponse = GetApiV1IbansDetailsResponses[keyof GetApiV1IbansDetailsResponses];
 
 export type PostApiV1IbansMoneriumProfileData = {
-    body?: {
+    body: {
         /**
          * Signature of the message "I hereby declare that I am the address owner."
          * This signature is created by signing the message with the user's wallet.
@@ -2356,14 +2425,14 @@ export type PostApiV1IbansMoneriumProfileData = {
          * Format: Ethereum signature string (e.g., "0x1234...").
          *
          */
-        signature?: string;
+        signature: string;
         /**
          * Optional URL to redirect the user to after the OAuth flow is completed.
          * This is used when the user already has a Monerium account that needs to be linked.
          * If not provided, a default redirect URL will be used.
          *
          */
-        callbackUrl?: string;
+        callbackUrl: string;
     };
     path?: never;
     query?: never;
@@ -2710,7 +2779,35 @@ export type PostApiV1KycImportPartnerApplicantResponses = {
 export type PostApiV1KycImportPartnerApplicantResponse = PostApiV1KycImportPartnerApplicantResponses[keyof PostApiV1KycImportPartnerApplicantResponses];
 
 export type PostApiV1OrderByOrderIdCreateCardData = {
-    body?: never;
+    body: {
+        /**
+         * Optional PIN data for the card
+         */
+        pinData?: {
+            /**
+             * Encrypted key for PIN
+             */
+            encryptedKey?: string;
+            /**
+             * Encrypted PIN value
+             */
+            encryptedPin?: string;
+            /**
+             * Initialization vector for encryption
+             */
+            iv?: string;
+        };
+        /**
+         * Transaction hash for card payment. Required for paid cards.
+         * Must be in hexadecimal format (0x...).
+         *
+         */
+        transactionHash?: string;
+        /**
+         * Optional coupon code for discount
+         */
+        couponCode?: string;
+    };
     path: {
         /**
          * The unique identifier of the card order.
@@ -2723,26 +2820,60 @@ export type PostApiV1OrderByOrderIdCreateCardData = {
 
 export type PostApiV1OrderByOrderIdCreateCardErrors = {
     /**
-     * Not authorised
+     * Bad request - validation errors
      */
-    401: unknown;
+    400: {
+        /**
+         * Error message
+         */
+        error?: string;
+    };
     /**
-     * The card order was not found
+     * Unauthorized - user not found or not authenticated
      */
-    404: unknown;
+    401: {
+        error?: string;
+    };
     /**
-     * Criteria not met
+     * Card order not found
      */
-    422: unknown;
+    404: {
+        error?: string;
+    };
     /**
-     * Unexpected error
+     * Conflict - business rule violations
      */
-    500: unknown;
+    409: {
+        /**
+         * Error message
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable entity - validation criteria not met
+     */
+    422: {
+        /**
+         * Validation error message
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error
+     */
+    500: {
+        /**
+         * Error message
+         */
+        error?: string;
+    };
 };
+
+export type PostApiV1OrderByOrderIdCreateCardError = PostApiV1OrderByOrderIdCreateCardErrors[keyof PostApiV1OrderByOrderIdCreateCardErrors];
 
 export type PostApiV1OrderByOrderIdCreateCardResponses = {
     /**
-     * The card was created
+     * The card was created successfully
      */
     200: {
         success?: boolean;
