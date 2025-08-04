@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog } from "lucide-react";
-import { AccountSection, PersonalDetailsModal, GenericModal, UserProfileHeader } from "@/components/account";
+import {
+  AccountSection,
+  PersonalDetailsModal,
+  GenericModal,
+  UserProfileHeader,
+  AccountDetailsModal,
+} from "@/components/account";
 
 enum ModalType {
   NONE = "none",
@@ -66,11 +72,9 @@ export const AccountRoute = () => {
         onOpenChange={(open) => (open ? setOpenModal(ModalType.PERSONAL_DETAILS) : closeModal())}
       />
 
-      <GenericModal
+      <AccountDetailsModal
         open={openModal === ModalType.ACCOUNT_DETAILS}
         onOpenChange={(open) => (open ? setOpenModal(ModalType.ACCOUNT_DETAILS) : closeModal())}
-        title="Account details"
-        content="Account details and settings will be available here."
       />
 
       <GenericModal
