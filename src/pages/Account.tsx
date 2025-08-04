@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog } from "lucide-react";
+import { SquareUser as UserIcon, Landmark, Gauge } from "lucide-react";
 import {
   AccountSection,
   PersonalDetailsModal,
