@@ -3,9 +3,9 @@ import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog } from "lucide
 import {
   AccountSection,
   PersonalDetailsModal,
-  GenericModal,
   UserProfileHeader,
   AccountDetailsModal,
+  DailyLimitModal,
 } from "@/components/account";
 
 enum ModalType {
@@ -19,15 +19,11 @@ enum ModalType {
 
 export const AccountRoute = () => {
   const [openModal, setOpenModal] = useState<ModalType>(ModalType.NONE);
-
   const closeModal = () => setOpenModal(ModalType.NONE);
 
   return (
     <div className="w-full max-w-xl mx-auto p-4 space-y-8">
-      {/* User Profile Header */}
       <UserProfileHeader />
-
-      {/* Account Section */}
       <div className="space-y-4">
         <h2 className="text-lg font-medium text-foreground">Account</h2>
         <div className="space-y-3">
@@ -49,8 +45,12 @@ export const AccountRoute = () => {
         </div>
       </div>
 
+      {/* TODO: as part of 
+      - https://linear.app/gnosis-pay/issue/ENG-2930/support-showing-and-updating-the-account-owning-the-delay-relay-module
+      - https://linear.app/gnosis-pay/issue/ENG-2929/support-showing-and-updating-the-siwe-accounts
+      */}
       {/* Security Section */}
-      <div className="space-y-4">
+      {/* <div className="space-y-4">
         <h2 className="text-lg font-medium text-foreground">Security</h2>
         <div className="space-y-3">
           <AccountSection
@@ -64,9 +64,8 @@ export const AccountRoute = () => {
             onClick={() => setOpenModal(ModalType.SIGN_IN_WALLETS)}
           />
         </div>
-      </div>
+      </div> */}
 
-      {/* Modals */}
       <PersonalDetailsModal
         open={openModal === ModalType.PERSONAL_DETAILS}
         onOpenChange={(open) => (open ? setOpenModal(ModalType.PERSONAL_DETAILS) : closeModal())}
@@ -77,25 +76,9 @@ export const AccountRoute = () => {
         onOpenChange={(open) => (open ? setOpenModal(ModalType.ACCOUNT_DETAILS) : closeModal())}
       />
 
-      <GenericModal
+      <DailyLimitModal
         open={openModal === ModalType.LIMITS}
         onOpenChange={(open) => (open ? setOpenModal(ModalType.LIMITS) : closeModal())}
-        title="Limits"
-        content="Transaction limits and spending controls will be displayed here."
-      />
-
-      <GenericModal
-        open={openModal === ModalType.SAFE_OWNERS}
-        onOpenChange={(open) => (open ? setOpenModal(ModalType.SAFE_OWNERS) : closeModal())}
-        title="Safe owners"
-        content="Manage Safe wallet owners and permissions here."
-      />
-
-      <GenericModal
-        open={openModal === ModalType.SIGN_IN_WALLETS}
-        onOpenChange={(open) => (open ? setOpenModal(ModalType.SIGN_IN_WALLETS) : closeModal())}
-        title="Sign-in wallets"
-        content="Manage your connected wallets and authentication methods here."
       />
     </div>
   );

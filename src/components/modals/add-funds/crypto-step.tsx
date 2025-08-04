@@ -1,4 +1,3 @@
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { ADD_FUNDS_CONSTANTS, currencies } from "@/constants";
 import { useUser } from "@/context/UserContext";
