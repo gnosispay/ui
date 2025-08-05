@@ -16,7 +16,7 @@ export const Home = () => {
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4">
         <Balances />
-        <div className="mb-12 mt-4 flex gap-4">
+        <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
           <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
           <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
         </div>

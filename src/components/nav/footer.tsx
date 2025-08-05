@@ -8,11 +8,9 @@ export const FooterNavBar = () => {
       {/* Spacer for header height on mobile */}
       <div className="h-20 lg:hidden" />
       <footer className="fixed bottom-0 left-0 w-full border-t lg:hidden py-2 bg-background z-50">
-        <div className="grid grid-cols-3 h-14 items-center px-4">
-          {/* Empty left cell */}
-          <div />
-          {/* Center cell with nav links */}
-          <div className="flex items-center justify-center gap-8">
+        <div className="relative flex h-14 items-center px-4">
+          {/* Centered menu items */}
+          <div className="flex-1 flex items-center justify-center gap-6">
             {menuRoutes.map((route) => (
               <NavLink
                 to={route.path}
@@ -23,13 +21,13 @@ export const FooterNavBar = () => {
                   }`
                 }
               >
-                <route.icon size={28} />
-                <span className="text-sm">{route.label}</span>
+                <route.icon size={24} />
+                <span className="text-xs">{route.label}</span>
               </NavLink>
             ))}
           </div>
-          {/* Right cell with ModeToggle */}
-          <div className="flex justify-end">
+          {/* Absolute positioned ModeToggle on the right */}
+          <div className="absolute right-4 top-1/2 -translate-y-1/2">
             <ModeToggle />
           </div>
         </div>

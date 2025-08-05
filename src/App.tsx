@@ -5,11 +5,12 @@ import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
 import { TransactionsRoute } from "./pages/Transactions";
 import { FooterNavBar } from "./components/nav/footer";
-import { Home as HomeIcon, CreditCard, List } from "lucide-react";
+import { Home as HomeIcon, CreditCard, List, User } from "lucide-react";
 import { SignUpRoute } from "./pages/SignUp";
 import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 import { AuthGuard } from "@/components/AuthGuard";
+import { AccountRoute } from "./pages/Account";
 
 export const menuRoutes = [
   {
@@ -29,6 +30,12 @@ export const menuRoutes = [
     element: <TransactionsRoute />,
     icon: List,
     label: "Transactions",
+  },
+  {
+    path: "/account",
+    element: <AccountRoute />,
+    icon: User,
+    label: "Account",
   },
 ];
 
