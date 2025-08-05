@@ -25,7 +25,7 @@ export const SafeAccountDetails = ({ addressLabel = "Wallet address" }: SafeAcco
     const address = safeConfig?.address || "";
     copyToClipboard(address, {
       successMessage: "Wallet address copied to clipboard",
-      errorMessage: "Failed to copy address",
+      errorMessage: "Failed to copy wallet address",
     });
   };
 
