@@ -1265,6 +1265,74 @@ export type PostApiV1CardsVirtualResponses = {
 
 export type PostApiV1CardsVirtualResponse = PostApiV1CardsVirtualResponses[keyof PostApiV1CardsVirtualResponses];
 
+export type GetApiV1CardsTransactionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Comma-separated list of card tokens
+         */
+        cardTokens?: string;
+        /**
+         * Maximum number of transactions to return
+         */
+        limit?: number;
+        /**
+         * Number of transactions to skip
+         */
+        offset?: number;
+        /**
+         * Filter transactions before this date (ISO 8601 format, e.g., "2023-04-01T00:00:00Z")
+         */
+        before?: string;
+        /**
+         * Filter transactions after this date (ISO 8601 format, e.g., "2023-03-01T00:00:00Z")
+         */
+        after?: string;
+        /**
+         * Filter by billing currency code
+         */
+        billingCurrency?: string;
+        /**
+         * Filter by transaction currency code
+         */
+        transactionCurrency?: string;
+        /**
+         * Filter by Merchant Category Code (MCC)
+         */
+        mcc?: string;
+        /**
+         * Filter by transaction type code (e.g., "00" for Purchase, "01" for Withdrawal)
+         */
+        transactionType?: string;
+    };
+    url: '/api/v1/cards/transactions';
+};
+
+export type GetApiV1CardsTransactionsErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type GetApiV1CardsTransactionsError = GetApiV1CardsTransactionsErrors[keyof GetApiV1CardsTransactionsErrors];
+
+export type GetApiV1CardsTransactionsResponses = {
+    /**
+     * Successful response
+     */
+    200: Array<Event>;
+};
+
+export type GetApiV1CardsTransactionsResponse = GetApiV1CardsTransactionsResponses[keyof GetApiV1CardsTransactionsResponses];
+
 export type GetApiV1DelayRelayData = {
     body?: never;
     path?: never;
@@ -1695,74 +1763,6 @@ export type PostApiV1VerificationResponses = {
 
 export type PostApiV1VerificationResponse = PostApiV1VerificationResponses[keyof PostApiV1VerificationResponses];
 
-export type GetApiV2TransactionsData = {
-    body?: never;
-    path?: never;
-    query?: {
-        /**
-         * Comma-separated list of card tokens
-         */
-        cardTokens?: string;
-        /**
-         * Maximum number of transactions to return
-         */
-        limit?: number;
-        /**
-         * Number of transactions to skip
-         */
-        offset?: number;
-        /**
-         * Filter transactions before this date (ISO 8601 format, e.g., "2023-04-01T00:00:00Z")
-         */
-        before?: string;
-        /**
-         * Filter transactions after this date (ISO 8601 format, e.g., "2023-03-01T00:00:00Z")
-         */
-        after?: string;
-        /**
-         * Filter by billing currency code
-         */
-        billingCurrency?: string;
-        /**
-         * Filter by transaction currency code
-         */
-        transactionCurrency?: string;
-        /**
-         * Filter by Merchant Category Code (MCC)
-         */
-        mcc?: string;
-        /**
-         * Filter by transaction type code (e.g., "00" for Purchase, "01" for Withdrawal)
-         */
-        transactionType?: string;
-    };
-    url: '/api/v2/transactions';
-};
-
-export type GetApiV2TransactionsErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: _Error;
-};
-
-export type GetApiV2TransactionsError = GetApiV2TransactionsErrors[keyof GetApiV2TransactionsErrors];
-
-export type GetApiV2TransactionsResponses = {
-    /**
-     * Successful response
-     */
-    200: Array<Event>;
-};
-
-export type GetApiV2TransactionsResponse = GetApiV2TransactionsResponses[keyof GetApiV2TransactionsResponses];
-
 export type GetApiV1AccountsOnchainDailyLimitData = {
     body?: never;
     path?: never;
@@ -1812,6 +1812,10 @@ export type GetApiV1AccountsOnchainDailyLimitResponses = {
              * The current daily spending limit in the Safe token's base units.
              */
             onchainDailyLimit: number;
+            /**
+             * The remaining daily spending limit in the Safe token's base units.
+             */
+            onchainDailyRemaining: number;
         };
     };
 };
