@@ -261,7 +261,7 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
             </div>
 
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold text-foreground">Daily limit updated</h3>
+              <h3 className="text-lg font-semibold text-foreground">Success</h3>
               <p className="text-sm text-muted-foreground">
                 Your transaction is queued and will be executed in 3 minutes.
               </p>
