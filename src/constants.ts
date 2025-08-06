@@ -56,3 +56,5 @@ export const userTermsTitle: Record<UserTermsTypeFromApi, string> = {
 };
 
 export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";
+
+export const MAX_DAILY_LIMIT = 5000;

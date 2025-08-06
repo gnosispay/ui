@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TriangleAlert, Coins } from "lucide-react";
+import { StandardAlert } from "@/components/ui/standard-alert";
+import { Coins } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { isAddress } from "viem";
 import type { CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
@@ -61,29 +61,19 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
       {isQueueNotEmpty && <QueueNotEmptyAlert />}
 
       {!isQueueNotEmpty && (
-        <Alert variant="warning">
-          <TriangleAlert className="h-4 w-4" />
-          <AlertDescription>
-            Please ensure you enter a Gnosis Chain address. You are solely responsible for the accuracy of the address
-            and the safety of your funds.
-          </AlertDescription>
-        </Alert>
+        <StandardAlert
+          variant="warning"
+          description="Please ensure you enter a Gnosis Chain address. You are solely responsible for the accuracy of the address and the safety of your funds."
+        />
       )}
 
-      {signerError && (
-        <Alert variant="destructive">
-          <TriangleAlert className="h-4 w-4" />
-          <AlertDescription>{signerError.message}</AlertDescription>
-        </Alert>
-      )}
+      {signerError && <StandardAlert variant="destructive" description={signerError.message} />}
 
       {!isSignerConnected && !isDataLoading && (
-        <Alert variant="destructive">
-          <TriangleAlert className="h-4 w-4" />
-          <AlertDescription>
-            Please make sure to be connected with an account that is a signer of the Gnosis Pay account
-          </AlertDescription>
-        </Alert>
+        <StandardAlert
+          variant="destructive"
+          description="Please make sure to be connected with an account that is a signer of the Gnosis Pay account"
+        />
       )}
 
       <div className="space-y-2">
@@ -100,10 +90,7 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
         <Label htmlFor="amount">Amount</Label>
         <TokenAmountInput onTokenChange={setSelectedToken} onAmountChange={setAmount} setError={setAmountError} />
         {amountError && (
-          <Alert variant="destructive">
-            <Coins className="h-4 w-4" />
-            <AlertDescription>{amountError}</AlertDescription>
-          </Alert>
+          <StandardAlert variant="destructive" description={amountError} customIcon={<Coins className="h-4 w-4" />} />
         )}
       </div>
 

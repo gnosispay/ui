@@ -1,5 +1,5 @@
 import { getApiV1KycIntegration, type KycStatus } from "@/client";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { StandardAlert } from "@/components/ui/standard-alert";
 import { useUser } from "@/context/UserContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
@@ -100,10 +100,7 @@ export const KycRoute = () => {
     <div className="grid grid-cols-6 gap-4 h-full">
       {error && (
         <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
-          <Alert variant="destructive" className="mt-4">
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
+          <StandardAlert variant="destructive" title="Error" description={error} className="mt-4" />
         </div>
       )}
       <div className="col-span-6">

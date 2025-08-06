@@ -1,10 +1,10 @@
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { StandardAlert } from "@/components/ui/standard-alert";
 import { Button } from "@/components/ui/button";
 import { ADD_FUNDS_CONSTANTS } from "@/constants";
 import { useUser } from "@/context/UserContext";
 import { useUserFullName } from "@/hooks/useUserFullName";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
-import { Info, Copy, InboxIcon } from "lucide-react";
+import { Copy, InboxIcon } from "lucide-react";
 
 export const IbanAccountDetails = () => {
   const { user, safeConfig } = useUser();
@@ -88,40 +88,35 @@ export const IbanAccountDetails = () => {
       </div>
 
       <div className="space-y-3 pt-4 border-t border-border">
-        <Alert variant="warning">
-          <Info className="h-4 w-4" />
-          <AlertDescription>Counterpart bank may charge for international payments.</AlertDescription>
-        </Alert>
+        <StandardAlert variant="warning" description="Counterpart bank may charge for international payments." />
 
-        <Alert variant="info">
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            All transfers go through SEPA Instant. SEPA Standard is used when the counterpart bank does not support SEPA
-            Instant, or the amount exceeds 100,000 {safeConfig?.fiatSymbol}.
-          </AlertDescription>
-        </Alert>
+        <StandardAlert
+          variant="info"
+          description={`All transfers go through SEPA Instant. SEPA Standard is used when the counterpart bank does not support SEPA Instant, or the amount exceeds 100,000 ${safeConfig?.fiatSymbol}.`}
+        />
 
-        <Alert variant="info">
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            Instant payments are available 24/7, 365 days a year. SEPA Standard may take up to one business day.
-          </AlertDescription>
-        </Alert>
+        <StandardAlert
+          variant="info"
+          description="Instant payments are available 24/7, 365 days a year. SEPA Standard may take up to one business day."
+        />
 
-        <Alert variant="info">
-          <Info className="h-4 w-4" />
-          <AlertDescription>
-            The IBAN and related services are provided by Monerium EMI ehf., a third party electronic money institution{" "}
-            <a
-              href={ADD_FUNDS_CONSTANTS.MONERIUM_AUTHORISED_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2"
-            >
-              authorised by the Financial Supervisory Authority of the Central Bank of Iceland.
-            </a>
-          </AlertDescription>
-        </Alert>
+        <StandardAlert
+          variant="info"
+          description={
+            <>
+              The IBAN and related services are provided by Monerium EMI ehf., a third party electronic money
+              institution{" "}
+              <a
+                href={ADD_FUNDS_CONSTANTS.MONERIUM_AUTHORISED_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2"
+              >
+                authorised by the Financial Supervisory Authority of the Central Bank of Iceland.
+              </a>
+            </>
+          }
+        />
       </div>
     </>
   );

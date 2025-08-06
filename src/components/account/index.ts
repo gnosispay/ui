@@ -4,4 +4,3 @@ export { IbanAccountDetails } from "./IbanAccountDetails";
 export { UserProfileHeader } from "./UserProfileHeader";
 export { AccountDetailsModal } from "./AccountDetailsModal";
 export { SafeAccountDetails } from "./SafeAccountDetails";
-export { DailyLimitModal } from "./DailyLimitModal";
