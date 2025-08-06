@@ -74,113 +74,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     setCardInfoMap(newMap);
   }, []);
 
-  const freezeCard = useCallback(async (cardId: string) => {
-    postApiV1CardsByCardIdFreeze({
-      path: {
-        cardId,
-      },
-    })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error freezing card: ", error);
-          toast.error(<CollapsedError title="Error freezing card" error={error} />);
-          return;
-        }
-
-        toast.success("Card frozen successfully");
-        refreshCards();
-      })
-      .catch((error) => {
-        console.error("Error freezing card: ", error);
-        toast.error(<CollapsedError title="Error freezing card" error={error} />);
-      });
-  }, []);
-
-  const unfreezeCard = useCallback(async (cardId: string) => {
-    postApiV1CardsByCardIdUnfreeze({
-      path: {
-        cardId,
-      },
-    })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error unfreezing card: ", error);
-          toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
-          return;
-        }
-
-        toast.success("Card unfrozen successfully");
-        refreshCards();
-      })
-      .catch((error) => {
-        console.error("Error unfreezing card: ", error);
-        toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
-      });
-  }, []);
-
-  const markCardAsStolen = useCallback(async (cardId: string) => {
-    postApiV1CardsByCardIdStolen({
-      path: {
-        cardId,
-      },
-    })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error marking card as stolen: ", error);
-          toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
-          return;
-        }
-
-        toast.success("Card marked as stolen successfully");
-        refreshCards();
-      })
-      .catch((error) => {
-        console.error("Error marking card as stolen: ", error);
-        toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
-      });
-  }, []);
-
-  const markCardAsLost = useCallback(async (cardId: string) => {
-    postApiV1CardsByCardIdLost({
-      path: {
-        cardId,
-      },
-    })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error marking card as lost: ", error);
-          toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
-          return;
-        }
-
-        toast.success("Card marked as lost successfully");
-        refreshCards();
-      })
-      .catch((error) => {
-        console.error("Error marking card as lost: ", error);
-        toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
-      });
-  }, []);
-
-  const activateCard = useCallback(async (cardId: string) => {
-    postApiV1CardsByCardIdActivate({
-      path: { cardId },
-    })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error activating card: ", error);
-          toast.error(<CollapsedError title="Error activating card" error={error} />);
-          return;
-        }
-        toast.success("Card activated successfully");
-        refreshCards();
-      })
-      .catch((error) => {
-        toast.error(<CollapsedError title="Error activating card" error={error} />);
-        console.error("Error activating card:", error);
-      });
-  }, []);
-
   const refreshCards = useCallback(() => {
     setCards(undefined);
     getApiV1Cards()
@@ -200,6 +93,128 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch(console.error);
   }, [setCardsInfo]);
+
+  const freezeCard = useCallback(
+    async (cardId: string) => {
+      postApiV1CardsByCardIdFreeze({
+        path: {
+          cardId,
+        },
+      })
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error freezing card: ", error);
+            toast.error(<CollapsedError title="Error freezing card" error={error} />);
+            return;
+          }
+
+          toast.success("Card frozen successfully");
+          refreshCards();
+        })
+        .catch((error) => {
+          console.error("Error freezing card: ", error);
+          toast.error(<CollapsedError title="Error freezing card" error={error} />);
+        });
+    },
+    [refreshCards],
+  );
+
+  const unfreezeCard = useCallback(
+    async (cardId: string) => {
+      postApiV1CardsByCardIdUnfreeze({
+        path: {
+          cardId,
+        },
+      })
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error unfreezing card: ", error);
+            toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
+            return;
+          }
+
+          toast.success("Card unfrozen successfully");
+          refreshCards();
+        })
+        .catch((error) => {
+          console.error("Error unfreezing card: ", error);
+          toast.error(<CollapsedError title="Error unfreezing card" error={error} />);
+        });
+    },
+    [refreshCards],
+  );
+
+  const markCardAsStolen = useCallback(
+    async (cardId: string) => {
+      postApiV1CardsByCardIdStolen({
+        path: {
+          cardId,
+        },
+      })
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error marking card as stolen: ", error);
+            toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
+            return;
+          }
+
+          toast.success("Card marked as stolen successfully");
+          refreshCards();
+        })
+        .catch((error) => {
+          console.error("Error marking card as stolen: ", error);
+          toast.error(<CollapsedError title="Error marking card as stolen" error={error} />);
+        });
+    },
+    [refreshCards],
+  );
+
+  const markCardAsLost = useCallback(
+    async (cardId: string) => {
+      postApiV1CardsByCardIdLost({
+        path: {
+          cardId,
+        },
+      })
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error marking card as lost: ", error);
+            toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
+            return;
+          }
+
+          toast.success("Card marked as lost successfully");
+          refreshCards();
+        })
+        .catch((error) => {
+          console.error("Error marking card as lost: ", error);
+          toast.error(<CollapsedError title="Error marking card as lost" error={error} />);
+        });
+    },
+    [refreshCards],
+  );
+
+  const activateCard = useCallback(
+    async (cardId: string) => {
+      postApiV1CardsByCardIdActivate({
+        path: { cardId },
+      })
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error activating card: ", error);
+            toast.error(<CollapsedError title="Error activating card" error={error} />);
+            return;
+          }
+          toast.success("Card activated successfully");
+          refreshCards();
+        })
+        .catch((error) => {
+          toast.error(<CollapsedError title="Error activating card" error={error} />);
+          console.error("Error activating card:", error);
+        });
+    },
+    [refreshCards],
+  );
 
   useEffect(() => {
     if (!isAuthenticated) return;
