@@ -12,11 +12,11 @@ import { currencies, MAX_DAILY_LIMIT } from "@/constants";
 import { formatDisplayAmount } from "@/utils/formatCurrency";
 import { Skeleton } from "../ui/skeleton";
 import { Progress } from "../ui/progress";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import { populateExecuteEnqueue } from "@gnosispay/account-kit";
 import { gnosis } from "viem/chains";
 import { useSignTypedData } from "wagmi";
-import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { StandardAlert } from "../ui/standard-alert";
 
 enum DailyLimitStep {
   None = "none",
@@ -185,13 +185,7 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
     }
 
     if (error && step === DailyLimitStep.None) {
-      return (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Error</AlertTitle>
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      );
+      return <StandardAlert variant="destructive" title="Error" description={error} />;
     }
 
     switch (step) {
@@ -228,13 +222,7 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
               {MAX_DAILY_LIMIT.toLocaleString()}
             </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+            {error && <StandardAlert variant="destructive" title="Error" description={error} />}
 
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={handleCancel} disabled={isSubmitting}>

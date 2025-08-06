@@ -1,11 +1,11 @@
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { currencies } from "@/constants";
 import { useUser } from "@/context/UserContext";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { shortenAddress } from "@/utils/shortenAddress";
-import { Copy, AlertTriangle } from "lucide-react";
+import { Copy } from "lucide-react";
 import { useMemo } from "react";
+import { StandardAlert } from "@/components/ui/standard-alert";
 
 interface SafeAccountDetailsProps {
   showTokenAndNetwork?: boolean;
@@ -56,14 +56,12 @@ export const SafeAccountDetails = ({ addressLabel = "Wallet address" }: SafeAcco
         </div>
       </div>
 
-      <Alert variant="warning">
-        <AlertTriangle className="h-4 w-4" />
-        <AlertDescription>
-          Please only deposit {currency?.tokenSymbol} on Gnosis Chain
-          {currency?.address && <> (contract {shortenAddress(currency.address)})</>}, this is solely your
-          responsibility. If you deposit on another network, your assets may be lost.
-        </AlertDescription>
-      </Alert>
+      <StandardAlert
+        variant="warning"
+        description={`Please only deposit ${currency?.tokenSymbol} on Gnosis Chain${
+          currency?.address ? ` (contract ${shortenAddress(currency.address)})` : ""
+        }, this is solely your responsibility. If you deposit on another network, your assets may be lost.`}
+      />
     </div>
   );
 };
