@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { StandardAlert } from "@/components/ui/standard-alert";
 import { Clock } from "lucide-react";
 import { formatUnits } from "viem";
 import type { Address } from "viem";
@@ -124,10 +124,11 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
         </div>
       </div>
 
-      <Alert variant="info">
-        <Clock className="h-4 w-4" />
-        <AlertDescription>As a security measure, your card will be temporarily frozen for 3 minutes.</AlertDescription>
-      </Alert>
+      <StandardAlert
+        variant="info"
+        description="As a security measure, your card will be temporarily frozen for 3 minutes."
+        customIcon={<Clock className="h-4 w-4" />}
+      />
 
       <div className="flex gap-3">
         <Button variant="outline" onClick={onBack} disabled={isLoading}>

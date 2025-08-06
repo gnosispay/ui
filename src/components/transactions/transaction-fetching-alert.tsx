@@ -1,10 +1,10 @@
-import { AlertCircleIcon } from "lucide-react";
-import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
+import { StandardAlert } from "../ui/standard-alert";
 
 export const TransactionFetchingAlert = () => (
-  <Alert variant="destructive" className="mt-4">
-    <AlertCircleIcon />
-    <AlertTitle>Error fetching transactions</AlertTitle>
-    <AlertDescription>Please try again later.</AlertDescription>
-  </Alert>
+  <StandardAlert
+    variant="destructive"
+    title="Error fetching transactions"
+    description="Please try again later."
+    className="mt-4"
+  />
 );

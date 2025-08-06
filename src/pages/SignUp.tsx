@@ -9,7 +9,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { StandardAlert } from "@/components/ui/standard-alert";
 import { OtpInput } from "@/components/otpInput";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
@@ -203,12 +203,7 @@ export const SignUpRoute = () => {
             >
               Get code
             </Button>
-            {error && (
-              <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+            {error && <StandardAlert variant="destructive" title="Error" description={error} />}
           </form>
         )}
         {step === ScreenStep.OtpVerification && (
@@ -225,12 +220,7 @@ export const SignUpRoute = () => {
                 Verify and Sign Up
               </Button>
             )}
-            {error && (
-              <Alert variant="destructive">
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+            {error && <StandardAlert variant="destructive" title="Error" description={error} />}
           </form>
         )}
       </div>

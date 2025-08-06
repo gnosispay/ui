@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { TriangleAlert, MousePointer2 } from "lucide-react";
+import { StandardAlert } from "@/components/ui/standard-alert";
+import { MousePointer2 } from "lucide-react";
 
 interface AddressInputProps {
   toAddress: string;
@@ -42,12 +42,7 @@ export const AddressInput = ({ toAddress, onChange, error, connectedAddress }: A
         </Button>
       )}
 
-      {error && (
-        <Alert variant="warning">
-          <TriangleAlert className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+      {error && <StandardAlert variant="warning" description={error} />}
     </div>
   );
 };
