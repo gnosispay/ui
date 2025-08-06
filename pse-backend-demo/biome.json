@@ -1,9 +1,10 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "root": false,
+  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
   "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["components/ui/**/*.tsx", "dist", "src/client"]
+    "includes": ["**", "!**/components/ui/**/*.tsx", "!**/dist", "!**/src/client"]
   },
   "formatter": {
     "enabled": true,
@@ -11,7 +12,7 @@
     "bracketSpacing": true,
     "indentStyle": "space"
   },
-  "organizeImports": { "enabled": false },
+  "assist": { "actions": { "source": { "organizeImports": "off" } } },
   "linter": {
     "enabled": true,
     "rules": {
