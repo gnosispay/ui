@@ -38,7 +38,7 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
     }
 
     showPinIframe(card.cardToken);
-  }, [card]);
+  }, [card, showPinIframe]);
 
   const showPinIframe = useCallback(
     async (cardToken: string) => {

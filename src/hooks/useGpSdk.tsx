@@ -29,6 +29,40 @@ export const useGpSdk = () => {
     toast.error(<CollapsedError title={message} error={error} />);
   }, []);
 
+  const getEphemeralToken = useCallback(async () => {
+    const serverUrl = import.meta.env.VITE_PSE_RELAY_SERVER_URL;
+
+    if (!serverUrl) {
+      showError("VITE_PSE_RELAY_SERVER_URL is not set");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      const response = await fetch(serverUrl, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const res: ResponseData = await response.json();
+
+      if (!res.success) {
+        showError("Error getting ephemeral token", res);
+        return;
+      }
+
+      const token = res.responseObject.data.ephemeralToken;
+
+      return token;
+    } catch (error) {
+      showError("Error getting ephemeral token", error);
+      return;
+    } finally {
+      setIsLoading(false);
+    }
+  }, [showError]);
+
   const getGpSdk = useCallback(
     async ({ actionCallback }: { actionCallback?: (action?: Action) => void } = {}) => {
       const appId = import.meta.env.VITE_PSE_APP_ID;
@@ -64,7 +98,7 @@ export const useGpSdk = () => {
 
       return gp;
     },
-    [getJWT, showError],
+    [getJWT, showError, getEphemeralToken],
   );
 
   const showCardDetails = useCallback(
@@ -98,40 +132,6 @@ export const useGpSdk = () => {
     },
     [getGpSdk, showError],
   );
-
-  const getEphemeralToken = useCallback(async () => {
-    const serverUrl = import.meta.env.VITE_PSE_RELAY_SERVER_URL;
-
-    if (!serverUrl) {
-      showError("VITE_PSE_RELAY_SERVER_URL is not set");
-      return;
-    }
-
-    try {
-      setIsLoading(true);
-      const response = await fetch(serverUrl, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const res: ResponseData = await response.json();
-
-      if (!res.success) {
-        showError("Error getting ephemeral token", res);
-        return;
-      }
-
-      const token = res.responseObject.data.ephemeralToken;
-
-      return token;
-    } catch (error) {
-      showError("Error getting ephemeral token", error);
-      return;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [showError]);
 
   return { getGpSdk, isLoading, showCardDetails, showPin };
 };

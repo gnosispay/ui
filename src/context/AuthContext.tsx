@@ -89,6 +89,14 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     updateClient();
   }, [jwt, updateClient]);
 
+  const updateJwt = useCallback(
+    (newJwt: string) => {
+      localStorage.setItem(jwtAddressKey, newJwt);
+      setJwt(newJwt);
+    },
+    [jwtAddressKey],
+  );
+
   const renewToken = useCallback(async () => {
     if (!address || !chainId) {
       console.info("No address or chainId");
@@ -181,15 +189,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       setIsAuthenticating(false);
       return;
     }
-  }, [address, chainId, signMessageAsync, connections, jwtAddressKey]);
-
-  const updateJwt = useCallback(
-    (newJwt: string) => {
-      localStorage.setItem(jwtAddressKey, newJwt);
-      setJwt(newJwt);
-    },
-    [jwtAddressKey],
-  );
+  }, [address, chainId, signMessageAsync, connections, jwtAddressKey, updateJwt]);
 
   useEffect(() => {
     const expired = isTokenExpired(jwt);

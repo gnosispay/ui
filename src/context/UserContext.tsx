@@ -50,32 +50,6 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     }
   }, [safeConfig]);
 
-  useEffect(() => {
-    if (!isAuthenticated || !isUserSignedUp) return;
-
-    refreshUser();
-  }, [isAuthenticated, isUserSignedUp]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !isUserSignedUp) return;
-
-    refreshSafeConfig();
-  }, [isAuthenticated, isUserSignedUp]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !user) return;
-
-    // Call immediately
-    getAccountBalance();
-
-    // Call every 30s
-    const interval = setInterval(() => {
-      getAccountBalance();
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [isAuthenticated, user]);
-
   const refreshSafeConfig = useCallback(() => {
     getApiV1SafeConfig()
       .then(({ data, error }) => {
@@ -132,6 +106,32 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         console.error("Error fetching account balances:", error);
       });
   }, [isAuthenticated, user]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isUserSignedUp) return;
+
+    refreshUser();
+  }, [isAuthenticated, isUserSignedUp, refreshUser]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !isUserSignedUp) return;
+
+    refreshSafeConfig();
+  }, [isAuthenticated, isUserSignedUp, refreshSafeConfig]);
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+
+    // Call immediately
+    getAccountBalance();
+
+    // Call every 30s
+    const interval = setInterval(() => {
+      getAccountBalance();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, user, getAccountBalance]);
 
   return (
     <UserContext.Provider

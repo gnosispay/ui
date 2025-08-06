@@ -69,7 +69,7 @@ const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepPr
         return;
       }
       onComplete();
-    } catch (err) {
+    } catch (_err) {
       setError("Error verifying code");
     } finally {
       setIsOtpLoading(false);
