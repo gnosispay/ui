@@ -54,9 +54,20 @@ jobs:
       - name: Build, tag, and push image to AWS Container Registry
         env:
           IMAGE_NAME: ${{ steps.docker_image.outputs.image_name }}
+          HOST: ${{ secrets.HOST }}
+          PORT: ${{ secrets.PORT }}
+          GNOSIS_PSE_PRIVATE_API_BASE_URL: ${{ secrets.GNOSIS_PSE_PRIVATE_API_BASE_URL }}
+          CLIENT_CERT: ${{ secrets.CLIENT_CERT }}
+          CLIENT_KEY: ${{ secrets.CLIENT_KEY }}
         if: steps.docker_image.outputs.image_exists == 'false'
         run: |
-          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.pse-backend --push
+          docker buildx build \
+            --build-arg HOST=$HOST \
+            --build-arg PORT=$PORT \
+            --build-arg GNOSIS_PSE_PRIVATE_API_BASE_URL=$GNOSIS_PSE_PRIVATE_API_BASE_URL \
+            --build-arg CLIENT_CERT="$CLIENT_CERT" \
+            --build-arg CLIENT_KEY="$CLIENT_KEY" \
+            -t $IMAGE_NAME . -f ./Dockerfile.pse-backend --push
 
   # deploy-on-staging:
   #   name: Deploy on Staging

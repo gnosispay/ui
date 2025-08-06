@@ -52,9 +52,18 @@ jobs:
       - name: Build, tag, and push image to AWS Container Registry
         env:
           IMAGE_NAME: ${{ steps.docker_image.outputs.image_name }}
+          VITE_PSE_RELAY_SERVER_URL: ${{ secrets.VITE_PSE_RELAY_SERVER_URL }}
+          VITE_IFRAME_HOST: ${{ secrets.VITE_IFRAME_HOST }}
+          VITE_GNOSIS_PAY_API_BASE_URL: ${{ secrets.VITE_GNOSIS_PAY_API_BASE_URL }}
+          VITE_PSE_APP_ID: ${{ secrets.VITE_PSE_APP_ID }}
         if: steps.docker_image.outputs.image_exists == 'false'
         run: |
-          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.ui --push
+          docker buildx build \
+            --build-arg VITE_PSE_RELAY_SERVER_URL=$VITE_PSE_RELAY_SERVER_URL \
+            --build-arg VITE_IFRAME_HOST=$VITE_IFRAME_HOST \
+            --build-arg VITE_GNOSIS_PAY_API_BASE_URL=$VITE_GNOSIS_PAY_API_BASE_URL \
+            --build-arg VITE_PSE_APP_ID=$VITE_PSE_APP_ID \
+            -t $IMAGE_NAME . -f ./Dockerfile.ui --push
 
   # deploy-on-staging:
   #   name: Deploy on Staging
