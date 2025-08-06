@@ -1,5 +1,6 @@
 import { ChevronDown } from "lucide-react";
 import { useCallback, useState } from "react";
+import { Button } from "./ui/button";
 
 interface Props {
   title: string;
@@ -29,10 +30,9 @@ export const CollapsedError = ({ error, title }: Props) => {
   return (
     <div className="flex flex-col">
       <div>{title}</div>
-      {/* biome-ignore lint/a11y/useKeyWithClickEvents: <explanation> */}
-      <div onClick={onSwitch} className="flex items-center cursor-pointer text-muted-foreground">
+      <Button variant="ghost" onClick={onSwitch} className="text-muted-foreground p-0 justify-start w-fit">
         Details <ChevronDown size={16} className={open ? "rotate-180" : ""} />
-      </div>
+      </Button>
       <div className={`text-sm text-muted-foreground ${open ? "block" : "hidden"}`}>
         {JSON.stringify(error, errorReplacer, 2)}
       </div>

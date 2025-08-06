@@ -63,6 +63,12 @@ function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
 }
 
 function App() {
+  console.log("+++ env variables +++");
+  console.log(import.meta.env.VITE_PSE_RELAY_SERVER_URL);
+  console.log(import.meta.env.VITE_IFRAME_HOST);
+  console.log(import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL);
+  console.log(import.meta.env.VITE_PSE_APP_ID);
+
   return (
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />

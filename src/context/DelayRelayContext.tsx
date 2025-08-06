@@ -69,6 +69,27 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     });
   }, [nonExecutedQueue]);
 
+  const fetchDelayQueue = useCallback(async () => {
+    setIsLoading(true);
+    getApiV1DelayRelay()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error fetching delay queue", error);
+          setError(extractErrorMessage(error, "Failed to fetch delay queue"));
+          return;
+        }
+
+        setQueue(data || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching delay queue", error);
+        setError(extractErrorMessage(error, "Failed to fetch delay queue"));
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
   // Dynamic fetch interval management
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -91,7 +112,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
         clearInterval(fetchIntervalRef.current);
       }
     };
-  }, [isAuthenticated, hasExecutingTransactions, nonExecutedQueue.length]);
+  }, [isAuthenticated, hasExecutingTransactions, nonExecutedQueue.length, fetchDelayQueue]);
 
   // Executing transactions
   useEffect(() => {
@@ -153,7 +174,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
 
     for (const tx of countDownQueue) {
       const readyDate = new Date(tx.readyAt || "");
-      const diff = readyDate.getTime() - new Date().getTime();
+      const diff = readyDate.getTime() - Date.now();
 
       if (tx.id && !countDownTxsRef.current.has(tx.id)) {
         toast.loading(`Transaction ${tx.id.slice(0, 6)}... queued`, {
@@ -185,7 +206,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
       for (const tx of countDownQueue) {
         if (tx.readyAt && tx.id && countDownTxsRef.current.has(tx.id)) {
           const readyDate = new Date(tx.readyAt);
-          const diff = readyDate.getTime() - new Date().getTime();
+          const diff = readyDate.getTime() - Date.now();
           if (diff > 0) {
             activeTransactions = true;
             // Update toast with fresh countdown
@@ -209,27 +230,6 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
       }
     };
   }, [countDownQueue]);
-
-  const fetchDelayQueue = useCallback(async () => {
-    setIsLoading(true);
-    getApiV1DelayRelay()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Error fetching delay queue", error);
-          setError(extractErrorMessage(error, "Failed to fetch delay queue"));
-          return;
-        }
-
-        setQueue(data || []);
-      })
-      .catch((error) => {
-        console.error("Error fetching delay queue", error);
-        setError(extractErrorMessage(error, "Failed to fetch delay queue"));
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
 
   return (
     <DelayRelayContext.Provider value={{ queue: nonExecutedQueue, isLoading, error, fetchDelayQueue }}>

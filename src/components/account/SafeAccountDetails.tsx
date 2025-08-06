@@ -31,17 +31,16 @@ export const SafeAccountDetails = ({ addressLabel = "Wallet address" }: SafeAcco
 
   return (
     <div className="space-y-4">
-      <>
-        <div>
-          <div className="text-sm text-muted-foreground mb-2">Token</div>
-          <div className="text-foreground">{currency?.tokenSymbol}</div>
-        </div>
+      <div>
+        <div className="text-sm text-muted-foreground mb-2">Token</div>
+        <div className="text-foreground">{currency?.tokenSymbol}</div>
+      </div>
 
-        <div>
-          <div className="text-sm text-muted-foreground mb-2">Network</div>
-          <div className="text-foreground">Gnosis Chain</div>
-        </div>
-      </>
+      <div>
+        <div className="text-sm text-muted-foreground mb-2">Network</div>
+        <div className="text-foreground">Gnosis Chain</div>
+      </div>
+
       <div>
         <div className="text-sm font-medium text-muted-foreground">{addressLabel}</div>
         <div className="mt-1 flex items-center gap-2">

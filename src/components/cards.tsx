@@ -50,17 +50,14 @@ export const Cards = () => {
             </div>
           ))}
         <div className="flex items-center gap-2">
-          <div
-            className="rounded-sm w-20 h-14 bg-muted flex items-center justify-center cursor-pointer"
+          <button
+            type="button"
+            className="cursor-pointer rounded-sm w-20 h-14 bg-muted flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={handleAddCard}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                handleAddCard();
-              }
-            }}
+            aria-label="Add card"
           >
             <PlusIcon className="w-4 h-4" />
-          </div>
+          </button>
           <div className="flex flex-col gap-2">
             <div className="text-sm text-primary">
               <span className="mr-2">Add card</span>
