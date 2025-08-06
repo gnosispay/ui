@@ -29,17 +29,6 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
 
   const { getGpSdk } = useGpSdk();
 
-  useEffect(() => {
-    if (!card.cardToken) {
-      const errorMessage = "No card token";
-      console.error(errorMessage);
-      toast.error(errorMessage);
-      return;
-    }
-
-    showPinIframe(card.cardToken);
-  }, [card, showPinIframe]);
-
   const showPinIframe = useCallback(
     async (cardToken: string) => {
       const gpSdk = await getGpSdk({ actionCallback });
@@ -58,6 +47,17 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
     },
     [getGpSdk, setPinId, actionCallback],
   );
+
+  useEffect(() => {
+    if (!card.cardToken) {
+      const errorMessage = "No card token";
+      console.error(errorMessage);
+      toast.error(errorMessage);
+      return;
+    }
+
+    showPinIframe(card.cardToken);
+  }, [card, showPinIframe]);
 
   const onOpenChange = useCallback(
     (open: boolean) => {
