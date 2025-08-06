@@ -1,0 +1,239 @@
+# Gnosis Pay UI Development Rules
+
+## Color System & Theming
+
+### Never Use Hard-coded Colors
+- **NEVER** use hard-coded color values like `#000000`, `rgb(255, 0, 0)`, or `hsl(120, 100%, 50%)`
+- **ALWAYS** use CSS custom properties defined in `src/index.css`
+- Use Tailwind CSS color classes that map to our design system variables
+
+### Available Color Variables
+Use these predefined color variables from `src/index.css`:
+
+#### Semantic Colors (Automatically adapt to light/dark mode)
+- `background` / `bg-background` - Main background color
+- `foreground` / `text-foreground` - Main text color
+- `card` / `bg-card` - Card background
+- `card-foreground` / `text-card-foreground` - Card text
+- `muted` / `bg-muted` - Muted background
+- `muted-foreground` / `text-muted-foreground` - Muted text
+- `primary` / `bg-primary` - Primary button/action color
+- `primary-foreground` / `text-primary-foreground` - Primary text
+- `secondary` / `bg-secondary` - Secondary elements
+- `destructive` / `bg-destructive` - Error/destructive actions
+- `border` / `border-border` - Default border color
+- `input` / `bg-input` - Input field backgrounds
+- `ring` / `ring-ring` - Focus ring color
+
+#### Brand Colors
+- `brand` / `bg-brand` - Brand green color
+- `button-bg` / `bg-button-bg` - Primary button background
+- `button-bg-hover` / `hover:bg-button-bg-hover` - Button hover state
+- `button-black` / `text-button-black` - Button text
+
+#### Status Colors
+- `success` / `text-success` - Success states
+- `warning` / `text-warning` - Warning states  
+- `info` / `text-info` - Info states
+- `error` / `text-error` - Error states
+
+#### Navigation & Links
+- `link-active` / `text-link-active` - Active navigation links
+- `link-secondary` / `text-link-secondary` - Secondary/inactive links
+
+### Adding New Colors
+If a design requires colors not in our system:
+1. Add new CSS custom properties to `src/index.css` in both light and dark mode sections
+2. Follow the existing naming convention (semantic names, not color names)
+3. Ensure proper contrast ratios for accessibility
+4. Test in both light and dark modes
+
+### Examples
+```tsx
+// ❌ DON'T - Hard-coded colors
+<div style={{ backgroundColor: '#ffffff', color: '#000000' }}>
+
+// ❌ DON'T - Arbitrary Tailwind colors
+<div className="bg-white text-black">
+
+// ✅ DO - Use design system variables
+<div className="bg-background text-foreground">
+<div className="bg-card text-card-foreground border border-border">
+<button className="bg-button-bg hover:bg-button-bg-hover text-button-black">
+
+// ✅ DO - CSS custom properties for inline styles
+<div style={{ backgroundColor: 'var(--color-brand)' }}>
+```
+
+## Responsive Design & Mobile-First
+
+### Breakpoint Strategy
+Follow the existing mobile-first approach:
+- Default styles: Mobile (< 640px)
+- `sm:` Small screens (≥ 640px)
+- `md:` Medium screens (≥ 768px) 
+- `lg:` Large screens (≥ 1024px)
+- `xl:` Extra large (≥ 1280px)
+
+### Layout Patterns
+Follow these established patterns:
+
+#### Navigation
+- **Mobile**: Bottom fixed navigation with icon + label
+- **Desktop**: Top header with horizontal navigation
+```tsx
+// Mobile navigation (hidden on lg+)
+<footer className="fixed bottom-0 left-0 w-full border-t lg:hidden">
+
+// Desktop navigation (hidden below lg)
+<header className="w-full border-b hidden lg:block">
+```
+
+#### Page Layout
+Use the 6-column grid system:
+```tsx
+// Standard page layout
+<div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
+  <div className="col-span-6 lg:col-start-2 lg:col-span-4">
+    {/* Content centered on desktop, full width on mobile */}
+  </div>
+</div>
+```
+
+#### Modal Sizing
+```tsx
+// Small modals
+<DialogContent className="max-w-md">
+
+// Medium modals  
+<DialogContent className="sm:max-w-lg">
+
+// Responsive sheets
+<SheetContent className="w-3/4 sm:max-w-sm">
+```
+
+### Mobile-First Requirements
+
+#### Touch-Friendly Design
+- Minimum 44px touch targets for interactive elements
+- Adequate spacing between clickable elements
+- Consider thumb-reach zones
+
+#### Mobile Navigation
+- Use bottom navigation for primary actions
+- Implement swipe gestures where appropriate
+- Ensure easy one-handed usage
+
+#### Content Adaptation
+- Stack layouts vertically on mobile
+- Use horizontal layouts on larger screens
+- Implement proper text scaling
+- Optimize image sizes for different screens
+
+#### Performance
+- Lazy load images and heavy components
+- Minimize layout shifts
+- Use appropriate image formats and sizes
+
+### Examples
+```tsx
+// ❌ DON'T - Desktop-first approach
+<div className="flex lg:flex-col">
+
+// ✅ DO - Mobile-first approach  
+<div className="flex-col lg:flex-row">
+
+// ❌ DON'T - Fixed mobile layout
+<div className="w-full p-4">
+
+// ✅ DO - Responsive spacing and sizing
+<div className="w-full mx-4 lg:mx-0 p-4 lg:p-6">
+<div className="max-w-xl mx-auto lg:max-w-4xl">
+
+// ✅ DO - Progressive enhancement
+<div className="space-y-4 lg:space-y-0 lg:space-x-4 lg:flex">
+```
+
+## Component Guidelines
+
+### Reuse Existing Components
+Before creating new components, check if existing ones can be used:
+- `Button`, `IconButton` - Various button styles
+- `Dialog`, `Sheet` - Modal and drawer patterns
+- `Input`, `Select` - Form controls
+- `Alert` - Status messages
+- `Progress` - Loading indicators
+
+### Component Structure
+- Use `cn()` utility for className merging
+- Support className prop for customization
+- Use forwardRef for interactive components
+- Implement proper TypeScript types
+
+### Accessibility
+- Include proper ARIA labels and roles
+- Ensure keyboard navigation works
+- Maintain focus management
+- Support screen readers
+- Test with accessibility tools
+
+## Code Quality
+
+### TypeScript
+- Use strict TypeScript configuration
+- Define proper interfaces for props
+- Avoid `any` types
+- Use type guards where appropriate
+
+### Performance
+- Use `useMemo` and `useCallback` appropriately
+- Implement proper loading states
+- Avoid unnecessary re-renders
+- Optimize bundle size
+
+### Error Handling
+- Implement proper error boundaries
+- Show user-friendly error messages
+- Handle loading and error states consistently
+- Log errors appropriately
+
+### Promise Handling
+- **PREFER** `promise.then().catch().finally()` over `try/catch` blocks when possible
+- Use `try/catch` only when absolutely necessary (e.g., within async/await functions where promise chaining isn't practical)
+- Maintain consistent error handling patterns across the codebase
+
+#### Examples
+```tsx
+// ✅ DO - Use promise chaining
+someApiCall()
+  .then((response) => {
+    // Handle success
+    setData(response.data);
+  })
+  .catch((error) => {
+    // Handle error
+    setError("Failed to fetch data");
+    console.error("API Error:", error);
+  })
+  .finally(() => {
+    // Cleanup
+    setIsLoading(false);
+  });
+
+// ❌ AVOID - try/catch unless necessary
+try {
+  const response = await someApiCall();
+  setData(response.data);
+} catch (error) {
+  setError("Failed to fetch data");
+} finally {
+  setIsLoading(false);
+}
+```
+
+## Testing Considerations
+- Test components in both light and dark modes
+- Verify responsive behavior at different breakpoints
+- Test keyboard navigation and accessibility
+- Validate color contrast ratios
+- Test on actual mobile devices when possible 
