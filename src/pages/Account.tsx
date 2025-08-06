@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { SquareUser as UserIcon, Landmark, Gauge } from "lucide-react";
-import {
-  AccountSection,
-  PersonalDetailsModal,
-  UserProfileHeader,
-  AccountDetailsModal,
-  DailyLimitModal,
-} from "@/components/account";
+import { AccountSection, PersonalDetailsModal, UserProfileHeader, AccountDetailsModal } from "@/components/account";
+import { DailyLimitModal } from "@/components/modals/daily-limit";
 
 enum ModalType {
   NONE = "none",
