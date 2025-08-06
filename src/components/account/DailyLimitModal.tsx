@@ -139,7 +139,7 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
         return;
       }
 
-      const { error: putError, data: putData } = await putApiV1AccountsOnchainDailyLimit({
+      const { error: putError } = await putApiV1AccountsOnchainDailyLimit({
         body: {
           onchainDailyLimit: limitNumber,
           signature,
@@ -151,7 +151,6 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
         return;
       }
 
-      console.log("putData", putData);
       setStep(DailyLimitStep.Success);
     } catch (err) {
       setError("Failed to create transaction");
