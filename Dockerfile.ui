@@ -1,6 +1,20 @@
 # Stage 1: Build the app
 FROM node:20-alpine AS builder
 
+# Declare build-time arguments that can be passed from the 'docker build' command.
+# These names MUST match the keys used in the --build-arg flag.
+ARG VITE_PSE_RELAY_SERVER_URL
+ARG VITE_IFRAME_HOST
+ARG VITE_GNOSIS_PAY_API_BASE_URL
+ARG VITE_PSE_APP_ID
+
+# Set these arguments as environment variables for subsequent RUN commands in this stage.
+# Vite reads environment variables prefixed with VITE_ during the build.
+ENV VITE_PSE_RELAY_SERVER_URL=$VITE_PSE_RELAY_SERVER_URL
+ENV VITE_IFRAME_HOST=$VITE_IFRAME_HOST
+ENV VITE_GNOSIS_PAY_API_BASE_URL=$VITE_GNOSIS_PAY_API_BASE_URL
+ENV VITE_PSE_APP_ID=$VITE_PSE_APP_ID
+
 # Set working directory
 WORKDIR /app
 
@@ -14,7 +28,7 @@ RUN pnpm install --frozen-lockfile
 # Copy the rest of the source code
 COPY . .
 
-# Build the app
+# Build the app. This command will now have access to the ENV variables set above.
 RUN pnpm build
 
 # Stage 2: Serve with nginx
@@ -30,4 +44,4 @@ COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 
 # Start nginx
-CMD ["nginx", "-g", "daemon off;"] 
+CMD ["nginx", "-g", "daemon off;"]
