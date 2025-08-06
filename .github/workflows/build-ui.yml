@@ -28,7 +28,7 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID_PROD }}:role/github-actions-role
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID_PROD }}:role/github-actions-gnosispay-v2-ui-prod
           aws-region: eu-central-1
 
       - name: Login to AWS Container Registry
@@ -54,8 +54,7 @@ jobs:
           IMAGE_NAME: ${{ steps.docker_image.outputs.image_name }}
         if: steps.docker_image.outputs.image_exists == 'false'
         run: |
-          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.ui
-          docker push $IMAGE_NAME
+          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.ui --push
 
   # deploy-on-staging:
   #   name: Deploy on Staging

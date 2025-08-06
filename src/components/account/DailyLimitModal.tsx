@@ -12,10 +12,11 @@ import { currencies, MAX_DAILY_LIMIT } from "@/constants";
 import { formatDisplayAmount } from "@/utils/formatCurrency";
 import { Skeleton } from "../ui/skeleton";
 import { Progress } from "../ui/progress";
-import { CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { populateExecuteEnqueue } from "@gnosispay/account-kit";
 import { gnosis } from "viem/chains";
 import { useSignTypedData } from "wagmi";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 
 enum DailyLimitStep {
   None = "none",
@@ -96,19 +97,19 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
   };
 
   const handleSave = useCallback(async () => {
-    if (!safeConfig?.address) {
+    if (!safeConfig?.address || !currency) {
       return;
     }
 
-    const limitValue = Number.parseFloat(newLimit);
+    const limitNumber = Math.round(Number(newLimit));
 
-    if (Number.isNaN(limitValue) || limitValue < 0) {
+    if (Number.isNaN(limitNumber) || limitNumber < 0) {
       setError("Please enter a valid amount");
       return;
     }
 
-    if (limitValue > MAX_DAILY_LIMIT) {
-      setError(`Daily limit cannot exceed ${currency?.symbol}${MAX_DAILY_LIMIT.toLocaleString()}`);
+    if (limitNumber > MAX_DAILY_LIMIT) {
+      setError(`Daily limit cannot exceed ${formatDisplayAmount(MAX_DAILY_LIMIT, currency)}`);
       return;
     }
 
@@ -118,7 +119,7 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
     try {
       const { error, data } = await getApiV1AccountsOnchainDailyLimitTransactionData({
         query: {
-          onchainDailyLimit: limitValue.toString(),
+          onchainDailyLimit: limitNumber.toString(),
         },
       });
 
@@ -140,7 +141,7 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
 
       const { error: putError, data: putData } = await putApiV1AccountsOnchainDailyLimit({
         body: {
-          onchainDailyLimit: limitValue,
+          onchainDailyLimit: limitNumber,
           signature,
         },
       });
@@ -164,6 +165,21 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
     onOpenChange(false);
   };
 
+  const onChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setError(null);
+    const value = Math.round(Number(e.target.value));
+
+    if (value === 0) {
+      setNewLimit("");
+    } else {
+      setNewLimit(value.toString());
+    }
+  }, []);
+
+  const onSetMax = useCallback(() => {
+    onChange({ target: { value: MAX_DAILY_LIMIT.toString() } } as React.ChangeEvent<HTMLInputElement>);
+  }, [onChange]);
+
   const renderContent = () => {
     if (isLoading) {
       return <Skeleton className="h-32 w-full" />;
@@ -171,9 +187,11 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
 
     if (error && step === DailyLimitStep.None) {
       return (
-        <div className="text-center py-4">
-          <div className="text-destructive">{error}</div>
-        </div>
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
       );
     }
 
@@ -190,8 +208,8 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
                   id="daily-limit"
                   type="number"
                   value={newLimit}
-                  onChange={(e) => setNewLimit(e.target.value)}
-                  placeholder="500"
+                  onChange={onChange}
+                  placeholder="350"
                   className="text-2xl font-semibold h-16 pr-16"
                   min="0"
                   max={MAX_DAILY_LIMIT}
@@ -199,7 +217,7 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
                 <Button
                   variant="ghost"
                   className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground font-medium"
-                  onClick={() => setNewLimit(MAX_DAILY_LIMIT.toString())}
+                  onClick={onSetMax}
                 >
                   Max
                 </Button>
@@ -211,7 +229,13 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
               {MAX_DAILY_LIMIT.toLocaleString()}
             </div>
 
-            {error && <div className="text-destructive text-sm">{error}</div>}
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
 
             <div className="flex gap-3">
               <Button variant="outline" className="flex-1" onClick={handleCancel} disabled={isSubmitting}>
