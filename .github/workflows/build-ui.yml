@@ -54,8 +54,7 @@ jobs:
           IMAGE_NAME: ${{ steps.docker_image.outputs.image_name }}
         if: steps.docker_image.outputs.image_exists == 'false'
         run: |
-          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.ui
-          docker push $IMAGE_NAME
+          docker buildx build -t $IMAGE_NAME . -f ./Dockerfile.ui --push
 
   # deploy-on-staging:
   #   name: Deploy on Staging
