@@ -5,6 +5,7 @@ import { StandardAlert } from "@/components/ui/standard-alert";
 import { postApiV1EoaAccounts } from "@/client";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { isAddress } from "viem";
 
 interface SignInWalletsEditProps {
   onCancel: () => void;
@@ -15,12 +16,6 @@ export const SignInWalletsEdit = ({ onCancel, onSuccess }: SignInWalletsEditProp
   const [address, setAddress] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const validateAddress = useCallback((addr: string) => {
-    // Basic Ethereum address validation
-    const ethereumAddressRegex = /^0x[a-fA-F0-9]{40}$/;
-    return ethereumAddressRegex.test(addr);
-  }, []);
 
   const handleAddressChange = useCallback((value: string) => {
     setError(null);
@@ -35,7 +30,7 @@ export const SignInWalletsEdit = ({ onCancel, onSuccess }: SignInWalletsEditProp
       return;
     }
 
-    if (!validateAddress(trimmedAddress)) {
+    if (!isAddress(trimmedAddress)) {
       setError("Please enter a valid Ethereum address");
       return;
     }
@@ -64,7 +59,7 @@ export const SignInWalletsEdit = ({ onCancel, onSuccess }: SignInWalletsEditProp
       .finally(() => {
         setIsSubmitting(false);
       });
-  }, [address, onSuccess, validateAddress]);
+  }, [address, onSuccess]);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

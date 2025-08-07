@@ -20,7 +20,7 @@ export const SignInWalletsSuccessDeletion = ({ onBack }: SignInWalletsSuccessDel
       </div>
 
       <Button className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium" onClick={onBack}>
-        Back to account
+        Back to wallets
       </Button>
     </div>
   );
