@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { CheckCircle2 } from "lucide-react";
 
-interface SignInWalletsSuccessProps {
+interface SignInWalletsSuccessDeletionProps {
   onBack: () => void;
 }
 
-export const SignInWalletsSuccess = ({ onBack }: SignInWalletsSuccessProps) => {
+export const SignInWalletsSuccessDeletion = ({ onBack }: SignInWalletsSuccessDeletionProps) => {
   return (
     <div className="space-y-6 text-center">
       <div className="flex justify-center">
@@ -13,9 +13,9 @@ export const SignInWalletsSuccess = ({ onBack }: SignInWalletsSuccessProps) => {
       </div>
 
       <div className="space-y-2">
-        <h3 className="text-lg font-semibold text-foreground">Success</h3>
+        <h3 className="text-lg font-semibold text-foreground">Wallet deleted</h3>
         <p className="text-sm text-muted-foreground">
-          Your wallet address has been added successfully. You can now use it to sign in to your account.
+          The wallet address has been successfully removed from your account.
         </p>
       </div>
 

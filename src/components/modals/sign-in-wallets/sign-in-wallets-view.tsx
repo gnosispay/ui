@@ -1,25 +1,37 @@
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import type { EoaAccount } from "@/client";
 import { Button } from "@/components/ui/button";
-import { Copy, InboxIcon } from "lucide-react";
+import { Copy, InboxIcon, Trash2 } from "lucide-react";
+import { useCallback } from "react";
 
 interface SignInWalletsViewProps {
   eoaAccounts: EoaAccount[];
   isLoading: boolean;
   onEditClick: () => void;
+  onDeleteClick: (account: EoaAccount) => void;
 }
 
-export const SignInWalletsView = ({ eoaAccounts, isLoading, onEditClick }: SignInWalletsViewProps) => {
+export const SignInWalletsView = ({ eoaAccounts, isLoading, onEditClick, onDeleteClick }: SignInWalletsViewProps) => {
   const { copyToClipboard } = useCopyToClipboard();
 
-  const handleCopyAddress = (address: string | undefined) => {
-    if (!address) return;
+  const handleCopyAddress = useCallback(
+    (address: string | undefined) => {
+      if (!address) return;
 
-    copyToClipboard(address, {
-      successMessage: "Address copied to clipboard",
-      errorMessage: "Failed to copy address",
-    });
-  };
+      copyToClipboard(address, {
+        successMessage: "Address copied to clipboard",
+        errorMessage: "Failed to copy address",
+      });
+    },
+    [copyToClipboard],
+  );
+
+  const handleDeleteClick = useCallback(
+    (account: EoaAccount) => {
+      onDeleteClick(account);
+    },
+    [onDeleteClick],
+  );
 
   return (
     <div className="space-y-4">
@@ -30,12 +42,14 @@ export const SignInWalletsView = ({ eoaAccounts, isLoading, onEditClick }: SignI
             <div className="flex items-center gap-2">
               <div className="flex-1 h-12 bg-muted/50 rounded-lg animate-pulse" />
               <div className="h-9 w-9 bg-muted/50 rounded animate-pulse" />
+              <div className="h-9 w-9 bg-muted/50 rounded animate-pulse" />
             </div>
           </div>
           <div className="space-y-2">
             <div className="h-4 bg-muted/50 rounded animate-pulse" />
             <div className="flex items-center gap-2">
               <div className="flex-1 h-12 bg-muted/50 rounded-lg animate-pulse" />
+              <div className="h-9 w-9 bg-muted/50 rounded animate-pulse" />
               <div className="h-9 w-9 bg-muted/50 rounded animate-pulse" />
             </div>
           </div>
@@ -55,7 +69,7 @@ export const SignInWalletsView = ({ eoaAccounts, isLoading, onEditClick }: SignI
             <div key={account.id || account.address || Math.random()} className="space-y-2">
               <div className="text-sm text-muted-foreground">Address</div>
               <div className="flex items-center gap-2">
-                <div className="flex-1 p-3 bg-muted/50 rounded-lg font-mono text-sm text-foreground break-all">
+                <div className="flex-1 p-3 bg-muted/50 rounded-lg font-mono text-xs text-foreground break-all">
                   {account.address || "N/A"}
                 </div>
                 {account.address && (
@@ -66,6 +80,16 @@ export const SignInWalletsView = ({ eoaAccounts, isLoading, onEditClick }: SignI
                     className="p-2 flex-shrink-0"
                   >
                     <Copy className="h-4 w-4" />
+                  </Button>
+                )}
+                {eoaAccounts.length > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDeleteClick(account)}
+                    className="p-2 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4" />
                   </Button>
                 )}
               </div>

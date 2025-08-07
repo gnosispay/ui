@@ -4,12 +4,16 @@ import { type EoaAccount, getApiV1EoaAccounts } from "@/client";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { SignInWalletsView } from "./sign-in-wallets-view";
 import { SignInWalletsEdit } from "./sign-in-wallets-edit";
-import { SignInWalletsSuccess } from "./sign-in-wallets-success";
+import { SignInWalletsSuccessAddition } from "./sign-in-wallets-success-addition";
+import { SignInWalletsDeleteConfirmation } from "./sign-in-wallets-delete-confirmation";
+import { SignInWalletsSuccessDeletion } from "./sign-in-wallets-success-deletion";
 
 export enum SignInWalletsStep {
   None = "none",
   Editing = "editing",
-  Success = "success",
+  SuccessAddition = "successAddition",
+  DeleteConfirmation = "deleteConfirmation",
+  SuccessDeletion = "successDeletion",
 }
 
 interface SignInWalletsModalProps {
@@ -22,6 +26,7 @@ export const SignInWalletsModal = ({ open, onOpenChange }: SignInWalletsModalPro
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [step, setStep] = useState<SignInWalletsStep>(SignInWalletsStep.None);
+  const [selectedAccountForDeletion, setSelectedAccountForDeletion] = useState<EoaAccount | null>(null);
 
   const fetchEoaAccounts = useCallback(() => {
     setIsLoading(true);
@@ -48,30 +53,44 @@ export const SignInWalletsModal = ({ open, onOpenChange }: SignInWalletsModalPro
     if (!open) {
       setStep(SignInWalletsStep.None);
       setError(null);
+      setSelectedAccountForDeletion(null);
       return;
     }
 
     fetchEoaAccounts();
   }, [open, fetchEoaAccounts]);
 
-  const handleEditClick = () => {
+  const handleEditClick = useCallback(() => {
     setStep(SignInWalletsStep.Editing);
-  };
+  }, []);
 
-  const handleBack = () => {
+  const handleDeleteClick = useCallback((account: EoaAccount) => {
+    setSelectedAccountForDeletion(account);
+    setStep(SignInWalletsStep.DeleteConfirmation);
+  }, []);
+
+  const handleBack = useCallback(() => {
     setStep(SignInWalletsStep.None);
     setError(null);
-  };
+    setSelectedAccountForDeletion(null);
+  }, []);
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setStep(SignInWalletsStep.None);
     setError(null);
-  };
+    setSelectedAccountForDeletion(null);
+  }, []);
 
-  const handleSuccess = () => {
-    setStep(SignInWalletsStep.Success);
+  const handleSuccessAddition = useCallback(() => {
+    setStep(SignInWalletsStep.SuccessAddition);
     fetchEoaAccounts();
-  };
+  }, [fetchEoaAccounts]);
+
+  const handleSuccessDeletion = useCallback(() => {
+    setStep(SignInWalletsStep.SuccessDeletion);
+    setSelectedAccountForDeletion(null);
+    fetchEoaAccounts();
+  }, [fetchEoaAccounts]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -90,13 +109,28 @@ export const SignInWalletsModal = ({ open, onOpenChange }: SignInWalletsModalPro
           )}
 
           {step === SignInWalletsStep.Editing && (
-            <SignInWalletsEdit onCancel={handleCancel} onSuccess={handleSuccess} />
+            <SignInWalletsEdit onCancel={handleCancel} onSuccess={handleSuccessAddition} />
           )}
 
-          {step === SignInWalletsStep.Success && <SignInWalletsSuccess onBack={handleBack} />}
+          {step === SignInWalletsStep.SuccessAddition && <SignInWalletsSuccessAddition onBack={handleBack} />}
+
+          {step === SignInWalletsStep.DeleteConfirmation && selectedAccountForDeletion && (
+            <SignInWalletsDeleteConfirmation
+              account={selectedAccountForDeletion}
+              onCancel={handleCancel}
+              onSuccess={handleSuccessDeletion}
+            />
+          )}
+
+          {step === SignInWalletsStep.SuccessDeletion && <SignInWalletsSuccessDeletion onBack={handleBack} />}
 
           {step === SignInWalletsStep.None && (
-            <SignInWalletsView eoaAccounts={eoaAccounts} isLoading={isLoading} onEditClick={handleEditClick} />
+            <SignInWalletsView
+              eoaAccounts={eoaAccounts}
+              isLoading={isLoading}
+              onEditClick={handleEditClick}
+              onDeleteClick={handleDeleteClick}
+            />
           )}
         </div>
       </DialogContent>
