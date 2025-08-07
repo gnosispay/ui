@@ -1,0 +1,81 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "pse-backend-demo",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 8083,
+                    "hostPort": 8083,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "PORT",
+                    "value": "8083"
+                },
+                {
+                    "name": "HOST",
+                    "value": "localhost"
+                },
+                {
+                    "name": "GNOSIS_PSE_PRIVATE_API_BASE_URL",
+                    "value": "https://api-pse.gnosispay.com"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "linuxParameters": {
+                "initProcessEnabled": true
+            },
+            "secrets": [
+                {
+                    "name": "CLIENT_CERT",
+                    //TODO: add the value from ssm
+                    "valueFrom": "TO_BE_ADDED"
+                },
+                {
+                    "name": "CLIENT_KEY",
+                    //TODO: add the value from ssm
+                    "valueFrom": "TO_BE_ADDED"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awsfirelens",
+                "options": {
+                    "RemoveKeys": "ecs_task_arn",
+                    "LineFormat": "key_value",
+                    "Labels": "{job=\"webapp\",environment=\"stg\"}",
+                    "LabelKeys": "container_name,container_id,ecs_task_definition,source,ecs_cluster",
+                    "Url": "https://loki.stg.gnosispay.in/loki/api/v1/push",
+                    "Name": "grafana-loki"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    //TODO: I have no idea about any of these things, but I'm sure they're important
+    "family": "pse-backend-demo",
+    "taskRoleArn": "TO_BE_ADDED",
+    "executionRoleArn": "TO_BE_ADDED",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "placementConstraints": [],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "tags": []
+}
