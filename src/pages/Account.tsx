@@ -1,6 +1,12 @@
 import { useState } from "react";
-import { SquareUser as UserIcon, Landmark, Gauge } from "lucide-react";
-import { AccountSection, PersonalDetailsModal, UserProfileHeader, AccountDetailsModal } from "@/components/account";
+import { SquareUser as UserIcon, Landmark, Gauge, Wallet } from "lucide-react";
+import {
+  AccountSection,
+  PersonalDetailsModal,
+  UserProfileHeader,
+  AccountDetailsModal,
+  SignInWalletsModal,
+} from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
 
 enum ModalType {
@@ -40,26 +46,25 @@ export const AccountRoute = () => {
         </div>
       </div>
 
-      {/* TODO: as part of 
-      - https://linear.app/gnosis-pay/issue/ENG-2930/support-showing-and-updating-the-account-owning-the-delay-relay-module
-      - https://linear.app/gnosis-pay/issue/ENG-2929/support-showing-and-updating-the-siwe-accounts
-      */}
       {/* Security Section */}
-      {/* <div className="space-y-4">
+      <div className="space-y-4">
         <h2 className="text-lg font-medium text-foreground">Security</h2>
         <div className="space-y-3">
-          <AccountSection
+          {/* TODO: as part of 
+          - https://linear.app/gnosis-pay/issue/ENG-2930/support-showing-and-updating-the-account-owning-the-delay-relay-module
+          */}
+          {/* <AccountSection
             icon={<UserCog className="w-6 h-6" />}
             title="Safe owners"
             onClick={() => setOpenModal(ModalType.SAFE_OWNERS)}
-          />
+          /> */}
           <AccountSection
             icon={<Wallet className="w-6 h-6" />}
             title="Sign-in wallets"
             onClick={() => setOpenModal(ModalType.SIGN_IN_WALLETS)}
           />
         </div>
-      </div> */}
+      </div>
 
       <PersonalDetailsModal
         open={openModal === ModalType.PERSONAL_DETAILS}
@@ -74,6 +79,11 @@ export const AccountRoute = () => {
       <DailyLimitModal
         open={openModal === ModalType.LIMITS}
         onOpenChange={(open) => (open ? setOpenModal(ModalType.LIMITS) : closeModal())}
+      />
+
+      <SignInWalletsModal
+        open={openModal === ModalType.SIGN_IN_WALLETS}
+        onOpenChange={(open) => (open ? setOpenModal(ModalType.SIGN_IN_WALLETS) : closeModal())}
       />
     </div>
   );

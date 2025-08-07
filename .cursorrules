@@ -186,10 +186,37 @@ Before creating new components, check if existing ones can be used:
 - Use type guards where appropriate
 
 ### Performance
-- Use `useMemo` and `useCallback` appropriately
+- **USE BY DEFAULT**: Wrap functions with `useCallback` and expensive computations with `useMemo`
+- Always use `useCallback` for event handlers passed as props to child components
+- Always use `useMemo` for expensive calculations, object/array creation, and derived state
 - Implement proper loading states
 - Avoid unnecessary re-renders
 - Optimize bundle size
+
+#### useCallback & useMemo Guidelines
+```tsx
+// ✅ DO - Default useCallback for event handlers
+const handleClick = useCallback(() => {
+  // Handle click logic
+}, [dependency]);
+
+// ✅ DO - Default useMemo for object/array creation
+const config = useMemo(() => ({
+  option1: value1,
+  option2: value2
+}), [value1, value2]);
+
+// ✅ DO - useMemo for expensive calculations
+const expensiveValue = useMemo(() => {
+  return items.filter(item => item.active).map(item => transform(item));
+}, [items]);
+
+// ❌ DON'T - Inline functions as props (causes re-renders)
+<Button onClick={() => handleAction(id)} />
+
+// ✅ DO - useCallback for props
+<Button onClick={handleActionCallback} />
+```
 
 ### Error Handling
 - Implement proper error boundaries
