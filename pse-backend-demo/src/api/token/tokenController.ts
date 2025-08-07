@@ -17,10 +17,16 @@ class TokenController {
     axiosInstance.interceptors.response.use(filteredResponseLogger, AxiosLogger.errorLogger);
 
     try {
+      // we pass our cert and key as base64 encoded strings
+      const bufferCert = Buffer.from(env.CLIENT_CERT, "base64");
+      const bufferKey = Buffer.from(env.CLIENT_KEY, "base64");
+      const decodedCert = bufferCert.toString("utf8");
+      const decodedKey = bufferKey.toString("utf8");
+
       // Create an HTTPS agent with the certificates
       const httpsAgent = new https.Agent({
-        cert: env.CLIENT_CERT,
-        key: env.CLIENT_KEY,
+        cert: decodedCert,
+        key: decodedKey,
         rejectUnauthorized: true, // Ensure SSL verification
       });
 
