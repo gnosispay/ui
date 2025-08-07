@@ -9,7 +9,6 @@ This server exposes the following routes:
 - `/health-check` to verify the liveness of the sever
 
 ## 🛠️ Getting Started
-
 #### ⚙️ Environment Configuration
 
 Copy `.env.template` to `.env` to get started
