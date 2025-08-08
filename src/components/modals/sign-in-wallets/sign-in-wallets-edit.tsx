@@ -31,7 +31,7 @@ export const SignInWalletsEdit = ({ onCancel, onSuccess }: SignInWalletsEditProp
     }
 
     if (!isAddress(trimmedAddress)) {
-      setError("Please enter a valid Ethereum address");
+      setError("Please enter a valid wallet address");
       return;
     }
 
