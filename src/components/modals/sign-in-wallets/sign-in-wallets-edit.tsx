@@ -83,7 +83,7 @@ export const SignInWalletsEdit = ({ onCancel, onSuccess }: SignInWalletsEditProp
           className="font-mono"
         />
         <div className="text-xs text-muted-foreground">
-          Enter a valid Ethereum wallet address that you want to use for signing in
+          Enter a valid wallet address that you want to use for signing in
         </div>
       </div>
 
