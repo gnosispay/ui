@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SquareUser as UserIcon, Landmark, Gauge, Wallet } from "lucide-react";
+import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog } from "lucide-react";
 import {
   AccountSection,
   PersonalDetailsModal,
@@ -8,6 +8,7 @@ import {
   SignInWalletsModal,
 } from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
+import { SafeOwnersModal } from "@/components/modals/safe-owners";
 
 enum ModalType {
   NONE = "none",
@@ -50,14 +51,11 @@ export const AccountRoute = () => {
       <div className="space-y-4">
         <h2 className="text-lg font-medium text-foreground">Security</h2>
         <div className="space-y-3">
-          {/* TODO: as part of 
-          - https://linear.app/gnosis-pay/issue/ENG-2930/support-showing-and-updating-the-account-owning-the-delay-relay-module
-          */}
-          {/* <AccountSection
+          <AccountSection
             icon={<UserCog className="w-6 h-6" />}
             title="Safe owners"
             onClick={() => setOpenModal(ModalType.SAFE_OWNERS)}
-          /> */}
+          />
           <AccountSection
             icon={<Wallet className="w-6 h-6" />}
             title="Sign-in wallets"
@@ -84,6 +82,11 @@ export const AccountRoute = () => {
       <SignInWalletsModal
         open={openModal === ModalType.SIGN_IN_WALLETS}
         onOpenChange={(open) => (open ? setOpenModal(ModalType.SIGN_IN_WALLETS) : closeModal())}
+      />
+
+      <SafeOwnersModal
+        open={openModal === ModalType.SAFE_OWNERS}
+        onOpenChange={(open) => (open ? setOpenModal(ModalType.SAFE_OWNERS) : closeModal())}
       />
     </div>
   );
