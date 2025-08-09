@@ -56,7 +56,7 @@ export const SafeOwnersEdit = ({ onCancel, onSuccess }: SafeOwnersEditProps) => 
       });
 
       if (transactionError) {
-        setError("Failed to create transaction");
+        setError(extractErrorMessage(transactionError, "Failed to create transaction"));
         return;
       }
 

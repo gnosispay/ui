@@ -42,7 +42,7 @@ export const SafeOwnersDeleteConfirmation = ({
       });
 
       if (transactionError) {
-        setError("Failed to create transaction");
+        setError(extractErrorMessage(transactionError, "Failed to create transaction"));
         return;
       }
 
