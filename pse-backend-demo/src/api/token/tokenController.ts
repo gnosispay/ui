@@ -37,8 +37,8 @@ class TokenController {
     try {
       // Create an HTTPS agent with the certificates
       const httpsAgent = new https.Agent({
-        cert: env.CLIENT_CERT,
-        key: env.CLIENT_KEY,
+        cert: envCERT,
+        key: envKEY,
         rejectUnauthorized: true, // Ensure SSL verification
       });
 
