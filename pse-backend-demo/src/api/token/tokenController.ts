@@ -8,7 +8,6 @@ import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import type { Token } from "./tokenModel";
 import { filteredResponseLogger } from "@/common/utils/filteredResponseLogger";
-import { CERT, KEY } from "./constants";
 
 class TokenController {
   public getToken: RequestHandler = async (_req: Request, res: Response) => {
@@ -17,28 +16,15 @@ class TokenController {
     axiosInstance.interceptors.request.use(AxiosLogger.requestLogger, AxiosLogger.errorLogger);
     axiosInstance.interceptors.response.use(filteredResponseLogger, AxiosLogger.errorLogger);
 
-    const base64CERT = Buffer.from(CERT).toString("base64");
-    const base64KEY = Buffer.from(KEY).toString("base64");
-
-    console.log("====> certs in constants.ts");
-    console.log(base64CERT);
-    console.log("====> key in constants.ts");
-    console.log(base64KEY);
-
-    const envCERT = Buffer.from(env.CLIENT_CERT, "base64").toString("ascii");
-    const envKEY = Buffer.from(env.CLIENT_KEY, "base64").toString("ascii");
-
-    if (base64CERT !== envCERT || base64KEY !== envKEY) {
-      console.log("!!!! certs not matching");
-    } else {
-      console.log("====> certs match");
-    }
+    // Decode the base64 encoded certificate and key from environment variables
+    const cert = Buffer.from(env.CLIENT_CERT, "base64").toString("ascii");
+    const key = Buffer.from(env.CLIENT_KEY, "base64").toString("ascii");
 
     try {
       // Create an HTTPS agent with the certificates
       const httpsAgent = new https.Agent({
-        cert: envCERT,
-        key: envKEY,
+        cert,
+        key,
         rejectUnauthorized: true, // Ensure SSL verification
       });
 
