@@ -109,7 +109,7 @@ export const SafeOwnersModal = ({ open, onOpenChange }: SafeOwnersModalProps) =>
           )}
 
           {step === SafeOwnersStep.Adding && (
-            <SafeOwnersAdd onCancel={handleCancel} onSuccess={handleSuccessAddition} currentOwners={currentOwners} />
+            <SafeOwnersAdd onCancel={handleCancel} onSuccess={handleSuccessAddition} currentOwners={owners} />
           )}
 
           {step === SafeOwnersStep.SuccessAddition && <SafeOwnersSuccessAddition onBack={handleBack} />}
