@@ -52,6 +52,8 @@ jobs:
           echo "image_exists=$image_exists" >> $GITHUB_OUTPUT
 
       - name: Build, tag, and push image to AWS Container Registry
+        env:
+          IMAGE_NAME: ${{ steps.docker_image.outputs.image_name }}
         if: steps.docker_image.outputs.image_exists == 'false'
         run: |
           docker buildx build \
