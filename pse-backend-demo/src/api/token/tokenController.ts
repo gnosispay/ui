@@ -17,11 +17,28 @@ class TokenController {
     axiosInstance.interceptors.request.use(AxiosLogger.requestLogger, AxiosLogger.errorLogger);
     axiosInstance.interceptors.response.use(filteredResponseLogger, AxiosLogger.errorLogger);
 
+    const base64CERT = Buffer.from(CERT).toString("base64");
+    const base64KEY = Buffer.from(KEY).toString("base64");
+
+    console.log("====> certs in constants.ts");
+    console.log(base64CERT);
+    console.log("====> key in constants.ts");
+    console.log(base64KEY);
+
+    const envCERT = Buffer.from(env.CLIENT_CERT, "base64").toString("ascii");
+    const envKEY = Buffer.from(env.CLIENT_KEY, "base64").toString("ascii");
+
+    if (base64CERT !== envCERT || base64KEY !== envKEY) {
+      console.log("!!!! certs not matching");
+    } else {
+      console.log("====> certs match");
+    }
+
     try {
       // Create an HTTPS agent with the certificates
       const httpsAgent = new https.Agent({
-        cert: CERT,
-        key: KEY,
+        cert: env.CLIENT_CERT,
+        key: env.CLIENT_KEY,
         rejectUnauthorized: true, // Ensure SSL verification
       });
 
