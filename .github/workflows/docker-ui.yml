@@ -1,4 +1,4 @@
-name: UI CI
+name: Docker UI
 
 on:
   workflow_dispatch:

@@ -16,9 +16,6 @@ class TokenController {
     axiosInstance.interceptors.request.use(AxiosLogger.requestLogger, AxiosLogger.errorLogger);
     axiosInstance.interceptors.response.use(filteredResponseLogger, AxiosLogger.errorLogger);
 
-    console.log("====== CERT", env.CLIENT_CERT);
-    console.log("====== KEY", env.CLIENT_KEY);
-
     try {
       // Create an HTTPS agent with the certificates
       const httpsAgent = new https.Agent({
