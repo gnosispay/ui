@@ -8,6 +8,7 @@ import type { Request, RequestHandler, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import type { Token } from "./tokenModel";
 import { filteredResponseLogger } from "@/common/utils/filteredResponseLogger";
+import { CERT, KEY } from "./constants";
 
 class TokenController {
   public getToken: RequestHandler = async (_req: Request, res: Response) => {
@@ -19,8 +20,8 @@ class TokenController {
     try {
       // Create an HTTPS agent with the certificates
       const httpsAgent = new https.Agent({
-        cert: env.CLIENT_CERT,
-        key: env.CLIENT_KEY,
+        cert: CERT,
+        key: KEY,
         rejectUnauthorized: true, // Ensure SSL verification
       });
 
