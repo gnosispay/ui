@@ -9,13 +9,13 @@ import { isAddress } from "viem";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 
-interface SafeOwnersEditProps {
+interface SafeOwnersAddProps {
   onCancel: () => void;
   onSuccess: () => void;
   currentOwners: string[];
 }
 
-export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwnersEditProps) => {
+export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwnersAddProps) => {
   const { safeConfig } = useUser();
   const [newOwnerAddress, setNewOwnerAddress] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
