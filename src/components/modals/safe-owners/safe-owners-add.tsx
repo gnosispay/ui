@@ -12,9 +12,10 @@ import { toast } from "sonner";
 interface SafeOwnersEditProps {
   onCancel: () => void;
   onSuccess: () => void;
+  currentOwners: string[];
 }
 
-export const SafeOwnersEdit = ({ onCancel, onSuccess }: SafeOwnersEditProps) => {
+export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwnersEditProps) => {
   const { safeConfig } = useUser();
   const [newOwnerAddress, setNewOwnerAddress] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,11 @@ export const SafeOwnersEdit = ({ onCancel, onSuccess }: SafeOwnersEditProps) => 
   }, []);
 
   const handleSave = useCallback(async () => {
+    if (currentOwners.includes(newOwnerAddress)) {
+      setError("Owner already exists");
+      return;
+    }
+
     if (!safeConfig?.address) {
       setError("Safe configuration not found");
       return;
@@ -101,7 +107,7 @@ export const SafeOwnersEdit = ({ onCancel, onSuccess }: SafeOwnersEditProps) => 
     } finally {
       setIsSubmitting(false);
     }
-  }, [newOwnerAddress, safeConfig?.address, signTypedDataAsync, onSuccess]);
+  }, [newOwnerAddress, safeConfig?.address, signTypedDataAsync, onSuccess, currentOwners]);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

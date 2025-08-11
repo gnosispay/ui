@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { SafeOwnersView } from "./safe-owners-view";
-import { SafeOwnersEdit } from "./safe-owners-edit";
+import { SafeOwnersAdd } from "./safe-owners-add";
 import { SafeOwnersSuccessAddition } from "./safe-owners-success-addition";
 import { SafeOwnersDeleteConfirmation } from "./safe-owners-delete-confirmation";
 import { SafeOwnersSuccessDeletion } from "./safe-owners-success-deletion";
@@ -10,7 +10,7 @@ import { getApiV1Owners } from "@/client";
 
 export enum SafeOwnersStep {
   None = "none",
-  Editing = "editing",
+  Adding = "adding",
   SuccessAddition = "successAddition",
   DeleteConfirmation = "deleteConfirmation",
   SuccessDeletion = "successDeletion",
@@ -61,7 +61,7 @@ export const SafeOwnersModal = ({ open, onOpenChange }: SafeOwnersModalProps) =>
   }, [open, fetchOwners]);
 
   const handleEditClick = useCallback(() => {
-    setStep(SafeOwnersStep.Editing);
+    setStep(SafeOwnersStep.Adding);
   }, []);
 
   const handleDeleteClick = useCallback((ownerAddress: string) => {
@@ -108,8 +108,8 @@ export const SafeOwnersModal = ({ open, onOpenChange }: SafeOwnersModalProps) =>
             />
           )}
 
-          {step === SafeOwnersStep.Editing && (
-            <SafeOwnersEdit onCancel={handleCancel} onSuccess={handleSuccessAddition} />
+          {step === SafeOwnersStep.Adding && (
+            <SafeOwnersAdd onCancel={handleCancel} onSuccess={handleSuccessAddition} currentOwners={currentOwners} />
           )}
 
           {step === SafeOwnersStep.SuccessAddition && <SafeOwnersSuccessAddition onBack={handleBack} />}
