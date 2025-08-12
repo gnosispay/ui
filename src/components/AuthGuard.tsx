@@ -29,16 +29,12 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="flex flex-col items-center space-y-6 max-w-md w-full">
-          {/* Gnosis Owl Logo */}
           <img src={effectiveTheme === "dark" ? darkOwl : lightOwl} alt="Gnosis Pay" className="w-10 h-10" />
 
-          {/* Welcome heading */}
           <h1 className="text-2xl font-semibold text-foreground">Welcome to Gnosis Pay</h1>
 
-          {/* Description */}
           <p className="text-muted-foreground text-center">You need to complete the signup process to use the app.</p>
 
-          {/* Complete Signup Button */}
           <Button
             onClick={() => navigate("/register")}
             className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium py-3"
@@ -53,18 +49,14 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="flex flex-col items-center space-y-6 max-w-md w-full">
-          {/* Gnosis Owl Logo */}
           <img src={effectiveTheme === "dark" ? darkOwl : lightOwl} alt="Gnosis Pay" className="w-10 h-10" />
 
-          {/* Sign in heading */}
           <h1 className="text-2xl font-semibold text-foreground">Sign in</h1>
 
-          {/* Description */}
           <p className="text-muted-foreground text-center">
             {isAuthenticating ? "Please connect your wallet to sign in" : "Please sign the message request."}
           </p>
 
-          {/* Connect Button */}
           <Button
             disabled={isAuthenticating}
             loading={isAuthenticating}
