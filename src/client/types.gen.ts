@@ -333,11 +333,8 @@ export type IbanOrder = {
 export type KycStatus = 'notStarted' | 'documentsRequested' | 'pending' | 'processing' | 'approved' | 'resubmissionRequested' | 'rejected' | 'requiresAction';
 
 export type SafeAccount = {
-    id: string;
     address: string;
-    salt?: string | null;
     chainId?: string;
-    userId: string;
     tokenSymbol?: string;
     createdAt: string;
 };
@@ -3311,6 +3308,354 @@ export type PostApiV1OrderCreateResponses = {
 };
 
 export type PostApiV1OrderCreateResponse = PostApiV1OrderCreateResponses[keyof PostApiV1OrderCreateResponses];
+
+export type DeleteApiV1OwnersData = {
+    body: {
+        /**
+         * The address to remove from Safe owners.
+         */
+        ownerToRemove: string;
+        /**
+         * The wallet signature authorizing this operation.
+         */
+        signature: string;
+        /**
+         * The message object containing transaction data and salt.
+         */
+        message: {
+            /**
+             * The salt value used in the EIP-712 typed data.
+             */
+            salt: string;
+            /**
+             * The encoded transaction data from the typed data message.
+             */
+            data: string;
+        };
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/owners';
+};
+
+export type DeleteApiV1OwnersErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in request body.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type DeleteApiV1OwnersError = DeleteApiV1OwnersErrors[keyof DeleteApiV1OwnersErrors];
+
+export type DeleteApiV1OwnersResponses = {
+    /**
+     * Successfully submitted the remove owner request.
+     */
+    200: {
+        data: DelayTransaction;
+    };
+};
+
+export type DeleteApiV1OwnersResponse = DeleteApiV1OwnersResponses[keyof DeleteApiV1OwnersResponses];
+
+export type GetApiV1OwnersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/owners';
+};
+
+export type GetApiV1OwnersErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: {
+        /**
+         * Authentication error message.
+         */
+        error?: string;
+    };
+    /**
+     * Safe account not found for the user.
+     */
+    404: {
+        /**
+         * Error message explaining why the request failed.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type GetApiV1OwnersError = GetApiV1OwnersErrors[keyof GetApiV1OwnersErrors];
+
+export type GetApiV1OwnersResponses = {
+    /**
+     * Successfully retrieved the list of Safe owners.
+     */
+    200: {
+        data: {
+            owners: Array<string>;
+        };
+    };
+};
+
+export type GetApiV1OwnersResponse = GetApiV1OwnersResponses[keyof GetApiV1OwnersResponses];
+
+export type PostApiV1OwnersData = {
+    body: {
+        /**
+         * The address to add as a new Safe owner.
+         */
+        newOwner: string;
+        /**
+         * The wallet signature authorizing this operation.
+         */
+        signature: string;
+        /**
+         * The message object containing transaction data and salt.
+         */
+        message: {
+            /**
+             * The salt value used in the EIP-712 typed data.
+             */
+            salt: string;
+            /**
+             * The encoded transaction data from the typed data message.
+             */
+            data: string;
+        };
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/owners';
+};
+
+export type PostApiV1OwnersErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in request body.
+     */
+    422: {
+        /**
+         * Details about the validation error.
+         */
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type PostApiV1OwnersError = PostApiV1OwnersErrors[keyof PostApiV1OwnersErrors];
+
+export type PostApiV1OwnersResponses = {
+    /**
+     * Successfully submitted the add owner request.
+     */
+    200: {
+        data: DelayTransaction;
+    };
+};
+
+export type PostApiV1OwnersResponse = PostApiV1OwnersResponses[keyof PostApiV1OwnersResponses];
+
+export type GetApiV1OwnersAddTransactionDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The address to add as a new Safe owner.
+         */
+        newOwner: string;
+    };
+    url: '/api/v1/owners/add/transaction-data';
+};
+
+export type GetApiV1OwnersAddTransactionDataErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in query parameters.
+     */
+    422: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type GetApiV1OwnersAddTransactionDataResponses = {
+    /**
+     * Successfully retrieved EIP-712 typed data for signing.
+     */
+    200: {
+        data: {
+            domain: {
+                /**
+                 * The contract address that will verify the signature.
+                 */
+                verifyingContract: string;
+                /**
+                 * The chain ID for the network.
+                 */
+                chainId: number;
+            };
+            /**
+             * The primary type for EIP-712 typed data signing.
+             */
+            primaryType: 'ModuleTx';
+            types: {
+                /**
+                 * Array of type definitions for the ModuleTx structure.
+                 */
+                ModuleTx: Array<{
+                    /**
+                     * The field type.
+                     */
+                    type: string;
+                    /**
+                     * The field name.
+                     */
+                    name: string;
+                }>;
+            };
+            message: {
+                /**
+                 * The encoded transaction data for adding an owner.
+                 */
+                data: string;
+                /**
+                 * The salt value for the typed data.
+                 */
+                salt: string;
+            };
+        };
+    };
+};
+
+export type GetApiV1OwnersAddTransactionDataResponse = GetApiV1OwnersAddTransactionDataResponses[keyof GetApiV1OwnersAddTransactionDataResponses];
+
+export type GetApiV1OwnersRemoveTransactionDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The address to remove from Safe owners.
+         */
+        ownerToRemove: string;
+    };
+    url: '/api/v1/owners/remove/transaction-data';
+};
+
+export type GetApiV1OwnersRemoveTransactionDataErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in query parameters.
+     */
+    422: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type GetApiV1OwnersRemoveTransactionDataResponses = {
+    /**
+     * Successfully retrieved EIP-712 typed data for signing.
+     */
+    200: {
+        data: {
+            domain: {
+                /**
+                 * The contract address that will verify the signature.
+                 */
+                verifyingContract: string;
+                /**
+                 * The chain ID for the network.
+                 */
+                chainId: number;
+            };
+            /**
+             * The primary type for EIP-712 typed data signing.
+             */
+            primaryType: 'ModuleTx';
+            types: {
+                /**
+                 * Array of type definitions for the ModuleTx structure.
+                 */
+                ModuleTx: Array<{
+                    /**
+                     * The field type.
+                     */
+                    type: string;
+                    /**
+                     * The field name.
+                     */
+                    name: string;
+                }>;
+            };
+            message: {
+                /**
+                 * The encoded transaction data for removing an owner.
+                 */
+                data: string;
+                /**
+                 * The salt value for the typed data.
+                 */
+                salt: string;
+            };
+        };
+    };
+};
+
+export type GetApiV1OwnersRemoveTransactionDataResponse = GetApiV1OwnersRemoveTransactionDataResponses[keyof GetApiV1OwnersRemoveTransactionDataResponses];
 
 export type GetApiV1RewardsData = {
     body?: never;
