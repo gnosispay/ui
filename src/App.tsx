@@ -1,4 +1,3 @@
-import "@rainbow-me/rainbowkit/styles.css";
 import { HeaderNavBar } from "./components/nav/header";
 import { Route, Routes, Outlet } from "react-router-dom";
 import { CardsRoute } from "./pages/Cards";

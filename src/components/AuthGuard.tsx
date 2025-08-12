@@ -1,9 +1,13 @@
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
-import { LoaderCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useTheme } from "@/context/ThemeContext";
+import { useCallback } from "react";
 import type { ReactNode } from "react";
+import darkOwl from "@/assets/Gnosis-owl-white.svg";
+import lightOwl from "@/assets/Gnosis-owl-black.svg";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -13,39 +17,62 @@ interface AuthGuardProps {
 export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated } = useAuth();
   const { isUserSignedUp, isKycApproved, isSafeConfigured } = useUser();
+  const { effectiveTheme } = useTheme();
+  const { openConnectModal } = useConnectModal();
   const navigate = useNavigate();
+
+  const handleConnect = useCallback(() => {
+    openConnectModal?.();
+  }, [openConnectModal]);
 
   if (checkForSignup && isAuthenticated && (!isUserSignedUp || !isKycApproved || !isSafeConfigured))
     return (
-      <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
-        <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-          <h2 className="text-xl">Welcome to Gnosis Pay</h2>
-          <div className="text-muted-foreground">You need to complete the signup process to use the app.</div>
-          <Button className="mt-4" onClick={() => navigate("/register")}>
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="flex flex-col items-center space-y-6 max-w-md w-full">
+          {/* Gnosis Owl Logo */}
+          <img src={effectiveTheme === "dark" ? darkOwl : lightOwl} alt="Gnosis Pay" className="w-10 h-10" />
+
+          {/* Welcome heading */}
+          <h1 className="text-2xl font-semibold text-foreground">Welcome to Gnosis Pay</h1>
+
+          {/* Description */}
+          <p className="text-muted-foreground text-center">You need to complete the signup process to use the app.</p>
+
+          {/* Complete Signup Button */}
+          <Button
+            onClick={() => navigate("/register")}
+            className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium py-3"
+          >
             Complete Signup
           </Button>
         </div>
       </div>
     );
 
-  if (!isAuthenticated && !isAuthenticating)
+  if (!isAuthenticated)
     return (
-      <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
-        <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-          <h2 className="text-xl">Welcome to Gnosis Pay</h2>
-          <p className="text-muted-foreground">Connect your wallet to get started.</p>
-        </div>
-      </div>
-    );
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="flex flex-col items-center space-y-6 max-w-md w-full">
+          {/* Gnosis Owl Logo */}
+          <img src={effectiveTheme === "dark" ? darkOwl : lightOwl} alt="Gnosis Pay" className="w-10 h-10" />
 
-  if (isAuthenticating)
-    return (
-      <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
-        <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-          <h2 className="flex items-center text-xl">
-            <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> Authenticating...
-          </h2>
-          <p>Please sign the message request.</p>
+          {/* Sign in heading */}
+          <h1 className="text-2xl font-semibold text-foreground">Sign in</h1>
+
+          {/* Description */}
+          <p className="text-muted-foreground text-center">
+            {isAuthenticating ? "Please connect your wallet to sign in" : "Please sign the message request."}
+          </p>
+
+          {/* Connect Button */}
+          <Button
+            disabled={isAuthenticating}
+            loading={isAuthenticating}
+            onClick={handleConnect}
+            className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium py-3"
+          >
+            Connect
+          </Button>
         </div>
       </div>
     );
