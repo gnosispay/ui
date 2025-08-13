@@ -14,16 +14,12 @@ export const Cards = () => {
     setOpen(true);
   };
 
-  if (!!cards && cards.length === 0) {
-    return <div className="text-center text-muted-foreground">No cards found.</div>;
-  }
-
   return (
     <>
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
         {loading &&
           [1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center gap-2">
+            <div key={`skeleton-${i}`} className="flex items-center gap-2">
               <Skeleton className="rounded-sm w-20 h-14" />
               <div className="flex flex-col gap-2">
                 <div className="text-sm text-primary">
