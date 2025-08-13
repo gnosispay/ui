@@ -1,6 +1,5 @@
 import { Buffer } from "buffer";
 import { ThemeProvider } from "@/context/ThemeContext.tsx";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ReactDOM from "react-dom/client";
 import { WagmiProvider } from "wagmi";
@@ -10,6 +9,7 @@ import App from "./App.tsx";
 import { config } from "./wagmi.ts";
 
 import "./index.css";
+import "@rainbow-me/rainbowkit/styles.css";
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
@@ -18,6 +18,7 @@ import { Toaster } from "sonner";
 import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
 import { TransactionsContextProvider } from "./context/TransactionsContext.tsx";
 import { TransactionsByCardContextProvider } from "./context/TransactionsByCardContext.tsx";
+import { RainbowKitWrapper } from "./context/CustomRainbowKitProvider.tsx";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
 
@@ -40,7 +41,7 @@ ReactDOM.createRoot(rootElement).render(
     <ThemeProvider defaultTheme="system" storageKey="gp-ui-theme">
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitProvider>
+          <RainbowKitWrapper>
             <AuthContextProvider>
               <UserContextProvider>
                 <CardsContextProvider>
@@ -55,7 +56,7 @@ ReactDOM.createRoot(rootElement).render(
                 </CardsContextProvider>
               </UserContextProvider>
             </AuthContextProvider>
-          </RainbowKitProvider>
+          </RainbowKitWrapper>
         </QueryClientProvider>
       </WagmiProvider>
     </ThemeProvider>
