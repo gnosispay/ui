@@ -32,8 +32,10 @@ jobs:
         run: pnpm install
       - name: Build
         env:
-          VITE_PSE_RELAY_SERVER_URL: 'http://localhost:8080/token'
+          VITE_PSE_RELAY_SERVER_URL: 'https://pse-backend.stg.v2.gnosispay.com/token'
           VITE_PSE_APP_ID: 'gp_a1b2c3d4e5f678901234567890123456'
+          VITE_GNOSIS_PAY_API_BASE_URL: 'https://api.gnosispay.com/'
+          VITE_IFRAME_HOST: 'https://api-pse-public.gnosispay.com'
         run: pnpm build
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
