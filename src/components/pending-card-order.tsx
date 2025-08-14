@@ -1,66 +1,19 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Button } from "./ui/button";
 import { ConfirmationDialog } from "./modals/confirmation-dialog";
-import { getApiV1Order, postApiV1OrderByOrderIdCancel } from "@/client";
+import { postApiV1OrderByOrderIdCancel, type CardOrder } from "@/client";
 import { toast } from "sonner";
 import { CollapsedError } from "./collapsedError";
 import { Clock, Package } from "lucide-react";
-
-interface CardOrder {
-  id: string;
-  status:
-    | "PENDINGTRANSACTION"
-    | "TRANSACTIONCOMPLETE"
-    | "CONFIRMATIONREQUIRED"
-    | "READY"
-    | "CARDCREATED"
-    | "FAILEDTRANSACTION"
-    | "CANCELLED";
-  embossedName?: string | null;
-  createdAt: string;
-  totalAmountEUR?: number | null;
-}
+import { useNavigate } from "react-router-dom";
+import { usePendingCardOrders } from "@/hooks/useCardOrders";
 
 export const PendingCardOrder = () => {
-  const [orders, setOrders] = useState<CardOrder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const navigate = useNavigate();
+  const { pendingOrders, isLoading, refetch } = usePendingCardOrders();
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
-
-  const fetchOrders = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const { data, error } = await getApiV1Order();
-
-      if (error) {
-        console.error("Error fetching card orders:", error);
-        toast.error(<CollapsedError title="Failed to fetch card orders" error={error} />);
-        return;
-      }
-
-      setOrders(data || []);
-    } catch (error) {
-      console.error("Error fetching card orders:", error);
-      toast.error(<CollapsedError title="Failed to fetch card orders" error={error} />);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
-
-  const pendingOrders = useMemo(() => {
-    return orders.filter(
-      (order) =>
-        order.status === "PENDINGTRANSACTION" ||
-        order.status === "TRANSACTIONCOMPLETE" ||
-        order.status === "CONFIRMATIONREQUIRED" ||
-        order.status === "READY",
-    );
-  }, [orders]);
 
   const handleCancelOrder = useCallback(async () => {
     if (!orderToCancel) return;
@@ -79,7 +32,7 @@ export const PendingCardOrder = () => {
 
       toast.success("Card order cancelled successfully");
       // Refresh orders after successful cancellation
-      fetchOrders();
+      refetch();
     } catch (error) {
       console.error("Error cancelling order:", error);
       toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
@@ -88,17 +41,19 @@ export const PendingCardOrder = () => {
       setShowCancelConfirmation(false);
       setOrderToCancel(null);
     }
-  }, [orderToCancel, fetchOrders]);
+  }, [orderToCancel, refetch]);
 
   const handleCancelClick = useCallback((orderId: string) => {
     setOrderToCancel(orderId);
     setShowCancelConfirmation(true);
   }, []);
 
-  const handleResumeOrder = useCallback((orderId: string) => {
-    // Mock implementation for now
-    toast.info(`Resume order ${orderId} - Coming soon!`);
-  }, []);
+  const handleResumeOrder = useCallback(
+    (orderId: string) => {
+      navigate(`/card-order/${orderId}`);
+    },
+    [navigate],
+  );
 
   const getStatusText = useCallback((status: CardOrder["status"]) => {
     switch (status) {
@@ -123,6 +78,8 @@ export const PendingCardOrder = () => {
     return null; // Don't show anything if no pending orders
   }
 
+  const pendingOrder = pendingOrders[0];
+
   return (
     <>
       <div className="bg-card border border-border rounded-xl p-4 mb-6">
@@ -131,41 +88,19 @@ export const PendingCardOrder = () => {
             <Package className="w-5 h-5 text-warning" />
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground mb-1">
-              Pending Card Order{pendingOrders.length > 1 ? "s" : ""}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              You have {pendingOrders.length} pending card order{pendingOrders.length > 1 ? "s" : ""} that need
-              {pendingOrders.length === 1 ? "s" : ""} attention.
-            </p>
+            <h3 className="font-semibold text-foreground mb-1">Pending Card Order</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">{getStatusText(pendingOrder.status)}</span>
+            </div>
 
-            <div className="space-y-3">
-              {pendingOrders.map((order) => (
-                <div key={order.id} className="bg-muted/50 rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-sm font-medium text-foreground">{getStatusText(order.status)}</span>
-                    </div>
-                    {order.totalAmountEUR && (
-                      <span className="text-sm text-muted-foreground">€{order.totalAmountEUR.toFixed(2)}</span>
-                    )}
-                  </div>
-
-                  {order.embossedName && (
-                    <p className="text-sm text-muted-foreground mb-3">Card for: {order.embossedName}</p>
-                  )}
-
-                  <div className="flex gap-2">
-                    <Button size="sm" variant="default" onClick={() => handleResumeOrder(order.id)} className="flex-1">
-                      Resume
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => handleCancelClick(order.id)} className="flex-1">
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              ))}
+            <div className="flex gap-2">
+              <Button size="sm" variant="default" onClick={() => handleResumeOrder(pendingOrder.id)} className="flex-1">
+                Resume
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => handleCancelClick(pendingOrder.id)} className="flex-1">
+                Cancel
+              </Button>
             </div>
           </div>
         </div>
