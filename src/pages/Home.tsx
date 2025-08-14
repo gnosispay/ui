@@ -3,6 +3,7 @@ import { Balances } from "@/components/balances";
 import { AddFundsModal } from "@/components/modals/add-funds/add-funds";
 import { SendFundsModal } from "@/components/modals/send-funds/send-funds";
 import { Transactions } from "@/components/transactions/transactions";
+import { PendingCardOrder } from "@/components/pending-card-order";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -15,6 +16,9 @@ export const Home = () => {
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4">
+        <div className="mx-4 lg:mx-0">
+          <PendingCardOrder />
+        </div>
         <Balances />
         <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
           <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
