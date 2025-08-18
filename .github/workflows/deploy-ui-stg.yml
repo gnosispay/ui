@@ -15,7 +15,6 @@ on:
       image_tag:
         required: true
         type: string
-    secrets: inherit
 
 permissions:
   id-token: write
