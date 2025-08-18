@@ -1,11 +1,5 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
-import {
-  postApiV1AuthSignup,
-  postApiV1AuthSignupOtp,
-  getApiV1UserTerms,
-  postApiV1UserTerms,
-  type GetApiV1UserTermsResponse,
-} from "@/client";
+import { useEffect, useState, useCallback } from "react";
+import { postApiV1AuthSignup, postApiV1AuthSignupOtp, getApiV1UserTerms, postApiV1UserTerms } from "@/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { userTermsTitle, type UserTermsTypeFromApi } from "@/constants";
+import { userTerms, type UserTermsTypeFromApi } from "@/constants";
 
 enum ScreenStep {
   EmailAndTos = "email-and-tos",
@@ -32,9 +26,6 @@ export const SignUpRoute = () => {
   const [otp, setOtp] = useState("");
   const [isAcceptedTos, setIsAcceptedTos] = useState(false);
   const navigate = useNavigate();
-  // list of terms that the user has not accepted or that have a different version than the current one
-  const [tosToBeAccepted, setTosToBeAccepted] = useState<GetApiV1UserTermsResponse["terms"]>([]);
-  const atLeastOneToSMustBeAccepted = useMemo(() => tosToBeAccepted && tosToBeAccepted.length > 0, [tosToBeAccepted]);
 
   useEffect(() => {
     // if the user is authenticated and signed up, we should go to kyc
@@ -43,30 +34,16 @@ export const SignUpRoute = () => {
     }
   }, [isUserSignedUp, navigate]);
 
-  useEffect(() => {
-    if (step !== ScreenStep.EmailAndTos) return;
-
-    getApiV1UserTerms()
-      .then(({ data, error }) => {
-        const termsList = data?.terms || [];
-
-        setTosToBeAccepted(termsList.filter((term) => !term.accepted || term.currentVersion !== term.acceptedVersion));
-
-        if (error) {
-          const message = extractErrorMessage(error, "unknown");
-          setError(`Error getting terms: ${message}`);
-          console.error(error);
-        }
-      })
-      .catch((err) => {
-        setError("Error while getting user terms");
-        console.error(err);
-      });
-  }, [step]);
-
   const acceptAllUserTerms = useCallback(async () => {
     try {
-      if (!tosToBeAccepted) return;
+      // verify what terms the user has accepted
+      // we can't do this before since the user is not authenticated yet
+      // and this endpoint requires authentication
+      const termsRes = await getApiV1UserTerms();
+      const termsList = termsRes?.data?.terms || [];
+      const tosToBeAccepted = termsList.filter(
+        (term) => !term.accepted || term.currentVersion !== term.acceptedVersion,
+      );
 
       // accept all terms that are not already accepted
       // since we displayed all of them in the UI with their respective link
@@ -79,17 +56,19 @@ export const SignUpRoute = () => {
             version: term.currentVersion,
           },
         });
+
         if (error) {
           const message = extractErrorMessage(error, "unknown");
           setError(`Error accepting terms (${term.type}): ${message}`);
-          console.error(error);
+          console.error("Error accepting terms", error);
         }
       }
     } catch (termsErr) {
-      setError("Error while accepting user terms");
-      console.error(termsErr);
+      const message = extractErrorMessage(termsErr, "unknown");
+      setError(`Error while accepting user terms: ${message}`);
+      console.error("Error accepting user terms", termsErr);
     }
-  }, [tosToBeAccepted]);
+  }, []);
 
   const handleSubmitOtpRequest = useCallback(
     async (e: React.FormEvent) => {
@@ -104,14 +83,15 @@ export const SignUpRoute = () => {
         });
         if (error) {
           const message = extractErrorMessage(error, "unknown");
-          setError(`Error while requesting the OTP: ${message}`);
-          console.error(error);
+          setError(`Error returned while requesting the OTP: ${message}`);
+          console.error("Error returned while requesting the OTP", error);
         }
 
         data?.ok && setStep(ScreenStep.OtpVerification);
       } catch (err) {
-        setError("Error while requesting the OTP");
-        console.error(err);
+        const message = extractErrorMessage(err, "unknown");
+        setError(`Error while requesting the OTP: ${message}`);
+        console.error("Error requesting OTP", err);
       } finally {
         setIsLoading(false);
       }
@@ -132,8 +112,8 @@ export const SignUpRoute = () => {
 
         if (error || !data) {
           const message = extractErrorMessage(error, "unknown");
-          setError(`Error while signin up: ${message}`);
-          console.error(error);
+          setError(`Error returned while signing up: ${message}`);
+          console.error("Error returned while signing up", error);
           return;
         }
 
@@ -145,8 +125,9 @@ export const SignUpRoute = () => {
         await acceptAllUserTerms();
         navigate("/kyc");
       } catch (err) {
-        setError("Error while signing up");
-        console.error(err);
+        const message = extractErrorMessage(err, "unknown");
+        setError(`Error while signing up: ${message}`);
+        console.error("Error while signing up", err);
       } finally {
         setIsLoading(false);
       }
@@ -173,34 +154,29 @@ export const SignUpRoute = () => {
                 disabled={isLoading}
               />
             </div>
-            {atLeastOneToSMustBeAccepted && (
-              <div className="flex items-center space-x-2 mt-2">
-                <input
-                  id="accept-tos"
-                  type="checkbox"
-                  checked={isAcceptedTos}
-                  onChange={(e) => setIsAcceptedTos(e.target.checked)}
-                  disabled={isLoading}
-                  required
-                />
-                <Label htmlFor="accept-tos" className="text-sm">
-                  I have read and agree to the{" "}
-                  {(tosToBeAccepted || []).map(({ type, url }, idx, arr) => (
-                    <span key={type}>
-                      <a href={url} target="_blank" rel="noopener noreferrer" className="underline">
-                        {userTermsTitle[type as UserTermsTypeFromApi]}
-                      </a>
-                      {idx < arr.length - 1 ? ", " : ""}
-                    </span>
-                  ))}
-                </Label>
-              </div>
-            )}
-            <Button
-              type="submit"
-              loading={isLoading}
-              disabled={isLoading || !email || (!isAcceptedTos && atLeastOneToSMustBeAccepted)}
-            >
+            <div className="flex items-center space-x-2 mt-2">
+              <input
+                id="accept-tos"
+                type="checkbox"
+                checked={isAcceptedTos}
+                onChange={(e) => setIsAcceptedTos(e.target.checked)}
+                disabled={isLoading}
+                required
+              />
+              <Label htmlFor="accept-tos" className="text-sm">
+                I have read and agree to the{" "}
+                {Object.entries(userTerms).map(([type, { url }], idx, arr) => (
+                  <span key={type}>
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="underline">
+                      {userTerms[type as UserTermsTypeFromApi].title}
+                    </a>
+                    {idx < arr.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </Label>
+            </div>
+
+            <Button type="submit" loading={isLoading} disabled={isLoading || !email || !isAcceptedTos}>
               Get code
             </Button>
             {error && <StandardAlert variant="destructive" title="Error" description={error} />}
