@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Card } from "../../client";
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import { Dialog } from "../ui/dialog";
 import { toast } from "sonner";
 import type GPSDK from "@gnosispay/pse-sdk";
 import { ElementType, Action } from "@gnosispay/pse-sdk";
