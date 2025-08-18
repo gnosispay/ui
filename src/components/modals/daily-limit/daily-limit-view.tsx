@@ -56,6 +56,16 @@ export const DailyLimitView: React.FC<DailyLimitViewProps> = ({ dailyLimit, allo
       <Button className="w-full bg-brand hover:bg-brand/90 text-button-black font-medium" onClick={onEditClick}>
         Change daily limit
       </Button>
+      <div className="text-center text-sm">
+        <a
+          href="https://help.gnosispay.com/en/articles/8663251-fees-and-limits"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline"
+        >
+          See all fees & limits
+        </a>
+      </div>
     </div>
   );
 };
