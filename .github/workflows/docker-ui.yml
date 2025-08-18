@@ -72,6 +72,4 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: build-and-push-image
     uses: ./.github/workflows/deploy-ui-stg.yml
-    with:
-      image_tag: ${{ github.sha }}
     secrets: inherit
