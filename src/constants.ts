@@ -49,10 +49,22 @@ export const ADD_FUNDS_CONSTANTS = {
 export type UserTermsTypeFromApi = NonNullable<NonNullable<GetApiV1UserTermsResponse["terms"]>[number]["type"]>;
 
 // this is strongly typed to the API response
-export const userTermsTitle: Record<UserTermsTypeFromApi, string> = {
-  "general-tos": "Gnosis Pay Terms of Service",
-  "card-monavate-tos": "Cardholder Terms of Service",
-  "cashback-tos": "Cardholder Cashback Terms of Service",
+export const userTerms: Record<UserTermsTypeFromApi, { title: string; version: string; url: string }> = {
+  "general-tos": {
+    title: "Gnosis Pay Terms of Service",
+    version: "TOS_GENERAL_VERSION_1",
+    url: "https://legal.gnosispay.com/en/articles/8911632-gnosis-pay-terms-of-service",
+  },
+  "card-monavate-tos": {
+    title: "Cardholder Terms of Service",
+    version: "TOS_CARD_VERSION_1",
+    url: "https://legal.gnosispay.com/en/articles/8911633-monavate-cardholder-terms-eea",
+  },
+  "cashback-tos": {
+    title: "Cardholder Cashback Terms of Service",
+    version: "TOS_CASHBACK_2024-08-01",
+    url: "https://forum.gnosis.io/t/gip-110-should-the-gnosis-dao-create-and-fund-a-gnosis-pay-rewards-program-with-10k-gno/8837",
+  },
 };
 
 export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";

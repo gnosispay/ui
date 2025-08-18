@@ -103,9 +103,11 @@ export const KycRoute = () => {
           <StandardAlert variant="destructive" title="Error" description={error} className="mt-4" />
         </div>
       )}
-      <div className="col-span-6">
-        {kycUrl && <iframe src={kycUrl} className="w-full h-[calc(100vh-73px)]" title="KYC Integration" />}
-      </div>
+      {!error && (
+        <div className="col-span-6">
+          {kycUrl && <iframe src={kycUrl} className="w-full h-[calc(100vh-73px)]" title="KYC Integration" />}
+        </div>
+      )}
     </div>
   );
 };
