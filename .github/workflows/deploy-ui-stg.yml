@@ -45,7 +45,7 @@ jobs:
         with:
           task-definition: task-definition.json
           container-name: ui
-          image: ${{ steps.login-ecr.outputs.registry }}/ui:${{ github.sha }}
+          image: ${{ secrets.AWS_ACCOUNT_ID_PROD }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/ui:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
