@@ -39,6 +39,8 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: true
 
       - name: Download task definition
         run: |
@@ -53,7 +55,7 @@ jobs:
           image: ${{ steps.login-ecr.outputs.registry }}/ui:${{ inputs.image_tag }}
 
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: ui-stg
