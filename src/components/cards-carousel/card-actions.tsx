@@ -3,19 +3,20 @@ import { IconButton } from "../ui/icon-button";
 import type { Card } from "@/client";
 import { useGpSdk } from "@/hooks/useGpSdk";
 import { toast } from "sonner";
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import { Dialog } from "../ui/dialog";
 import { useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { ReportCardModal } from "../modals/report-card";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
 import { ChangePinModal } from "../modals/change-pin";
+import { PSEDialogContent, PSEDialogTitle } from "../PSEDialog";
 
 const PSE_IFRAME_ID = "pse-iframe";
 
 export const CardActions = ({ card }: { card: Card }) => {
   const { showCardDetails, showPin, isLoading } = useGpSdk();
   const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap } = useCards();
-  const [isPSEModalOpen, setIsPSEModalOpen] = useState(false);
+  const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
   const cardInfo = cardInfoMap?.[card.id];
@@ -31,7 +32,7 @@ export const CardActions = ({ card }: { card: Card }) => {
 
     try {
       showCardDetails(cardToken, PSE_IFRAME_ID);
-      setIsPSEModalOpen(true);
+      setIsCardDetailsModalOpen(true);
     } catch (error) {
       console.error(error);
       toast.error("Error showing card details");
@@ -46,7 +47,7 @@ export const CardActions = ({ card }: { card: Card }) => {
 
     try {
       showPin(cardToken, PSE_IFRAME_ID);
-      setIsPSEModalOpen(true);
+      setIsCardDetailsModalOpen(true);
     } catch (error) {
       console.error(error);
       toast.error("Error showing PIN");
@@ -111,9 +112,9 @@ export const CardActions = ({ card }: { card: Card }) => {
         )}
       </div>
 
-      <Dialog open={isPSEModalOpen} onOpenChange={setIsPSEModalOpen}>
-        <DialogContent aria-describedby={undefined}>
-          <DialogTitle>Card Details</DialogTitle>
+      <Dialog open={isCardDetailsModalOpen} onOpenChange={setIsCardDetailsModalOpen}>
+        <PSEDialogContent>
+          <PSEDialogTitle>Card Details</PSEDialogTitle>
           <div className="grid flex-1 gap-2">
             <div id={PSE_IFRAME_ID} />
           </div>
@@ -122,7 +123,7 @@ export const CardActions = ({ card }: { card: Card }) => {
               <Loader2 className="h-10 w-10 animate-spin" />
             </div>
           )}
-        </DialogContent>
+        </PSEDialogContent>
       </Dialog>
 
       {isReportModalOpen && (

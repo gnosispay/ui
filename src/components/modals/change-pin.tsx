@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import type GPSDK from "@gnosispay/pse-sdk";
 import { ElementType, Action } from "@gnosispay/pse-sdk";
 import { useGpSdk } from "@/hooks/useGpSdk";
+import { PSEDialogContent, PSEDialogTitle } from "../PSEDialog";
 
 interface Props {
   onClose: () => void;
@@ -71,12 +72,12 @@ export const ChangePinModal = ({ onClose, card }: Props) => {
 
   return (
     <Dialog open={true} onOpenChange={onOpenChange}>
-      <DialogContent aria-describedby={undefined}>
-        <DialogTitle>Change pin</DialogTitle>
+      <PSEDialogContent>
+        <PSEDialogTitle>Change pin</PSEDialogTitle>
         <div className="grid flex-1 gap-2">
           <div id={setPinId} className="h-68" />
         </div>
-      </DialogContent>
+      </PSEDialogContent>
     </Dialog>
   );
 };
