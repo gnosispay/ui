@@ -39,8 +39,16 @@ export const SignUpRoute = () => {
       // verify what terms the user has accepted
       // we can't do this before since the user is not authenticated yet
       // and this endpoint requires authentication
-      const termsRes = await getApiV1UserTerms();
-      const termsList = termsRes?.data?.terms || [];
+      const { data, error: termsError } = await getApiV1UserTerms();
+
+      if (termsError) {
+        const message = extractErrorMessage(termsError, "unknown");
+        setError(`Error getting terms: ${message}`);
+        console.error("Error getting terms", termsError);
+        return;
+      }
+
+      const termsList = data?.terms || [];
       const tosToBeAccepted = termsList.filter(
         (term) => !term.accepted || term.currentVersion !== term.acceptedVersion,
       );
