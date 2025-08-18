@@ -20,9 +20,15 @@ export const CardActions = ({ card }: { card: Card }) => {
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
   const cardInfo = cardInfoMap?.[card.id];
-  const canReport = card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost;
+  const canReport =
+    card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && cardInfo?.isVoid;
   const canChangePin =
-    !card.virtual && card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost;
+    !card.virtual &&
+    card.activatedAt &&
+    !cardInfo?.isFrozen &&
+    !cardInfo?.isStolen &&
+    !cardInfo?.isLost &&
+    cardInfo?.isVoid;
 
   const onShowCardDetails = (cardToken?: string) => {
     if (!cardToken) {
