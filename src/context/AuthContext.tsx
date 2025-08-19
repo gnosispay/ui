@@ -3,7 +3,9 @@ import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
 import { isTokenExpired } from "@/utils/isTokenExpired";
 import { isTokenWithUserId } from "@/utils/isTokenWithUserId";
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { differenceInMilliseconds, fromUnixTime } from "date-fns";
+import { jwtDecode } from "jwt-decode";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
 import { useAccount, useConnections, useSignMessage } from "wagmi";
@@ -32,6 +34,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
+  const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const jwtAddressKey = useMemo(() => {
     if (!address) return "";
     return `${LOCALSTORAGE_JWT_KEY}.${address}`;
@@ -63,9 +66,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
 
     return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0;
   }, [jwt, isAuthenticating, address, chainId, connections]);
-
-  // todo implement interceptor to refresh the jwt if it's expired
-  // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
 
   const updateClient = useCallback(
     (optionalJwt?: string) => {
@@ -190,6 +190,51 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       return;
     }
   }, [address, chainId, signMessageAsync, connections, jwtAddressKey, updateJwt]);
+
+  // Set up automatic JWT renewal timeout, simpler approach than with an interceptor
+  // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors
+  useEffect(() => {
+    // Clear any existing timeout when setting up a new one
+    if (renewalTimeoutRef.current) {
+      clearTimeout(renewalTimeoutRef.current);
+      renewalTimeoutRef.current = null;
+    }
+
+    // Only set up timeout if we have a valid JWT
+    if (!jwt || isTokenExpired(jwt)) {
+      return;
+    }
+
+    try {
+      const decodedToken = jwtDecode(jwt);
+
+      if (!decodedToken.exp) {
+        return;
+      }
+
+      const expirationDate = fromUnixTime(decodedToken.exp);
+      const currentDate = new Date();
+      const timeUntilExpiry = differenceInMilliseconds(expirationDate, currentDate);
+
+      // Set timeout to renew when token expires
+      const timeoutDelay = Math.max(0, timeUntilExpiry);
+
+      renewalTimeoutRef.current = setTimeout(() => {
+        console.info("JWT renewal timeout triggered, renewing token...");
+        renewToken();
+      }, timeoutDelay);
+    } catch (error) {
+      console.error("Error setting up JWT renewal timeout:", error);
+    }
+
+    // Cleanup function to clear timeout when component unmounts or effect re-runs
+    return () => {
+      if (renewalTimeoutRef.current) {
+        clearTimeout(renewalTimeoutRef.current);
+        renewalTimeoutRef.current = null;
+      }
+    };
+  }, [jwt, renewToken]);
 
   useEffect(() => {
     const expired = isTokenExpired(jwt);
