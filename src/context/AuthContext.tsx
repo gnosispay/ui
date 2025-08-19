@@ -3,6 +3,7 @@ import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
 import { isTokenExpired } from "@/utils/isTokenExpired";
 import { isTokenWithUserId } from "@/utils/isTokenWithUserId";
+import { differenceInMilliseconds, fromUnixTime } from "date-fns";
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SiweMessage } from "siwe";
@@ -211,9 +212,9 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
-      const expirationTime = decodedToken.exp * 1000; // Convert to milliseconds
-      const currentTime = Date.now();
-      const timeUntilExpiry = expirationTime - currentTime;
+      const expirationDate = fromUnixTime(decodedToken.exp);
+      const currentDate = new Date();
+      const timeUntilExpiry = differenceInMilliseconds(expirationDate, currentDate);
 
       // Set timeout to renew when token expires
       const timeoutDelay = Math.max(0, timeUntilExpiry);
