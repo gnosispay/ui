@@ -1,11 +1,13 @@
 name: Docker UI
 
 on:
-  workflow_dispatch:
   push:
     branches:
       - main
-  pull_request:
+    # paths:
+    #   - 'services/ui/**'
+  workflow_dispatch:
+
 
 jobs:
 
@@ -65,12 +67,9 @@ jobs:
             --build-arg VITE_PSE_APP_ID=$VITE_PSE_APP_ID \
             -t $IMAGE_NAME . -f ./Dockerfile.ui --push
 
-  # deploy-on-staging:
-  #   name: Deploy on Staging
-  #   if: github.ref == 'refs/heads/main'
-  #   uses: ./.github/workflows/deploy.yml
-  #   needs: build-and-push-image
-  #   with:
-  #     environment: stg
-  #     image_tag: ${{ github.sha }}
-  #   secrets: inherit
+  deploy-on-staging:
+    name: Deploy on Staging
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-push-image
+    uses: ./.github/workflows/deploy-ui-stg.yml
+    secrets: inherit

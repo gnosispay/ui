@@ -1,11 +1,11 @@
-import { AlertTriangle, Snowflake } from "lucide-react";
+import { AlertTriangle, Snowflake, Ban } from "lucide-react";
 
 interface CardStatusOverlayProps {
-  status: "frozen" | "stolen" | "lost";
+  status: "frozen" | "stolen" | "lost" | "void";
 }
 
 export const CardStatusOverlay = ({ status }: CardStatusOverlayProps) => {
-  const statusConfig = {
+  const statusConfig: Record<CardStatusOverlayProps["status"], { icon: React.ReactNode; text: string }> = {
     frozen: {
       icon: <Snowflake size={40} className="text-white mb-2" />,
       text: "FROZEN",
@@ -17,6 +17,10 @@ export const CardStatusOverlay = ({ status }: CardStatusOverlayProps) => {
     lost: {
       icon: <AlertTriangle size={40} className="text-white mb-2" />,
       text: "LOST",
+    },
+    void: {
+      icon: <Ban size={40} className="text-white mb-2" />,
+      text: "VOID",
     },
   };
 
