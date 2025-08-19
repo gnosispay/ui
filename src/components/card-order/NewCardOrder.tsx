@@ -9,6 +9,7 @@ import { useUser } from "@/context/UserContext";
 import { Package, MapPin } from "lucide-react";
 import { useCallback, useState, useEffect, useMemo } from "react";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { StandardAlert } from "../ui/standard-alert";
 
 // Common countries for shipping - can be expanded based on supported regions
 const SUPPORTED_COUNTRIES = [
@@ -232,7 +233,13 @@ export const NewCardOrder = () => {
             </div>
           </div>
 
-          {error && <div className="text-sm text-error bg-error/10 p-3 rounded-md">{error}</div>}
+          {error && (
+            <StandardAlert
+              title="Error"
+              description={extractErrorMessage(error, "Error creating order")}
+              variant="destructive"
+            />
+          )}
 
           <div className="flex justify-end pt-4">
             <Button disabled={isLoadingCreation || !isShippingValid} loading={isLoadingCreation} onClick={createOrder}>

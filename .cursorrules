@@ -219,10 +219,42 @@ const expensiveValue = useMemo(() => {
 ```
 
 ### Error Handling
+- **ALWAYS** use the `StandardAlert` component for displaying errors, warnings, and info messages
+- **ALWAYS** use `extractErrorMessage` from `@/utils/errorHelpers` to format error messages
 - Implement proper error boundaries
 - Show user-friendly error messages
 - Handle loading and error states consistently
 - Log errors appropriately
+
+#### Error Display Pattern
+```tsx
+import { StandardAlert } from "@/components/ui/standard-alert";
+import { extractErrorMessage } from "@/utils/errorHelpers";
+
+// ✅ DO - Use StandardAlert with extractErrorMessage
+<StandardAlert 
+  variant="destructive" 
+  message={extractErrorMessage(error)} 
+/>
+
+// ✅ DO - Warning messages
+<StandardAlert 
+  variant="warning" 
+  message="This action cannot be undone" 
+/>
+
+// ✅ DO - Info messages  
+<StandardAlert 
+  variant="info" 
+  message="Your card will arrive in 5-7 business days" 
+/>
+
+// ❌ DON'T - Raw error display
+<div className="text-red-500">{error.message}</div>
+
+// ❌ DON'T - Using other alert components for errors
+<Alert variant="destructive">{error.toString()}</Alert>
+```
 
 ### Promise Handling
 - **PREFER** `promise.then().catch().finally()` over `try/catch` blocks when possible

@@ -4,18 +4,16 @@ import { postApiV1OrderByOrderIdAttachCoupon, postApiV1OrderByOrderIdCancel, typ
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ConfirmationDialog } from "@/components/modals/confirmation-dialog";
 import { usePendingCardOrders } from "@/hooks/useCardOrders";
-import { InboxIcon } from "lucide-react";
+import { InboxIcon, Loader2 } from "lucide-react";
 import { formatDisplayAmount } from "@/utils/formatCurrency";
-import { COUNTRIES, currencies } from "@/constants";
+import { COUNTRIES, COUPON_CODES, currencies } from "@/constants";
 
 export const ExistingCardOrder = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const [order, setOrder] = useState<CardOrder | null>(null);
-  const [couponCode, setCouponCode] = useState("");
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
   const [isNotFound, setIsNotFound] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
@@ -43,13 +41,14 @@ export const ExistingCardOrder = () => {
   }, [orders, orderId, isLoadingOrders]);
 
   const handleApplyCoupon = useCallback(async () => {
-    if (!order || !couponCode.trim()) return;
+    if (!order) return;
 
     try {
       setIsApplyingCoupon(true);
+
       const { data, error } = await postApiV1OrderByOrderIdAttachCoupon({
         path: { orderId: order.id },
-        body: { couponCode: couponCode.trim() },
+        body: { couponCode: COUPON_CODES },
       });
 
       if (error) {
@@ -59,7 +58,6 @@ export const ExistingCardOrder = () => {
       }
 
       if (data) {
-        toast.success("Coupon applied successfully");
         // Refresh order data to get updated totals
         await refetchOrders();
       }
@@ -69,7 +67,19 @@ export const ExistingCardOrder = () => {
     } finally {
       setIsApplyingCoupon(false);
     }
-  }, [order, couponCode, refetchOrders]);
+  }, [order, refetchOrders]);
+
+  useEffect(() => {
+    if (!order) return;
+
+    if (isApplyingCoupon) return;
+
+    // make sure any oder is for free
+    // using our coupon code
+    if (!order.couponCode || order.couponCode.toLowerCase() !== COUPON_CODES.toLowerCase()) {
+      handleApplyCoupon();
+    }
+  }, [order, handleApplyCoupon, isApplyingCoupon]);
 
   const handleCancelOrder = useCallback(async () => {
     if (!order) return;
@@ -116,6 +126,15 @@ export const ExistingCardOrder = () => {
     );
   }, []);
 
+  const handleCompleteOrder = useCallback(() => {
+    if (!order) return;
+    if (order.status === "PENDINGTRANSACTION") {
+      toast.info("Payment flow will be implemented");
+    } else {
+      toast.info("Payment flow will be implemented");
+    }
+  }, [order]);
+
   if (isNotFound) {
     return (
       <div className="flex flex-col items-center justify-center mt-4">
@@ -125,11 +144,12 @@ export const ExistingCardOrder = () => {
     );
   }
 
-  if (isLoadingOrders || !order) {
+  if (isLoadingOrders || isApplyingCoupon || !order) {
     return (
       <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
         <div className="col-span-6 lg:col-start-2 lg:col-span-4">
-          <div className="flex items-center justify-center py-8">
+          <div className="flex h-full items-center justify-center">
+            <Loader2 className="h-10 w-10 animate-spin" />
             <div className="text-muted-foreground">Loading order details...</div>
           </div>
         </div>
@@ -141,7 +161,6 @@ export const ExistingCardOrder = () => {
     <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4">
         <div className="space-y-6">
-          {/* Header */}
           <div className="text-center">
             <h1 className="text-2xl font-semibold text-foreground">Checkout</h1>
           </div>
@@ -191,27 +210,6 @@ export const ExistingCardOrder = () => {
                 )}
               </div>
 
-              {/* Discount Coupon */}
-              <div className="bg-card rounded-xl p-6">
-                <h4 className="text-sm font-medium text-foreground mb-3">Discount coupon</h4>
-                <div className="flex gap-2">
-                  <Input
-                    placeholder="Enter coupon code"
-                    value={couponCode}
-                    onChange={(e) => setCouponCode(e.target.value)}
-                    className="flex-1"
-                  />
-                  <Button
-                    onClick={handleApplyCoupon}
-                    disabled={!couponCode.trim() || isApplyingCoupon}
-                    className="bg-button-bg hover:bg-button-bg-hover text-button-black"
-                  >
-                    {isApplyingCoupon ? "Applying..." : "Apply"}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Total */}
               <div className="bg-card rounded-xl p-6">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>TOTAL</span>
@@ -220,34 +218,21 @@ export const ExistingCardOrder = () => {
                     <div className="text-sm text-muted-foreground font-normal">€ {finalAmount.toFixed(2)}</div>
                   </div>
                 </div>
-
-                {/* Gas Fee */}
-                {finalAmount > 0 && (
-                  <div className="flex justify-between text-sm mt-4 pt-4 border-t">
-                    <span className="text-muted-foreground">GAS FEE</span>
-                    <div className="text-right">
-                      <div>~0.01 xDAI</div>
-                      <div className="text-muted-foreground">€ 0.01</div>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
-          {/* Actions */}
-          {(order.status === "PENDINGTRANSACTION" || order.status === "FAILEDTRANSACTION") && (
-            <div className="flex justify-end gap-3 mt-6">
-              <Button variant="outline" onClick={() => setShowCancelConfirmation(true)}>
-                Cancel Order
-              </Button>
-              <Button
-                className="bg-button-bg hover:bg-button-bg-hover text-button-black"
-                onClick={() => toast.info("Payment flow will be implemented")}
-              >
-                {order.status === "PENDINGTRANSACTION" ? "Complete Payment" : "Retry Payment"}
-              </Button>
-            </div>
-          )}
+
+          <div className="flex justify-end gap-3 mt-6">
+            <Button variant="outline" onClick={handleCompleteOrder}>
+              Cancel Order
+            </Button>
+            <Button
+              className="bg-button-bg hover:bg-button-bg-hover text-button-black"
+              onClick={() => toast.info("Payment flow will be implemented")}
+            >
+              Complete Order
+            </Button>
+          </div>
         </div>
       </div>
 

@@ -7,7 +7,7 @@ export interface UsePendingCardOrdersResult {
   orders: CardOrder[];
   pendingOrders: CardOrder[];
   isLoading: boolean;
-  refetch: () => void;
+  refetch: () => Promise<void>;
 }
 
 export const usePendingCardOrders = (): UsePendingCardOrdersResult => {

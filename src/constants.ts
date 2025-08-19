@@ -1602,3 +1602,5 @@ export const COUNTRIES = [
     alpha3: "ZWE",
   },
 ];
+
+export const COUPON_CODES = "GPUI100";
