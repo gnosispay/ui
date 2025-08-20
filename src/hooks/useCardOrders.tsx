@@ -40,13 +40,15 @@ export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
   }, [fetchOrders]);
 
   const pendingOrders = useMemo(() => {
-    return orders.filter(
-      (order) =>
-        order.status === "PENDINGTRANSACTION" ||
-        order.status === "TRANSACTIONCOMPLETE" ||
-        order.status === "CONFIRMATIONREQUIRED" ||
-        order.status === "READY",
-    );
+    return orders
+      .filter((order) => !order.virtual)
+      .filter(
+        (order) =>
+          order.status === "PENDINGTRANSACTION" ||
+          order.status === "TRANSACTIONCOMPLETE" ||
+          order.status === "CONFIRMATIONREQUIRED" ||
+          order.status === "READY",
+      );
   }, [orders]);
 
   return {

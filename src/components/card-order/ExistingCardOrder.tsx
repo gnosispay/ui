@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { postApiV1OrderByOrderIdAttachCoupon, postApiV1OrderByOrderIdCancel, type CardOrder } from "@/client";
+import {
+  postApiV1OrderByOrderIdAttachCoupon,
+  postApiV1OrderByOrderIdCancel,
+  postApiV1OrderByOrderIdCreateCard,
+  putApiV1OrderByOrderIdConfirmPayment,
+  type CardOrder,
+} from "@/client";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 import { Button } from "@/components/ui/button";
+import { StandardAlert } from "@/components/ui/standard-alert";
 import { ConfirmationDialog } from "@/components/modals/confirmation-dialog";
 import { usePendingCardOrders } from "@/hooks/useCardOrders";
 import { InboxIcon, Loader2 } from "lucide-react";
 import { formatDisplayAmount } from "@/utils/formatCurrency";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 import { COUNTRIES, COUPON_CODES, currencies } from "@/constants";
 
 export const ExistingCardOrder = () => {
@@ -18,6 +26,8 @@ export const ExistingCardOrder = () => {
   const [isNotFound, setIsNotFound] = useState(false);
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isCompletingOrder, setIsCompletingOrder] = useState(false);
+  const [globalError, setGlobalError] = useState<string | null>(null);
   const { orders, isLoading: isLoadingOrders, refetch: refetchOrders } = usePendingCardOrders();
   const totalAmount = useMemo(() => order?.totalAmountEUR || 0, [order]);
   const discount = useMemo(() => order?.totalDiscountEUR || 0, [order]);
@@ -97,7 +107,7 @@ export const ExistingCardOrder = () => {
       }
 
       toast.success("Card order cancelled successfully");
-      navigate("/cards");
+      navigate("/");
     } catch (error) {
       console.error("Error cancelling order:", error);
       toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
@@ -126,12 +136,47 @@ export const ExistingCardOrder = () => {
     );
   }, []);
 
-  const handleCompleteOrder = useCallback(() => {
+  const handleCompleteOrder = useCallback(async () => {
     if (!order) return;
-    if (order.status === "PENDINGTRANSACTION") {
-      toast.info("Payment flow will be implemented");
-    } else {
-      toast.info("Payment flow will be implemented");
+
+    try {
+      setIsCompletingOrder(true);
+      setGlobalError(null);
+
+      // although it's for free, we need to confirm the payment
+      // to make sure the order is in the correct state
+      const { error: confirmError } = await putApiV1OrderByOrderIdConfirmPayment({
+        path: { orderId: order.id },
+      });
+
+      if (confirmError) {
+        const errorMessage = extractErrorMessage(confirmError, "Failed to confirm payment");
+        setGlobalError(errorMessage);
+        console.error("Error confirming payment:", confirmError);
+        return;
+      }
+
+      const { error: createError } = await postApiV1OrderByOrderIdCreateCard({
+        path: { orderId: order.id },
+        body: {}, // PIN will be set via PSE after card creation
+      });
+
+      if (createError) {
+        const errorMessage = extractErrorMessage(createError, "Failed to create card");
+        setGlobalError(errorMessage);
+        console.error("Error creating card:", createError);
+        return;
+      }
+
+      // toast.success("Card order completed successfully!");
+      // navigate("/cards");
+      // need to get back the card token here, and initiate the PSE change pin flow
+    } catch (error) {
+      const errorMessage = extractErrorMessage(error, "An unexpected error occurred");
+      setGlobalError(errorMessage);
+      console.error("Error completing order:", error);
+    } finally {
+      setIsCompletingOrder(false);
     }
   }, [order]);
 
@@ -222,13 +267,20 @@ export const ExistingCardOrder = () => {
             </div>
           </div>
 
+          {/* Global Error Display */}
+          {globalError && (
+            <StandardAlert variant="destructive" title="Error" description={globalError} className="mb-6" />
+          )}
+
           <div className="flex justify-end gap-3 mt-6">
-            <Button variant="outline" onClick={handleCompleteOrder}>
+            <Button variant="outline" onClick={() => setShowCancelConfirmation(true)}>
               Cancel Order
             </Button>
             <Button
               className="bg-button-bg hover:bg-button-bg-hover text-button-black"
-              onClick={() => toast.info("Payment flow will be implemented")}
+              onClick={handleCompleteOrder}
+              loading={isCompletingOrder}
+              disabled={order.status !== "PENDINGTRANSACTION" || isCompletingOrder}
             >
               Complete Order
             </Button>
