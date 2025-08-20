@@ -7,32 +7,34 @@ export interface UsePendingCardOrdersResult {
   orders: CardOrder[];
   pendingOrders: CardOrder[];
   isLoading: boolean;
-  refetch: () => Promise<void>;
+  refetch: () => void;
 }
 
 export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
   const [orders, setOrders] = useState<CardOrder[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const fetchOrders = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      const { data, error } = await getApiV1Order();
+  const fetchOrders = useCallback(() => {
+    setIsLoading(true);
 
-      if (error) {
+    getApiV1Order()
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Error fetching card orders:", error);
+          toast.error(<CollapsedError title="Failed to fetch card orders" error={error} />);
+          return;
+        }
+
+        // Type assertion to handle the null vs undefined difference
+        setOrders((data || []) as CardOrder[]);
+      })
+      .catch((error) => {
         console.error("Error fetching card orders:", error);
         toast.error(<CollapsedError title="Failed to fetch card orders" error={error} />);
-        return;
-      }
-
-      // Type assertion to handle the null vs undefined difference
-      setOrders((data || []) as CardOrder[]);
-    } catch (error) {
-      console.error("Error fetching card orders:", error);
-      toast.error(<CollapsedError title="Failed to fetch card orders" error={error} />);
-    } finally {
-      setIsLoading(false);
-    }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   useEffect(() => {
