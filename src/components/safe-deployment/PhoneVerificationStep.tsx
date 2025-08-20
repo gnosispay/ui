@@ -9,6 +9,7 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 export type PhoneVerificationStepProps = {
   onComplete: () => void;
   setError: (err: string) => void;
+  onCancel?: () => void;
 };
 
 enum PhoneStep {
@@ -17,7 +18,7 @@ enum PhoneStep {
   OtpVerification = "otp-verification",
 }
 
-const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepProps) => {
+const PhoneVerificationStep = ({ onComplete, setError, onCancel }: PhoneVerificationStepProps) => {
   const [step, setStep] = useState<PhoneStep>(PhoneStep.TypePhone);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -91,8 +92,13 @@ const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepPr
           <p className="text-muted-foreground mb-4">
             A one time code will be sent to your phone. Please enter your phone number to continue.
           </p>
-          <form className="space-y-4 mt-4 lg:w-1/4" onSubmit={handlePhoneContinue}>
+          <form className="space-y-4 mt-4 w-xs" onSubmit={handlePhoneContinue}>
             <PhoneInput value={phone} onChange={setPhone} disabled={isSubmitting} />
+            {onCancel && (
+              <Button className="mr-4" type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            )}
             <Button type="submit" disabled={!phone || isSubmitting}>
               Continue
             </Button>
