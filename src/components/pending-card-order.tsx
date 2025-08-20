@@ -6,11 +6,11 @@ import { toast } from "sonner";
 import { CollapsedError } from "./collapsedError";
 import { Clock, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { usePendingCardOrders } from "@/hooks/useCardOrders";
+import { useOrders } from "@/context/OrdersContext";
 
 export const PendingCardOrder = () => {
   const navigate = useNavigate();
-  const { pendingPhysicalOrders, isLoading, refetch } = usePendingCardOrders();
+  const { pendingPhysicalOrders, isLoading, refetch } = useOrders();
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);

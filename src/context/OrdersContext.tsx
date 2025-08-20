@@ -1,18 +1,26 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
 import { getApiV1Order, type CardOrder } from "@/client";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
+import { useAuth } from "./AuthContext";
 
-export interface UsePendingCardOrdersResult {
+type OrdersContextProps = {
+  children: ReactNode | ReactNode[];
+};
+
+export type IOrdersContext = {
   orders: CardOrder[];
   pendingPhysicalOrders: CardOrder[];
   isLoading: boolean;
   refetch: () => void;
-}
+};
 
-export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
+const OrdersContext = createContext<IOrdersContext | undefined>(undefined);
+
+const OrdersContextProvider = ({ children }: OrdersContextProps) => {
   const [orders, setOrders] = useState<CardOrder[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { isAuthenticated } = useAuth();
 
   const fetchOrders = useCallback(() => {
     setIsLoading(true);
@@ -25,8 +33,7 @@ export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
           return;
         }
 
-        // Type assertion to handle the null vs undefined difference
-        setOrders((data || []) as CardOrder[]);
+        setOrders(data as CardOrder[]);
       })
       .catch((error) => {
         console.error("Error fetching card orders:", error);
@@ -36,10 +43,6 @@ export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
         setIsLoading(false);
       });
   }, []);
-
-  useEffect(() => {
-    fetchOrders();
-  }, [fetchOrders]);
 
   const pendingPhysicalOrders = useMemo(() => {
     return orders
@@ -53,10 +56,31 @@ export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
       );
   }, [orders]);
 
-  return {
-    orders,
-    pendingPhysicalOrders,
-    isLoading,
-    refetch: fetchOrders,
-  };
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    fetchOrders();
+  }, [fetchOrders, isAuthenticated]);
+
+  return (
+    <OrdersContext.Provider
+      value={{
+        orders,
+        pendingPhysicalOrders,
+        isLoading,
+        refetch: fetchOrders,
+      }}
+    >
+      {children}
+    </OrdersContext.Provider>
+  );
 };
+
+const useOrders = () => {
+  const context = useContext(OrdersContext);
+  if (context === undefined) {
+    throw new Error("useOrders() must be used within an OrdersContextProvider");
+  }
+  return context;
+};
+
+export { OrdersContextProvider, useOrders };

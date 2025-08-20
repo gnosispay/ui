@@ -18,6 +18,7 @@ import { Toaster } from "sonner";
 import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
 import { TransactionsContextProvider } from "./context/TransactionsContext.tsx";
 import { TransactionsByCardContextProvider } from "./context/TransactionsByCardContext.tsx";
+import { OrdersContextProvider } from "./context/OrdersContext.tsx";
 import { RainbowKitWrapper } from "./context/CustomRainbowKitProvider.tsx";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
@@ -45,14 +46,16 @@ ReactDOM.createRoot(rootElement).render(
             <AuthContextProvider>
               <UserContextProvider>
                 <CardsContextProvider>
-                  <TransactionsContextProvider>
-                    <TransactionsByCardContextProvider>
-                      <DelayRelayContextProvider>
-                        <App />
-                        <Toaster expand />
-                      </DelayRelayContextProvider>
-                    </TransactionsByCardContextProvider>
-                  </TransactionsContextProvider>
+                  <OrdersContextProvider>
+                    <TransactionsContextProvider>
+                      <TransactionsByCardContextProvider>
+                        <DelayRelayContextProvider>
+                          <App />
+                          <Toaster expand />
+                        </DelayRelayContextProvider>
+                      </TransactionsByCardContextProvider>
+                    </TransactionsContextProvider>
+                  </OrdersContextProvider>
                 </CardsContextProvider>
               </UserContextProvider>
             </AuthContextProvider>

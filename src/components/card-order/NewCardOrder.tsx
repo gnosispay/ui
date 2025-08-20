@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { usePendingCardOrders } from "@/hooks/useCardOrders";
+import { useOrders } from "@/context/OrdersContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,7 +23,7 @@ interface ShippingAddress {
 
 export const NewCardOrder = () => {
   const navigate = useNavigate();
-  const { pendingPhysicalOrders, isLoading } = usePendingCardOrders();
+  const { pendingPhysicalOrders, isLoading, refetch } = useOrders();
   const { user } = useUser();
   const [isLoadingCreation, setIsLoadingCreation] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +103,7 @@ export const NewCardOrder = () => {
           return;
         }
 
+        refetch();
         navigate(`/card-order/${data.id}`, { replace: true });
       })
       .catch((error) => {
@@ -112,10 +113,10 @@ export const NewCardOrder = () => {
       .finally(() => {
         setIsLoadingCreation(false);
       });
-  }, [isShippingValid, shippingAddress, navigate]);
+  }, [isShippingValid, shippingAddress, navigate, refetch]);
 
   return (
-    <div className="grid grid-cols-6 gap-8 h-full mt-4 md:px-0">
+    <div className="grid grid-cols-6 gap-8 h-full my-4 md:px-0">
       <div className="col-span-6 md:col-span-4 md:col-start-2 px-4 sm:px-0">
         <div className="space-y-6">
           {/* Header section */}

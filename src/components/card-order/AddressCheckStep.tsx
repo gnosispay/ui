@@ -9,14 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { ConfirmationDialog } from "@/components/modals/confirmation-dialog";
-import { usePendingCardOrders } from "@/hooks/useCardOrders";
+import { useOrders } from "@/context/OrdersContext";
 import { formatDisplayAmount } from "@/utils/formatCurrency";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { COUNTRIES, COUPON_CODES, currencies } from "@/constants";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
-import { InboxIcon, Loader2 } from "lucide-react";
+import { InboxIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { AddressCheckSkeleton } from "./AddressCheckSkeleton";
 
 export interface AddressCheckStepProps {
   orderId: string;
@@ -31,7 +32,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const { orders, isLoading: isLoadingOrders, refetch: refetchOrders } = usePendingCardOrders();
+  const { orders, isLoading: isLoadingOrders, refetch: refetchOrders } = useOrders();
   const navigate = useNavigate();
 
   const totalAmount = useMemo(() => order?.totalAmountEUR || 0, [order]);
@@ -40,7 +41,6 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
     return totalAmount - discount;
   }, [totalAmount, discount]);
 
-  // Find the order by ID from the pending orders
   useEffect(() => {
     if (isLoadingOrders) return;
 
@@ -131,6 +131,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
         }
 
         toast.success("Card order cancelled successfully");
+        refetchOrders();
         navigate("/");
       })
       .catch((error) => {
@@ -141,7 +142,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
         setIsCancelling(false);
         setShowCancelConfirmation(false);
       });
-  }, [order, navigate]);
+  }, [order, navigate, refetchOrders]);
 
   const handleCompleteOrder = useCallback(async () => {
     if (!order) return;
@@ -203,13 +204,8 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
     );
   }
 
-  if (!order) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin" />
-        <div className="text-muted-foreground">Loading order details...</div>
-      </div>
-    );
+  if (!order || isLoadingOrders || isApplyingCoupon) {
+    return <AddressCheckSkeleton />;
   }
 
   return (

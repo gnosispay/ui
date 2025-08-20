@@ -14,7 +14,6 @@ export const ExistingCardOrder = () => {
   const [currentStep, setCurrentStep] = useState<OrderStep>(OrderStep.ADDRESS_CHECK);
   const [cardToken, setCardToken] = useState<string | null>(null);
 
-  // Step transition handlers
   const handleAddressConfirmed = useCallback((cardToken: string) => {
     setCardToken(cardToken);
     setCurrentStep(OrderStep.SET_PIN);
