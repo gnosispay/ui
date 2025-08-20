@@ -60,6 +60,7 @@ export const SafeDeploymentRoute = () => {
             setStep(ScreenStep.DeploySafe);
           }}
           setError={setError}
+          title="Mobile phone verification"
         />
       )}
       {step === ScreenStep.DeploySafe && <DeploySafeStep setError={setError} />}

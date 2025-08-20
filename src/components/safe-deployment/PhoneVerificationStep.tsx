@@ -9,6 +9,8 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 export type PhoneVerificationStepProps = {
   onComplete: () => void;
   setError: (err: string) => void;
+  onCancel?: () => void;
+  title: string;
 };
 
 enum PhoneStep {
@@ -17,7 +19,7 @@ enum PhoneStep {
   OtpVerification = "otp-verification",
 }
 
-const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepProps) => {
+const PhoneVerificationStep = ({ onComplete, setError, onCancel, title }: PhoneVerificationStepProps) => {
   const [step, setStep] = useState<PhoneStep>(PhoneStep.TypePhone);
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -87,12 +89,17 @@ const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepPr
     <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
       {step === PhoneStep.TypePhone && (
         <>
-          <h2 className="text-lg font-semibold mb-4 mt-4">Mobile phone verification</h2>
+          <h2 className="text-lg font-semibold mb-4 mt-4">{title}</h2>
           <p className="text-muted-foreground mb-4">
             A one time code will be sent to your phone. Please enter your phone number to continue.
           </p>
-          <form className="space-y-4 mt-4 lg:w-1/4" onSubmit={handlePhoneContinue}>
+          <form className="space-y-4 mt-4 w-xs" onSubmit={handlePhoneContinue}>
             <PhoneInput value={phone} onChange={setPhone} disabled={isSubmitting} />
+            {onCancel && (
+              <Button className="mr-4" type="button" variant="outline" onClick={onCancel}>
+                Cancel
+              </Button>
+            )}
             <Button type="submit" disabled={!phone || isSubmitting}>
               Continue
             </Button>
@@ -101,7 +108,7 @@ const PhoneVerificationStep = ({ onComplete, setError }: PhoneVerificationStepPr
       )}
       {step === PhoneStep.VerifyPhoneNumber && (
         <form className="space-y-4 mt-4" onSubmit={handlePhoneSubmit}>
-          <h2 className="text-lg font-semibold mb-4 mt-4">This number will be used to send you a one time code:</h2>
+          <p className="text-muted-foreground mb-4">This number will be used to send you a one time code:</p>
           <div className="mb-4 font-mono text-lg">{phone}</div>
           <div className="flex gap-2">
             <Button
