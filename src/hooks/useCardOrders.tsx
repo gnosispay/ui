@@ -5,7 +5,7 @@ import { CollapsedError } from "@/components/collapsedError";
 
 export interface UsePendingCardOrdersResult {
   orders: CardOrder[];
-  pendingOrders: CardOrder[];
+  pendingPhysicalOrders: CardOrder[];
   isLoading: boolean;
   refetch: () => void;
 }
@@ -41,7 +41,7 @@ export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const pendingOrders = useMemo(() => {
+  const pendingPhysicalOrders = useMemo(() => {
     return orders
       .filter((order) => !order.virtual)
       .filter(
@@ -55,7 +55,7 @@ export const usePendingCardOrders = (): UsePendingCardOrdersResult => {
 
   return {
     orders,
-    pendingOrders,
+    pendingPhysicalOrders,
     isLoading,
     refetch: fetchOrders,
   };

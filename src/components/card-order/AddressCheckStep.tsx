@@ -116,30 +116,31 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
     }
   }, [order, handleApplyCoupon, isApplyingCoupon]);
 
-  const handleCancelOrder = useCallback(async () => {
+  const handleCancelOrder = useCallback(() => {
     if (!order) return;
 
-    try {
-      setIsCancelling(true);
-      const { error } = await postApiV1OrderByOrderIdCancel({
-        path: { orderId: order.id },
-      });
+    setIsCancelling(true);
+    postApiV1OrderByOrderIdCancel({
+      path: { orderId: order.id },
+    })
+      .then(({ error }) => {
+        if (error) {
+          console.error("Error cancelling order:", error);
+          toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
+          return;
+        }
 
-      if (error) {
+        toast.success("Card order cancelled successfully");
+        navigate("/");
+      })
+      .catch((error) => {
         console.error("Error cancelling order:", error);
         toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
-        return;
-      }
-
-      toast.success("Card order cancelled successfully");
-      navigate("/");
-    } catch (error) {
-      console.error("Error cancelling order:", error);
-      toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
-    } finally {
-      setIsCancelling(false);
-      setShowCancelConfirmation(false);
-    }
+      })
+      .finally(() => {
+        setIsCancelling(false);
+        setShowCancelConfirmation(false);
+      });
   }, [order, navigate]);
 
   const handleCompleteOrder = useCallback(async () => {
@@ -177,8 +178,8 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
       }
 
       if (!createData || !createData.cardToken) {
-        setGlobalError("Failed to create card");
-        console.error("Error creating card:", createError);
+        setGlobalError("An error occurred while creating the card, no cardToken was returned");
+        console.error("Error creating card:", createData);
         return;
       }
 

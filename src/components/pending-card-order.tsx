@@ -10,7 +10,7 @@ import { usePendingCardOrders } from "@/hooks/useCardOrders";
 
 export const PendingCardOrder = () => {
   const navigate = useNavigate();
-  const { pendingOrders, isLoading, refetch } = usePendingCardOrders();
+  const { pendingPhysicalOrders, isLoading, refetch } = usePendingCardOrders();
   const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
   const [orderToCancel, setOrderToCancel] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
@@ -74,11 +74,11 @@ export const PendingCardOrder = () => {
     return null; // Don't show anything while loading
   }
 
-  if (pendingOrders.length === 0) {
+  if (pendingPhysicalOrders.length === 0) {
     return null; // Don't show anything if no pending orders
   }
 
-  const pendingOrder = pendingOrders[0];
+  const pendingOrder = pendingPhysicalOrders[0];
 
   return (
     <>
