@@ -26,27 +26,23 @@ export const CardsRoute = () => {
           </Button>
         </div>
       </div>
-      {!!cards && cards.length > 0 && (
-        <>
-          <div className="col-span-6 md:col-span-4 md:col-start-2">
-            <div className="w-full flex flex-col lg:flex-row gap-6">
-              <CardsCarousel currentIndex={selectedIndex} setCurrentIndex={setSelectedIndex} />
-              <div className="flex-1 flex items-center justify-center">
-                {selectedCard && <CardActions card={selectedCard} />}
-              </div>
-            </div>
+      <div className="col-span-6 md:col-span-4 md:col-start-2">
+        <div className="w-full flex flex-col lg:flex-row gap-6">
+          <CardsCarousel currentIndex={selectedIndex} setCurrentIndex={setSelectedIndex} />
+          <div className="flex-1 flex items-center justify-center">
+            {selectedCard && <CardActions card={selectedCard} />}
           </div>
-          <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="font-bold text-secondary">Transactions</h1>
-              <Link to="/transactions" className="flex items-center gap-2">
-                View all <ChevronRight size={16} />
-              </Link>
-            </div>
-            <CardTransactions cardToken={selectedCard?.cardToken} />
-          </div>
-        </>
-      )}
+        </div>
+      </div>
+      <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="font-bold text-secondary">Transactions</h1>
+          <Link to="/transactions" className="flex items-center gap-2">
+            View all <ChevronRight size={16} />
+          </Link>
+        </div>
+        <CardTransactions cardToken={selectedCard?.cardToken} />
+      </div>
       {!cards ||
         (cards.length === 0 && (
           <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
