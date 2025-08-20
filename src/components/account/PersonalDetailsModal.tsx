@@ -25,6 +25,15 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
     return parts.join("\n");
   }, [user]);
 
+  const handleOnOpenChange = useCallback(
+    (open: boolean) => {
+      setIsEditingPhone(false);
+      refreshUser();
+      onOpenChange(open);
+    },
+    [onOpenChange, refreshUser],
+  );
+
   const handleEditPhoneClick = useCallback(() => {
     setIsEditingPhone(true);
     setError("");
@@ -41,7 +50,7 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
   }, []);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOnOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Personal details</DialogTitle>
