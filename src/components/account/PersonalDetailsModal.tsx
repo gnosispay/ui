@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, XCircle } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
 import PhoneVerificationStep from "@/components/safe-deployment/PhoneVerificationStep";
+import EmailVerificationStep from "@/components/safe-deployment/EmailVerificationStep";
 import { StandardAlert } from "../ui/standard-alert";
 
 interface PersonalDetailsModalProps {
@@ -17,6 +18,7 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
   const fullName = useUserFullName();
 
   const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [error, setError] = useState("");
 
   const formattedAddress = useMemo(() => {
@@ -28,6 +30,7 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
   const handleOnOpenChange = useCallback(
     (open: boolean) => {
       setIsEditingPhone(false);
+      setIsEditingEmail(false);
       refreshUser();
       onOpenChange(open);
     },
@@ -39,8 +42,19 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
     setError("");
   }, []);
 
+  const handleEditEmailClick = useCallback(() => {
+    setIsEditingEmail(true);
+    setError("");
+  }, []);
+
   const handlePhoneVerificationComplete = useCallback(() => {
     setIsEditingPhone(false);
+    setError("");
+    refreshUser();
+  }, [refreshUser]);
+
+  const handleEmailVerificationComplete = useCallback(() => {
+    setIsEditingEmail(false);
     setError("");
     refreshUser();
   }, [refreshUser]);
@@ -53,7 +67,9 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
     <Dialog open={open} onOpenChange={handleOnOpenChange}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Personal details</DialogTitle>
+          <DialogTitle>
+            {isEditingEmail ? "Change email address" : isEditingPhone ? "Change phone number" : "Personal details"}
+          </DialogTitle>
         </DialogHeader>
 
         {isEditingPhone ? (
@@ -63,6 +79,19 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
               onComplete={handlePhoneVerificationComplete}
               setError={handleSetError}
               onCancel={() => setIsEditingPhone(false)}
+              title=""
+            />
+          </div>
+        ) : isEditingEmail ? (
+          <div className="space-y-4">
+            {error && <StandardAlert description={error} variant="destructive" />}
+            <EmailVerificationStep
+              onComplete={handleEmailVerificationComplete}
+              setError={handleSetError}
+              onCancel={() => setIsEditingEmail(false)}
+              submitButtonText="Verify new email"
+              title=""
+              description="Enter your new email address. A verification code will be sent to verify the change."
             />
           </div>
         ) : (
@@ -74,7 +103,12 @@ export const PersonalDetailsModal: React.FC<PersonalDetailsModalProps> = ({ open
 
             <div>
               <span className="text-sm text-muted-foreground">Email</span>
-              <div>{user?.email || "Not provided"}</div>
+              <div className="space-y-2">
+                <div>{user?.email || "Not provided"}</div>
+                <Button variant="outline" size="sm" onClick={handleEditEmailClick} className="w-fit">
+                  Edit email address
+                </Button>
+              </div>
             </div>
 
             <div>
