@@ -10,6 +10,7 @@ import { CollapsedError } from "@/components/collapsedError";
 import { ConfirmationDialog } from "@/components/modals/confirmation-dialog";
 import { useAuth } from "./AuthContext";
 import { COUPON_CODES } from "@/constants";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 type OrdersContextProps = {
   children: ReactNode | ReactNode[];
@@ -42,7 +43,8 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
       .then(({ data, error }) => {
         if (error) {
           console.error("Error fetching card orders:", error);
-          toast.error(<CollapsedError title="Failed to fetch card orders" error={error} />);
+          const message = extractErrorMessage(error, "Failed to fetch card orders");
+          toast.error(<CollapsedError title="Failed to fetch card orders" error={message} />);
           return;
         }
 
@@ -50,7 +52,8 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
       })
       .catch((error) => {
         console.error("Error fetching card orders:", error);
-        toast.error(<CollapsedError title="Failed to fetch card orders" error={error} />);
+        const message = extractErrorMessage(error, "Failed to fetch card orders");
+        toast.error(<CollapsedError title="Failed to fetch card orders" error={message} />);
       })
       .finally(() => {
         setIsLoading(false);
@@ -78,7 +81,8 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
 
       if (error) {
         console.error("Error applying coupon:", error);
-        toast.error(<CollapsedError title="Failed to apply coupon" error={error} />);
+        const message = extractErrorMessage(error, "Failed to apply coupon");
+        toast.error(<CollapsedError title="Failed to apply coupon" error={message} />);
         throw error;
       }
 
@@ -98,7 +102,8 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
 
       if (error) {
         console.error("Error cancelling order:", error);
-        toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
+        const message = extractErrorMessage(error, "Failed to cancel order");
+        toast.error(<CollapsedError title="Failed to cancel order" error={message} />);
         throw error;
       }
 
