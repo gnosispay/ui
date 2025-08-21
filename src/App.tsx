@@ -10,6 +10,7 @@ import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AccountRoute } from "./pages/Account";
+import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
 
 export const menuRoutes = [
   {
@@ -50,6 +51,14 @@ const publicRoutes = [
   {
     path: "/safe-deployment",
     element: <SafeDeploymentRoute />,
+  },
+  {
+    path: "/card-order/new",
+    element: <NewCardOrder />,
+  },
+  {
+    path: "/card-order/:orderId",
+    element: <ExistingCardOrder />,
   },
 ];
 

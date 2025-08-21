@@ -1,6 +1,6 @@
 import { useCards } from "@/context/CardsContext";
 import { Skeleton } from "./ui/skeleton";
-import { VirtualCardsOrderModal } from "./modals/virtual-cards-order";
+import { CardsOrderModal } from "./modals/cards-order.tsx/cards-order";
 import CardFront from "./cards-carousel/card-front";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -58,11 +58,10 @@ export const Cards = () => {
             <div className="text-sm text-primary">
               <span className="mr-2">Add card</span>
             </div>
-            <div className="text-sm font-light text-secondary">Virtual</div>
           </div>
         </div>
       </div>
-      <VirtualCardsOrderModal open={open} onOpenChange={setOpen} />
+      <CardsOrderModal open={open} onOpenChange={setOpen} />
     </>
   );
 };

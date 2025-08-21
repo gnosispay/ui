@@ -1,4 +1,14 @@
-import { CreditCard, Eye, Snowflake, AlertOctagon, Loader2, Sun, MoreHorizontal, KeyRound } from "lucide-react";
+import {
+  CreditCard,
+  Eye,
+  Snowflake,
+  AlertOctagon,
+  Loader2,
+  Sun,
+  MoreHorizontal,
+  KeyRound,
+  MailCheck,
+} from "lucide-react";
 import { IconButton } from "../ui/icon-button";
 import type { Card } from "@/client";
 import { useGpSdk } from "@/hooks/useGpSdk";
@@ -10,25 +20,27 @@ import { ReportCardModal } from "../modals/report-card";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
 import { ChangePinModal } from "../modals/change-pin";
 import { PSEDialogContent, PSEDialogTitle } from "../PSEDialog";
+import { ConfirmationDialog } from "../modals/confirmation-dialog";
 
 const PSE_IFRAME_ID = "pse-iframe";
 
 export const CardActions = ({ card }: { card: Card }) => {
   const { showCardDetails, showPin, isLoading } = useGpSdk();
-  const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap } = useCards();
+  const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap, activateCard } = useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
+  const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false);
   const cardInfo = cardInfoMap?.[card.id];
   const canReport =
-    card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && cardInfo?.isVoid;
+    !!card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid;
   const canChangePin =
+    !!card.activatedAt &&
     !card.virtual &&
-    card.activatedAt &&
     !cardInfo?.isFrozen &&
     !cardInfo?.isStolen &&
     !cardInfo?.isLost &&
-    cardInfo?.isVoid;
+    !cardInfo?.isVoid;
 
   const onShowCardDetails = (cardToken?: string) => {
     if (!cardToken) {
@@ -60,9 +72,22 @@ export const CardActions = ({ card }: { card: Card }) => {
     }
   };
 
+  const onConfirmActivation = () => {
+    activateCard(card.id);
+    setIsActivationDialogOpen(false);
+  };
+
   return (
     <>
       <div className="flex flex-wrap gap-4 lg:gap-8 justify-center">
+        {!card.activatedAt && (
+          <IconButton
+            icon={<MailCheck size={22} />}
+            label="Activate"
+            onClick={() => setIsActivationDialogOpen(true)}
+            size="lg"
+          />
+        )}
         <IconButton
           icon={<CreditCard size={22} />}
           label="Show details"
@@ -141,6 +166,16 @@ export const CardActions = ({ card }: { card: Card }) => {
       )}
 
       {isChangePinModalOpen && <ChangePinModal onClose={() => setIsChangePinModalOpen(false)} card={card} />}
+
+      <ConfirmationDialog
+        open={isActivationDialogOpen}
+        onOpenChange={setIsActivationDialogOpen}
+        title="Activate Card"
+        iconColor="text-warning"
+        message="Only activate your card if you have physically received it."
+        confirmText="Activate Card"
+        onConfirm={onConfirmActivation}
+      />
     </>
   );
 };
