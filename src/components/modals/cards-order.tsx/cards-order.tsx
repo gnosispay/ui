@@ -55,7 +55,9 @@ export const CardsOrderModal = ({ open, onOpenChange }: CardsOrderModalProps) =>
             />
           )}
 
-          {step === CardsOrderStep.Virtual && <CardsOrderVirtual onClose={() => handleClose(false)} />}
+          {step === CardsOrderStep.Virtual && (
+            <CardsOrderVirtual onClose={() => handleClose(false)} onGoBack={() => setStep(CardsOrderStep.Selection)} />
+          )}
         </div>
       </DialogContent>
     </Dialog>

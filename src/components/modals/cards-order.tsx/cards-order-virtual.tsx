@@ -1,32 +1,24 @@
 import { Button } from "@/components/ui/button";
 import { useCallback, useState } from "react";
-import { postApiV1OrderCreate } from "@/client";
+import { postApiV1CardsVirtual } from "@/client";
 import { DialogFooter } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { useCards } from "@/context/CardsContext";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 
 interface CardsOrderVirtualProps {
   onClose: () => void;
+  onGoBack: () => void;
 }
 
-export const CardsOrderVirtual = ({ onClose }: CardsOrderVirtualProps) => {
+export const CardsOrderVirtual = ({ onClose, onGoBack }: CardsOrderVirtualProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { refreshCards } = useCards();
-  const [nameOnCard, setNameOnCard] = useState("");
 
   const onCardOrder = useCallback(() => {
     setIsLoading(true);
 
-    postApiV1OrderCreate({
-      body: {
-        virtual: true,
-        ENSName: nameOnCard,
-        personalizationSource: "ENS",
-      },
-    })
+    postApiV1CardsVirtual()
       .then(({ error }) => {
         if (error) {
           console.error("Error ordering card: ", error);
@@ -45,27 +37,24 @@ export const CardsOrderVirtual = ({ onClose }: CardsOrderVirtualProps) => {
         setIsLoading(false);
         onClose();
       });
-  }, [refreshCards, nameOnCard, onClose]);
+  }, [refreshCards, onClose]);
 
   return (
     <div className="space-y-4">
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="nameOnCard">Name on the card</Label>
-          <Input
-            id="nameOnCard"
-            placeholder="Your name or ENS name"
-            value={nameOnCard}
-            onChange={(e) => setNameOnCard(e.target.value)}
-          />
-        </div>
-
-        <DialogFooter className="justify-end">
-          <Button disabled={isLoading || !nameOnCard.trim()} loading={isLoading} onClick={onCardOrder}>
-            Order Virtual Card
-          </Button>
-        </DialogFooter>
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">
+          The card will be available in your dashboard immediately for online purchases. You can also add it manually to
+          your mobile wallet for offline purchases.
+        </p>
       </div>
+      <DialogFooter className="justify-end">
+        <Button variant="outline" onClick={onGoBack}>
+          Back
+        </Button>
+        <Button disabled={isLoading} loading={isLoading} onClick={onCardOrder}>
+          Order Virtual Card
+        </Button>
+      </DialogFooter>
     </div>
   );
 };
