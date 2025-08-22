@@ -1,20 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {
-  postApiV1OrderByOrderIdAttachCoupon,
-  postApiV1OrderByOrderIdCancel,
-  postApiV1OrderByOrderIdCreateCard,
-  putApiV1OrderByOrderIdConfirmPayment,
-  type CardOrder,
-} from "@/client";
+import { postApiV1OrderByOrderIdCreateCard, putApiV1OrderByOrderIdConfirmPayment, type CardOrder } from "@/client";
 import { Button } from "@/components/ui/button";
 import { StandardAlert } from "@/components/ui/standard-alert";
-import { ConfirmationDialog } from "@/components/modals/confirmation-dialog";
+
 import { useOrders } from "@/context/OrdersContext";
 import { formatDisplayAmount } from "@/utils/formatCurrency";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { COUNTRIES, COUPON_CODES, currencies } from "@/constants";
-import { toast } from "sonner";
-import { CollapsedError } from "@/components/collapsedError";
 import { InboxIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { AddressCheckSkeleton } from "./AddressCheckSkeleton";
@@ -29,10 +21,9 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
   const [isNotFound, setIsNotFound] = useState(false);
   const [isCompletingOrder, setIsCompletingOrder] = useState(false);
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
-  const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
+
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const { orders, isLoading: isLoadingOrders, refetch: refetchOrders } = useOrders();
+  const { orders, isLoading: isLoadingOrders, applyCoupon, cancelOrderWithConfirmation } = useOrders();
   const navigate = useNavigate();
 
   const totalAmount = useMemo(() => order?.totalAmountEUR || 0, [order]);
@@ -80,30 +71,14 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
     async (order: CardOrder) => {
       try {
         setIsApplyingCoupon(true);
-
-        const { data, error } = await postApiV1OrderByOrderIdAttachCoupon({
-          path: { orderId: order.id },
-          body: { couponCode: COUPON_CODES },
-        });
-
-        if (error) {
-          console.error("Error applying coupon:", error);
-          toast.error(<CollapsedError title="Failed to apply coupon" error={error} />);
-          return;
-        }
-
-        if (data) {
-          // Refresh order data to get updated totals
-          await refetchOrders();
-        }
-      } catch (error) {
-        console.error("Error applying coupon:", error);
-        toast.error(<CollapsedError title="Failed to apply coupon" error={error} />);
+        await applyCoupon(order.id);
+      } catch {
+        // Error handling is already done in the context
       } finally {
         setIsApplyingCoupon(false);
       }
     },
-    [refetchOrders],
+    [applyCoupon],
   );
 
   useEffect(() => {
@@ -115,34 +90,6 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
       handleApplyCoupon(order);
     }
   }, [order, handleApplyCoupon, isApplyingCoupon]);
-
-  const handleCancelOrder = useCallback(() => {
-    if (!order) return;
-
-    setIsCancelling(true);
-    postApiV1OrderByOrderIdCancel({
-      path: { orderId: order.id },
-    })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Error cancelling order:", error);
-          toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
-          return;
-        }
-
-        toast.success("Card order cancelled successfully");
-        refetchOrders();
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Error cancelling order:", error);
-        toast.error(<CollapsedError title="Failed to cancel order" error={error} />);
-      })
-      .finally(() => {
-        setIsCancelling(false);
-        setShowCancelConfirmation(false);
-      });
-  }, [order, navigate, refetchOrders]);
 
   const handleCompleteOrder = useCallback(async () => {
     if (!order) return;
@@ -276,7 +223,10 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
       {globalError && <StandardAlert variant="destructive" description={globalError} className="mb-6" />}
 
       <div className="flex justify-end gap-3 mt-6">
-        <Button variant="outline" onClick={() => setShowCancelConfirmation(true)}>
+        <Button
+          variant="outline"
+          onClick={() => cancelOrderWithConfirmation({ orderId, onSuccess: () => navigate("/") })}
+        >
           Cancel Order
         </Button>
         <Button
@@ -288,17 +238,6 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
           Create Card & Set PIN
         </Button>
       </div>
-
-      <ConfirmationDialog
-        open={showCancelConfirmation}
-        onOpenChange={setShowCancelConfirmation}
-        title="Cancel Card Order"
-        iconColor="text-destructive"
-        message="Are you sure you want to cancel this card order? This action cannot be undone and any payments made will not be refunded."
-        confirmText="Cancel Order"
-        onConfirm={handleCancelOrder}
-        isLoading={isCancelling}
-      />
     </div>
   );
 };
