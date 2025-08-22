@@ -14,9 +14,9 @@ const CORS_CONFIG = {
   staticOrigins: ["https://verified-pug-renewing.ngrok-free.app", "http://localhost"],
   // Pattern for dynamic subdomain matching
   patterns: [
-    /^https:\/\/[a-zA-Z0-9-]+\.gp-ui\.pages\.dev$/,
+    /^https:\/\/([a-zA-Z0-9-]+\.)*gp-ui\.pages\.dev$/,
     /^http:\/\/localhost:[0-9-]+$/,
-    /^https:\/\/([a-zA-Z0-9-]+\.)*[a-zA-Z0-9-]+\.gnosispay\.com$/,
+    /^https:\/\/([a-zA-Z0-9-]+\.)*gnosispay\.com$/,
   ],
 };
 
