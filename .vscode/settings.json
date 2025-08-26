@@ -6,5 +6,9 @@
   },
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
+  },
+  "files.associations": {
+    "*.css": "tailwindcss",
+    "*.scss": "tailwindcss"
   }
 }

@@ -67,6 +67,8 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
                 />
               );
             }
+
+            return null;
           })}
         </div>
       ))}
