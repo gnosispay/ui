@@ -8,7 +8,7 @@ import {
   postApiV1CardsByCardIdStolen,
   postApiV1CardsByCardIdUnfreeze,
 } from "@/client";
-import { type ReactNode, createContext, useCallback, useContext, useEffect, useState } from "react";
+import { type ReactNode, createContext, useCallback, useContext, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 import { useAuth } from "./AuthContext";
@@ -33,6 +33,8 @@ type CardInfoMap = Record<string, CardInfo>;
 export type ICardContext = {
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
+  hideVoidedCards: boolean;
+  setHideVoidedCards: (hide: boolean) => void;
   refreshCards: () => void;
   freezeCard: (cardId: string) => void;
   unfreezeCard: (cardId: string) => void;
@@ -44,9 +46,21 @@ export type ICardContext = {
 const CardsContext = createContext<ICardContext | undefined>(undefined);
 
 const CardsContextProvider = ({ children }: CardContextProps) => {
-  const [cards, setCards] = useState<ICardContext["cards"]>(undefined);
+  const [fetchedCards, setFetchedCards] = useState<ICardContext["cards"]>(undefined);
   const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
+  const [hideVoidedCards, setHideVoidedCards] = useState(true);
   const { isAuthenticated } = useAuth();
+
+  const cards = useMemo(() => {
+    if (!fetchedCards || !cardInfoMap) return undefined;
+
+    if (!hideVoidedCards) return fetchedCards;
+
+    return fetchedCards.filter((card) => {
+      const cardInfo = cardInfoMap[card.id];
+      return cardInfo && !cardInfo.isVoid && !cardInfo.isLost && !cardInfo.isStolen;
+    });
+  }, [fetchedCards, cardInfoMap, hideVoidedCards]);
 
   const setCardsInfo = useCallback(async (cards: Card[]) => {
     const newMap: CardInfoMap = {};
@@ -75,7 +89,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
   }, []);
 
   const refreshCards = useCallback(() => {
-    setCards(undefined);
+    setFetchedCards(undefined);
     getApiV1Cards()
       .then(async ({ data, error }) => {
         if (error) {
@@ -89,7 +103,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         }
 
         await setCardsInfo(data);
-        setCards(data);
+        setFetchedCards(data);
       })
       .catch(console.error);
   }, [setCardsInfo]);
@@ -226,6 +240,8 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       value={{
         cards,
         cardInfoMap,
+        hideVoidedCards,
+        setHideVoidedCards,
         refreshCards,
         freezeCard,
         unfreezeCard,
