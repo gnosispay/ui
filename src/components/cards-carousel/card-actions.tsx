@@ -6,7 +6,6 @@ import {
   Loader2,
   Sun,
   MoreHorizontal,
-  KeyRound,
   MailCheck,
   EyeOff,
 } from "lucide-react";
@@ -19,7 +18,7 @@ import { useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { ReportCardModal } from "../modals/report-card";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
-import { ChangePinModal } from "../modals/change-pin";
+
 import { PSEDialogContent, PSEDialogTitle } from "../PSEDialog";
 import { ConfirmationDialog } from "../modals/confirmation-dialog";
 import { Switch } from "../ui/switch";
@@ -40,18 +39,11 @@ export const CardActions = ({ card }: { card: Card }) => {
   } = useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
+
   const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false);
   const cardInfo = cardInfoMap?.[card.id];
   const canReport =
     !!card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid;
-  const canChangePin =
-    !!card.activatedAt &&
-    !card.virtual &&
-    !cardInfo?.isFrozen &&
-    !cardInfo?.isStolen &&
-    !cardInfo?.isLost &&
-    !cardInfo?.isVoid;
 
   const onShowCardDetails = (cardToken?: string) => {
     if (!cardToken) {
@@ -156,11 +148,7 @@ export const CardActions = ({ card }: { card: Card }) => {
                 onClick={(e) => e.stopPropagation()}
               />
             </DropdownMenuItem>
-            {canChangePin && (
-              <DropdownMenuItem onClick={() => setIsChangePinModalOpen(true)}>
-                <KeyRound size={22} /> Change PIN
-              </DropdownMenuItem>
-            )}
+
             {canReport && (
               <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
                 <AlertOctagon size={22} /> Report
@@ -191,8 +179,6 @@ export const CardActions = ({ card }: { card: Card }) => {
           onReportAsStolen={() => markCardAsStolen(card.id)}
         />
       )}
-
-      {isChangePinModalOpen && <ChangePinModal onClose={() => setIsChangePinModalOpen(false)} card={card} />}
 
       <ConfirmationDialog
         open={isActivationDialogOpen}
