@@ -19,6 +19,7 @@ export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => 
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [signerError, setSignerError] = useState<Error | null>(null);
 
+  console.log("---> connectedAddress", connectedAddress);
   const getSafeSigners = useCallback(
     async (safeAddress: Address) => {
       setSignerError(null);
@@ -26,15 +27,16 @@ export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => 
       setIsDataLoading(true);
 
       try {
+        console.log("---> safeAddress", safeAddress);
         const { delay: delayModuleAddress } = predictAddresses(safeAddress);
-
+        console.log("---> delayModuleAddress", delayModuleAddress);
         const data = await getAccountOwners((data) =>
           publicClient.call({
             to: delayModuleAddress as Address,
             data,
           }),
         );
-
+        console.log("---> data", data);
         setSafeSigners(data);
       } catch (error) {
         console.error("Error getting safe signers", error);
@@ -47,9 +49,9 @@ export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => 
   );
 
   useEffect(() => {
-    if (safeConfig?.address) {
-      getSafeSigners(safeConfig.address as Address);
-    }
+    if (!safeConfig?.address) return;
+
+    getSafeSigners(safeConfig.address as Address);
   }, [safeConfig?.address, getSafeSigners]);
 
   const isSignerConnected = useMemo(() => {
