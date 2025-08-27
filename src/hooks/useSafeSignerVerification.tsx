@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import type { Address } from "viem";
-import { useAccount, usePublicClient } from "wagmi";
-import { predictAddresses, getAccountOwners } from "@gnosispay/account-kit";
+import { useAccount } from "wagmi";
+import { getApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 interface UseSafeSignerVerificationResult {
   isSignerConnected: boolean;
@@ -13,44 +14,48 @@ interface UseSafeSignerVerificationResult {
 export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => {
   const { address: connectedAddress } = useAccount();
   const { safeConfig } = useUser();
-  const publicClient = usePublicClient();
 
   const [safeSigners, setSafeSigners] = useState<Address[] | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [signerError, setSignerError] = useState<Error | null>(null);
 
-  const getSafeSigners = useCallback(
-    async (safeAddress: Address) => {
-      setSignerError(null);
+  const getSafeSigners = useCallback(async () => {
+    setSignerError(null);
+    setIsDataLoading(true);
 
-      setIsDataLoading(true);
+    try {
+      const { data: apiResponse, error: apiError } = await getApiV1Owners();
 
-      try {
-        const { delay: delayModuleAddress } = predictAddresses(safeAddress);
-
-        const data = await getAccountOwners((data) =>
-          publicClient.call({
-            to: delayModuleAddress as Address,
-            data,
-          }),
-        );
-
-        setSafeSigners(data);
-      } catch (error) {
-        console.error("Error getting safe signers", error);
-        setSignerError(error as Error);
-      } finally {
-        setIsDataLoading(false);
+      if (apiError) {
+        console.error("---> API error:", apiError);
+        const message = extractErrorMessage(apiError, "Failed to fetch safe owners");
+        setSignerError(new Error(message));
+        return;
       }
-    },
-    [publicClient],
-  );
+
+      if (!apiResponse?.data?.owners || !Array.isArray(apiResponse.data.owners)) {
+        const message = "API returned invalid owners data";
+        setSignerError(new Error(message));
+        return;
+      }
+
+      setSafeSigners(apiResponse.data.owners as Address[]);
+    } catch (error) {
+      console.error("Error getting safe signers", error);
+      const message = extractErrorMessage(error, "Failed to fetch safe owners");
+      setSignerError(new Error(message));
+    } finally {
+      setIsDataLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (safeConfig?.address) {
-      getSafeSigners(safeConfig.address as Address);
+    if (!safeConfig) {
+      return;
     }
-  }, [safeConfig?.address, getSafeSigners]);
+
+    getSafeSigners();
+  }, [safeConfig, getSafeSigners]);
 
   const isSignerConnected = useMemo(() => {
     if (!safeSigners?.length) return false;

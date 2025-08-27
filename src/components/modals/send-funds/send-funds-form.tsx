@@ -60,19 +60,19 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
     <div className="space-y-6">
       {isQueueNotEmpty && <QueueNotEmptyAlert />}
 
-      {!isQueueNotEmpty && (
-        <StandardAlert
-          variant="warning"
-          description="Please ensure you enter a Gnosis Chain address. You are solely responsible for the accuracy of the address and the safety of your funds."
-        />
-      )}
-
       {signerError && <StandardAlert variant="destructive" description={signerError.message} />}
 
       {!isSignerConnected && !isDataLoading && (
         <StandardAlert
           variant="destructive"
           description="Please make sure to be connected with an account that is a signer of the Gnosis Pay account"
+        />
+      )}
+
+      {!isQueueNotEmpty && (
+        <StandardAlert
+          variant="warning"
+          description="Please ensure you enter a Gnosis Chain address. You are solely responsible for the accuracy of the address and the safety of your funds."
         />
       )}
 
