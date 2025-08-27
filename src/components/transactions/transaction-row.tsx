@@ -6,9 +6,10 @@ import { format, parseISO } from "date-fns";
 
 interface TransactionRowProps {
   transaction: Event;
+  onClick?: () => void;
 }
 
-export const TransactionRow = ({ transaction }: TransactionRowProps) => {
+export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) => {
   const {
     kind,
     isPending,
@@ -38,14 +39,18 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
   });
 
   return (
-    <div className="flex items-center justify-between py-3">
+    <button
+      className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors w-full text-left"
+      onClick={onClick}
+      type="button"
+    >
       <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-icon-card-bg flex items-center justify-center">
-          <Icon className="w-6 h-6 text-icon-card" aria-hidden="true" />
+        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+          <Icon className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
         </div>
         <div>
-          <div className="text-xl text-primary">{merchantName}</div>
-          <div className="text-xs text-secondary">
+          <div className="text-xl text-foreground">{merchantName}</div>
+          <div className="text-xs text-muted-foreground">
             {time}
             {failedTxStatus && <span> • {failedTxStatus}</span>}
             {isRefundOrReversal && <span> • Refund</span>}
@@ -54,11 +59,11 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
         </div>
       </div>
       <div className="text-right">
-        <div className={`text-xl text-primary ${!isApproved && "line-through"}`}>
+        <div className={`text-xl text-foreground ${!isApproved && "line-through"}`}>
           {billAmount ? `${sign} ${billAmount}` : "-"}
         </div>
-        {txAmount !== billAmount && <div className="text-xs text-secondary mt-1">{`${sign} ${txAmount}`}</div>}
+        {txAmount !== billAmount && <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>}
       </div>
-    </div>
+    </button>
   );
 };

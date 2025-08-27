@@ -1,7 +1,9 @@
+import { useState, useCallback } from "react";
 import type { Event, IbanOrder } from "@/client";
 import { TransactionSkeleton } from "./transaction-skeleton";
 import { TransactionRow } from "./transaction-row";
 import { BankTransferRow } from "./bank-transfer-row";
+import { TransactionDetailsModal } from "./transaction-details-modal";
 import { type Transaction, TransactionType } from "@/types/transaction";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
 import { InboxIcon } from "lucide-react";
@@ -19,6 +21,9 @@ interface TransactionsProps {
 
 export const Transactions = ({ history = 7, withIban = true, withOnchain = true }: TransactionsProps) => {
   const { safeConfig } = useUser();
+  const [selectedTransaction, setSelectedTransaction] = useState<Event | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const {
     isLoading,
     isError,
@@ -28,6 +33,16 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
     history,
     withOnchain,
   });
+
+  const handleTransactionClick = useCallback((transaction: Event) => {
+    setSelectedTransaction(transaction);
+    setIsModalOpen(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+    setSelectedTransaction(null);
+  }, []);
 
   if (!safeConfig || isLoading || !transactions) {
     return <TransactionSkeleton />;
@@ -51,7 +66,13 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
 
           {transactions[date].map((transaction: Transaction) => {
             if (transaction.type === TransactionType.CARD) {
-              return <TransactionRow key={transaction.id} transaction={transaction.data as Event} />;
+              return (
+                <TransactionRow
+                  key={transaction.id}
+                  transaction={transaction.data as Event}
+                  onClick={() => handleTransactionClick(transaction.data as Event)}
+                />
+              );
             }
 
             if (transaction.type === TransactionType.IBAN) {
@@ -72,6 +93,8 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
           })}
         </div>
       ))}
+
+      <TransactionDetailsModal transaction={selectedTransaction} isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };
