@@ -7,7 +7,7 @@ export const TransactionsRoute = () => {
         <h1 className="text-xl">Transactions</h1>
       </div>
       <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
-        <Transactions history={90} />
+        <Transactions history={120} />
       </div>
     </div>
   );

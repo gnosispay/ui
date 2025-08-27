@@ -3,7 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useCallback } from "react";
 
 interface StatusHelpIconProps {
-  type: "pending" | "refund" | "pending-merchant";
+  type: "pending" | "refund" | "pending-merchant" | "reversal";
 }
 
 export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
@@ -15,10 +15,16 @@ export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
         return "This payment has been partially refunded. The refund will be transferred within 10 working days from the payment date.";
       case "pending-merchant":
         return "If not confirmed by the merchant, it will be reverted in 11 days";
+      case "reversal":
+        return "This payment is the reversal of a previous transaction.";
       default:
         return "";
     }
   }, [type]);
+
+  const handleClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+  }, []);
 
   return (
     <Popover>
@@ -28,6 +34,7 @@ export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
           aria-label={`Help about ${type} status`}
           role="button"
           tabIndex={0}
+          onClick={handleClick}
         >
           <HelpCircle className="w-3 h-3" />
         </span>

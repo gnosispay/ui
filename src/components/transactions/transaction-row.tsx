@@ -1,17 +1,27 @@
+import { useState, useCallback } from "react";
 import { getIconForMcc } from "@/utils/mccUtils";
 import { formatCurrency } from "@/utils/formatCurrency";
 import type { Event } from "@/client";
 import { format, parseISO } from "date-fns";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { useTransactionStatus } from "@/hooks/useTransactionStatus";
+import { TransactionDetailsModal } from "@/components/modals/transaction-details/transaction-details-modal";
 
 interface TransactionRowProps {
   transaction: Event;
-  onClick?: () => void;
 }
 
-export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) => {
+export const TransactionRow = ({ transaction }: TransactionRowProps) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { isRefund, isReversal, isPending, otherTxStatus, sign } = useTransactionStatus(transaction);
+
+  const handleClick = useCallback(() => {
+    setIsModalOpen(true);
+  }, []);
+
+  const handleCloseModal = useCallback(() => {
+    setIsModalOpen(false);
+  }, []);
 
   const { kind, mcc, merchant, createdAt, billingAmount, billingCurrency, transactionAmount, transactionCurrency } =
     transaction;
@@ -41,47 +51,51 @@ export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) =>
   });
 
   return (
-    <button
-      className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors w-full text-left"
-      onClick={onClick}
-      type="button"
-    >
-      <div className="flex items-center gap-3">
-        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-          <Icon className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
-        </div>
-        <div>
-          <div className="text-xl text-foreground">{merchantName}</div>
-          <div className="text-xs text-muted-foreground">
-            {time}
-            {isRefund && (
-              <span className="inline-flex items-center ml-1">
-                {"• Refund"}
-                <StatusHelpIcon type="refund" />
-              </span>
-            )}
-            {isReversal && (
-              <span className="inline-flex items-center ml-1">
-                {"• Reversal"}
-                {/* <StatusHelpIcon type="reversal" /> */}
-              </span>
-            )}
-            {isPending && (
-              <span className="inline-flex items-center ml-1">
-                {"• Pending"}
-                <StatusHelpIcon type="pending" />
-              </span>
-            )}
-            {otherTxStatus && <span> • {otherTxStatus}</span>}
+    <>
+      <button
+        className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors w-full text-left p-2"
+        onClick={handleClick}
+        type="button"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+            <Icon className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
+          </div>
+          <div>
+            <div className="text-xl text-foreground">{merchantName}</div>
+            <div className="text-xs text-muted-foreground">
+              {time}
+              {isRefund && (
+                <span className="inline-flex items-center ml-1">
+                  {"• Refund"}
+                  <StatusHelpIcon type="refund" />
+                </span>
+              )}
+              {isReversal && (
+                <span className="inline-flex items-center ml-1">
+                  {"• Reversal"}
+                  <StatusHelpIcon type="reversal" />
+                </span>
+              )}
+              {isPending && (
+                <span className="inline-flex items-center ml-1">
+                  {"• Pending"}
+                  <StatusHelpIcon type="pending" />
+                </span>
+              )}
+              {otherTxStatus && <span> • {otherTxStatus}</span>}
+            </div>
           </div>
         </div>
-      </div>
-      <div className="text-right">
-        <div className={`text-xl text-foreground ${isStrikethrough ? "line-through" : ""}`}>
-          {billAmount ? `${sign} ${billAmount}` : "-"}
+        <div className="text-right">
+          <div className={`text-xl text-foreground ${isStrikethrough ? "line-through" : ""}`}>
+            {billAmount ? `${sign} ${billAmount}` : "-"}
+          </div>
+          {txAmount !== billAmount && <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>}
         </div>
-        {txAmount !== billAmount && <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>}
-      </div>
-    </button>
+      </button>
+
+      <TransactionDetailsModal transaction={transaction} isOpen={isModalOpen} onClose={handleCloseModal} />
+    </>
   );
 };

@@ -1,9 +1,7 @@
-import { useState, useCallback } from "react";
 import type { Event, IbanOrder } from "@/client";
 import { TransactionSkeleton } from "./transaction-skeleton";
 import { TransactionRow } from "./transaction-row";
 import { BankTransferRow } from "./bank-transfer-row";
-import { TransactionDetailsModal } from "./transaction-details-modal";
 import { type Transaction, TransactionType } from "@/types/transaction";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
 import { InboxIcon } from "lucide-react";
@@ -21,8 +19,6 @@ interface TransactionsProps {
 
 export const Transactions = ({ history = 7, withIban = true, withOnchain = true }: TransactionsProps) => {
   const { safeConfig } = useUser();
-  const [selectedTransaction, setSelectedTransaction] = useState<Event | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const {
     isLoading,
@@ -34,26 +30,15 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
     withOnchain,
   });
 
-  const handleTransactionClick = useCallback((transaction: Event) => {
-    setSelectedTransaction(transaction);
-    setIsModalOpen(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-    setSelectedTransaction(null);
-  }, []);
-
   if (!safeConfig || isLoading || !transactions) {
     return <TransactionSkeleton />;
   }
-
   if (isError) {
     return <TransactionFetchingAlert />;
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+    <div className="flex flex-col gap-4 bg-card rounded-xl p-2">
       {Object.keys(transactions).length === 0 && (
         <div className="flex flex-col items-center justify-center">
           <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
@@ -66,13 +51,7 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
 
           {transactions[date].map((transaction: Transaction) => {
             if (transaction.type === TransactionType.CARD) {
-              return (
-                <TransactionRow
-                  key={transaction.id}
-                  transaction={transaction.data as Event}
-                  onClick={() => handleTransactionClick(transaction.data as Event)}
-                />
-              );
+              return <TransactionRow key={transaction.id} transaction={transaction.data as Event} />;
             }
 
             if (transaction.type === TransactionType.IBAN) {
@@ -80,11 +59,12 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
             }
 
             if (transaction.type === TransactionType.ONCHAIN && !!safeConfig.fiatSymbol) {
+              const currency = currencies[safeConfig.fiatSymbol];
               return (
                 <OnchainTransferRow
                   key={transaction.id}
                   transfer={transaction.data as Erc20TokenEvent}
-                  currency={currencies[safeConfig.fiatSymbol]}
+                  currency={currency}
                 />
               );
             }
@@ -93,8 +73,6 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
           })}
         </div>
       ))}
-
-      <TransactionDetailsModal transaction={selectedTransaction} isOpen={isModalOpen} onClose={handleCloseModal} />
     </div>
   );
 };

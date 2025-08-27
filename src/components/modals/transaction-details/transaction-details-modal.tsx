@@ -40,38 +40,6 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
       txHash,
     };
 
-    // Handle regular payments (not reversals)
-    if (isApproved) {
-      const { billingAmount, billingCurrency, transactionAmount, transactionCurrency } = transaction;
-
-      const billAmount = formatCurrency(billingAmount, {
-        decimals: billingCurrency?.decimals,
-        fiatSymbol: billingCurrency?.symbol,
-      });
-
-      const txAmount = formatCurrency(transactionAmount, {
-        decimals: transactionCurrency?.decimals,
-        fiatSymbol: transactionCurrency?.symbol,
-      });
-
-      const exchangeRate = calculateExchangeRate(
-        billingAmount,
-        billingCurrency,
-        transactionAmount,
-        transactionCurrency,
-      );
-
-      return {
-        ...baseDetails,
-        sign: "-",
-        billAmount,
-        txAmount,
-        exchangeRate,
-        status: "Completed",
-        transactionCurrency,
-      };
-    }
-
     if (isRefund || isReversal) {
       const amountAndCurrency = getAmountAndCurrency(transaction);
       if (!amountAndCurrency) return null;
@@ -97,10 +65,33 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
       };
     }
 
-    return null;
-  }, [transaction, isApproved, isRefund, isReversal]);
+    const { billingAmount, billingCurrency, transactionAmount, transactionCurrency } = transaction;
+
+    const billAmount = formatCurrency(billingAmount, {
+      decimals: billingCurrency?.decimals,
+      fiatSymbol: billingCurrency?.symbol,
+    });
+
+    const txAmount = formatCurrency(transactionAmount, {
+      decimals: transactionCurrency?.decimals,
+      fiatSymbol: transactionCurrency?.symbol,
+    });
+
+    const exchangeRate = calculateExchangeRate(billingAmount, billingCurrency, transactionAmount, transactionCurrency);
+
+    return {
+      ...baseDetails,
+      sign: "-",
+      billAmount,
+      txAmount,
+      exchangeRate,
+      status: isPending ? "Pending" : isApproved ? "Completed" : otherTxStatus,
+      transactionCurrency,
+    };
+  }, [transaction, isApproved, isRefund, isReversal, isPending, otherTxStatus]);
 
   if (!transaction || !transactionDetails) {
+    console.log("returning null");
     return null;
   }
 
@@ -130,8 +121,6 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
               <div className="text-xl text-foreground font-normal">{merchantName}</div>
               <div className="text-xs text-muted-foreground">
                 {format(parseISO(transaction.createdAt || ""), "MMM dd, yyyy 'at' HH:mm")}
-                {otherTxStatus && <span> • {otherTxStatus}</span>}
-                {isPending && <span> • Pending</span>}
               </div>
             </div>
             <div className="text-right">
@@ -149,12 +138,19 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
             <span className="text-muted-foreground">Status</span>
             <div className="flex items-center">
               <span
-                className={`font-medium ${isApproved ? "text-success" : isPending ? "text-warning" : "text-error"}`}
+                className={`font-medium ${
+                  isRefund || isReversal || isApproved
+                    ? "text-success"
+                    : isPending
+                      ? "text-warning"
+                      : "text-destructive"
+                }`}
               >
-                {isRefund ? "Refund" : isPending ? "Pending" : status || "Completed"}
+                {status}
               </span>
               {isPending && !isRefund && <StatusHelpIcon type="pending-merchant" />}
               {isRefund && <StatusHelpIcon type="refund" />}
+              {isReversal && <StatusHelpIcon type="reversal" />}
             </div>
           </div>
 
