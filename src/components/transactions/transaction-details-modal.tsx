@@ -5,8 +5,12 @@ import type { Event } from "@/client";
 import { getIconForMcc, getMccCategory } from "@/utils/mccUtils";
 import { formatCurrency } from "@/utils/formatCurrency";
 import { fromPascalCase } from "@/utils/convertFromPascalCase";
+import { getCountryFlag } from "@/utils/countryUtils";
+import { calculateExchangeRate, getAmountAndCurrency } from "@/utils/transactionUtils";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { StatusHelpIcon } from "@/components/ui/status-help-icon";
+import { shortenAddress } from "@/utils/shortenAddress";
 
 interface TransactionDetailsModalProps {
   transaction: Event | null;
@@ -15,78 +19,99 @@ interface TransactionDetailsModalProps {
 }
 
 export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: TransactionDetailsModalProps) => {
+  const isApproved = useMemo(() => transaction?.kind === "Payment" && transaction.status === "Approved", [transaction]);
+  const isRefund =
+    transaction?.kind === "Refund" ||
+    (transaction?.kind === "Payment" &&
+      transaction.status &&
+      ["Reversal", "PartialReversal"].includes(transaction.status));
+  const isReversal = useMemo(() => transaction?.kind === "Reversal", [transaction]);
+  const otherTxStatus = useMemo(
+    () =>
+      !isApproved && !isRefund && !isReversal && transaction?.kind === "Payment" && fromPascalCase(transaction.status),
+    [transaction, isApproved, isRefund, isReversal],
+  );
+
   const transactionDetails = useMemo(() => {
-    if (!transaction || transaction.kind !== "Payment") return null;
+    if (!transaction) return null;
 
-    const {
-      isPending,
-      mcc,
-      merchant,
-      billingAmount,
-      billingCurrency,
-      transactionAmount,
-      transactionCurrency,
-      country,
-      status,
-    } = transaction;
-
-    const isApproved = status === "Approved";
-    const failedTxStatus = !isApproved && status ? fromPascalCase(status) : null;
-    // const isRefundOrReversal = kind === "Refund" || kind === "Reversal";
-    const sign = "-";
+    const { mcc, merchant, country, createdAt } = transaction;
     const Icon = getIconForMcc(mcc);
     const merchantName = merchant?.name || "Unknown";
     const category = getMccCategory({ mcc: mcc || "" });
+    const countryFlag = getCountryFlag(country?.alpha2);
+    const txHash = transaction?.transactions?.[0]?.hash;
 
-    const billAmount = formatCurrency(billingAmount, {
-      decimals: billingCurrency?.decimals,
-      fiatSymbol: billingCurrency?.symbol,
-    });
-
-    const txAmount = formatCurrency(transactionAmount, {
-      decimals: transactionCurrency?.decimals,
-      fiatSymbol: transactionCurrency?.symbol,
-    });
-
-    // Exchange rate calculation
-    const exchangeRate = (() => {
-      if (!billingAmount || !transactionAmount || !billingCurrency || !transactionCurrency) {
-        return null;
-      }
-
-      if (billingCurrency.symbol === transactionCurrency.symbol) {
-        return null; // Same currency, no exchange rate needed
-      }
-
-      try {
-        const billingValue = Number(billingAmount) / 10 ** (billingCurrency.decimals || 0);
-        const transactionValue = Number(transactionAmount) / 10 ** (transactionCurrency.decimals || 0);
-
-        if (transactionValue === 0) return null;
-
-        const rate = billingValue / transactionValue;
-        return `1 ${transactionCurrency.symbol} = ${rate.toFixed(2)} ${billingCurrency.symbol}`;
-      } catch {
-        return null;
-      }
-    })();
-
-    return {
+    const baseDetails = {
       Icon,
       merchantName,
       category,
-      sign,
-      billAmount,
-      txAmount,
-      exchangeRate,
-      isApproved,
-      failedTxStatus,
-      isPending,
       country: country?.name,
-      status: status ? fromPascalCase(status) : null,
-      transactionCurrency,
+      countryFlag,
+      txHash,
     };
-  }, [transaction]);
+
+    // Handle regular payments (not reversals)
+    if (transaction.kind === "Payment" && transaction.status !== "Reversal") {
+      const { isPending, billingAmount, billingCurrency, transactionAmount, transactionCurrency, status } = transaction;
+
+      const billAmount = formatCurrency(billingAmount, {
+        decimals: billingCurrency?.decimals,
+        fiatSymbol: billingCurrency?.symbol,
+      });
+
+      const txAmount = formatCurrency(transactionAmount, {
+        decimals: transactionCurrency?.decimals,
+        fiatSymbol: transactionCurrency?.symbol,
+      });
+
+      const exchangeRate = calculateExchangeRate(
+        billingAmount,
+        billingCurrency,
+        transactionAmount,
+        transactionCurrency,
+      );
+
+      return {
+        ...baseDetails,
+        sign: "-",
+        billAmount,
+        txAmount,
+        exchangeRate,
+        isPending,
+        status: status ? fromPascalCase(status) : null,
+        transactionCurrency,
+      };
+    }
+
+    if (isRefund || isReversal) {
+      const amountAndCurrency = getAmountAndCurrency(transaction);
+      if (!amountAndCurrency) return null;
+
+      const { amount, currency } = amountAndCurrency;
+
+      const formattedAmount = formatCurrency(String(amount || "0"), {
+        decimals: currency?.decimals,
+        fiatSymbol: currency?.symbol,
+      });
+
+      const statusText = isRefund ? "Refund" : "Reversal";
+      const statusWithDate = createdAt ? `${statusText} • ${format(parseISO(createdAt), "MMM dd")}` : statusText;
+
+      return {
+        ...baseDetails,
+        sign: "+",
+        billAmount: formattedAmount,
+        txAmount: null, // No secondary amount for refunds/reversals
+        exchangeRate: null,
+        isPending: false,
+        status: statusWithDate,
+        transactionCurrency: currency,
+      };
+    }
+
+    return null;
+  }, [transaction, isRefund, isReversal]);
 
   if (!transaction || !transactionDetails) {
     return null;
@@ -100,11 +125,11 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
     billAmount,
     txAmount,
     exchangeRate,
-    isApproved,
-    failedTxStatus,
     isPending,
     country,
+    countryFlag,
     status,
+    txHash,
   } = transactionDetails;
 
   return (
@@ -119,14 +144,12 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
               <div className="text-xl text-foreground font-normal">{merchantName}</div>
               <div className="text-xs text-muted-foreground">
                 {format(parseISO(transaction.createdAt || ""), "MMM dd, yyyy 'at' HH:mm")}
-                {failedTxStatus && <span> • {failedTxStatus}</span>}
+                {otherTxStatus && <span> • {otherTxStatus}</span>}
                 {isPending && <span> • Pending</span>}
               </div>
             </div>
             <div className="text-right">
-              <div className={`text-xl text-foreground font-normal ${!isApproved && "line-through"}`}>
-                {billAmount ? `${sign} ${billAmount}` : "-"}
-              </div>
+              <div className={`text-xl text-foreground font-normal`}>{billAmount ? `${sign} ${billAmount}` : "-"}</div>
               {txAmount !== billAmount && txAmount && (
                 <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>
               )}
@@ -136,26 +159,29 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
 
         <div className="space-y-0">
           {/* Status */}
-          <div className="flex justify-between items-center py-3 border-b border-border">
+          <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Status</span>
-            <span
-              className={`font-medium ${
-                status === "Approved" ? "text-success" : isPending ? "text-warning" : "text-error"
-              }`}
-            >
-              {isPending ? "Pending" : status || "Completed"}
-            </span>
+            <div className="flex items-center">
+              <span
+                className={`font-medium ${isApproved ? "text-success" : isPending ? "text-warning" : "text-error"}`}
+              >
+                {isRefund ? "Refund" : isPending ? "Pending" : status || "Completed"}
+              </span>
+              {isPending && !isRefund && <StatusHelpIcon type="pending-merchant" />}
+              {isRefund && <StatusHelpIcon type="refund" />}
+            </div>
           </div>
 
-          {/* Card */}
-          <div className="flex justify-between items-center py-3 border-b border-border">
+          {/* Card - TODO: Add card details when ENG-2745 is implemented */}
+          {/* 
+          <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Card</span>
             <span className="font-medium text-foreground">••• 2973</span>
-          </div>
+          </div> */}
 
           {/* Transaction Currency */}
           {transactionDetails?.transactionCurrency?.symbol && (
-            <div className="flex justify-between items-center py-3 border-b border-border">
+            <div className="flex justify-between items-center py-3">
               <span className="text-muted-foreground">Transaction currency</span>
               <span className="font-medium text-foreground">{transactionDetails.transactionCurrency.symbol}</span>
             </div>
@@ -163,7 +189,7 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
 
           {/* Exchange Rate */}
           {exchangeRate && (
-            <div className="flex justify-between items-center py-3 border-b border-border">
+            <div className="flex justify-between items-center py-3">
               <span className="text-muted-foreground">Exchange rate</span>
               <span className="font-medium text-foreground">{exchangeRate}</span>
             </div>
@@ -171,7 +197,7 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
 
           {/* Category */}
           {transactionDetails?.category && (
-            <div className="flex justify-between items-center py-3 border-b border-border">
+            <div className="flex justify-between items-center py-3">
               <span className="text-muted-foreground">Category</span>
               <span className="font-medium text-foreground">{category}</span>
             </div>
@@ -179,30 +205,34 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
 
           {/* Country */}
           {country && (
-            <div className="flex justify-between items-center py-3 border-b border-border">
+            <div className="flex justify-between items-center py-3">
               <span className="text-muted-foreground">Country</span>
-              <span className="font-medium text-foreground">{country}</span>
+              <div className="flex items-center gap-2">
+                {countryFlag && <span className="text-lg">{countryFlag}</span>}
+                <span className="font-medium text-foreground">{country}</span>
+              </div>
             </div>
           )}
 
-          {/* TxHash - Mock data for now */}
-          <div className="flex justify-between items-center py-3">
-            <span className="text-muted-foreground">TxHash</span>
-            <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground">0x13sf...013f</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 w-8 p-0"
-                onClick={() => {
-                  // This would open a blockchain explorer
-                  console.log("Open transaction in explorer");
-                }}
-              >
-                <ExternalLink className="w-4 h-4" />
-              </Button>
+          {/* TxHash */}
+          {txHash && (
+            <div className="flex justify-between items-center py-3">
+              <span className="text-muted-foreground">TxHash</span>
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-foreground">{shortenAddress(txHash)}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0"
+                  onClick={() => {
+                    window.open(`https://gnosisscan.io/tx/${txHash}`, "_blank");
+                  }}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>

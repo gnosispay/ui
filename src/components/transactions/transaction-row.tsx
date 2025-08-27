@@ -24,8 +24,23 @@ export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) =>
   } = transaction;
 
   const isApproved = kind === "Payment" && transaction.status === "Approved";
-  const failedTxStatus = !isApproved && kind === "Payment" && fromPascalCase(transaction.status);
-  const isRefundOrReversal = kind === "Refund" || kind === "Reversal";
+  const isStrikethrough =
+    kind === "Payment" &&
+    transaction.status &&
+    [
+      "IncorrectPin",
+      "InsufficientFunds",
+      "InvalidAmount",
+      "PinEntryTriesExceeded",
+      "IncorrectSecurityCode",
+      "Other",
+    ].includes(transaction.status);
+  const isRefund =
+    kind === "Refund" ||
+    (kind === "Payment" && transaction.status && ["Reversal", "PartialReversal"].includes(transaction.status));
+  const isReversal = kind === "Reversal";
+  const otherTxStatus =
+    !isApproved && !isRefund && !isReversal && kind === "Payment" && fromPascalCase(transaction.status);
   const sign = kind === "Payment" ? "-" : "+";
   const Icon = getIconForMcc(mcc);
   const merchantName = merchant?.name || "Unknown";
@@ -41,7 +56,7 @@ export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) =>
 
   return (
     <button
-      className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/50 rounded-lg px-2 -mx-2 transition-colors w-full text-left"
+      className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors w-full text-left"
       onClick={onClick}
       type="button"
     >
@@ -53,11 +68,16 @@ export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) =>
           <div className="text-xl text-foreground">{merchantName}</div>
           <div className="text-xs text-muted-foreground">
             {time}
-            {failedTxStatus && <span> • {failedTxStatus}</span>}
-            {isRefundOrReversal && (
+            {isRefund && (
               <span className="inline-flex items-center ml-1">
                 {"• Refund"}
                 <StatusHelpIcon type="refund" />
+              </span>
+            )}
+            {isReversal && (
+              <span className="inline-flex items-center ml-1">
+                {"• Reversal"}
+                {/* <StatusHelpIcon type="reversal" /> */}
               </span>
             )}
             {isPending && (
@@ -66,11 +86,12 @@ export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) =>
                 <StatusHelpIcon type="pending" />
               </span>
             )}
+            {otherTxStatus && <span> • {otherTxStatus}</span>}
           </div>
         </div>
       </div>
       <div className="text-right">
-        <div className={`text-xl text-foreground ${!isApproved && "line-through"}`}>
+        <div className={`text-xl text-foreground ${isStrikethrough ? "line-through" : ""}`}>
           {billAmount ? `${sign} ${billAmount}` : "-"}
         </div>
         {txAmount !== billAmount && <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>}
