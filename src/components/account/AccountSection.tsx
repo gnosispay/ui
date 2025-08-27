@@ -11,7 +11,7 @@ export const AccountSection: React.FC<AccountSectionProps> = ({ icon, title, onC
     <button
       type="button"
       onClick={onClick}
-      className="w-full flex items-center justify-between p-4 rounded-lg bg-card hover:bg-accent/50 transition-colors group"
+      className="w-full flex items-center justify-between p-4 rounded-lg bg-card hover:bg-accent/50 transition-colors group cursor-pointer"
     >
       <div className="flex items-center gap-3">
         <div className="w-8 h-8 flex items-center justify-center text-foreground">{icon}</div>

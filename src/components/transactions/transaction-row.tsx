@@ -3,6 +3,7 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import { fromPascalCase } from "@/utils/convertFromPascalCase";
 import type { Event } from "@/client";
 import { format, parseISO } from "date-fns";
+import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 
 interface TransactionRowProps {
   transaction: Event;
@@ -48,8 +49,18 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
           <div className="text-xs text-secondary">
             {time}
             {failedTxStatus && <span> • {failedTxStatus}</span>}
-            {isRefundOrReversal && <span> • Refund</span>}
-            {isPending && <span> • Pending</span>}
+            {isRefundOrReversal && (
+              <span className="inline-flex items-center ml-1">
+                {"• Refund"}
+                <StatusHelpIcon type="refund" />
+              </span>
+            )}
+            {isPending && (
+              <span className="inline-flex items-center ml-1">
+                {"• Pending"}
+                <StatusHelpIcon type="pending" />
+              </span>
+            )}
           </div>
         </div>
       </div>
