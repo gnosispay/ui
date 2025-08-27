@@ -6,8 +6,8 @@ import {
   Loader2,
   Sun,
   MoreHorizontal,
-  KeyRound,
   MailCheck,
+  EyeOff,
 } from "lucide-react";
 import { IconButton } from "../ui/icon-button";
 import type { Card } from "@/client";
@@ -18,29 +18,32 @@ import { useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { ReportCardModal } from "../modals/report-card";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
-import { ChangePinModal } from "../modals/change-pin";
+
 import { PSEDialogContent, PSEDialogTitle } from "../PSEDialog";
 import { ConfirmationDialog } from "../modals/confirmation-dialog";
+import { Switch } from "../ui/switch";
 
 const PSE_IFRAME_ID = "pse-iframe";
 
 export const CardActions = ({ card }: { card: Card }) => {
   const { showCardDetails, showPin, isLoading } = useGpSdk();
-  const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap, activateCard } = useCards();
+  const {
+    freezeCard,
+    unfreezeCard,
+    markCardAsStolen,
+    markCardAsLost,
+    cardInfoMap,
+    activateCard,
+    hideVoidedCards,
+    setHideVoidedCards,
+  } = useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-  const [isChangePinModalOpen, setIsChangePinModalOpen] = useState(false);
+
   const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false);
   const cardInfo = cardInfoMap?.[card.id];
   const canReport =
     !!card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid;
-  const canChangePin =
-    !!card.activatedAt &&
-    !card.virtual &&
-    !cardInfo?.isFrozen &&
-    !cardInfo?.isStolen &&
-    !cardInfo?.isLost &&
-    !cardInfo?.isVoid;
 
   const onShowCardDetails = (cardToken?: string) => {
     if (!cardToken) {
@@ -120,27 +123,39 @@ export const CardActions = ({ card }: { card: Card }) => {
             variant="default"
           />
         )}
-        {(canChangePin || canReport) && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <span>
-                <IconButton icon={<MoreHorizontal size={22} />} label="More" size="lg" variant="default" />
-              </span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {canChangePin && (
-                <DropdownMenuItem onClick={() => setIsChangePinModalOpen(true)}>
-                  <KeyRound size={22} /> Change PIN
-                </DropdownMenuItem>
-              )}
-              {canReport && (
-                <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
-                  <AlertOctagon size={22} /> Report
-                </DropdownMenuItem>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <span>
+              <IconButton icon={<MoreHorizontal size={22} />} label="More" size="lg" variant="default" />
+            </span>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={(e) => {
+                e.preventDefault();
+                setHideVoidedCards(!hideVoidedCards);
+              }}
+              className="flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <EyeOff size={22} />
+                Hide voided cards
+              </div>
+              <Switch
+                checked={hideVoidedCards}
+                onCheckedChange={setHideVoidedCards}
+                onClick={(e) => e.stopPropagation()}
+              />
+            </DropdownMenuItem>
+
+            {canReport && (
+              <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
+                <AlertOctagon size={22} /> Report
+              </DropdownMenuItem>
+            )}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <Dialog open={isCardDetailsModalOpen} onOpenChange={setIsCardDetailsModalOpen}>
@@ -164,8 +179,6 @@ export const CardActions = ({ card }: { card: Card }) => {
           onReportAsStolen={() => markCardAsStolen(card.id)}
         />
       )}
-
-      {isChangePinModalOpen && <ChangePinModal onClose={() => setIsChangePinModalOpen(false)} card={card} />}
 
       <ConfirmationDialog
         open={isActivationDialogOpen}

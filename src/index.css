@@ -97,6 +97,10 @@
   --color-warning: var(--warning-600);
   --dialog-background: var(--neutral-50);
   --alert-background: var(--neutral-200);
+  --switch-unchecked-bg: var(--neutral-300);
+  --switch-unchecked-thumb: var(--neutral-50);
+  --switch-checked-bg: var(--brand-500);
+  --switch-checked-thumb: var(--neutral-50);
 }
 
 @media (prefers-color-scheme: light) {
@@ -158,6 +162,10 @@
   --color-success: var(--color-success);
   --color-dialog-background: var(--dialog-background);
   --color-alert-background: var(--alert-background);
+  --color-switch-unchecked-bg: var(--switch-unchecked-bg);
+  --color-switch-unchecked-thumb: var(--switch-unchecked-thumb);
+  --color-switch-checked-bg: var(--switch-checked-bg);
+  --color-switch-checked-thumb: var(--switch-checked-thumb);
 }
 
 .dark {
@@ -211,6 +219,10 @@
   --color-warning: var(--warning-600);
   --dialog-background: var(--neutral-900);
   --alert-background: var(--neutral-600);
+  --switch-unchecked-bg: var(--neutral-600);
+  --switch-unchecked-thumb: var(--neutral-50);
+  --switch-checked-bg: var(--brand-500);
+  --switch-checked-thumb: var(--neutral-900);
 }
 
 @layer base {
