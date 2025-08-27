@@ -4,9 +4,9 @@ import { ExternalLink } from "lucide-react";
 import type { Event } from "@/client";
 import { getIconForMcc, getMccCategory } from "@/utils/mccUtils";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { fromPascalCase } from "@/utils/convertFromPascalCase";
 import { getCountryFlag } from "@/utils/countryUtils";
 import { calculateExchangeRate, getAmountAndCurrency } from "@/utils/transactionUtils";
+import { useTransactionStatus } from "@/hooks/useTransactionStatus";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
@@ -19,18 +19,7 @@ interface TransactionDetailsModalProps {
 }
 
 export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: TransactionDetailsModalProps) => {
-  const isApproved = useMemo(() => transaction?.kind === "Payment" && transaction.status === "Approved", [transaction]);
-  const isRefund =
-    transaction?.kind === "Refund" ||
-    (transaction?.kind === "Payment" &&
-      transaction.status &&
-      ["Reversal", "PartialReversal"].includes(transaction.status));
-  const isReversal = useMemo(() => transaction?.kind === "Reversal", [transaction]);
-  const otherTxStatus = useMemo(
-    () =>
-      !isApproved && !isRefund && !isReversal && transaction?.kind === "Payment" && fromPascalCase(transaction.status),
-    [transaction, isApproved, isRefund, isReversal],
-  );
+  const { isApproved, isRefund, isReversal, isPending, otherTxStatus } = useTransactionStatus(transaction);
 
   const transactionDetails = useMemo(() => {
     if (!transaction) return null;
@@ -52,8 +41,8 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
     };
 
     // Handle regular payments (not reversals)
-    if (transaction.kind === "Payment" && transaction.status !== "Reversal") {
-      const { isPending, billingAmount, billingCurrency, transactionAmount, transactionCurrency, status } = transaction;
+    if (isApproved) {
+      const { billingAmount, billingCurrency, transactionAmount, transactionCurrency } = transaction;
 
       const billAmount = formatCurrency(billingAmount, {
         decimals: billingCurrency?.decimals,
@@ -78,8 +67,7 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
         billAmount,
         txAmount,
         exchangeRate,
-        isPending,
-        status: status ? fromPascalCase(status) : null,
+        status: "Completed",
         transactionCurrency,
       };
     }
@@ -104,14 +92,13 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
         billAmount: formattedAmount,
         txAmount: null, // No secondary amount for refunds/reversals
         exchangeRate: null,
-        isPending: false,
         status: statusWithDate,
         transactionCurrency: currency,
       };
     }
 
     return null;
-  }, [transaction, isRefund, isReversal]);
+  }, [transaction, isApproved, isRefund, isReversal]);
 
   if (!transaction || !transactionDetails) {
     return null;
@@ -125,7 +112,6 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
     billAmount,
     txAmount,
     exchangeRate,
-    isPending,
     country,
     countryFlag,
     status,

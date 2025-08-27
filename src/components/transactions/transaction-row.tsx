@@ -1,9 +1,9 @@
 import { getIconForMcc } from "@/utils/mccUtils";
 import { formatCurrency } from "@/utils/formatCurrency";
-import { fromPascalCase } from "@/utils/convertFromPascalCase";
 import type { Event } from "@/client";
 import { format, parseISO } from "date-fns";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
+import { useTransactionStatus } from "@/hooks/useTransactionStatus";
 
 interface TransactionRowProps {
   transaction: Event;
@@ -11,19 +11,11 @@ interface TransactionRowProps {
 }
 
 export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) => {
-  const {
-    kind,
-    isPending,
-    mcc,
-    merchant,
-    createdAt,
-    billingAmount,
-    billingCurrency,
-    transactionAmount,
-    transactionCurrency,
-  } = transaction;
+  const { isRefund, isReversal, isPending, otherTxStatus, sign } = useTransactionStatus(transaction);
 
-  const isApproved = kind === "Payment" && transaction.status === "Approved";
+  const { kind, mcc, merchant, createdAt, billingAmount, billingCurrency, transactionAmount, transactionCurrency } =
+    transaction;
+
   const isStrikethrough =
     kind === "Payment" &&
     transaction.status &&
@@ -35,13 +27,7 @@ export const TransactionRow = ({ transaction, onClick }: TransactionRowProps) =>
       "IncorrectSecurityCode",
       "Other",
     ].includes(transaction.status);
-  const isRefund =
-    kind === "Refund" ||
-    (kind === "Payment" && transaction.status && ["Reversal", "PartialReversal"].includes(transaction.status));
-  const isReversal = kind === "Reversal";
-  const otherTxStatus =
-    !isApproved && !isRefund && !isReversal && kind === "Payment" && fromPascalCase(transaction.status);
-  const sign = kind === "Payment" ? "-" : "+";
+
   const Icon = getIconForMcc(mcc);
   const merchantName = merchant?.name || "Unknown";
   const time = createdAt ? format(parseISO(createdAt), "HH:mm") : "unknown";
