@@ -89,17 +89,21 @@ export const BankTransferDetailsModal = ({ ibanOrder, isOpen, onClose }: BankTra
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader className="pb-0">
-          <DialogTitle className="flex items-center gap-3 pb-4">
-            <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-              <Icon className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
-            </div>
-            <div className="flex-1">
-              <div className="text-xl text-foreground font-normal">{transferTitle}</div>
-              <div className="text-xs text-muted-foreground">{formattedDate}</div>
-            </div>
-            <div className="text-right">
-              <div className="text-xl text-foreground font-normal">
-                {formattedAmount ? `${sign} ${formattedAmount}` : "-"}
+          <DialogTitle className="pb-4 mt-4">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+              <div className="flex items-center gap-3 flex-1">
+                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
+                </div>
+                <div className="flex-1">
+                  <div className="text-xl text-foreground font-normal">{transferTitle}</div>
+                  <div className="text-xs text-muted-foreground">{formattedDate}</div>
+                </div>
+              </div>
+              <div className="text-center sm:text-right">
+                <div className="text-xl text-foreground font-normal">
+                  {formattedAmount ? `${sign} ${formattedAmount}` : "-"}
+                </div>
               </div>
             </div>
           </DialogTitle>

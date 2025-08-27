@@ -9,7 +9,7 @@ import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
 import type { Address } from "viem";
 import { getApiV1Transactions, getApiV1IbansOrders } from "@/client";
 
-const DEFAULT_TRANSACTIONS_HISTORY = 90;
+const DEFAULT_TRANSACTIONS_HISTORY = 30;
 
 type TransactionsContextProps = {
   children: ReactNode | ReactNode[];

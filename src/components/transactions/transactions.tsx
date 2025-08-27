@@ -47,7 +47,7 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
       )}
       {Object.keys(transactions).map((date) => (
         <div key={date}>
-          <div className="text-xs text-secondary mb-2">{date}</div>
+          <div className="text-xs text-secondary mb-2 p-2">{date}</div>
 
           {transactions[date].map((transaction: Transaction) => {
             if (transaction.type === TransactionType.CARD) {
