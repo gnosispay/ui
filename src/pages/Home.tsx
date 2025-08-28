@@ -4,10 +4,12 @@ import { AddFundsModal } from "@/components/modals/add-funds/add-funds";
 import { SendFundsModal } from "@/components/modals/send-funds/send-funds";
 import { Transactions } from "@/components/transactions/transactions";
 import { PendingCardOrder } from "@/components/pending-card-order";
+import { Rewards } from "@/components/rewards";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 
 export const Home = () => {
   const [sendFundsModalOpen, setSendFundsModalOpen] = useState(false);
@@ -36,6 +38,12 @@ export const Home = () => {
           </div>
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
             <div className="flex items-center justify-between mb-4">
+              <h1 className="font-bold text-secondary">
+                Rewards <StatusHelpIcon type="rewards" />
+              </h1>
+            </div>
+            <Rewards />
+            <div className="flex items-center justify-between mb-4 mt-6">
               <h1 className="font-bold text-secondary">Cards</h1>
               <Link to="/cards" className="flex items-center gap-2">
                 View details <ChevronRight size={16} />

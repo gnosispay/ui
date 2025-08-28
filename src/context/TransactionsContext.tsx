@@ -170,7 +170,7 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
       withOnchain: true,
     });
 
-    const interval = 5 * 60 * 1000; // 5 minutes
+    const interval = 3 * 60 * 1000; // 3 minutes
     const intervalId = setInterval(() => {
       fetchTransactions({
         history: DEFAULT_TRANSACTIONS_HISTORY,
