@@ -22,6 +22,13 @@ interface TransactionDetailsModalProps {
 export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: TransactionDetailsModalProps) => {
   const { isApproved, isRefund, isReversal, isPending, otherTxStatus } = useTransactionStatus(transaction);
   const { cardInfoMap } = useCards();
+  const cardInfo = useMemo(() => {
+    if (!transaction?.cardToken || !cardInfoMap) {
+      return undefined;
+    }
+
+    return cardInfoMap[transaction.cardToken];
+  }, [transaction?.cardToken, cardInfoMap]);
 
   const transactionDetails = useMemo(() => {
     if (!transaction) return null;
@@ -93,7 +100,6 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
   }, [transaction, isApproved, isRefund, isReversal, isPending, otherTxStatus]);
 
   if (!transaction || !transactionDetails) {
-    console.log("returning null");
     return null;
   }
 
@@ -110,8 +116,6 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
     status,
     txHash,
   } = transactionDetails;
-
-  console.log("transaction", cardInfoMap, transaction.cardToken, cardInfoMap![transaction!.cardToken!]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -164,14 +168,10 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
             </div>
           </div>
 
-          {cardInfoMap && transaction.cardToken && cardInfoMap[transaction.cardToken] && (
+          {cardInfo && (
             <div className="flex justify-between items-center py-3">
-              <span className="text-muted-foreground">
-                {cardInfoMap[transaction.cardToken].virtual ? "Virtual" : "Physical"} Card
-              </span>
-              <span className="font-medium text-foreground">
-                ••• {cardInfoMap[transaction.cardToken].lastFourDigits}
-              </span>
+              <span className="text-muted-foreground">{cardInfo.virtual ? "Virtual" : "Physical"} Card</span>
+              <span className="font-medium text-foreground">••• {cardInfo.lastFourDigits}</span>
             </div>
           )}
 
