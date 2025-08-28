@@ -21,7 +21,7 @@ export const currencies: Record<string, CurrencyInfo> = {
     fiatSymbol: "EUR",
     logo: eurLogo,
   },
-  GPB: {
+  GBP: {
     tokenSymbol: "GBPe",
     address: "0x5Cb9073902F2035222B9749F8fB0c9BFe5527108",
     decimals: 18,
