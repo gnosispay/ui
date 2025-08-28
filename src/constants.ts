@@ -26,7 +26,7 @@ export const currencies: Record<string, CurrencyInfo> = {
     address: "0x5Cb9073902F2035222B9749F8fB0c9BFe5527108",
     decimals: 18,
     symbol: "£",
-    fiatSymbol: "GPB",
+    fiatSymbol: "GBP",
     logo: gbpLogo,
   },
   USD: {
