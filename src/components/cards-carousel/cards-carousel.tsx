@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { CardPreview } from "./card-preview";
 import { useCards } from "@/context/CardsContext";
 import { CardSkeleton } from "./card-skeleton";
@@ -49,15 +49,13 @@ export const CardsCarousel = ({
   };
 
   const scrollToCard = useCallback((index: number) => {
-    if (scrollContainerRef.current) {
-      const cardElement = scrollContainerRef.current.children[index] as HTMLElement;
-      if (cardElement) {
-        cardElement.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-          inline: "center",
-        });
-      }
+    const cardElement = scrollContainerRef.current?.children[index] as HTMLElement;
+    if (cardElement) {
+      cardElement.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
     }
   }, []);
 
@@ -86,6 +84,21 @@ export const CardsCarousel = ({
     },
     [cards, scrollToCard, setCurrentIndex, onCardChange],
   );
+
+  // Ensure carousel scrolls to correct position when currentIndex changes
+  // This is especially important after cards refresh (e.g., after freeze/unfreeze)
+  useEffect(() => {
+    if (cards && cardInfoMap && cards.length > 0 && currentIndex >= 0 && currentIndex < cards.length) {
+      // Double requestAnimationFrame to ensure DOM is fully rendered and painted
+      const rafId = requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          scrollToCard(currentIndex);
+        });
+      });
+
+      return () => cancelAnimationFrame(rafId);
+    }
+  }, [cards, cardInfoMap, currentIndex, scrollToCard]);
 
   if (!cards || !cardInfoMap) {
     return <CardSkeleton />;

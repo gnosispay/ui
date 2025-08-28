@@ -1906,7 +1906,7 @@ export type GetApiV1AccountsOnchainDailyLimitTransactionDataData = {
     path?: never;
     query: {
         /**
-         * The new daily spending limit to set (1-5000, must be an integer).
+         * The new daily spending limit to set (1-8000, must be an integer).
          */
         onchainDailyLimit: string;
     };
@@ -2878,6 +2878,10 @@ export type PostApiV1OrderByOrderIdCreateCardResponses = {
      */
     200: {
         success?: boolean;
+        /**
+         * The token of the created card
+         */
+        cardToken?: string;
     };
 };
 
@@ -3262,6 +3266,9 @@ export type PostApiV1OrderCreateData = {
             address2?: string | null;
             city: string;
             postalCode: string;
+            /**
+             * Two-letter country code per ISO 3166-1 alpha-2 (e.g., "BR", "DE").
+             */
             country: string;
         } | null;
         virtual?: boolean;
@@ -3272,6 +3279,9 @@ export type PostApiV1OrderCreateData = {
             address2?: string | null;
             city: string;
             postalCode: string;
+            /**
+             * Two-letter country code per ISO 3166-1 alpha-2 (e.g., "BR", "DE").
+             */
             country: string;
         } | null;
         virtual?: boolean;

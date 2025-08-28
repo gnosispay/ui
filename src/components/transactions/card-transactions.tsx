@@ -42,6 +42,8 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
             if (transaction.type === TransactionType.CARD) {
               return <TransactionRow key={transaction.id} transaction={transaction.data as Event} />;
             }
+
+            return null;
           })}
         </div>
       ))}

@@ -598,7 +598,7 @@ export const getApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
  *
  * The limit update is processed through a delay relay mechanism that executes after 3 minutes.
  *
- * **Note:** The onchainDailyLimit must be an integer value between 1 and 5000.
+ * **Note:** The onchainDailyLimit must be an integer value between 1 and 8000.
  *
  */
 export const putApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean = false>(options: Options<PutApiV1AccountsOnchainDailyLimitData, ThrowOnError>) => {
@@ -626,7 +626,7 @@ export const putApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
  * 2. Sign the transaction data with the user's wallet
  * 3. Submit the signature to the PUT `/api/v1/accounts/onchain-daily-limit` endpoint
  *
- * **Note:** The onchainDailyLimit must be an integer value between 1 and 5000.
+ * **Note:** The onchainDailyLimit must be an integer value between 1 and 8000.
  *
  */
 export const getApiV1AccountsOnchainDailyLimitTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AccountsOnchainDailyLimitTransactionDataData, ThrowOnError>) => {

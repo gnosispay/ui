@@ -19,6 +19,7 @@ interface TransactionsProps {
 
 export const Transactions = ({ history = 7, withIban = true, withOnchain = true }: TransactionsProps) => {
   const { safeConfig } = useUser();
+
   const {
     isLoading,
     isError,
@@ -32,13 +33,12 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
   if (!safeConfig || isLoading || !transactions) {
     return <TransactionSkeleton />;
   }
-
   if (isError) {
     return <TransactionFetchingAlert />;
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+    <div className="flex flex-col gap-4 bg-card rounded-xl p-2">
       {Object.keys(transactions).length === 0 && (
         <div className="flex flex-col items-center justify-center">
           <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
@@ -47,7 +47,7 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
       )}
       {Object.keys(transactions).map((date) => (
         <div key={date}>
-          <div className="text-xs text-secondary mb-2">{date}</div>
+          <div className="text-xs text-secondary mb-2 p-2">{date}</div>
 
           {transactions[date].map((transaction: Transaction) => {
             if (transaction.type === TransactionType.CARD) {
@@ -59,14 +59,17 @@ export const Transactions = ({ history = 7, withIban = true, withOnchain = true 
             }
 
             if (transaction.type === TransactionType.ONCHAIN && !!safeConfig.fiatSymbol) {
+              const currency = currencies[safeConfig.fiatSymbol];
               return (
                 <OnchainTransferRow
                   key={transaction.id}
                   transfer={transaction.data as Erc20TokenEvent}
-                  currency={currencies[safeConfig.fiatSymbol]}
+                  currency={currency}
                 />
               );
             }
+
+            return null;
           })}
         </div>
       ))}

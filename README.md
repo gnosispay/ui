@@ -1,6 +1,6 @@
 # ui
 
-React user interface to kickstart your integration to the Gnosis Pay API.
+User interface for Gnosis Pay.
 
 # Environment variables
 Set this variables in a `.env` file
