@@ -67,9 +67,9 @@ jobs:
             --build-arg VITE_PSE_APP_ID=$VITE_PSE_APP_ID \
             -t $IMAGE_NAME . -f ./Dockerfile.ui --push
 
-  deploy-on-staging:
-    name: Deploy on Staging
+  deploy-on-production:
+    name: Deploy on Production
     if: github.ref == 'refs/heads/main'
     needs: build-and-push-image
-    uses: ./.github/workflows/deploy-ui-stg.yml
+    uses: ./.github/workflows/deploy-ui.yml
     secrets: inherit
