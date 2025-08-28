@@ -1,4 +1,4 @@
-name: Deploy UI to Staging
+name: Deploy UI to Production
 
 on:
   push:
@@ -17,7 +17,7 @@ jobs:
   deploy:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    # environment: staging
+    # environment: production
 
     steps:
       - name: Checkout
