@@ -50,6 +50,17 @@ export type CardOrder = {
     virtual?: boolean;
 };
 
+export type TermsBody = {
+    /**
+     * Type of terms and conditions
+     */
+    terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos';
+    /**
+     * Version of the terms document
+     */
+    version: string;
+};
+
 export type CardAlreadyActiveError = {
     error?: 'Card has been already activated';
 };
@@ -1138,6 +1149,10 @@ export type GetApiV1CardsData = {
          * Exclude voided cards from the response
          */
         exclude_voided?: boolean;
+        /**
+         * Filter cards by status code
+         */
+        status_code?: string;
     };
     url: '/api/v1/cards';
 };
@@ -3872,16 +3887,7 @@ export type GetApiV1UserTermsResponses = {
 export type GetApiV1UserTermsResponse = GetApiV1UserTermsResponses[keyof GetApiV1UserTermsResponses];
 
 export type PostApiV1UserTermsData = {
-    body: {
-        /**
-         * Type of terms and conditions
-         */
-        terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos';
-        /**
-         * Version of the terms document
-         */
-        version: string;
-    };
+    body: TermsBody;
     path?: never;
     query?: never;
     url: '/api/v1/user/terms';
@@ -3957,5 +3963,5 @@ export type GetApiV1UserResponses = {
 export type GetApiV1UserResponse = GetApiV1UserResponses[keyof GetApiV1UserResponses];
 
 export type ClientOptions = {
-    baseUrl: `${string}://${string}` | (string & {});
+    baseUrl: 'https://api.gnosispay.com' | (string & {});
 };
