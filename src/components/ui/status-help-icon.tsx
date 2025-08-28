@@ -3,7 +3,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useCallback } from "react";
 
 interface StatusHelpIconProps {
-  type: "pending" | "refund" | "pending-merchant" | "reversal";
+  type: "pending" | "refund" | "pending-merchant" | "reversal" | "rewards";
 }
 
 export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
@@ -17,6 +17,8 @@ export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
         return "If not confirmed by the merchant, it will be reverted in 11 days";
       case "reversal":
         return "This payment is the reversal of a previous transaction.";
+      case "rewards":
+        return <p>Learn more about the <a href="https://help.gnosispay.com/en/articles/9813409-gno-cashback-how-to-get-the-reward" target="_blank" rel="noopener noreferrer" className="text-muted-foreground underline">Rewards program</a></p>
       default:
         return "";
     }
