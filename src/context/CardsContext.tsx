@@ -57,7 +57,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     if (!hideVoidedCards) return fetchedCards;
 
     return fetchedCards.filter((card) => {
-      const cardInfo = cardInfoMap[card.id];
+      const cardInfo = !!card.cardToken && cardInfoMap[card.cardToken];
       return cardInfo && !cardInfo.isVoid && !cardInfo.isLost && !cardInfo.isStolen;
     });
   }, [fetchedCards, cardInfoMap, hideVoidedCards]);
