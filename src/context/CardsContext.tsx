@@ -17,9 +17,9 @@ type CardContextProps = {
   children: ReactNode | ReactNode[];
 };
 
-export interface CardInfo {
+export interface CardInfo extends Card {
   cardToken?: string;
-  activatedAt?: string;
+  activatedAt?: string | null;
   statusCode: number;
   isFrozen: boolean;
   isStolen: boolean;
@@ -82,7 +82,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         return;
       }
 
-      newMap[card.id] = { cardToken: card.cardToken, ...data };
+      if (!card.cardToken) return;
+
+      newMap[card.cardToken] = { ...card, ...data };
     }
 
     setCardInfoMap(newMap);

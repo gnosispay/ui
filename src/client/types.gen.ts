@@ -253,6 +253,10 @@ export type BasePaymentish = {
      *
      */
     transactionType?: string;
+    /**
+     * The token identifying the card used for this transaction
+     */
+    cardToken?: string;
     transactions?: Array<Transaction>;
 };
 
@@ -1340,7 +1344,24 @@ export type GetApiV1CardsTransactionsResponses = {
     /**
      * Successful response
      */
-    200: Array<Event>;
+    200: {
+        /**
+         * Total number of transactions available
+         */
+        count?: number;
+        /**
+         * URL for the next page of results, null if no more pages
+         */
+        next?: string | null;
+        /**
+         * URL for the previous page of results, null if on first page
+         */
+        previous?: string | null;
+        /**
+         * Array of transaction events for the current page
+         */
+        results?: Array<Event>;
+    };
 };
 
 export type GetApiV1CardsTransactionsResponse = GetApiV1CardsTransactionsResponses[keyof GetApiV1CardsTransactionsResponses];

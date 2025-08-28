@@ -128,7 +128,7 @@ export const CardsCarousel = ({
           onTouchEnd={onTouchEnd}
         >
           {cards.map((card, index) => {
-            const cardInfo = cardInfoMap[card.id];
+            const cardInfo = card.cardToken && cardInfoMap?.[card.cardToken] ? cardInfoMap[card.cardToken] : undefined;
             if (!cardInfo) return null;
             return (
               <div

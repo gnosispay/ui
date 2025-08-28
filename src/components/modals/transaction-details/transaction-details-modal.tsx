@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { shortenAddress } from "@/utils/shortenAddress";
+import { useCards } from "@/context/CardsContext";
 
 interface TransactionDetailsModalProps {
   transaction: Event | null;
@@ -20,6 +21,7 @@ interface TransactionDetailsModalProps {
 
 export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: TransactionDetailsModalProps) => {
   const { isApproved, isRefund, isReversal, isPending, otherTxStatus } = useTransactionStatus(transaction);
+  const { cardInfoMap } = useCards();
 
   const transactionDetails = useMemo(() => {
     if (!transaction) return null;
@@ -109,6 +111,8 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
     txHash,
   } = transactionDetails;
 
+  console.log("transaction", cardInfoMap, transaction.cardToken, cardInfoMap![transaction!.cardToken!]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg">
@@ -160,12 +164,17 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
             </div>
           </div>
 
-          {/* Card - TODO: Add card details when ENG-2745 is implemented */}
-          {/* 
-          <div className="flex justify-between items-center py-3">
-            <span className="text-muted-foreground">Card</span>
-            <span className="font-medium text-foreground">••• 2973</span>
-          </div> */}
+          {cardInfoMap && transaction.cardToken && cardInfoMap[transaction.cardToken] && (
+            <div className="flex justify-between items-center py-3">
+              <span className="text-muted-foreground">Card</span>
+              <span className="font-medium text-foreground">
+                ••• {cardInfoMap[transaction.cardToken].lastFourDigits}{" "}
+                <span className="text-muted-foreground text-xs">
+                  {cardInfoMap[transaction.cardToken].virtual ? "Virtual" : "Physical"}
+                </span>
+              </span>
+            </div>
+          )}
 
           {/* Transaction Currency */}
           {transactionDetails?.transactionCurrency?.symbol && (

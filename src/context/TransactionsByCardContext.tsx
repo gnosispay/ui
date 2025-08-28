@@ -3,7 +3,7 @@ import { getCardTransactionsFromCardEvents, groupByDate } from "@/utils/transact
 import { formatISO, subDays } from "date-fns";
 import type { Transaction } from "@/types/transaction";
 import { useAuth } from "./AuthContext";
-import { getApiV1Transactions } from "@/client";
+import { getApiV1CardsTransactions } from "@/client";
 import { useCards } from "./CardsContext";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 
@@ -44,7 +44,7 @@ const TransactionsByCardContextProvider = ({ children }: TransactionsByCardConte
       return;
     }
 
-    const { data, error } = await getApiV1Transactions({
+    const { data, error } = await getApiV1CardsTransactions({
       query: {
         cardTokens: cardToken,
         after: fromDate,
@@ -56,7 +56,7 @@ const TransactionsByCardContextProvider = ({ children }: TransactionsByCardConte
       return;
     }
 
-    return data;
+    return data.results;
   }, []);
 
   // since there is no card info in the general transactions endpoint, we need to fetch the transactions for each card separately

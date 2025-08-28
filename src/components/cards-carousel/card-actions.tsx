@@ -39,9 +39,8 @@ export const CardActions = ({ card }: { card: Card }) => {
   } = useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-
   const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false);
-  const cardInfo = cardInfoMap?.[card.id];
+  const cardInfo = card.cardToken && cardInfoMap?.[card.cardToken] ? cardInfoMap[card.cardToken] : undefined;
   const canReport =
     !!card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid;
 
