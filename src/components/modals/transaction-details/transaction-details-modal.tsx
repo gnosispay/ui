@@ -166,12 +166,14 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
 
           {cardInfoMap && transaction.cardToken && cardInfoMap[transaction.cardToken] && (
             <div className="flex justify-between items-center py-3">
-              <span className="text-muted-foreground">Card</span>
-              <span className="font-medium text-foreground">
-                ••• {cardInfoMap[transaction.cardToken].lastFourDigits}{" "}
+              <span className="text-muted-foreground">
+                Card{" "}
                 <span className="text-muted-foreground text-xs">
-                  {cardInfoMap[transaction.cardToken].virtual ? "Virtual" : "Physical"}
+                  • {cardInfoMap[transaction.cardToken].virtual ? "Virtual" : "Physical"}
                 </span>
+              </span>
+              <span className="font-medium text-foreground">
+                ••• {cardInfoMap[transaction.cardToken].lastFourDigits}
               </span>
             </div>
           )}
