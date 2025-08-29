@@ -553,6 +553,7 @@ export const postApiV1VerificationCheck = <ThrowOnError extends boolean = false>
 
 /**
  * Request an OTP to verify a Phone Number.
+ * This call replaces the existing phone number for a user if it exists, whether it's verified or not.
  */
 export const postApiV1Verification = <ThrowOnError extends boolean = false>(options: Options<PostApiV1VerificationData, ThrowOnError>) => {
     return (options.client ?? _heyApiClient).post<PostApiV1VerificationResponses, PostApiV1VerificationErrors, ThrowOnError>({

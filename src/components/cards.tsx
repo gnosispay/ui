@@ -3,11 +3,11 @@ import { Skeleton } from "./ui/skeleton";
 import { CardsOrderModal } from "./modals/cards-order.tsx/cards-order";
 import CardFront from "./cards-carousel/card-front";
 import { PlusIcon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 export const Cards = () => {
   const { cards, cardInfoMap } = useCards();
-  const loading = !cards || !cardInfoMap;
+  const isLoading = useMemo(() => !cards || !cardInfoMap, [cards, cardInfoMap]);
   const [open, setOpen] = useState(false);
 
   const handleAddCard = () => {
@@ -17,7 +17,7 @@ export const Cards = () => {
   return (
     <>
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
-        {loading &&
+        {isLoading &&
           [1, 2, 3].map((i) => (
             <div key={`skeleton-${i}`} className="flex items-center gap-2">
               <Skeleton className="rounded-sm w-20 h-14" />
@@ -31,9 +31,8 @@ export const Cards = () => {
               </div>
             </div>
           ))}
-        {!!cards &&
-          !!cardInfoMap &&
-          cards.map((card) => (
+        {!isLoading &&
+          cards?.map((card) => (
             <div key={card.id} className="flex items-center gap-2">
               <CardFront className="rounded-sm w-20" />
               <div className="flex flex-col gap-2">

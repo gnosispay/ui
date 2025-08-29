@@ -50,6 +50,17 @@ export type CardOrder = {
     virtual?: boolean;
 };
 
+export type TermsBody = {
+    /**
+     * Type of terms and conditions
+     */
+    terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos';
+    /**
+     * Version of the terms document
+     */
+    version: string;
+};
+
 export type CardAlreadyActiveError = {
     error?: 'Card has been already activated';
 };
@@ -242,6 +253,10 @@ export type BasePaymentish = {
      *
      */
     transactionType?: string;
+    /**
+     * The token identifying the card used for this transaction
+     */
+    cardToken?: string;
     transactions?: Array<Transaction>;
 };
 
@@ -1138,6 +1153,10 @@ export type GetApiV1CardsData = {
          * Exclude voided cards from the response
          */
         exclude_voided?: boolean;
+        /**
+         * Filter cards by status code
+         */
+        status_code?: string;
     };
     url: '/api/v1/cards';
 };
@@ -1325,7 +1344,24 @@ export type GetApiV1CardsTransactionsResponses = {
     /**
      * Successful response
      */
-    200: Array<Event>;
+    200: {
+        /**
+         * Total number of transactions available
+         */
+        count?: number;
+        /**
+         * URL for the next page of results, null if no more pages
+         */
+        next?: string | null;
+        /**
+         * URL for the previous page of results, null if on first page
+         */
+        previous?: string | null;
+        /**
+         * Array of transaction events for the current page
+         */
+        results?: Array<Event>;
+    };
 };
 
 export type GetApiV1CardsTransactionsResponse = GetApiV1CardsTransactionsResponses[keyof GetApiV1CardsTransactionsResponses];
@@ -3872,16 +3908,7 @@ export type GetApiV1UserTermsResponses = {
 export type GetApiV1UserTermsResponse = GetApiV1UserTermsResponses[keyof GetApiV1UserTermsResponses];
 
 export type PostApiV1UserTermsData = {
-    body: {
-        /**
-         * Type of terms and conditions
-         */
-        terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos';
-        /**
-         * Version of the terms document
-         */
-        version: string;
-    };
+    body: TermsBody;
     path?: never;
     query?: never;
     url: '/api/v1/user/terms';
@@ -3957,5 +3984,5 @@ export type GetApiV1UserResponses = {
 export type GetApiV1UserResponse = GetApiV1UserResponses[keyof GetApiV1UserResponses];
 
 export type ClientOptions = {
-    baseUrl: `${string}://${string}` | (string & {});
+    baseUrl: 'https://api.gnosispay.com' | (string & {});
 };

@@ -14,7 +14,7 @@ import type { Card } from "@/client";
 import { useGpSdk } from "@/hooks/useGpSdk";
 import { toast } from "sonner";
 import { Dialog } from "../ui/dialog";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { ReportCardModal } from "../modals/report-card";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
@@ -39,9 +39,14 @@ export const CardActions = ({ card }: { card: Card }) => {
   } = useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
-
   const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false);
-  const cardInfo = cardInfoMap?.[card.id];
+  const cardInfo = useMemo(() => {
+    if (!card.cardToken || !cardInfoMap) {
+      return undefined;
+    }
+
+    return cardInfoMap[card.cardToken];
+  }, [card.cardToken, cardInfoMap]);
   const canReport =
     !!card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid;
 

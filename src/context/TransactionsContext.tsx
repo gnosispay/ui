@@ -7,7 +7,7 @@ import { useUser } from "./UserContext";
 import { useAuth } from "./AuthContext";
 import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
 import type { Address } from "viem";
-import { getApiV1Transactions, getApiV1IbansOrders } from "@/client";
+import { getApiV1IbansOrders, getApiV1CardsTransactions } from "@/client";
 
 const DEFAULT_TRANSACTIONS_HISTORY = 30;
 
@@ -57,7 +57,7 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
   }, [safeConfig?.tokenSymbol]);
 
   const getCardTransactions = useCallback(async ({ cardTokens, fromDate }: GetTxParams = {}) => {
-    const { data, error } = await getApiV1Transactions({
+    const { data, error } = await getApiV1CardsTransactions({
       query: {
         cardTokens: cardTokens?.join(","),
         after: fromDate,
@@ -69,7 +69,7 @@ const TransactionsContextProvider = ({ children }: TransactionsContextProps) => 
       return;
     }
 
-    return data;
+    return data.results;
   }, []);
 
   const getIbanOrders = useCallback(async () => {
