@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog } from "lucide-react";
+import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog, LifeBuoyIcon } from "lucide-react";
 import {
   AccountSection,
   PersonalDetailsModal,
@@ -60,6 +60,17 @@ export const AccountRoute = () => {
             icon={<Wallet className="w-6 h-6" />}
             title="Sign-in wallets"
             onClick={() => setOpenModal(ModalType.SIGN_IN_WALLETS)}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <h2 className="text-lg font-medium text-foreground">Support</h2>
+        <div className="space-y-3">
+          <AccountSection
+            icon={<LifeBuoyIcon className="w-6 h-6" />}
+            title="Help Center"
+            onClick={() => window.open("https://help.gnosispay.com/", "_blank")}
           />
         </div>
       </div>
