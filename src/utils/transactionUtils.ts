@@ -49,41 +49,6 @@ export const groupByCardToken = (transactions: Event[]) => {
   );
 };
 
-// export const getCardTransactionsFromCardEvents = (cardEvents: Event[]): Transaction[] => {
-//   return cardEvents.map((tx) => ({
-//     id: `${tx.createdAt}${tx.merchant?.name || ""}${tx.kind}`,
-//     createdAt: tx.createdAt || "",
-//     type: TransactionType.CARD,
-//     data: tx,
-//   }));
-// };
-
-// export function mergeAndSortTransactions(
-//   cardTransactions: Event[] = [],
-//   ibanOrders: IbanOrder[] = [],
-//   onchainSafeTransfers: Erc20TokenEvent[] = [],
-// ): Transaction[] {
-//   const cardTransactionsMapped = getCardTransactionsFromCardEvents(cardTransactions);
-
-//   const ibanOrdersMapped = ibanOrders.map((order) => ({
-//     id: order.id,
-//     createdAt: order.meta.placedAt,
-//     type: TransactionType.IBAN,
-//     data: order,
-//   }));
-
-//   const onchainSafeTransfersMapped = onchainSafeTransfers.map((tx) => ({
-//     id: tx.hash,
-//     createdAt: tx.date.toISOString(),
-//     type: TransactionType.ONCHAIN,
-//     data: tx,
-//   }));
-
-//   return [...cardTransactionsMapped, ...ibanOrdersMapped, ...onchainSafeTransfersMapped].sort(
-//     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-//   );
-// }
-
 /**
  * Calculates the exchange rate between two currencies
  * @param billingAmount - The amount in billing currency (raw value)
