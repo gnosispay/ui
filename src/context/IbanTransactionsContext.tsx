@@ -4,9 +4,6 @@ import type { IbanOrder } from "@/client";
 import { useAuth } from "./AuthContext";
 import { getApiV1IbansOrders } from "@/client";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { subDays, isAfter, parseISO } from "date-fns";
-
-export const DEFAULT_IBAN_TRANSACTIONS_DAYS = 30;
 
 type IbanTransactionsContextProps = {
   children: ReactNode | ReactNode[];
@@ -36,30 +33,9 @@ const IbanTransactionsContextProvider = ({ children }: IbanTransactionsContextPr
       setIbanTransactionsError(extractErrorMessage(error, "Error fetching IBAN transactions"));
       console.error("Error fetching IBAN transactions:", error);
     } else if (data?.data) {
-      // Filter IBAN orders by the placement date (API doesn't support date filtering yet)
-      const fromDate = subDays(new Date(), DEFAULT_IBAN_TRANSACTIONS_DAYS);
-      const filteredOrders = data.data.filter((order) => isAfter(parseISO(order.meta.placedAt), fromDate));
+      const groupedTransactions = groupByDate(data.data);
 
-      // Convert IbanOrder[] to Transaction[] format for groupByDate
-      const transactionLikeData = filteredOrders.map((order) => ({
-        id: order.id,
-        createdAt: order.meta.placedAt,
-        type: "iban" as const,
-        data: order,
-      }));
-
-      const groupedTransactions = groupByDate(transactionLikeData);
-
-      // Extract the IbanOrder data back out
-      const groupedIbanTransactions = Object.entries(groupedTransactions).reduce(
-        (acc, [date, transactions]) => {
-          acc[date] = transactions.map((tx) => tx.data as IbanOrder);
-          return acc;
-        },
-        {} as Record<string, IbanOrder[]>,
-      );
-
-      setIbanTransactionsByDate(groupedIbanTransactions);
+      setIbanTransactionsByDate(groupedTransactions);
     }
 
     setIbanTransactionsLoading(false);
