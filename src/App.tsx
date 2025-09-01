@@ -3,7 +3,7 @@ import { Route, Routes, Outlet } from "react-router-dom";
 import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
 import { FooterNavBar } from "./components/nav/footer";
-import { Home as HomeIcon, CreditCard, List, User } from "lucide-react";
+import { Home as HomeIcon, CreditCard, User } from "lucide-react";
 import { SignUpRoute } from "./pages/SignUp";
 import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";

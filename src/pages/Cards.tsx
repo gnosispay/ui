@@ -2,12 +2,11 @@ import { CardsCarousel } from "@/components/cards-carousel/cards-carousel";
 import { CardsOrderModal } from "@/components/modals/cards-order.tsx";
 import { PendingCardOrder } from "@/components/pending-card-order";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, InboxIcon, PlusIcon } from "lucide-react";
+import { InboxIcon, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { CardActions } from "@/components/cards-carousel/card-actions";
 import { CardTransactions } from "@/components/transactions/card-transactions";
-import { Link } from "react-router-dom";
 
 export const CardsRoute = () => {
   const [open, setOpen] = useState(false);
