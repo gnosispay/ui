@@ -2,21 +2,33 @@ import { TransactionSkeleton } from "./transaction-skeleton";
 import { TransactionRow } from "./transaction-row";
 import { TransactionFetchingAlert } from "./transaction-fetching-alert";
 import { InboxIcon } from "lucide-react";
-import { DEFAULT_CARD_TRANSACTIONS_AMOUNT, useCardTransactions } from "@/context/CardTransactionsContext";
-import { useMemo } from "react";
+import { useCardTransactions } from "@/context/CardTransactionsContext";
+import { useMemo, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 
 interface CardTransactionsProps {
   cardToken?: string;
 }
 
 export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
-  const { cardTransactionsByTokenDate, cardTransactionsLoading, cardTransactionsError } = useCardTransactions();
+  const {
+    cardTransactionsByTokenDate,
+    cardTransactionsLoading,
+    cardTransactionsError,
+    hasNextPage,
+    isLoadingMoreCardTransactions,
+    loadMoreCardTransactions,
+    transactionCount,
+  } = useCardTransactions();
+
   const transactions = useMemo(
     () => !!cardToken && cardTransactionsByTokenDate[cardToken],
     [cardTransactionsByTokenDate, cardToken],
   );
 
-  console.log("transactions", transactions);
+  const handleLoadMore = useCallback(() => {
+    loadMoreCardTransactions();
+  }, [loadMoreCardTransactions]);
 
   if (!cardToken || cardTransactionsLoading) {
     return <TransactionSkeleton />;
@@ -27,12 +39,12 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+    <div className="flex flex-col gap-4 bg-card p-4 rounded-xl mb-4">
       {(!transactions || Object.keys(transactions).length === 0) && (
         <div className="flex flex-col items-center justify-center">
           <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
           <div className="text-center text-secondary">
-            No transactions for this card in the past {DEFAULT_CARD_TRANSACTIONS_AMOUNT} transactions
+            No transactions for this card in the past {transactionCount} transactions
           </div>
         </div>
       )}
@@ -47,6 +59,20 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
             })}
           </div>
         ))}
+
+      {hasNextPage && (
+        <div className="flex justify-center pt-4">
+          <Button
+            variant="outline"
+            onClick={handleLoadMore}
+            disabled={isLoadingMoreCardTransactions}
+            loading={isLoadingMoreCardTransactions}
+            className="w-full"
+          >
+            {isLoadingMoreCardTransactions ? "Loading..." : "Load More"}
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

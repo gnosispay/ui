@@ -13,6 +13,7 @@ import { currencies } from "@/constants";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useState, useCallback, useMemo } from "react";
 import { Toggle } from "@/components/ui/toggle";
+import { Button } from "@/components/ui/button";
 
 enum TransactionType {
   CARD = "card",
@@ -22,7 +23,14 @@ enum TransactionType {
 
 export const Transactions = () => {
   const { safeConfig } = useUser();
-  const { cardTransactionsByDate, cardTransactionsLoading, cardTransactionsError } = useCardTransactions();
+  const {
+    cardTransactionsByDate,
+    cardTransactionsLoading,
+    cardTransactionsError,
+    hasNextPage: cardHasNextPage,
+    isLoadingMoreCardTransactions,
+    loadMoreCardTransactions,
+  } = useCardTransactions();
   const { onchainTransactionsByDate, onchainTransactionsLoading, onchainTransactionsError } = useOnchainTransactions();
   const { ibanTransactionsByDate, ibanTransactionsLoading, ibanTransactionsError } = useIbanTransactions();
 
@@ -76,6 +84,23 @@ export const Transactions = () => {
     [selectedType, cardTransactionsByDate, onchainTransactionsByDate, ibanTransactionsByDate],
   );
 
+  const hasNextPage = useMemo(
+    () => (selectedType === TransactionType.CARD ? cardHasNextPage : false),
+    [selectedType, cardHasNextPage],
+  );
+
+  const loadingMore = useMemo(
+    () => (selectedType === TransactionType.CARD ? isLoadingMoreCardTransactions : false),
+    [selectedType, isLoadingMoreCardTransactions],
+  );
+
+  const handleLoadMore = useCallback(() => {
+    if (selectedType === TransactionType.CARD) {
+      loadMoreCardTransactions();
+    }
+    // TODO: Add load more for onchain and IBAN transactions when available
+  }, [selectedType, loadMoreCardTransactions]);
+
   if (!safeConfig || isLoading) {
     return <TransactionSkeleton />;
   }
@@ -87,7 +112,7 @@ export const Transactions = () => {
   const currency = safeConfig.fiatSymbol ? currencies[safeConfig.fiatSymbol] : null;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mb-4">
       {/* Toggle Buttons */}
       <div className="flex gap-2 p-1 bg-muted rounded-lg">
         <Toggle
@@ -151,6 +176,20 @@ export const Transactions = () => {
               })}
           </div>
         ))}
+
+        {hasNextPage && (
+          <div className="flex justify-center p-4">
+            <Button
+              variant="outline"
+              onClick={handleLoadMore}
+              disabled={loadingMore}
+              loading={loadingMore}
+              className="w-full"
+            >
+              {loadingMore ? "Loading..." : "Load More"}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
