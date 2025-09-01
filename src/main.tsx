@@ -18,6 +18,8 @@ import { Toaster } from "sonner";
 import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
 // import { TransactionsContextProvider } from "./context/TransactionsContext.tsx";
 import { CardTransactionsContextProvider } from "./context/CardTransactionsContext.tsx";
+import { OnchainTransactionsContextProvider } from "./context/OnchainTransactionsContext.tsx";
+import { IbanTransactionsContextProvider } from "./context/IbanTransactionsContext.tsx";
 import { OrdersContextProvider } from "./context/OrdersContext.tsx";
 import { RainbowKitWrapper } from "./context/CustomRainbowKitProvider.tsx";
 
@@ -49,10 +51,14 @@ ReactDOM.createRoot(rootElement).render(
                   <OrdersContextProvider>
                     {/* <TransactionsContextProvider> */}
                     <CardTransactionsContextProvider>
-                      <DelayRelayContextProvider>
-                        <App />
-                        <Toaster expand />
-                      </DelayRelayContextProvider>
+                      <OnchainTransactionsContextProvider>
+                        <IbanTransactionsContextProvider>
+                          <DelayRelayContextProvider>
+                            <App />
+                            <Toaster expand />
+                          </DelayRelayContextProvider>
+                        </IbanTransactionsContextProvider>
+                      </OnchainTransactionsContextProvider>
                     </CardTransactionsContextProvider>
                     {/* </TransactionsContextProvider> */}
                   </OrdersContextProvider>

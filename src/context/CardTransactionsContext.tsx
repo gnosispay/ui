@@ -91,13 +91,17 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
     };
   }, [cardTokens, fetchCardTransactions, isAuthenticated]);
 
-  return (
-    <CardTransactionsContext.Provider
-      value={{ cardTransactionsByTokenDate, cardTransactionsByDate, cardTransactionsLoading, cardTransactionsError }}
-    >
-      {children}
-    </CardTransactionsContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      cardTransactionsByTokenDate,
+      cardTransactionsByDate,
+      cardTransactionsLoading,
+      cardTransactionsError,
+    }),
+    [cardTransactionsByTokenDate, cardTransactionsByDate, cardTransactionsLoading, cardTransactionsError],
   );
+
+  return <CardTransactionsContext.Provider value={contextValue}>{children}</CardTransactionsContext.Provider>;
 };
 
 const useCardTransactions = () => {

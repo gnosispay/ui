@@ -1,6 +1,5 @@
-import type { Event, IbanOrder, Currency } from "@/client";
+import type { Event, Currency } from "@/client";
 import type { Erc20TokenEvent } from "@/types/transaction";
-import { type Transaction, TransactionType } from "@/types/transaction";
 
 export function formatDate(dateString?: string) {
   if (!dateString) return "";
