@@ -31,7 +31,14 @@ export const Transactions = () => {
     isLoadingMoreCardTransactions,
     loadMoreCardTransactions,
   } = useCardTransactions();
-  const { onchainTransactionsByDate, onchainTransactionsLoading, onchainTransactionsError } = useOnchainTransactions();
+  const {
+    onchainTransactionsByDate,
+    onchainTransactionsLoading,
+    onchainTransactionsError,
+    hasNextPage: onchainHasNextPage,
+    isLoadingMoreOnchainTransactions,
+    loadMoreOnchainTransactions,
+  } = useOnchainTransactions();
   const { ibanTransactionsByDate, ibanTransactionsLoading, ibanTransactionsError } = useIbanTransactions();
 
   const [selectedType, setSelectedType] = useState<TransactionType>(TransactionType.CARD);
@@ -85,21 +92,33 @@ export const Transactions = () => {
   );
 
   const hasNextPage = useMemo(
-    () => (selectedType === TransactionType.CARD ? cardHasNextPage : false),
-    [selectedType, cardHasNextPage],
+    () =>
+      selectedType === TransactionType.CARD
+        ? cardHasNextPage
+        : selectedType === TransactionType.ONCHAIN
+          ? onchainHasNextPage
+          : false,
+    [selectedType, cardHasNextPage, onchainHasNextPage],
   );
 
   const loadingMore = useMemo(
-    () => (selectedType === TransactionType.CARD ? isLoadingMoreCardTransactions : false),
-    [selectedType, isLoadingMoreCardTransactions],
+    () =>
+      selectedType === TransactionType.CARD
+        ? isLoadingMoreCardTransactions
+        : selectedType === TransactionType.ONCHAIN
+          ? isLoadingMoreOnchainTransactions
+          : false,
+    [selectedType, isLoadingMoreCardTransactions, isLoadingMoreOnchainTransactions],
   );
 
   const handleLoadMore = useCallback(() => {
     if (selectedType === TransactionType.CARD) {
       loadMoreCardTransactions();
     }
-    // TODO: Add load more for onchain and IBAN transactions when available
-  }, [selectedType, loadMoreCardTransactions]);
+    if (selectedType === TransactionType.ONCHAIN) {
+      loadMoreOnchainTransactions();
+    }
+  }, [selectedType, loadMoreCardTransactions, loadMoreOnchainTransactions]);
 
   if (!safeConfig || isLoading) {
     return <TransactionSkeleton />;

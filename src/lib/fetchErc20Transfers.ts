@@ -7,12 +7,45 @@ import {
   getAddress,
   parseEventLogs,
   type Address,
+  type PublicClient,
 } from "viem";
 import { gnosis } from "viem/chains";
 import { fromUnixTime } from "date-fns";
 import { GNOSIS_PAY_SETTLEMENT_ADDRESS } from "@/constants";
 import { Erc20TokenEventDirection } from "@/types/transaction";
 import type { Erc20TokenEvent } from "@/types/transaction";
+
+// Gnosis Chain average block time is approximately 5 seconds
+const GNOSIS_AVERAGE_BLOCK_TIME = 5;
+
+/**
+ * Estimates a block number from a date on Gnosis Chain
+ * This is an approximation based on average block times
+ */
+const estimateBlockFromDate = async (provider: PublicClient, targetDate: Date): Promise<bigint> => {
+  try {
+    const latestBlock = await provider.getBlock({ blockTag: "latest" });
+    const latestTimestamp = Number(latestBlock.timestamp);
+    const latestBlockNumber = Number(latestBlock.number);
+
+    const targetTimestamp = Math.floor(targetDate.getTime() / 1000);
+    const timeDiff = latestTimestamp - targetTimestamp;
+
+    // If target date is in the future, return latest block
+    if (timeDiff <= 0) {
+      return latestBlock.number;
+    }
+
+    // Estimate blocks back from latest
+    const estimatedBlocksBack = Math.floor(timeDiff / GNOSIS_AVERAGE_BLOCK_TIME);
+    const estimatedBlockNumber = Math.max(0, latestBlockNumber - estimatedBlocksBack);
+
+    return BigInt(estimatedBlockNumber);
+  } catch (error) {
+    console.warn("Failed to estimate block from date, falling back to block 0:", error);
+    return 0n;
+  }
+};
 
 const ERC20Abi = [
   {
@@ -61,18 +94,32 @@ export const fetchErc20Transfers = async ({
   address,
   tokenAddress,
   fromDate,
+  toDate,
   skipSettlementTransfers,
 }: {
   address: Address;
   tokenAddress: Address;
   fromDate?: string;
+  toDate?: string;
   skipSettlementTransfers: boolean;
-}): Promise<{ data?: Erc20TokenEvent[]; error?: Error | null }> => {
+}): Promise<{ data?: Erc20TokenEvent[]; error?: Error | null; reachedGenesisBlock?: boolean }> => {
   try {
     const provider = createPublicClient({
       chain: gnosis,
       transport: http(),
     });
+
+    // Calculate block range from date parameters
+    let fromBlock = 0n;
+    let toBlock: bigint | "latest" = "latest";
+
+    if (fromDate) {
+      fromBlock = await estimateBlockFromDate(provider, new Date(fromDate));
+    }
+
+    if (toDate) {
+      toBlock = await estimateBlockFromDate(provider, new Date(toDate));
+    }
 
     const eventFilters = [{ from: address }, { to: address }];
     const transferEvent = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
@@ -84,8 +131,8 @@ export const fetchErc20Transfers = async ({
             address: tokenAddress,
             event: transferEvent,
             args,
-            fromBlock: 0n,
-            toBlock: "latest",
+            fromBlock,
+            toBlock,
           }),
       ),
     );
@@ -127,11 +174,6 @@ export const fetchErc20Transfers = async ({
 
         const eventDate = fromUnixTime(Number(block.timestamp));
 
-        // Apply date filter if provided
-        if (fromDate && eventDate < new Date(fromDate)) {
-          return null;
-        }
-
         return {
           direction:
             getAddress(from) === getAddress(address)
@@ -147,7 +189,11 @@ export const fetchErc20Transfers = async ({
     );
 
     const filteredTransfers = transfers.filter((transfer): transfer is Erc20TokenEvent => transfer !== null);
-    return { data: filteredTransfers };
+
+    // Check if we've reached the genesis block (block 0)
+    const reachedGenesisBlock = fromBlock === 0n;
+
+    return { data: filteredTransfers, reachedGenesisBlock };
   } catch (error) {
     console.error("Error fetching ERC-20 transactions:", error);
     return {
