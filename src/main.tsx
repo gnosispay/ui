@@ -16,7 +16,6 @@ import { UserContextProvider } from "./context/UserContext.tsx";
 import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
 import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
-// import { TransactionsContextProvider } from "./context/TransactionsContext.tsx";
 import { CardTransactionsContextProvider } from "./context/CardTransactionsContext.tsx";
 import { OnchainTransactionsContextProvider } from "./context/OnchainTransactionsContext.tsx";
 import { IbanTransactionsContextProvider } from "./context/IbanTransactionsContext.tsx";
@@ -49,7 +48,6 @@ ReactDOM.createRoot(rootElement).render(
               <UserContextProvider>
                 <CardsContextProvider>
                   <OrdersContextProvider>
-                    {/* <TransactionsContextProvider> */}
                     <CardTransactionsContextProvider>
                       <OnchainTransactionsContextProvider>
                         <IbanTransactionsContextProvider>
@@ -60,7 +58,6 @@ ReactDOM.createRoot(rootElement).render(
                         </IbanTransactionsContextProvider>
                       </OnchainTransactionsContextProvider>
                     </CardTransactionsContextProvider>
-                    {/* </TransactionsContextProvider> */}
                   </OrdersContextProvider>
                 </CardsContextProvider>
               </UserContextProvider>
