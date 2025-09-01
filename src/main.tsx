@@ -16,8 +16,8 @@ import { UserContextProvider } from "./context/UserContext.tsx";
 import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
 import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
-import { TransactionsContextProvider } from "./context/TransactionsContext.tsx";
-import { TransactionsByCardContextProvider } from "./context/TransactionsByCardContext.tsx";
+// import { TransactionsContextProvider } from "./context/TransactionsContext.tsx";
+import { CardTransactionsContextProvider } from "./context/CardTransactionsContext.tsx";
 import { OrdersContextProvider } from "./context/OrdersContext.tsx";
 import { RainbowKitWrapper } from "./context/CustomRainbowKitProvider.tsx";
 
@@ -47,14 +47,14 @@ ReactDOM.createRoot(rootElement).render(
               <UserContextProvider>
                 <CardsContextProvider>
                   <OrdersContextProvider>
-                    <TransactionsContextProvider>
-                      <TransactionsByCardContextProvider>
-                        <DelayRelayContextProvider>
-                          <App />
-                          <Toaster expand />
-                        </DelayRelayContextProvider>
-                      </TransactionsByCardContextProvider>
-                    </TransactionsContextProvider>
+                    {/* <TransactionsContextProvider> */}
+                    <CardTransactionsContextProvider>
+                      <DelayRelayContextProvider>
+                        <App />
+                        <Toaster expand />
+                      </DelayRelayContextProvider>
+                    </CardTransactionsContextProvider>
+                    {/* </TransactionsContextProvider> */}
                   </OrdersContextProvider>
                 </CardsContextProvider>
               </UserContextProvider>

@@ -14,52 +14,69 @@ export function formatDate(dateString?: string) {
     .toUpperCase();
 }
 
-export function groupByDate(transactions: Transaction[]) {
+export function groupByDate<E extends Event | Erc20TokenEvent>(transactions: E[]) {
   return transactions.reduce(
     (acc, tx) => {
-      const date = formatDate(tx.createdAt);
+      const date = "createdAt" in tx ? formatDate(tx.createdAt) : "date" in tx ? formatDate(tx.date.toISOString()) : "";
       if (!acc[date]) acc[date] = [];
       acc[date].push(tx);
       return acc;
     },
-    {} as Record<string, Transaction[]>,
+    {} as Record<string, E[]>,
   );
 }
 
-export const getCardTransactionsFromCardEvents = (cardEvents: Event[]): Transaction[] => {
-  return cardEvents.map((tx) => ({
-    id: `${tx.createdAt}${tx.merchant?.name || ""}${tx.kind}`,
-    createdAt: tx.createdAt || "",
-    type: TransactionType.CARD,
-    data: tx,
-  }));
+export const groupByCardToken = (transactions: Event[]) => {
+  return transactions.reduce(
+    (acc, tx) => {
+      if (!tx.cardToken) {
+        return acc;
+      }
+
+      if (!acc[tx.cardToken]) {
+        acc[tx.cardToken] = [];
+      }
+      acc[tx.cardToken].push(tx);
+      return acc;
+    },
+    {} as Record<string, Event[]>,
+  );
 };
 
-export function mergeAndSortTransactions(
-  cardTransactions: Event[] = [],
-  ibanOrders: IbanOrder[] = [],
-  onchainSafeTransfers: Erc20TokenEvent[] = [],
-): Transaction[] {
-  const cardTransactionsMapped = getCardTransactionsFromCardEvents(cardTransactions);
+// export const getCardTransactionsFromCardEvents = (cardEvents: Event[]): Transaction[] => {
+//   return cardEvents.map((tx) => ({
+//     id: `${tx.createdAt}${tx.merchant?.name || ""}${tx.kind}`,
+//     createdAt: tx.createdAt || "",
+//     type: TransactionType.CARD,
+//     data: tx,
+//   }));
+// };
 
-  const ibanOrdersMapped = ibanOrders.map((order) => ({
-    id: order.id,
-    createdAt: order.meta.placedAt,
-    type: TransactionType.IBAN,
-    data: order,
-  }));
+// export function mergeAndSortTransactions(
+//   cardTransactions: Event[] = [],
+//   ibanOrders: IbanOrder[] = [],
+//   onchainSafeTransfers: Erc20TokenEvent[] = [],
+// ): Transaction[] {
+//   const cardTransactionsMapped = getCardTransactionsFromCardEvents(cardTransactions);
 
-  const onchainSafeTransfersMapped = onchainSafeTransfers.map((tx) => ({
-    id: tx.hash,
-    createdAt: tx.date.toISOString(),
-    type: TransactionType.ONCHAIN,
-    data: tx,
-  }));
+//   const ibanOrdersMapped = ibanOrders.map((order) => ({
+//     id: order.id,
+//     createdAt: order.meta.placedAt,
+//     type: TransactionType.IBAN,
+//     data: order,
+//   }));
 
-  return [...cardTransactionsMapped, ...ibanOrdersMapped, ...onchainSafeTransfersMapped].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-  );
-}
+//   const onchainSafeTransfersMapped = onchainSafeTransfers.map((tx) => ({
+//     id: tx.hash,
+//     createdAt: tx.date.toISOString(),
+//     type: TransactionType.ONCHAIN,
+//     data: tx,
+//   }));
+
+//   return [...cardTransactionsMapped, ...ibanOrdersMapped, ...onchainSafeTransfersMapped].sort(
+//     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+//   );
+// }
 
 /**
  * Calculates the exchange rate between two currencies
