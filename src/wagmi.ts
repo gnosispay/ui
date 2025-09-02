@@ -1,18 +1,18 @@
 import { http, createConfig } from "wagmi";
 import { gnosis } from "wagmi/chains";
-import { coinbaseWallet, injected, safe } from "wagmi/connectors";
+// import { coinbaseWallet, injected, safe } from "wagmi/connectors";
 
 export const config = createConfig({
   chains: [gnosis],
-  connectors: [
-    safe({
-      allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
-      debug: false,
-      shimDisconnect: false,
-    }),
-    injected(),
-    coinbaseWallet(),
-  ],
+  // connectors: [
+  //   safe({
+  //     allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
+  //     debug: false,
+  //     shimDisconnect: false,
+  //   }),
+  //   injected(),
+  //   coinbaseWallet(),
+  // ],
   transports: {
     [gnosis.id]: http(),
   },

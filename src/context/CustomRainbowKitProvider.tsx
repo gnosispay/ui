@@ -58,9 +58,5 @@ export const RainbowKitWrapper = ({ children }: { children: React.ReactNode }) =
     };
   }, []); // CSS variables are read dynamically, so no dependencies needed
 
-  return (
-    <RainbowKitProvider theme={effectiveTheme === "dark" ? customThemes.dark : customThemes.light}>
-      {children}
-    </RainbowKitProvider>
-  );
+  return <RainbowKitProvider>{children}</RainbowKitProvider>;
 };
