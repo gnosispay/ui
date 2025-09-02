@@ -2,9 +2,8 @@ import { HeaderNavBar } from "./components/nav/header";
 import { Route, Routes, Outlet } from "react-router-dom";
 import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
-import { TransactionsRoute } from "./pages/Transactions";
 import { FooterNavBar } from "./components/nav/footer";
-import { Home as HomeIcon, CreditCard, List, User } from "lucide-react";
+import { Home as HomeIcon, CreditCard, User } from "lucide-react";
 import { SignUpRoute } from "./pages/SignUp";
 import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
@@ -24,12 +23,6 @@ export const menuRoutes = [
     element: <CardsRoute />,
     icon: CreditCard,
     label: "Cards",
-  },
-  {
-    path: "/transactions",
-    element: <TransactionsRoute />,
-    icon: List,
-    label: "Transactions",
   },
   {
     path: "/account",

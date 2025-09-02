@@ -30,11 +30,8 @@ export const Home = () => {
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
               <h1 className="font-bold text-secondary">Transactions</h1>
-              <Link to="/transactions" className="flex items-center gap-2">
-                View all <ChevronRight size={16} />
-              </Link>
             </div>
-            <Transactions history={7} />
+            <Transactions />
           </div>
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
             <div className="flex items-center justify-between mb-4">

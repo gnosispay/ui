@@ -2,12 +2,11 @@ import { CardsCarousel } from "@/components/cards-carousel/cards-carousel";
 import { CardsOrderModal } from "@/components/modals/cards-order.tsx";
 import { PendingCardOrder } from "@/components/pending-card-order";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, InboxIcon, PlusIcon } from "lucide-react";
+import { InboxIcon, PlusIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { CardActions } from "@/components/cards-carousel/card-actions";
 import { CardTransactions } from "@/components/transactions/card-transactions";
-import { Link } from "react-router-dom";
 
 export const CardsRoute = () => {
   const [open, setOpen] = useState(false);
@@ -50,9 +49,6 @@ export const CardsRoute = () => {
       <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
         <div className="flex items-center justify-between mb-4">
           <h1 className="font-bold text-secondary">Transactions</h1>
-          <Link to="/transactions" className="flex items-center gap-2">
-            View all <ChevronRight size={16} />
-          </Link>
         </div>
         <CardTransactions cardToken={selectedCard?.cardToken} />
       </div>
