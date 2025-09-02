@@ -12,7 +12,7 @@ import { useIbanTransactions } from "@/context/IbanTransactionsContext";
 import { currencies } from "@/constants";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useState, useCallback, useMemo } from "react";
-import { Toggle } from "@/components/ui/toggle";
+import { TransactionTabs, TransactionTab } from "@/components/ui/transaction-tabs";
 import { Button } from "@/components/ui/button";
 
 enum TransactionType {
@@ -43,22 +43,8 @@ export const Transactions = () => {
 
   const [selectedType, setSelectedType] = useState<TransactionType>(TransactionType.CARD);
 
-  const handleCardTransactions = useCallback((pressed: boolean) => {
-    if (pressed) {
-      setSelectedType(TransactionType.CARD);
-    }
-  }, []);
-
-  const handleOnchainTransactions = useCallback((pressed: boolean) => {
-    if (pressed) {
-      setSelectedType(TransactionType.ONCHAIN);
-    }
-  }, []);
-
-  const handleIbanTransactions = useCallback((pressed: boolean) => {
-    if (pressed) {
-      setSelectedType(TransactionType.IBAN);
-    }
+  const handleTabChange = useCallback((value: string) => {
+    setSelectedType(value as TransactionType);
   }, []);
 
   const isLoading = useMemo(
@@ -132,83 +118,63 @@ export const Transactions = () => {
 
   return (
     <div className="flex flex-col gap-4 mb-4">
-      {/* Toggle Buttons */}
-      <div className="flex gap-2 p-1 bg-muted rounded-lg">
-        <Toggle
-          pressed={selectedType === TransactionType.CARD}
-          onPressedChange={handleCardTransactions}
-          className="flex-1"
-          size="sm"
-        >
-          Card
-        </Toggle>
-        <Toggle
-          pressed={selectedType === TransactionType.ONCHAIN}
-          onPressedChange={handleOnchainTransactions}
-          className="flex-1"
-          size="sm"
-        >
-          Onchain
-        </Toggle>
-        <Toggle
-          pressed={selectedType === TransactionType.IBAN}
-          onPressedChange={handleIbanTransactions}
-          className="flex-1"
-          size="sm"
-        >
-          IBAN
-        </Toggle>
-      </div>
-
       {/* Transactions Content */}
-      <div className="bg-card rounded-xl p-2">
-        {Object.keys(transactionsByDate).length === 0 && (
-          <div className="flex flex-col items-center justify-center py-8">
-            <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
-            <div className="text-center text-secondary">
-              {selectedType === TransactionType.CARD && "No card transactions to display"}
-              {selectedType === TransactionType.ONCHAIN && "No onchain transactions to display"}
-              {selectedType === TransactionType.IBAN && "No IBAN transactions to display"}
+      <div className="bg-card rounded-xl">
+        {/* Transaction Tabs */}
+        <TransactionTabs value={selectedType} onValueChange={handleTabChange}>
+          <TransactionTab value={TransactionType.CARD}>Card</TransactionTab>
+          <TransactionTab value={TransactionType.ONCHAIN}>On-chain</TransactionTab>
+          <TransactionTab value={TransactionType.IBAN}>IBAN</TransactionTab>
+        </TransactionTabs>
+        <div className="p-2">
+          {Object.keys(transactionsByDate).length === 0 && (
+            <div className="flex flex-col items-center justify-center py-8">
+              <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
+              <div className="text-center text-secondary">
+                {selectedType === TransactionType.CARD && "No card transactions to display"}
+                {selectedType === TransactionType.ONCHAIN && "No onchain transactions to display"}
+                {selectedType === TransactionType.IBAN && "No IBAN transactions to display"}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {Object.keys(transactionsByDate).map((date) => (
-          <div key={date}>
-            <div className="text-xs text-secondary mb-2 p-2">{date}</div>
+          {Object.keys(transactionsByDate).map((date) => (
+            <div key={date}>
+              <div className="text-xs text-secondary mb-2 p-2">{date}</div>
 
-            {selectedType === TransactionType.CARD &&
-              (transactionsByDate as Record<string, Event[]>)[date].map((tx: Event) => {
-                const id = `${tx.createdAt}${tx.merchant?.name || ""}${tx.kind}`;
-                return <TransactionRow key={id} transaction={tx} />;
-              })}
+              {selectedType === TransactionType.CARD &&
+                (transactionsByDate as Record<string, Event[]>)[date].map((tx: Event) => {
+                  const id = `${tx.createdAt}${tx.merchant?.name || ""}${tx.kind}`;
+                  return <TransactionRow key={id} transaction={tx} />;
+                })}
 
-            {selectedType === TransactionType.ONCHAIN &&
-              currency &&
-              (transactionsByDate as Record<string, Erc20TokenEvent[]>)[date].map((transfer: Erc20TokenEvent) => {
-                return <OnchainTransferRow key={transfer.hash} transfer={transfer} currency={currency} />;
-              })}
+              {selectedType === TransactionType.ONCHAIN &&
+                currency &&
+                (transactionsByDate as Record<string, Erc20TokenEvent[]>)[date].map((transfer: Erc20TokenEvent) => {
+                  return <OnchainTransferRow key={transfer.hash} transfer={transfer} currency={currency} />;
+                })}
 
-            {selectedType === TransactionType.IBAN &&
-              (transactionsByDate as Record<string, IbanOrder[]>)[date].map((ibanOrder: IbanOrder) => {
-                return <BankTransferRow key={ibanOrder.id} ibanOrder={ibanOrder} />;
-              })}
-          </div>
-        ))}
+              {selectedType === TransactionType.IBAN &&
+                (transactionsByDate as Record<string, IbanOrder[]>)[date].map((ibanOrder: IbanOrder) => {
+                  return <BankTransferRow key={ibanOrder.id} ibanOrder={ibanOrder} />;
+                })}
+            </div>
+          ))}
 
-        {hasNextPage && (
-          <div className="flex justify-center p-4">
-            <Button
-              variant="outline"
-              onClick={handleLoadMore}
-              disabled={loadingMore}
-              loading={loadingMore}
-              className="w-full"
-            >
-              {loadingMore ? "Loading..." : "Load More"}
-            </Button>
-          </div>
-        )}
+          {hasNextPage && (
+            <div className="flex justify-center p-4">
+              <Button
+                variant="outline"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                loading={loadingMore}
+                className="w-full"
+              >
+                {loadingMore ? "Loading..." : "Load More"}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
