@@ -11,7 +11,6 @@ export const config = createConfig({
       shimDisconnect: false,
     }),
     injected(),
-    coinbaseWallet(),
     walletConnect({
       projectId: "97f66822692378042f2b9a3c6d370c2b",
     }),
