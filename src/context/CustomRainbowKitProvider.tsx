@@ -1,6 +1,7 @@
 // import { useMemo } from "react";
 // import { useTheme } from "@/context/ThemeContext";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { gnosis } from "wagmi/chains";
 // import { getCSSVariable } from "@/utils/getCSSVariable";
 
 export const RainbowKitWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -58,5 +59,9 @@ export const RainbowKitWrapper = ({ children }: { children: React.ReactNode }) =
   //   };
   // }, []); // CSS variables are read dynamically, so no dependencies needed
 
-  return <RainbowKitProvider>{children}</RainbowKitProvider>;
+  return (
+    <RainbowKitProvider modalSize="compact" initialChain={gnosis}>
+      {children}
+    </RainbowKitProvider>
+  );
 };
