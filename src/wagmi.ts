@@ -1,6 +1,6 @@
 import { http, createConfig } from "wagmi";
 import { gnosis } from "wagmi/chains";
-import { coinbaseWallet, injected, safe, walletConnect } from "wagmi/connectors";
+import { injected, safe, walletConnect } from "wagmi/connectors";
 
 export const config = createConfig({
   chains: [gnosis],
