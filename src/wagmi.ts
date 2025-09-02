@@ -13,6 +13,7 @@ const connectors = connectorsForWallets(
   ],
   {
     appName: "Gnosis Pay",
+    // it's fine to have the id here, it has an allow list for the domains we use
     projectId: "02e652f4cb3974c4c3a822aa56ec09f6",
   },
 );
@@ -31,9 +32,3 @@ export const config = createConfig({
     [gnosis.id]: http(),
   },
 });
-
-// declare module "wagmi" {
-//   interface Register {
-//     config: typeof config;
-//   }
-// }
