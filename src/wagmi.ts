@@ -12,7 +12,7 @@ export const config = createConfig({
     }),
     injected(),
     walletConnect({
-      projectId: "97f66822692378042f2b9a3c6d370c2b",
+      projectId: "02e652f4cb3974c4c3a822aa56ec09f6",
     }),
   ],
   transports: {
