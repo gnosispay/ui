@@ -24,7 +24,7 @@ import { RainbowKitWrapper } from "./context/CustomRainbowKitProvider.tsx";
 import { ZendeskProvider } from "react-use-zendesk";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
-export const ZENDESK_API_KEY = import.meta.env.VITE_ZENDESK_KEY || "";
+export const zendeskKey = import.meta.env.VITE_ZENDESK_KEY;
 
 globalThis.Buffer = Buffer;
 
@@ -35,8 +35,8 @@ if (!rootElement) {
   throw new Error("Root element not found");
 }
 
-if (!ZENDESK_API_KEY) {
-  console.error("VITE_ZENDESK_API_KEY is not set");
+if (!zendeskKey) {
+  console.warn("VITE_ZENDESK_API_KEY is not set");
 }
 
 client.setConfig({
@@ -52,15 +52,7 @@ ReactDOM.createRoot(rootElement).render(
           <RainbowKitWrapper>
             <AuthContextProvider>
               <UserContextProvider>
-                <ZendeskProvider
-                  apiKey={ZENDESK_API_KEY}
-                  onOpen={() => {
-                    console.log("Zendesk opened");
-                  }}
-                  onClose={() => {
-                    console.log("Zendesk closed");
-                  }}
-                >
+                <ZendeskProvider apiKey={zendeskKey}>
                   <CardsContextProvider>
                     <OrdersContextProvider>
                       <CardTransactionsContextProvider>

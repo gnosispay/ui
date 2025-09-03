@@ -1636,8 +1636,5 @@ export enum ZENDESK_TICKET_TYPES {
   FRAUDULENT_TRANSACTION = "FRAUDULENT_TRANSACTION",
 }
 
-// This is a zendesk custom field for CR classification
-export const CR_CLASSIFICATION_ID = "31875545573908";
-export const ZENDESK_USER_ID_FIELD_ID = "34806749751956";
-export const ZENDESK_PARTNER_ID_FIELD_ID = "36915162816020";
-export const ZENDESK_PARTNER_NAME_FIELD_ID = "gnosispay_v2app";
+export const ZENDESK_USER_ID_FIELD_ID = "40875525876372";
+export const ZENDESK_PARTNER_TAG_VALUE = "GnosisPay v2app";
