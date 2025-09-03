@@ -1,0 +1,158 @@
+{
+    "containerDefinitions": [
+        {
+            "name": "logger",
+            "image": "grafana/fluent-bit-plugin-loki:2.9.1",
+            "cpu": 0,
+            "portMappings": [],
+            "essential": false,
+            "environment": [],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "user": "0",
+            "readonlyRootFilesystem": false,
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/stg-webapp-logger",
+                    "awslogs-region": "eu-central-1",
+                    "awslogs-stream-prefix": "webapp-logger"
+                },
+                "secretOptions": []
+            },
+            "systemControls": [],
+            "firelensConfiguration": {
+                "type": "fluentbit",
+                "options": {
+                    "enable-ecs-log-metadata": "true"
+                }
+            }
+        },
+        {
+            "name": "webapp",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "PROJECT",
+                    "value": "gnosispay"
+                },
+                {
+                    "name": "ENV",
+                    "value": "stg"
+                },
+                {
+                    "name": "PORT",
+                    "value": "3000"
+                },
+                {
+                    "name": "ACCOUNT_ID",
+                    "value": "529187432297"
+                },
+                {
+                    "name": "REGION",
+                    "value": "eu-central-1"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "linuxParameters": {
+                "initProcessEnabled": true
+            },
+            "secrets": [
+                {
+                    "name": "API_TOKEN",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/API_TOKEN"
+                },
+                {
+                    "name": "AUTH_SECRET",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/AUTH_SECRET"
+                },
+                {
+                    "name": "AUTH_URL",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/AUTH_URL"
+                },
+                {
+                    "name": "AUTH_TRUST_HOST",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/AUTH_TRUST_HOST"
+                },
+                {
+                    "name": "DATABASE_URL",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/DATABASE_URL"
+                },
+                {
+                    "name": "GATEWAY_RPC_KEY",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/GATEWAY_RPC_KEY"
+                },
+                {
+                    "name": "GATEWAY_RPC_URL",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/GATEWAY_RPC_URL"
+                },
+                {
+                    "name": "JWT_SECRET",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/JWT_SECRET"
+                },
+                {
+                    "name": "OTEL_EXPORTER_LOGS_HEADERS",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/OTEL_EXPORTER_LOGS_HEADERS"
+                },
+                {
+                    "name": "OTEL_EXPORTER_TRACES_HEADERS",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/OTEL_EXPORTER_TRACES_HEADERS"
+                },
+                {
+                    "name": "SENDGRID_SECRET",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/SENDGRID_SECRET"
+                },
+                {
+                    "name": "SPINDL_API_KEY",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/SPINDL_API_KEY"
+                },
+                {
+                    "name": "SUMSUB_APP_TOKEN",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/SUMSUB_APP_TOKEN"
+                },
+                {
+                    "name": "SUMSUB_SECRET_KEY",
+                    "valueFrom": "arn:aws:ssm:eu-central-1:529187432297:parameter/stg/webapp/SUMSUB_SECRET_KEY"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awsfirelens",
+                "options": {
+                    "RemoveKeys": "ecs_task_arn",
+                    "LineFormat": "key_value",
+                    "Labels": "{job=\"webapp\",environment=\"stg\"}",
+                    "LabelKeys": "container_name,container_id,ecs_task_definition,source,ecs_cluster",
+                    "Url": "https://loki.stg.gnosispay.in/loki/api/v1/push",
+                    "Name": "grafana-loki"
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
+        }
+    ],
+    "family": "stg-webapp",
+    "taskRoleArn": "arn:aws:iam::529187432297:role/gnosispay-stg-webapp-ecs-task-role",
+    "executionRoleArn": "arn:aws:iam::529187432297:role/gnosispay-stg-webapp-ecs-exec-role",
+    "networkMode": "awsvpc",
+    "volumes": [],
+    "placementConstraints": [],
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "runtimePlatform": {
+        "cpuArchitecture": "X86_64",
+        "operatingSystemFamily": "LINUX"
+    },
+    "tags": []
+}
