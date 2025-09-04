@@ -9,6 +9,7 @@ import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AccountRoute } from "./pages/Account";
+import { PartnersRoute } from "./pages/Partners";
 import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
 import { useZendeskUserId } from "./hooks/useZendeskUserId";
 
@@ -34,6 +35,11 @@ export const menuRoutes = [
 ];
 
 const publicRoutes = [
+  {
+    path: "/partners",
+    element: <PartnersRoute />,
+    label: "Apps",
+  },
   {
     path: "/register",
     element: <SignUpRoute />,
