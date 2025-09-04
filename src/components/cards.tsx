@@ -3,16 +3,29 @@ import { Skeleton } from "./ui/skeleton";
 import { CardsOrderModal } from "./modals/cards-order.tsx/cards-order";
 import CardFront from "./cards-carousel/card-front";
 import { PlusIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const Cards = () => {
   const { cards, cardInfoMap } = useCards();
+  const navigate = useNavigate();
   const isLoading = useMemo(() => !cards || !cardInfoMap, [cards, cardInfoMap]);
   const [open, setOpen] = useState(false);
 
-  const handleAddCard = () => {
+  const handleAddCard = useCallback(() => {
     setOpen(true);
-  };
+  }, []);
+
+  const handleCardClick = useCallback(
+    (index: number) => {
+      if (index === 0) {
+        navigate("/cards");
+      } else {
+        navigate(`/cards?cardIndex=${index}`);
+      }
+    },
+    [navigate],
+  );
 
   return (
     <>
@@ -32,8 +45,14 @@ export const Cards = () => {
             </div>
           ))}
         {!isLoading &&
-          cards?.map((card) => (
-            <div key={card.id} className="flex items-center gap-4">
+          cards?.map((card, index) => (
+            <button
+              key={card.id}
+              type="button"
+              className="flex items-center gap-4 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              onClick={() => handleCardClick(index)}
+              aria-label={`Go to card ending in ${card.lastFourDigits}`}
+            >
               <CardFront className="rounded-sm w-17" />
               <div className="flex flex-col gap-2">
                 <div className="text-sm text-primary">
@@ -42,7 +61,7 @@ export const Cards = () => {
                 </div>
                 <div className="text-sm font-light text-secondary">{card.virtual ? "Virtual" : "Physical"}</div>
               </div>
-            </div>
+            </button>
           ))}
         <div className="flex items-center gap-4">
           <button

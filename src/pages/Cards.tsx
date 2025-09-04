@@ -3,28 +3,51 @@ import { CardsOrderModal } from "@/components/modals/cards-order.tsx";
 import { PendingCardOrder } from "@/components/pending-card-order";
 import { Button } from "@/components/ui/button";
 import { InboxIcon, PlusIcon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useCards } from "@/context/CardsContext";
 import { CardActions } from "@/components/cards-carousel/card-actions";
 import { CardTransactions } from "@/components/transactions/card-transactions";
 
 export const CardsRoute = () => {
   const [open, setOpen] = useState(false);
-  const { cards, hideVoidedCards } = useCards();
-  const [selectedIndex, setSelectedIndex] = useState(0);
-  const selectedCard = cards && cards.length > 0 ? cards[selectedIndex] : undefined;
+  const { cards, selectedCardIndex, setSelectedCardIndex } = useCards();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCard = cards && cards.length > 0 ? cards[selectedCardIndex] : undefined;
 
-  // Reset selected index when cards are filtered
+  // Track if we're updating the URL ourselves to prevent circular updates
+  const isUpdatingUrl = useRef(false);
+
+  // Initialize selected index from URL parameter (only when not updating URL ourselves)
   useEffect(() => {
-    if (cards && selectedIndex >= cards.length) {
-      setSelectedIndex(0);
+    if (isUpdatingUrl.current) {
+      isUpdatingUrl.current = false;
+      return;
     }
-  }, [cards, selectedIndex]);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: we actually want to reset the selected card 0 on hide/unhide
+    const cardIndexParam = searchParams.get("cardIndex");
+    if (cardIndexParam !== null && cards && cards.length > 0) {
+      const index = parseInt(cardIndexParam, 10);
+      if (!Number.isNaN(index) && index >= 0 && index < cards.length) {
+        setSelectedCardIndex(index);
+      } else {
+        console.error("Invalid card index from URL", index);
+        setSelectedCardIndex(0);
+      }
+    }
+  }, [searchParams, cards, setSelectedCardIndex]);
+
+  // Update URL when selected index changes
   useEffect(() => {
-    setSelectedIndex(0);
-  }, [hideVoidedCards]);
+    isUpdatingUrl.current = true;
+    const newParams = new URLSearchParams(searchParams);
+    if (selectedCardIndex === 0) {
+      newParams.delete("cardIndex");
+    } else {
+      newParams.set("cardIndex", selectedCardIndex.toString());
+    }
+    setSearchParams(newParams, { replace: true });
+  }, [selectedCardIndex, searchParams, setSearchParams]);
 
   return (
     <div className="grid grid-cols-6 gap-8 h-full mt-4 md:px-0">
@@ -40,7 +63,7 @@ export const CardsRoute = () => {
       </div>
       <div className="col-span-6 md:col-span-4 md:col-start-2">
         <div className="w-full flex flex-col lg:flex-row gap-6">
-          <CardsCarousel currentIndex={selectedIndex} setCurrentIndex={setSelectedIndex} />
+          <CardsCarousel />
           <div className="flex-1 flex items-center justify-center">
             {selectedCard && <CardActions card={selectedCard} />}
           </div>

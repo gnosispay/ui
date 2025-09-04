@@ -33,8 +33,10 @@ type CardInfoMap = Record<string, CardInfo>;
 export type ICardContext = {
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
-  hideVoidedCards: boolean;
-  setHideVoidedCards: (hide: boolean) => void;
+  isHideVoidedCards: boolean;
+  toggleVoidedCardsVisibility: () => void;
+  selectedCardIndex: number;
+  setSelectedCardIndex: (index: number) => void;
   refreshCards: () => void;
   freezeCard: (cardId: string) => void;
   unfreezeCard: (cardId: string) => void;
@@ -48,19 +50,27 @@ const CardsContext = createContext<ICardContext | undefined>(undefined);
 const CardsContextProvider = ({ children }: CardContextProps) => {
   const [fetchedCards, setFetchedCards] = useState<ICardContext["cards"]>(undefined);
   const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
-  const [hideVoidedCards, setHideVoidedCards] = useState(true);
+  const [isHideVoidedCards, setIsHideVoidedCards] = useState(true);
+  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const { isAuthenticated } = useAuth();
 
   const cards = useMemo(() => {
     if (!fetchedCards || !cardInfoMap) return undefined;
 
-    if (!hideVoidedCards) return fetchedCards;
+    if (!isHideVoidedCards) return fetchedCards;
 
     return fetchedCards.filter((card) => {
       const cardInfo = !!card.cardToken && cardInfoMap[card.cardToken];
       return !!cardInfo && !cardInfo.isVoid && !cardInfo.isLost && !cardInfo.isStolen;
     });
-  }, [fetchedCards, cardInfoMap, hideVoidedCards]);
+  }, [fetchedCards, cardInfoMap, isHideVoidedCards]);
+
+  // Reset selected index when cards are filtered or when selected index is out of bounds
+  useEffect(() => {
+    if (cards && selectedCardIndex >= cards.length) {
+      setSelectedCardIndex(0);
+    }
+  }, [cards, selectedCardIndex]);
 
   const setCardsInfo = useCallback(async (cards: Card[]) => {
     const newMap: CardInfoMap = {};
@@ -232,6 +242,11 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     [refreshCards],
   );
 
+  const toggleVoidedCardsVisibility = useCallback(() => {
+    setIsHideVoidedCards(!isHideVoidedCards);
+    setSelectedCardIndex(0);
+  }, [isHideVoidedCards]);
+
   useEffect(() => {
     if (!isAuthenticated) return;
     refreshCards();
@@ -242,8 +257,10 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       value={{
         cards,
         cardInfoMap,
-        hideVoidedCards,
-        setHideVoidedCards,
+        isHideVoidedCards,
+        toggleVoidedCardsVisibility,
+        selectedCardIndex,
+        setSelectedCardIndex,
         refreshCards,
         freezeCard,
         unfreezeCard,

@@ -34,8 +34,8 @@ export const CardActions = ({ card }: { card: Card }) => {
     markCardAsLost,
     cardInfoMap,
     activateCard,
-    hideVoidedCards,
-    setHideVoidedCards,
+    isHideVoidedCards,
+    toggleVoidedCardsVisibility,
   } = useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
@@ -139,7 +139,7 @@ export const CardActions = ({ card }: { card: Card }) => {
             <DropdownMenuItem
               onClick={(e) => {
                 e.preventDefault();
-                setHideVoidedCards(!hideVoidedCards);
+                toggleVoidedCardsVisibility();
               }}
               className="flex items-center justify-between"
             >
@@ -148,8 +148,8 @@ export const CardActions = ({ card }: { card: Card }) => {
                 Hide voided cards
               </div>
               <Switch
-                checked={hideVoidedCards}
-                onCheckedChange={setHideVoidedCards}
+                checked={isHideVoidedCards}
+                onCheckedChange={toggleVoidedCardsVisibility}
                 onClick={(e) => e.stopPropagation()}
               />
             </DropdownMenuItem>
