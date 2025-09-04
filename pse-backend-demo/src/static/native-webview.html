@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Native WebView - PSE</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "@gnosispay/pse-sdk": "https://unpkg.com/@gnosispay/pse-sdk@1.2.2/dist/gp-sdk.es.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <div id="secure-frame-container"></div>
+    </div>
+    <script type="module">
+      import GPSDK, {
+        ElementType,
+        IframeMessageType,
+      } from "@gnosispay/pse-sdk";
+
+      async function loadEphemeralToken() {
+        try {
+          const response = await fetch("/token");
+          const data = await response.json();
+          return data.responseObject.data.ephemeralToken;
+        } catch (error) {
+          alert("Failed to load ephemeral token");
+        }
+      }
+
+      async function initializeSDK(appId, authToken, cardToken) {
+        try {
+          const ephemeralToken = await loadEphemeralToken();
+
+          const gp = new GPSDK({
+            appId,
+            ephemeralToken,
+            gnosisPayApiAuthToken: authToken,
+          });
+
+          const cardDisplay = gp.init(
+            ElementType.CardData,
+            "#secure-frame-container",
+            { cardToken },
+          );
+
+        } catch (error) {
+          console.error("Failed to initialize SDK:", error);
+        }
+      }
+
+      // Listen for messages from React Native
+      window.addEventListener('message', function(event) {
+        try {
+          const data = JSON.parse(event.data);
+          
+          // Extract the parameters
+          const appId = data.appId;
+          const authToken = data.authToken;
+          const cardToken = data.cardToken;
+          
+          // Validate required parameters
+          if (!appId || !authToken || !cardToken) {
+            console.error('Missing required parameters:', { appId, authToken, cardToken });
+            return;
+          }
+          
+          // Initialize the SDK with received parameters
+          initializeSDK(appId, authToken, cardToken);
+          
+        } catch (error) {
+          console.error('Failed to parse message:', error);
+        }
+      });
+    </script>
+  </body>
+</html>
+
