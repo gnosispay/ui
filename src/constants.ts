@@ -1,7 +1,9 @@
 import type { GetApiV1UserTermsResponse } from "./client";
-import eurLogo from "./assets/eure.png";
-import gbpLogo from "./assets/gbpe.png";
-import usdcLogo from "./assets/usdce.png";
+import eurLogo from "./assets/tokens/eure.png";
+import gbpLogo from "./assets/tokens/gbpe.png";
+import usdcLogo from "./assets/tokens/usdce.png";
+import gnoLogo from "./assets/tokens/gno.svg";
+import xdaiLogo from "./assets/tokens/xdai.png";
 
 export interface CurrencyInfo {
   tokenSymbol?: string;
@@ -11,6 +13,8 @@ export interface CurrencyInfo {
   fiatSymbol?: string;
   logo?: string;
 }
+
+export type TokenInfo = Omit<CurrencyInfo, "fiatSymbol">;
 
 export const currencies: Record<string, CurrencyInfo> = {
   EUR: {
@@ -36,6 +40,23 @@ export const currencies: Record<string, CurrencyInfo> = {
     symbol: "$",
     fiatSymbol: "USD",
     logo: usdcLogo,
+  },
+};
+
+export const supportedTokens: Record<string, TokenInfo> = {
+  GNO: {
+    tokenSymbol: "GNO",
+    address: "0x9c58bacc331c9aa871afd802db6379a98e80cedb",
+    decimals: 18,
+    symbol: "GNO",
+    logo: gnoLogo,
+  },
+  XDAI: {
+    tokenSymbol: "XDAI",
+    address: "0x0000000000000000000000000000000000000000",
+    decimals: 18,
+    symbol: "XDAI",
+    logo: xdaiLogo,
   },
 };
 
@@ -75,6 +96,7 @@ export const SUPPORTED_COUNTRIES = [
   "AT",
   "BE",
   "BG",
+  "BR",
   "HR",
   "CY",
   "CZ",
