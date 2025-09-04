@@ -10,6 +10,7 @@ import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
+import { PartnerBanner } from "@/components/ui/partner-banner";
 
 export const Home = () => {
   const [sendFundsModalOpen, setSendFundsModalOpen] = useState(false);
@@ -21,10 +22,17 @@ export const Home = () => {
         <div className="mx-4 lg:mx-0">
           <PendingCardOrder />
         </div>
-        <Balances />
-        <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
-          <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
-          <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
+        <div className="grid grid-cols-3 gap-4">
+          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
+            <Balances />
+            <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
+              <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
+              <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
+            </div>
+          </div>
+          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
+            <PartnerBanner />
+          </div>
         </div>
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
