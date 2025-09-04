@@ -1,9 +1,9 @@
 import cors from "cors";
-import fs from "fs";
+import fs from "node:fs";
 import express, { type Express } from "express";
 import helmet from "helmet";
 import { pino } from "pino";
-import path from "path";
+import path from "node:path";
 
 import { openAPIRouter } from "@/api-docs/openAPIRouter";
 import { healthCheckRouter } from "@/api/healthCheck/healthCheckRouter";
@@ -53,22 +53,17 @@ app.use(
   }),
 );
 
-app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
-      "script-src": [
-        "'self'",
-        "'unsafe-inline'",
-        "https://unpkg.com"
-      ],
-      "style-src": [
-        "'self'",
-        "'unsafe-inline'"
-      ],
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        "script-src": ["'self'", "'unsafe-inline'", "https://unpkg.com"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+      },
     },
-  },
-}));
+  }),
+);
 
 // Request logging
 app.use(requestLogger);
@@ -77,12 +72,8 @@ app.use(requestLogger);
 app.use("/health-check", healthCheckRouter);
 app.use("/token", tokenRouter);
 
-
 app.get("/native-webview", (_req, res) => {
-  const nativeWebviewPath = path.join(
-    __dirname,
-    "./static/native-webview.html",
-  );
+  const nativeWebviewPath = path.join(__dirname, "./static/native-webview.html");
   const htmlContent = fs.readFileSync(nativeWebviewPath, "utf-8");
 
   res.set("Content-Type", "text/html");
@@ -91,7 +82,6 @@ app.get("/native-webview", (_req, res) => {
 
 // Swagger UI
 app.use(openAPIRouter);
-
 
 // Error handlers
 app.use(errorHandler());
