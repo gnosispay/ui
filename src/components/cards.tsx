@@ -19,8 +19,8 @@ export const Cards = () => {
       <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
         {isLoading &&
           [1, 2, 3].map((i) => (
-            <div key={`skeleton-${i}`} className="flex items-center gap-2">
-              <Skeleton className="rounded-sm w-20 h-14" />
+            <div key={`skeleton-${i}`} className="flex items-center gap-4">
+              <Skeleton className="rounded-sm w-17 h-14" />
               <div className="flex flex-col gap-2">
                 <div className="text-sm text-primary">
                   <Skeleton className="w-20 h-4" />
@@ -33,8 +33,8 @@ export const Cards = () => {
           ))}
         {!isLoading &&
           cards?.map((card) => (
-            <div key={card.id} className="flex items-center gap-2">
-              <CardFront className="rounded-sm w-20" />
+            <div key={card.id} className="flex items-center gap-4">
+              <CardFront className="rounded-sm w-17" />
               <div className="flex flex-col gap-2">
                 <div className="text-sm text-primary">
                   <span className="mr-2">•••</span>
@@ -44,10 +44,10 @@ export const Cards = () => {
               </div>
             </div>
           ))}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <button
             type="button"
-            className="cursor-pointer rounded-sm w-20 h-14 bg-muted flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="cursor-pointer rounded-sm w-17 h-11 bg-muted flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={handleAddCard}
             aria-label="Add card"
           >
