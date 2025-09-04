@@ -1628,3 +1628,6 @@ export const SUPPORTED_SHIPPING_COUNTRIES = [
 ];
 
 export const COUPON_CODES = "GPUI100";
+
+export const ZENDESK_USER_ID_FIELD_ID = "40875525876372";
+export const ZENDESK_PARTNER_TAG_VALUE = "GnosisPay v2app";

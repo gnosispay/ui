@@ -10,6 +10,7 @@ import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AccountRoute } from "./pages/Account";
 import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
+import { useZendeskUserId } from "./hooks/useZendeskUserId";
 
 export const menuRoutes = [
   {
@@ -64,6 +65,8 @@ function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
 }
 
 function App() {
+  useZendeskUserId();
+
   return (
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />

@@ -36,6 +36,7 @@ jobs:
           VITE_PSE_APP_ID: 'gp_a1b2c3d4e5f678901234567890123456'
           VITE_GNOSIS_PAY_API_BASE_URL: 'https://api.gnosispay.com/'
           VITE_IFRAME_HOST: 'https://api-pse-public.gnosispay.com'
+          VITE_ZENDESK_KEY: '${{ secrets.VITE_ZENDESK_KEY }}'
         run: pnpm build
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1

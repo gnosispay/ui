@@ -21,8 +21,10 @@ import { OnchainTransactionsContextProvider } from "./context/OnchainTransaction
 import { IbanTransactionsContextProvider } from "./context/IbanTransactionsContext.tsx";
 import { OrdersContextProvider } from "./context/OrdersContext.tsx";
 import { RainbowKitWrapper } from "./context/CustomRainbowKitProvider.tsx";
+import { ZendeskProvider } from "react-use-zendesk";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
+export const zendeskKey = import.meta.env.VITE_ZENDESK_KEY;
 
 globalThis.Buffer = Buffer;
 
@@ -31,6 +33,10 @@ const rootElement = document.getElementById("root");
 
 if (!rootElement) {
   throw new Error("Root element not found");
+}
+
+if (!zendeskKey) {
+  console.warn("VITE_ZENDESK_API_KEY is not set");
 }
 
 client.setConfig({
@@ -46,20 +52,22 @@ ReactDOM.createRoot(rootElement).render(
           <RainbowKitWrapper>
             <AuthContextProvider>
               <UserContextProvider>
-                <CardsContextProvider>
-                  <OrdersContextProvider>
-                    <CardTransactionsContextProvider>
-                      <OnchainTransactionsContextProvider>
-                        <IbanTransactionsContextProvider>
-                          <DelayRelayContextProvider>
-                            <App />
-                            <Toaster expand />
-                          </DelayRelayContextProvider>
-                        </IbanTransactionsContextProvider>
-                      </OnchainTransactionsContextProvider>
-                    </CardTransactionsContextProvider>
-                  </OrdersContextProvider>
-                </CardsContextProvider>
+                <ZendeskProvider apiKey={zendeskKey}>
+                  <CardsContextProvider>
+                    <OrdersContextProvider>
+                      <CardTransactionsContextProvider>
+                        <OnchainTransactionsContextProvider>
+                          <IbanTransactionsContextProvider>
+                            <DelayRelayContextProvider>
+                              <App />
+                              <Toaster expand />
+                            </DelayRelayContextProvider>
+                          </IbanTransactionsContextProvider>
+                        </OnchainTransactionsContextProvider>
+                      </CardTransactionsContextProvider>
+                    </OrdersContextProvider>
+                  </CardsContextProvider>
+                </ZendeskProvider>
               </UserContextProvider>
             </AuthContextProvider>
           </RainbowKitWrapper>
