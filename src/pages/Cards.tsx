@@ -11,8 +11,9 @@ import { CardTransactions } from "@/components/transactions/card-transactions";
 
 export const CardsRoute = () => {
   const [open, setOpen] = useState(false);
-  const { cards, selectedCardIndex, setSelectedCardIndex } = useCards();
+  const { cards, isHideVoidedCards, setIsHideVoidedCards } = useCards();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const selectedCard = cards && cards.length > 0 ? cards[selectedCardIndex] : undefined;
 
   // Track if we're updating the URL ourselves to prevent circular updates
@@ -35,7 +36,7 @@ export const CardsRoute = () => {
         setSelectedCardIndex(0);
       }
     }
-  }, [searchParams, cards, setSelectedCardIndex]);
+  }, [searchParams, cards]);
 
   // Update URL when selected index changes
   useEffect(() => {
@@ -48,6 +49,19 @@ export const CardsRoute = () => {
     }
     setSearchParams(newParams, { replace: true });
   }, [selectedCardIndex, searchParams, setSearchParams]);
+
+  // Reset selected index when cards are filtered or when selected index is out of bounds
+  useEffect(() => {
+    if (cards && selectedCardIndex >= cards.length) {
+      setSelectedCardIndex(0);
+    }
+  }, [cards, selectedCardIndex]);
+
+  // Toggle voided cards visibility and reset selected index
+  const handleToggleVoidedCardsVisibility = () => {
+    setIsHideVoidedCards(!isHideVoidedCards);
+    setSelectedCardIndex(0);
+  };
 
   return (
     <div className="grid grid-cols-6 gap-8 h-full mt-4 md:px-0">
@@ -63,9 +77,11 @@ export const CardsRoute = () => {
       </div>
       <div className="col-span-6 md:col-span-4 md:col-start-2">
         <div className="w-full flex flex-col lg:flex-row gap-6">
-          <CardsCarousel />
+          <CardsCarousel currentIndex={selectedCardIndex} setCurrentIndex={setSelectedCardIndex} />
           <div className="flex-1 flex items-center justify-center">
-            {selectedCard && <CardActions card={selectedCard} />}
+            {selectedCard && (
+              <CardActions card={selectedCard} onToggleVoidedCardsVisibility={handleToggleVoidedCardsVisibility} />
+            )}
           </div>
         </div>
       </div>

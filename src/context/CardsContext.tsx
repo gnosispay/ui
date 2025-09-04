@@ -34,9 +34,7 @@ export type ICardContext = {
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
   isHideVoidedCards: boolean;
-  toggleVoidedCardsVisibility: () => void;
-  selectedCardIndex: number;
-  setSelectedCardIndex: (index: number) => void;
+  setIsHideVoidedCards: (hide: boolean) => void;
   refreshCards: () => void;
   freezeCard: (cardId: string) => void;
   unfreezeCard: (cardId: string) => void;
@@ -51,7 +49,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
   const [fetchedCards, setFetchedCards] = useState<ICardContext["cards"]>(undefined);
   const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
   const [isHideVoidedCards, setIsHideVoidedCards] = useState(true);
-  const [selectedCardIndex, setSelectedCardIndex] = useState(0);
   const { isAuthenticated } = useAuth();
 
   const cards = useMemo(() => {
@@ -64,13 +61,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       return !!cardInfo && !cardInfo.isVoid && !cardInfo.isLost && !cardInfo.isStolen;
     });
   }, [fetchedCards, cardInfoMap, isHideVoidedCards]);
-
-  // Reset selected index when cards are filtered or when selected index is out of bounds
-  useEffect(() => {
-    if (cards && selectedCardIndex >= cards.length) {
-      setSelectedCardIndex(0);
-    }
-  }, [cards, selectedCardIndex]);
 
   const setCardsInfo = useCallback(async (cards: Card[]) => {
     const newMap: CardInfoMap = {};
@@ -242,11 +232,6 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     [refreshCards],
   );
 
-  const toggleVoidedCardsVisibility = useCallback(() => {
-    setIsHideVoidedCards(!isHideVoidedCards);
-    setSelectedCardIndex(0);
-  }, [isHideVoidedCards]);
-
   useEffect(() => {
     if (!isAuthenticated) return;
     refreshCards();
@@ -258,9 +243,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         cards,
         cardInfoMap,
         isHideVoidedCards,
-        toggleVoidedCardsVisibility,
-        selectedCardIndex,
-        setSelectedCardIndex,
+        setIsHideVoidedCards,
         refreshCards,
         freezeCard,
         unfreezeCard,

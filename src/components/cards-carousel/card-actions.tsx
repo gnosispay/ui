@@ -25,18 +25,16 @@ import { Switch } from "../ui/switch";
 
 const PSE_IFRAME_ID = "pse-iframe";
 
-export const CardActions = ({ card }: { card: Card }) => {
+export const CardActions = ({
+  card,
+  onToggleVoidedCardsVisibility,
+}: {
+  card: Card;
+  onToggleVoidedCardsVisibility: () => void;
+}) => {
   const { showCardDetails, showPin, isLoading } = useGpSdk();
-  const {
-    freezeCard,
-    unfreezeCard,
-    markCardAsStolen,
-    markCardAsLost,
-    cardInfoMap,
-    activateCard,
-    isHideVoidedCards,
-    toggleVoidedCardsVisibility,
-  } = useCards();
+  const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap, activateCard, isHideVoidedCards } =
+    useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false);
@@ -139,7 +137,7 @@ export const CardActions = ({ card }: { card: Card }) => {
             <DropdownMenuItem
               onClick={(e) => {
                 e.preventDefault();
-                toggleVoidedCardsVisibility();
+                onToggleVoidedCardsVisibility();
               }}
               className="flex items-center justify-between"
             >
@@ -149,7 +147,7 @@ export const CardActions = ({ card }: { card: Card }) => {
               </div>
               <Switch
                 checked={isHideVoidedCards}
-                onCheckedChange={toggleVoidedCardsVisibility}
+                onCheckedChange={onToggleVoidedCardsVisibility}
                 onClick={(e) => e.stopPropagation()}
               />
             </DropdownMenuItem>

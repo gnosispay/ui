@@ -6,9 +6,17 @@ import { CardSkeleton } from "./card-skeleton";
 
 const minSwipeDistance = 50;
 
-export const CardsCarousel = ({ onCardChange }: { onCardChange?: (index: number) => void } = {}) => {
+export const CardsCarousel = ({
+  currentIndex,
+  setCurrentIndex,
+  onCardChange,
+}: {
+  currentIndex: number;
+  setCurrentIndex: (index: number) => void;
+  onCardChange?: (index: number) => void;
+}) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const { cards, cardInfoMap, selectedCardIndex, setSelectedCardIndex } = useCards();
+  const { cards, cardInfoMap } = useCards();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
@@ -34,7 +42,7 @@ export const CardsCarousel = ({ onCardChange }: { onCardChange?: (index: number)
       }
     } else {
       // Small swipe: revert to current card smoothly
-      scrollToCard(selectedCardIndex);
+      scrollToCard(currentIndex);
     }
     setTouchStartX(null);
     setTouchEndX(null);
@@ -53,44 +61,44 @@ export const CardsCarousel = ({ onCardChange }: { onCardChange?: (index: number)
 
   const nextCard = useCallback(() => {
     if (!cards || cards.length === 0) return;
-    const nextIndex = (selectedCardIndex + 1) % cards.length;
-    setSelectedCardIndex(nextIndex);
+    const nextIndex = (currentIndex + 1) % cards.length;
+    setCurrentIndex(nextIndex);
     scrollToCard(nextIndex);
     onCardChange?.(nextIndex);
-  }, [cards, selectedCardIndex, scrollToCard, setSelectedCardIndex, onCardChange]);
+  }, [cards, currentIndex, scrollToCard, setCurrentIndex, onCardChange]);
 
   const prevCard = useCallback(() => {
     if (!cards || cards.length === 0) return;
-    const prevIndex = (selectedCardIndex - 1 + cards.length) % cards.length;
-    setSelectedCardIndex(prevIndex);
+    const prevIndex = (currentIndex - 1 + cards.length) % cards.length;
+    setCurrentIndex(prevIndex);
     scrollToCard(prevIndex);
     onCardChange?.(prevIndex);
-  }, [cards, selectedCardIndex, scrollToCard, setSelectedCardIndex, onCardChange]);
+  }, [cards, currentIndex, scrollToCard, setCurrentIndex, onCardChange]);
 
   const goToCard = useCallback(
     (index: number) => {
       if (!cards || cards.length === 0) return;
-      setSelectedCardIndex(index);
+      setCurrentIndex(index);
       scrollToCard(index);
       onCardChange?.(index);
     },
-    [cards, scrollToCard, setSelectedCardIndex, onCardChange],
+    [cards, scrollToCard, setCurrentIndex, onCardChange],
   );
 
-  // Ensure carousel scrolls to correct position when selectedCardIndex changes
+  // Ensure carousel scrolls to correct position when currentIndex changes
   // This is especially important after cards refresh (e.g., after freeze/unfreeze)
   useEffect(() => {
-    if (cards && cardInfoMap && cards.length > 0 && selectedCardIndex >= 0 && selectedCardIndex < cards.length) {
+    if (cards && cardInfoMap && cards.length > 0 && currentIndex >= 0 && currentIndex < cards.length) {
       // Double requestAnimationFrame to ensure DOM is fully rendered and painted
       const rafId = requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          scrollToCard(selectedCardIndex);
+          scrollToCard(currentIndex);
         });
       });
 
       return () => cancelAnimationFrame(rafId);
     }
-  }, [cards, cardInfoMap, selectedCardIndex, scrollToCard]);
+  }, [cards, cardInfoMap, currentIndex, scrollToCard]);
 
   if (!cards || !cardInfoMap) {
     return <CardSkeleton />;
@@ -101,7 +109,7 @@ export const CardsCarousel = ({ onCardChange }: { onCardChange?: (index: number)
       {/* Cards Container with Side Arrows */}
       <div className="relative group">
         {/* Left Arrow */}
-        {selectedCardIndex > 0 && (
+        {currentIndex > 0 && (
           <button
             type="button"
             onClick={prevCard}
@@ -128,7 +136,7 @@ export const CardsCarousel = ({ onCardChange }: { onCardChange?: (index: number)
               <div
                 key={card.id}
                 className={`flex-shrink-0 transition-opacity duration-300 ${
-                  index === selectedCardIndex ? "opacity-100" : "opacity-40"
+                  index === currentIndex ? "opacity-100" : "opacity-40"
                 } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : index === cards.length - 1 ? "mr-[calc(50%-10rem)] sm:mr-0" : ""}`}
               >
                 <CardPreview
@@ -141,7 +149,7 @@ export const CardsCarousel = ({ onCardChange }: { onCardChange?: (index: number)
           })}
         </div>
         {/* Right Arrow */}
-        {selectedCardIndex < cards.length - 1 && (
+        {currentIndex < cards.length - 1 && (
           <button
             type="button"
             onClick={nextCard}
@@ -162,7 +170,7 @@ export const CardsCarousel = ({ onCardChange }: { onCardChange?: (index: number)
                 key={card.id}
                 type="button"
                 onClick={() => goToCard(index)}
-                className={`w-3 h-3 rounded-full transition-colors cursor-pointer border ${index === selectedCardIndex ? "border-primary" : "bg-border"}`}
+                className={`w-3 h-3 rounded-full transition-colors cursor-pointer border ${index === currentIndex ? "border-primary" : "bg-border"}`}
                 aria-label={`Go to card ${index + 1}`}
               />
             ))}
