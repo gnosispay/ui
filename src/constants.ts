@@ -96,7 +96,6 @@ export const SUPPORTED_COUNTRIES = [
   "AT",
   "BE",
   "BG",
-  "BR",
   "HR",
   "CY",
   "CZ",
