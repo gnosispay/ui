@@ -4,7 +4,7 @@ import { formatCountdown } from "@/utils/timeUtils";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { toast } from "sonner";
 import { useAuth } from "./AuthContext";
-import { deserializeTransaction, getTxTitle } from "@/utils/delayUtils";
+import { getTxTitle } from "@/utils/delayUtils";
 import { useUser } from "./UserContext";
 
 type DelayRelayContextProps = {
@@ -43,22 +43,6 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
   const executingQueue = useMemo(() => {
     return queue.filter((tx) => tx.status === "EXECUTING");
   }, [queue]);
-
-  const titleByTxId = useMemo(() => {
-    return nonExecutedQueue.reduce(
-      (acc, tx) => {
-        if (tx.id && tx.transactionData) {
-          acc[tx.id] = getTxTitle(safeConfig?.address ?? "", deserializeTransaction(tx.transactionData));
-        }
-
-        return acc;
-      },
-      {} as Record<string, string>,
-    );
-  }, [nonExecutedQueue, safeConfig?.address]);
-
-  console.log("titleByTxId", titleByTxId);
-  console.log("executingQueue", executingQueue);
 
   const hasExecutingTransactions = useMemo(() => executingQueue.length > 0, [executingQueue]);
 
@@ -141,7 +125,8 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     // Show toasts for new executing transactions
     for (const tx of executingQueue) {
       if (tx.transactionData && tx.id && !executingTxsRef.current.has(tx.id)) {
-        toast.loading(titleByTxId[tx.id], {
+        const title = getTxTitle(safeConfig?.address, tx.transactionData);
+        toast.loading(title, {
           id: `${prefix}-${tx.id}`,
           description: "Processing on-chain...",
           duration: Number.POSITIVE_INFINITY,
@@ -153,15 +138,14 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     for (const txId of executingTxsRef.current) {
       if (!currentExecutingIds.has(txId)) {
         toast.dismiss(`${prefix}-${txId}`);
-        toast.success(titleByTxId[txId], {
-          description: "completed",
+        toast.success("Transaction completed!", {
           duration: 1000,
         });
       }
     }
 
     executingTxsRef.current = currentExecutingIds;
-  }, [executingQueue, titleByTxId]);
+  }, [executingQueue, safeConfig?.address]);
 
   // Processing transactions (QUEUING/WAITING without readyAt or with past readyAt)
   useEffect(() => {
@@ -171,7 +155,8 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     // Show toasts for new processing transactions
     for (const tx of processingQueue) {
       if (tx.id && !processingTxsRef.current.has(tx.id)) {
-        toast.loading(titleByTxId[tx.id], {
+        const title = getTxTitle(safeConfig?.address, tx.transactionData);
+        toast.loading(title, {
           id: `${prefix}-${tx.id}`,
           description: "Processing...",
           duration: Number.POSITIVE_INFINITY,
@@ -187,7 +172,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     }
 
     processingTxsRef.current = currentProcessingIds;
-  }, [processingQueue, titleByTxId]);
+  }, [processingQueue, safeConfig?.address]);
 
   // Transactions with countdown (future readyAt)
   useEffect(() => {
@@ -199,7 +184,8 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
       const diff = readyDate.getTime() - Date.now();
 
       if (tx.id && !countDownTxsRef.current.has(tx.id)) {
-        toast.loading(titleByTxId[tx.id], {
+        const title = getTxTitle(safeConfig?.address, tx.transactionData);
+        toast.loading(title, {
           id: `${prefix}-${tx.id}`,
           description: `Executing in ${formatCountdown(diff)}`,
           duration: Number.POSITIVE_INFINITY,
@@ -232,7 +218,8 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
           if (diff > 0) {
             activeTransactions = true;
             // Update toast with fresh countdown
-            toast.loading(titleByTxId[tx.id], {
+            const title = getTxTitle(safeConfig?.address, tx.transactionData);
+            toast.loading(title, {
               id: `${prefix}-${tx.id}`,
               description: `Executing in ${formatCountdown(diff)}`,
             });
@@ -251,7 +238,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
         clearInterval(countdownIntervalRef.current);
       }
     };
-  }, [countDownQueue, titleByTxId]);
+  }, [countDownQueue, safeConfig?.address]);
 
   return (
     <DelayRelayContext.Provider value={{ queue: nonExecutedQueue, isLoading, error, fetchDelayQueue }}>

@@ -14,7 +14,7 @@ export const getTxInfo = (account: string, transactionData: TransactionRequest) 
   try {
     txType = profileDelayedTransaction(account, transactionData);
   } catch (error) {
-    console.log("Error profiling transaction", error);
+    console.info("Error profiling transaction", error);
     txType = DelayedTransactionType.Other;
   }
 
@@ -33,7 +33,7 @@ export const getTxInfo = (account: string, transactionData: TransactionRequest) 
     try {
       receiver = decodeErc20Transfer(transactionData.data as `0x${string}`).args?.[0] as `0x${string}`;
     } catch (error) {
-      console.error("Error decoding erc20 transfer", error);
+      console.info("Error decoding erc20 transfer", error);
       receiver = null;
     }
   }
@@ -41,17 +41,25 @@ export const getTxInfo = (account: string, transactionData: TransactionRequest) 
   return { txType, token, receiver };
 };
 
-export const getTxTitle = (account: string, transactionData: TransactionRequest) => {
+export const getTxTitle = (account?: string | null, transactionDataString?: string | null) => {
+  if (!transactionDataString || !account) {
+    return "Transaction";
+  }
+
+  const transactionData = deserializeTransaction(transactionDataString);
   const { txType, token, receiver } = getTxInfo(account, transactionData);
 
-  console.log("txType", txType);
-  console.log("token", token);
-  console.log("receiver", receiver);
+  if (
+    (txType === DelayedTransactionType.ERC20Transfer || txType === DelayedTransactionType.NativeTransfer) &&
+    (!receiver || !token?.tokenSymbol)
+  ) {
+    return `Transaction`;
+  }
 
   switch (txType) {
     case DelayedTransactionType.ERC20Transfer:
     case DelayedTransactionType.NativeTransfer:
-      return `Sending ${token?.symbol} to ${shortenAddress(receiver ?? "")}`;
+      return `Sending ${token?.tokenSymbol} to ${shortenAddress(receiver ?? "")}`;
     case DelayedTransactionType.AddOwner:
       return "Adding Account Owner";
     case DelayedTransactionType.RemoveOwner:

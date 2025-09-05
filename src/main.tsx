@@ -60,7 +60,7 @@ ReactDOM.createRoot(rootElement).render(
                           <IbanTransactionsContextProvider>
                             <DelayRelayContextProvider>
                               <App />
-                              <Toaster expand />
+                              <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
                             </DelayRelayContextProvider>
                           </IbanTransactionsContextProvider>
                         </OnchainTransactionsContextProvider>
