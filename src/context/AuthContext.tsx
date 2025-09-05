@@ -134,7 +134,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       domain: "gnosispay.com",
       address,
       statement: "Sign in with Ethereum to the app.",
-      uri: "https://www.gnosispay.com",
+      uri: "https://my.gnosispay.com",
       version: "1",
       chainId,
       nonce: data,

@@ -119,7 +119,7 @@ export const Transactions = () => {
   return (
     <div className="flex flex-col gap-4 mb-4">
       {/* Transactions Content */}
-      <div className="bg-card rounded-xl">
+      <div className="bg-card rounded-lg">
         {/* Transaction Tabs */}
         <TransactionTabs value={selectedType} onValueChange={handleTabChange}>
           <TransactionTab value={TransactionType.CARD}>Card</TransactionTab>

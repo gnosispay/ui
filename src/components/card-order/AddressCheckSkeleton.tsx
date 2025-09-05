@@ -12,7 +12,7 @@ export const AddressCheckSkeleton = () => {
         {/* Left Column - Order Details Skeleton */}
         <div className="space-y-6">
           {/* Order Details Card Skeleton */}
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <Skeleton className="h-6 w-32 mb-4" />
             <div className="space-y-3">
               <div>
@@ -23,7 +23,7 @@ export const AddressCheckSkeleton = () => {
           </div>
 
           {/* Shipping Address Card Skeleton */}
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <Skeleton className="h-6 w-36 mb-4" />
             <div className="space-y-2">
               <Skeleton className="h-4 w-full" />
@@ -37,7 +37,7 @@ export const AddressCheckSkeleton = () => {
         {/* Right Column - Summary Skeleton */}
         <div className="space-y-6">
           {/* Summary Card Skeleton */}
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <Skeleton className="h-6 w-20 mb-4" />
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -51,7 +51,7 @@ export const AddressCheckSkeleton = () => {
           </div>
 
           {/* Total Card Skeleton */}
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <div className="flex justify-between">
               <Skeleton className="h-6 w-12" />
               <div className="text-right space-y-1">

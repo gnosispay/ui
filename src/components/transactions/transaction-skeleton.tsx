@@ -1,7 +1,7 @@
 import { Skeleton } from "../ui/skeleton";
 
 export const TransactionSkeleton = () => (
-  <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+  <div className="flex flex-col gap-4 bg-card p-4 rounded-lg">
     {[1, 2].map((numb) => (
       <div key={`loader-date-${numb}`} className="text-xs text-secondary mb-2">
         <Skeleton className="h-4 w-20 rounded-lg" />
