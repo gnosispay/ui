@@ -128,14 +128,14 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
                   <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-xl text-foreground font-normal">{merchantName}</div>
+                  <div className="text-lg text-foreground font-normal">{merchantName}</div>
                   <div className="text-xs text-muted-foreground">
                     {format(parseISO(transaction.createdAt || ""), "MMM dd, yyyy 'at' HH:mm")}
                   </div>
                 </div>
               </div>
               <div className="text-center sm:text-right">
-                <div className={`text-xl text-foreground font-normal`}>
+                <div className={`text-lg text-foreground font-normal`}>
                   {billAmount ? `${sign} ${billAmount}` : "-"}
                 </div>
                 {txAmount !== billAmount && txAmount && (

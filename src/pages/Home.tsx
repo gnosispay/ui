@@ -39,19 +39,19 @@ export const Home = () => {
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="font-bold text-secondary">Transactions</h1>
+              <h1 className="font-bold text-secondary text-lg">Transactions</h1>
             </div>
             <Transactions />
           </div>
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
             <div className="flex items-center justify-between mb-4">
-              <h1 className="font-bold text-secondary">
+              <h1 className="font-bold text-secondary text-lg">
                 Rewards <StatusHelpIcon type="rewards" />
               </h1>
             </div>
             <Rewards />
             <div className="flex items-center justify-between mb-4 mt-6">
-              <h1 className="font-bold text-secondary">Cards</h1>
+              <h1 className="font-bold text-secondary text-lg">Cards</h1>
               <Link to="/cards" className="flex items-center gap-2">
                 View details <ChevronRight size={16} />
               </Link>

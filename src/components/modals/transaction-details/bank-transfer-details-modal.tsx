@@ -96,12 +96,12 @@ export const BankTransferDetailsModal = ({ ibanOrder, isOpen, onClose }: BankTra
                   <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-xl text-foreground font-normal">{transferTitle}</div>
+                  <div className="text-lg text-foreground font-normal">{transferTitle}</div>
                   <div className="text-xs text-muted-foreground">{formattedDate}</div>
                 </div>
               </div>
               <div className="text-center sm:text-right">
-                <div className="text-xl text-foreground font-normal">
+                <div className="text-lg text-foreground font-normal">
                   {formattedAmount ? `${sign} ${formattedAmount}` : "-"}
                 </div>
               </div>

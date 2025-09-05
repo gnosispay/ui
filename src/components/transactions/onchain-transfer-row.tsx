@@ -41,14 +41,14 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
             <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
-            <div className="text-xl text-primary">
+            <div className="text-lg text-primary">
               {isIncoming ? "From" : "To"} {shortenAddress(isIncoming ? transfer.from : transfer.to)}
             </div>
             <div className="text-xs text-secondary mt-1">{format(transfer.date, "HH:mm")}</div>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xl text-primary">{formattedValue ? `${sign} ${formattedValue}` : "-"}</div>
+          <div className="text-lg text-primary">{formattedValue ? `${sign} ${formattedValue}` : "-"}</div>
         </div>
       </button>
 

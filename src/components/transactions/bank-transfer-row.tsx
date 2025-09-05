@@ -56,7 +56,7 @@ export const BankTransferRow = ({ ibanOrder }: BankTransferRowProps) => {
             <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
-            <div>{transferTitle}</div>
+            <div className="text-lg">{transferTitle}</div>
             <div className="text-xs text-secondary mt-1">
               {transferTime}
               {memo && <span className="mx-1"> • {memo}</span>}
@@ -64,7 +64,7 @@ export const BankTransferRow = ({ ibanOrder }: BankTransferRowProps) => {
           </div>
         </div>
         <div className="text-right">
-          <div className="text-xl text-primary">{formattedAmount}</div>
+          <div className="text-lg text-primary">{formattedAmount}</div>
         </div>
       </button>
 
