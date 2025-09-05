@@ -101,6 +101,7 @@
   --switch-unchecked-thumb: var(--neutral-50);
   --switch-checked-bg: var(--brand-500);
   --switch-checked-thumb: var(--neutral-50);
+  --color-icon-background: var(--neutral-300);
 }
 
 @media (prefers-color-scheme: light) {
@@ -166,6 +167,7 @@
   --color-switch-unchecked-thumb: var(--switch-unchecked-thumb);
   --color-switch-checked-bg: var(--switch-checked-bg);
   --color-switch-checked-thumb: var(--switch-checked-thumb);
+  --color-icon-background: var(--color-icon-background);
 }
 
 .dark {
@@ -223,6 +225,7 @@
   --switch-unchecked-thumb: var(--neutral-50);
   --switch-checked-bg: var(--brand-500);
   --switch-checked-thumb: var(--neutral-900);
+  --color-icon-background: var(--neutral-500);
 }
 
 @layer base {
