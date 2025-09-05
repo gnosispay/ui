@@ -33,8 +33,8 @@ type CardInfoMap = Record<string, CardInfo>;
 export type ICardContext = {
   cards: Card[] | undefined;
   cardInfoMap: CardInfoMap | undefined;
-  hideVoidedCards: boolean;
-  setHideVoidedCards: (hide: boolean) => void;
+  isHideVoidedCards: boolean;
+  setIsHideVoidedCards: (hide: boolean) => void;
   refreshCards: () => void;
   freezeCard: (cardId: string) => void;
   unfreezeCard: (cardId: string) => void;
@@ -48,19 +48,19 @@ const CardsContext = createContext<ICardContext | undefined>(undefined);
 const CardsContextProvider = ({ children }: CardContextProps) => {
   const [fetchedCards, setFetchedCards] = useState<ICardContext["cards"]>(undefined);
   const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
-  const [hideVoidedCards, setHideVoidedCards] = useState(true);
+  const [isHideVoidedCards, setIsHideVoidedCards] = useState(true);
   const { isAuthenticated } = useAuth();
 
   const cards = useMemo(() => {
     if (!fetchedCards || !cardInfoMap) return undefined;
 
-    if (!hideVoidedCards) return fetchedCards;
+    if (!isHideVoidedCards) return fetchedCards;
 
     return fetchedCards.filter((card) => {
       const cardInfo = !!card.cardToken && cardInfoMap[card.cardToken];
       return !!cardInfo && !cardInfo.isVoid && !cardInfo.isLost && !cardInfo.isStolen;
     });
-  }, [fetchedCards, cardInfoMap, hideVoidedCards]);
+  }, [fetchedCards, cardInfoMap, isHideVoidedCards]);
 
   const setCardsInfo = useCallback(async (cards: Card[]) => {
     const newMap: CardInfoMap = {};
@@ -242,8 +242,8 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       value={{
         cards,
         cardInfoMap,
-        hideVoidedCards,
-        setHideVoidedCards,
+        isHideVoidedCards,
+        setIsHideVoidedCards,
         refreshCards,
         freezeCard,
         unfreezeCard,
