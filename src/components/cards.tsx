@@ -29,7 +29,7 @@ export const Cards = () => {
 
   return (
     <>
-      <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+      <div className="flex flex-col gap-4 bg-card p-4 rounded-lg">
         {isLoading &&
           [1, 2, 3].map((i) => (
             <div key={`skeleton-${i}`} className="flex items-center gap-4">

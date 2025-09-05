@@ -39,7 +39,7 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-card p-4 rounded-xl mb-4">
+    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg mb-4">
       {(!transactions || Object.keys(transactions).length === 0) && (
         <div className="flex flex-col items-center justify-center">
           <InboxIcon className="w-10 h-10 mb-2 text-secondary" />

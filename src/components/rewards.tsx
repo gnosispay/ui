@@ -55,14 +55,14 @@ export const Rewards = () => {
 
   if (error) {
     return (
-      <div className="bg-card p-4 rounded-xl">
+      <div className="bg-card p-4 rounded-lg">
         <StandardAlert variant="destructive" description={error} />
       </div>
     );
   }
 
   return (
-    <div className="bg-card p-4 rounded-xl">
+    <div className="bg-card p-4 rounded-lg">
       {isLoading ? (
         <div className="space-y-4">
           <div className="flex items-center gap-2">

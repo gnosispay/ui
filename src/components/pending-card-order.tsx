@@ -43,7 +43,7 @@ export const PendingCardOrder = () => {
   const pendingOrder = pendingPhysicalOrders[0];
 
   return (
-    <div className="bg-card border border-border rounded-xl p-4 mb-6">
+    <div className="bg-card border border-border rounded-lg p-4 mb-6">
       <div className="flex items-start gap-3">
         <div className="flex-shrink-0 mt-1">
           <Package className="w-5 h-5 text-warning" />

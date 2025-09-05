@@ -94,7 +94,7 @@ export const CardsRoute = () => {
       {!cards ||
         (cards.length === 0 && (
           <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
-            <div className="flex flex-col gap-4 bg-card p-4 rounded-xl">
+            <div className="flex flex-col gap-4 bg-card p-4 rounded-lg">
               <div className="flex flex-col items-center justify-center mt-4">
                 <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
                 <div className="text-center text-secondary">No cards found.</div>

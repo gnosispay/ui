@@ -166,7 +166,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
         {/* Left Column - Order Details */}
         <div className="space-y-6">
           {/* Order Details */}
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <h3 className="text-lg font-medium text-foreground mb-4">Order details</h3>
             <div className="space-y-3">
               {order.embossedName && (
@@ -179,7 +179,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
           </div>
 
           {/* Shipping Address */}
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <h3 className="text-lg font-medium text-foreground mb-4">Shipping address</h3>
             <div className="text-sm">{formatAddress(order)}</div>
           </div>
@@ -188,7 +188,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
         {/* Right Column - Summary */}
         <div className="space-y-6">
           {/* Summary */}
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <h3 className="text-lg font-medium text-foreground mb-4">Summary</h3>
             <div className="space-y-3">
               <div className="flex justify-between">
@@ -207,7 +207,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
             )}
           </div>
 
-          <div className="bg-card rounded-xl p-6">
+          <div className="bg-card rounded-lg p-6">
             <div className="flex justify-between text-lg font-semibold">
               <span>TOTAL</span>
               <div className="text-right">
