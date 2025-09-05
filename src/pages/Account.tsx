@@ -9,6 +9,7 @@ import {
 } from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
 import { SafeOwnersModal } from "@/components/modals/safe-owners";
+import { HELP_CENTER_URL } from "@/constants";
 
 enum ModalType {
   NONE = "none",
@@ -70,7 +71,7 @@ export const AccountRoute = () => {
           <AccountSection
             icon={<LifeBuoyIcon className="w-6 h-6" />}
             title="Help Center"
-            onClick={() => window.open("https://help.gnosispay.com/", "_blank")}
+            onClick={() => window.open(HELP_CENTER_URL, "_blank")}
           />
         </div>
       </div>

@@ -1,12 +1,14 @@
 import { useUser } from "@/context/UserContext";
 import { useMemo } from "react";
-import { Clock } from "lucide-react";
+import { CircleMinus, Clock } from "lucide-react";
 import { Skeleton } from "./ui/skeleton";
 import { currencies } from "../constants";
 import { formatCurrency } from "@/utils/formatCurrency";
+import { useUnspendableAmount } from "@/hooks/useUnspendableAmount";
 
 export const Balances = () => {
   const { balances, safeConfig } = useUser();
+  const { unspendableFormatted, shouldShowAlert } = useUnspendableAmount();
   const currencyInfo = useMemo(() => {
     if (!safeConfig?.fiatSymbol) {
       return;
@@ -40,8 +42,14 @@ export const Balances = () => {
       )}
       {balances?.pending && balances.pending !== "0" && (
         <div className="text-secondary flex items-center gap-1">
-          <Clock className="w-6 h-6" aria-hidden="true" />
+          <Clock className="w-4 h-4" aria-hidden="true" />
           {formattedPending} pending
+        </div>
+      )}
+      {shouldShowAlert && (
+        <div className="text-secondary flex items-center gap-1">
+          <CircleMinus className="w-4 h-4" aria-hidden="true" />
+          {unspendableFormatted} not spendable
         </div>
       )}
     </div>
