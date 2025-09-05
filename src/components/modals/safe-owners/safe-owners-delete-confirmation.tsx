@@ -7,7 +7,7 @@ import { useSignTypedData } from "wagmi";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 import { AlertTriangle } from "lucide-react";
-import { Address } from "viem";
+import type { Address } from "viem";
 
 interface SafeOwnersDeleteConfirmationProps {
   ownerAddress: string;

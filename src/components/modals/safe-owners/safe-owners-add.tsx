@@ -5,7 +5,7 @@ import { StandardAlert } from "@/components/ui/standard-alert";
 import { getApiV1OwnersAddTransactionData, postApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { useSignTypedData } from "wagmi";
-import { Address, isAddress } from "viem";
+import { type Address, isAddress } from "viem";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 

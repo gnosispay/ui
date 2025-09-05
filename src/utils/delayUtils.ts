@@ -2,7 +2,7 @@ import { currencies, supportedTokens, type TokenInfo } from "@/constants";
 import { decodeErc20Transfer } from "@/lib/fetchErc20Transfers";
 import { DelayedTransactionType, profileDelayedTransaction, type TransactionRequest } from "@gnosispay/account-kit";
 import { shortenAddress } from "./shortenAddress";
-import { Address } from "viem";
+import type { Address } from "viem";
 
 export const deserializeTransaction = (transactionData: string) => {
   const txData = JSON.parse(transactionData) as TransactionRequest;
