@@ -2,6 +2,7 @@ import { currencies, supportedTokens, type TokenInfo } from "@/constants";
 import { decodeErc20Transfer } from "@/lib/fetchErc20Transfers";
 import { DelayedTransactionType, profileDelayedTransaction, type TransactionRequest } from "@gnosispay/account-kit";
 import { shortenAddress } from "./shortenAddress";
+import { Address } from "viem";
 
 export const deserializeTransaction = (transactionData: string) => {
   const txData = JSON.parse(transactionData) as TransactionRequest;
@@ -19,11 +20,11 @@ export const getTxInfo = (account: string, transactionData: TransactionRequest) 
   }
 
   let token: TokenInfo | undefined;
-  let receiver: `0x${string}` | null;
+  let receiver: Address | null;
 
   if (txType === DelayedTransactionType.NativeTransfer) {
     token = supportedTokens.XDAI;
-    receiver = transactionData.to as `0x${string}`;
+    receiver = transactionData.to as Address;
   } else {
     token = Object.values(currencies).find((token) => token.address === transactionData.to);
     if (!token) {
@@ -31,7 +32,7 @@ export const getTxInfo = (account: string, transactionData: TransactionRequest) 
     }
 
     try {
-      receiver = decodeErc20Transfer(transactionData.data as `0x${string}`).args?.[0] as `0x${string}`;
+      receiver = decodeErc20Transfer(transactionData.data as Address).args?.[0] as Address;
     } catch (error) {
       console.info("Error decoding erc20 transfer", error);
       receiver = null;
