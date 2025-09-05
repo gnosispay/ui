@@ -7,6 +7,7 @@ import { useSignTypedData } from "wagmi";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 import { AlertTriangle } from "lucide-react";
+import type { Address } from "viem";
 
 interface SafeOwnersDeleteConfirmationProps {
   ownerAddress: string;
@@ -56,7 +57,7 @@ export const SafeOwnersDeleteConfirmation = ({
         ...transactionData.data,
         domain: {
           ...transactionData.data.domain,
-          verifyingContract: transactionData.data.domain.verifyingContract as `0x${string}`,
+          verifyingContract: transactionData.data.domain.verifyingContract as Address,
         },
       });
 

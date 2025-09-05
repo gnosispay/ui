@@ -5,7 +5,7 @@ import { StandardAlert } from "@/components/ui/standard-alert";
 import { getApiV1OwnersAddTransactionData, postApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { useSignTypedData } from "wagmi";
-import { isAddress } from "viem";
+import { type Address, isAddress } from "viem";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 
@@ -76,7 +76,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
         ...transactionData.data,
         domain: {
           ...transactionData.data.domain,
-          verifyingContract: transactionData.data.domain.verifyingContract as `0x${string}`,
+          verifyingContract: transactionData.data.domain.verifyingContract as Address,
         },
       });
 
