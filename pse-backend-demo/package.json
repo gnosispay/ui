@@ -59,7 +59,8 @@
     "clean": true,
     "dts": true,
     "splitting": false,
-    "skipNodeModulesBundle": true
+    "skipNodeModulesBundle": true,
+    "publicDir": "src/static"
   },
   "packageManager": "pnpm@10.15.1"
 }

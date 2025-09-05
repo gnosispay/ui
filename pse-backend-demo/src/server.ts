@@ -73,7 +73,11 @@ app.use("/health-check", healthCheckRouter);
 app.use("/token", tokenRouter);
 
 app.get("/native-webview", (_req, res) => {
-  const nativeWebviewPath = path.join(__dirname, "./static/native-webview.html");
+  const isDevelopment = __dirname.includes("/src");
+  const nativeWebviewPath = isDevelopment
+    ? path.join(__dirname, "./static/native-webview.html")
+    : path.join(__dirname, "./native-webview.html");
+
   const htmlContent = fs.readFileSync(nativeWebviewPath, "utf-8");
 
   res.set("Content-Type", "text/html");
