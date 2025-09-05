@@ -62,8 +62,8 @@ export const OnchainTransferDetailsModal = ({
           <DialogTitle className="pb-4 mt-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex items-center gap-3 flex-1">
-                <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                  <Icon className="w-6 h-6 text-muted-foreground" aria-hidden="true" />
+                <div className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center">
+                  <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
                   <div className="text-xl text-foreground font-normal">{transferTitle}</div>

@@ -37,8 +37,8 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
         type="button"
       >
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-icon-card-bg flex items-center justify-center">
-            <Icon className="w-6 h-6 text-icon-card" aria-hidden="true" />
+          <div className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center">
+            <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
             <div className="text-xl text-primary">

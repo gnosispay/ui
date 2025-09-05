@@ -17,7 +17,7 @@ export const UserProfileHeader = () => {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center text-2xl font-semibold text-muted-foreground">
+      <div className="w-20 h-20 rounded-full bg-icon-background flex items-center justify-center text-2xl font-semibold text-primary">
         {userInitials}
       </div>
       <h1 className="text-2xl font-semibold text-foreground text-center">{userDisplayName}</h1>
