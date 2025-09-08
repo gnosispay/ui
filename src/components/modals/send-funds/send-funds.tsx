@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useState, useCallback } from "react";
-import type { CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
+import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { SendFundsForm } from "./send-funds-form";
 import { SendFundsConfirm } from "./send-funds-confirm";
 
@@ -11,7 +11,7 @@ interface AddFundsModalProps {
 
 interface ValidatedFormData {
   toAddress: string;
-  selectedToken: CurrencyInfoWithBalance;
+  selectedToken: TokenInfoWithBalance;
   amount: bigint;
 }
 

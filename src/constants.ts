@@ -3,7 +3,7 @@ import eurLogo from "./assets/tokens/eure.png";
 import gbpLogo from "./assets/tokens/gbpe.png";
 import usdcLogo from "./assets/tokens/usdce.png";
 import gnoLogo from "./assets/tokens/gno.svg";
-import xdaiLogo from "./assets/tokens/xdai.png";
+import xdaiLogo from "./assets/tokens/xdai.svg";
 
 export interface CurrencyInfo {
   tokenSymbol?: string;

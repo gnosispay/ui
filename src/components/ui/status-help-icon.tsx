@@ -18,7 +18,7 @@ export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
       case "reversal":
         return "This payment is the reversal of a previous transaction.";
       case "rewards":
-        return <p>Learn more about the <a href="https://help.gnosispay.com/en/articles/9813409-gno-cashback-how-to-get-the-reward" target="_blank" rel="noopener noreferrer" className="text-muted-foreground underline">Rewards program</a></p>
+        return <>Learn more about the <a href="https://help.gnosispay.com/en/articles/9813409-gno-cashback-how-to-get-the-reward" target="_blank" rel="noopener noreferrer" className="text-muted-foreground underline">Rewards program</a></>;
       default:
         return "";
     }
@@ -42,7 +42,7 @@ export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
         </span>
       </PopoverTrigger>
       <PopoverContent className="w-64 text-sm" align="start">
-        <p className="text-foreground">{getHelpText()}</p>
+        <div className="text-foreground">{getHelpText()}</div>
       </PopoverContent>
     </Popover>
   );

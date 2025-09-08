@@ -7,13 +7,13 @@ import type { Address } from "viem";
 import { useSignTypedData } from "wagmi";
 import { toast } from "sonner";
 import { useState, useCallback } from "react";
-import type { CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
+import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { getApiV1AccountsWithdrawTransactionData, postApiV1AccountsWithdraw } from "@/client";
 import { useDelayRelay } from "@/context/DelayRelayContext";
 import { useUser } from "@/context/UserContext";
 
 interface SendFundsConfirmProps {
-  selectedToken: CurrencyInfoWithBalance;
+  selectedToken: TokenInfoWithBalance;
   amount: bigint;
   toAddress: string;
   onBack: () => void;
