@@ -58,7 +58,7 @@ export const DailyLimitView: React.FC<DailyLimitViewProps> = ({ dailyLimit, allo
       </Button>
       <div className="text-center text-sm">
         <a
-          href="https://help.gnosispay.com/en/articles/8663251-fees-and-limits"
+          href="https://help.gnosispay.com/hc/en-us/articles/39533569163284-Understanding-Your-Card-s-Fees-and-Limits"
           target="_blank"
           rel="noopener noreferrer"
           className="underline"
