@@ -3,12 +3,12 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { formatUnits, parseUnits } from "viem";
-import { useTokenBalance, type CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
+import { useTokenBalance, type TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { useUser } from "@/context/UserContext";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface TokenAmountInputProps {
-  onTokenChange: (token: CurrencyInfoWithBalance) => void;
+  onTokenChange: (token: TokenInfoWithBalance) => void;
   onAmountChange: (amount: bigint) => void;
   setError: (error: string) => void;
 }
@@ -16,7 +16,7 @@ interface TokenAmountInputProps {
 export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: TokenAmountInputProps) => {
   const { currenciesWithBalance: tokens } = useTokenBalance();
   const [displayAmount, setDisplayAmount] = useState<string>("");
-  const [selectedToken, setSelectedToken] = useState<CurrencyInfoWithBalance | undefined>();
+  const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
   const { safeConfig } = useUser();
   const amount = useMemo(() => {
     if (!selectedToken || !selectedToken.decimals || !displayAmount || displayAmount === "0") {

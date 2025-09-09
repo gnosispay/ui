@@ -4,7 +4,7 @@ import { StandardAlert } from "@/components/ui/standard-alert";
 import { Coins } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { isAddress } from "viem";
-import type { CurrencyInfoWithBalance } from "@/hooks/useTokenBalance";
+import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./token-amount-input";
 import { AddressInput } from "./address-input";
 import { useAccount } from "wagmi";
@@ -14,7 +14,7 @@ import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
 
 interface ValidatedFormData {
   toAddress: string;
-  selectedToken: CurrencyInfoWithBalance;
+  selectedToken: TokenInfoWithBalance;
   amount: bigint;
 }
 
@@ -28,7 +28,7 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
   const isQueueNotEmpty = useMemo(() => queue.length > 0, [queue]);
   const [toAddress, setToAddress] = useState("");
   const [addressError, setAddressError] = useState("");
-  const [selectedToken, setSelectedToken] = useState<CurrencyInfoWithBalance | undefined>();
+  const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
   const [amount, setAmount] = useState<bigint>(0n);
   const [amountError, setAmountError] = useState("");
   const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();

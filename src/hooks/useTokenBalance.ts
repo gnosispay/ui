@@ -1,40 +1,42 @@
 import { getBalance } from "wagmi/actions";
-import { currencies, type CurrencyInfo } from "@/constants";
+import { currencies as moneriumTokens, supportedTokens, type TokenInfo } from "@/constants";
 import { useState, useEffect, useCallback } from "react";
 import { config } from "@/wagmi";
 import { useUser } from "@/context/UserContext";
 import type { Address } from "viem";
 
-export interface CurrencyInfoWithBalance extends CurrencyInfo {
+export interface TokenInfoWithBalance extends TokenInfo {
   balance: bigint;
 }
 
-export type CurrencyWithBalance = Record<string, CurrencyInfoWithBalance>;
+export type TokenWithBalance = Record<string, TokenInfoWithBalance>;
 
 export interface UseTokenBalanceResult {
-  currenciesWithBalance: CurrencyWithBalance;
+  currenciesWithBalance: TokenWithBalance;
   isLoading: boolean;
   isError: boolean;
   refetch: () => void;
 }
 
+const tokens = { ...moneriumTokens, ...supportedTokens };
+
 export const useTokenBalance = (): UseTokenBalanceResult => {
   const { safeConfig } = useUser();
-  const [currenciesWithBalance, setCurrenciesWithBalance] = useState<CurrencyWithBalance>({});
+  const [currenciesWithBalance, setCurrenciesWithBalance] = useState<TokenWithBalance>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
   const fetchBalances = useCallback(async () => {
     if (!safeConfig?.address) {
       // Initialize with zero balances when no address
-      const initialCurrencies: CurrencyWithBalance = {};
-      for (const [symbol, currency] of Object.entries(currencies)) {
-        initialCurrencies[symbol] = {
+      const initialTokens: TokenWithBalance = {};
+      for (const [symbol, currency] of Object.entries(tokens)) {
+        initialTokens[symbol] = {
           ...currency,
           balance: 0n,
         };
       }
-      setCurrenciesWithBalance(initialCurrencies);
+      setCurrenciesWithBalance(initialTokens);
       return;
     }
 
@@ -42,23 +44,23 @@ export const useTokenBalance = (): UseTokenBalanceResult => {
     setIsError(false);
 
     try {
-      const balancePromises = Object.values(currencies).map(async (currency) => {
-        if (!currency.address) {
+      const balancePromises = Object.values(tokens).map(async (token) => {
+        if (!token.address) {
           return Promise.resolve({ value: 0n });
         }
 
         return getBalance(config, {
           address: safeConfig.address as Address,
-          token: currency.address as Address,
+          token: token.address !== supportedTokens.XDAI.address ? (token.address as Address) : undefined,
         });
       });
 
       const balanceResults = await Promise.all(balancePromises);
-      const newCurrencies: CurrencyWithBalance = {};
+      const newCurrencies: TokenWithBalance = {};
 
       for (const [index, result] of balanceResults.entries()) {
-        newCurrencies[Object.keys(currencies)[index]] = {
-          ...currencies[Object.keys(currencies)[index]],
+        newCurrencies[Object.keys(tokens)[index]] = {
+          ...tokens[Object.keys(tokens)[index]],
           balance: result.value,
         };
       }
@@ -69,8 +71,8 @@ export const useTokenBalance = (): UseTokenBalanceResult => {
       setIsError(true);
 
       // Set default balances on error
-      const errorCurrencies: CurrencyWithBalance = {};
-      for (const [key, currency] of Object.entries(currencies)) {
+      const errorCurrencies: TokenWithBalance = {};
+      for (const [key, currency] of Object.entries(tokens)) {
         errorCurrencies[key] = {
           ...currency,
           balance: 0n,
