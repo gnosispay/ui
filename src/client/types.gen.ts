@@ -670,6 +670,10 @@ export type PostApiV1AuthChallengeData = {
          * EOA signature or EIP-1271 contract signature
          */
         signature: string;
+        /**
+         * Represents the duration of the token in seconds. If not provided, defaults to 1 hour. Maximum 24 hours.
+         */
+        ttlInSeconds?: number;
     };
     path?: never;
     query?: never;
@@ -2027,7 +2031,7 @@ export type PostApiV1AccountsWithdrawData = {
          */
         to: string;
         /**
-         * The address of the token to withdraw.
+         * The address of the token to withdraw. Use "0x0000000000000000000000000000000000000000" for native token (xDAI) withdrawals.
          */
         tokenAddress: string;
         /**
@@ -2151,7 +2155,7 @@ export type GetApiV1AccountsWithdrawTransactionDataData = {
     path?: never;
     query: {
         /**
-         * The address of the token to withdraw.
+         * The address of the token to withdraw. Use "0x0000000000000000000000000000000000000000" for native token (xDAI) withdrawals.
          */
         tokenAddress: string;
         /**
