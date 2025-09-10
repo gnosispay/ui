@@ -50,6 +50,42 @@ export const groupByCardToken = (transactions: Event[]) => {
 };
 
 /**
+ * Formats a number with smart decimal precision
+ * Shows 2 decimals for significant values, more decimals for very small values
+ * @param value - The number to format
+ * @returns Formatted string with appropriate decimal places
+ */
+function formatSmartDecimals(value: number): string {
+  if (value === 0) return "0.00";
+
+  // For values >= 0.01, use 2 decimal places
+  if (value >= 0.01) {
+    return value.toFixed(2);
+  }
+
+  // For very small values, find the first significant digits
+  // Convert to string to find the position of the first non-zero digit after decimal
+  const str = value.toString();
+  const decimalIndex = str.indexOf(".");
+
+  if (decimalIndex === -1) {
+    return value.toFixed(2);
+  }
+
+  // Find first non-zero digit after decimal point
+  let firstSignificantIndex = decimalIndex + 1;
+  while (firstSignificantIndex < str.length && str[firstSignificantIndex] === "0") {
+    firstSignificantIndex++;
+  }
+
+  // Show at least 2 significant digits after the first non-zero digit
+  const decimalPlaces = Math.max(2, firstSignificantIndex - decimalIndex + 1);
+
+  // Cap at 8 decimal places to avoid excessive precision
+  return value.toFixed(Math.min(decimalPlaces, 8));
+}
+
+/**
  * Calculates the exchange rate between two currencies
  * @param billingAmount - The amount in billing currency (raw value)
  * @param billingCurrency - The billing currency object
@@ -78,7 +114,7 @@ export function calculateExchangeRate(
     if (transactionValue === 0) return null;
 
     const rate = billingValue / transactionValue;
-    return `1 ${transactionCurrency.symbol} = ${rate.toFixed(2)} ${billingCurrency.symbol}`;
+    return `1 ${transactionCurrency.symbol} = ${formatSmartDecimals(rate)} ${billingCurrency.symbol}`;
   } catch {
     return null;
   }
