@@ -32,18 +32,18 @@
         }
       }
 
-      async function initializeSDK(appId, authToken, cardToken) {
+      async function initializeSDK(appId, gnosisPayApiAuthToken, cardToken, elementType) {
         try {
           const ephemeralToken = await loadEphemeralToken();
 
           const gp = new GPSDK({
             appId,
             ephemeralToken,
-            gnosisPayApiAuthToken: authToken,
+            gnosisPayApiAuthToken,
           });
 
           const cardDisplay = gp.init(
-            ElementType.CardData,
+            elementType,
             "#secure-frame-container",
             { cardToken },
           );
@@ -60,17 +60,18 @@
           
           // Extract the parameters
           const appId = data.appId;
-          const authToken = data.authToken;
+          const gnosisPayApiAuthToken = data.gnosisPayApiAuthToken;
           const cardToken = data.cardToken;
+          const elementType = data.elementType;
           
           // Validate required parameters
-          if (!appId || !authToken || !cardToken) {
-            console.error('Missing required parameters:', { appId, authToken, cardToken });
+          if (!appId || !gnosisPayApiAuthToken || !cardToken || !elementType) {
+            console.error('Missing required parameters:', { appId, gnosisPayApiAuthToken, cardToken, elementType });
             return;
           }
           
           // Initialize the SDK with received parameters
-          initializeSDK(appId, authToken, cardToken);
+          initializeSDK(appId, gnosisPayApiAuthToken, cardToken, elementType);
           
         } catch (error) {
           console.error('Failed to parse message:', error);
