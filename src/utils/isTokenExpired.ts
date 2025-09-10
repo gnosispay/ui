@@ -13,7 +13,6 @@ export const isTokenExpired = (token: string | null): boolean => {
 
   // JWT exp is in seconds
   if (decodedToken.exp * 1000 < currentDate.getTime()) {
-    console.info("Token expired.");
     return true;
   }
 
