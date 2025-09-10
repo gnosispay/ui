@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ADD_FUNDS_CONSTANTS, currencies } from "@/constants";
 import { useUser } from "@/context/UserContext";
 import { useDebridgeUrl } from "@/hooks/useDebridgeUrl";
+import { useJumperUrl } from "@/hooks/useJumperUrl";
 import { ExternalLink, ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import { SafeAccountDetails } from "@/components/account/SafeAccountDetails";
@@ -18,10 +19,16 @@ export const CryptoStep = ({ onBack }: CryptoStepProps) => {
   }, [safeConfig]);
 
   const debridgeUrl = useDebridgeUrl();
+  const jumperUrl = useJumperUrl();
 
   const handleDeBridgeClick = () => {
     if (!debridgeUrl) return;
     window.open(debridgeUrl, "_blank");
+  };
+
+  const handleJumperClick = () => {
+    if (!jumperUrl) return;
+    window.open(jumperUrl, "_blank");
   };
 
   return (
@@ -46,7 +53,7 @@ export const CryptoStep = ({ onBack }: CryptoStepProps) => {
 
             <div>
               <p className="text-sm text-muted-foreground mb-4">
-                Get {currency?.tokenSymbol} on Gnosis Chain through deBridge below
+                Get {currency?.tokenSymbol} on Gnosis Chain through bridge services below
               </p>
               <a
                 href={ADD_FUNDS_CONSTANTS.GNOSIS_PAY_HELP_URL}
@@ -58,11 +65,16 @@ export const CryptoStep = ({ onBack }: CryptoStepProps) => {
               </a>
             </div>
 
-            <Button onClick={handleDeBridgeClick} className="w-full flex items-center gap-2">
-              <ExternalLink className="h-4 w-4" />
-              Get {currency?.tokenSymbol} with deBridge
-            </Button>
-
+            <div className="space-y-3">
+              <Button onClick={handleJumperClick} className="w-full flex items-center gap-2">
+                <ExternalLink className="h-4 w-4" />
+                Get {currency?.tokenSymbol} with Jumper
+              </Button>
+              <Button onClick={handleDeBridgeClick} className="w-full flex items-center gap-2">
+                <ExternalLink className="h-4 w-4" />
+                Get {currency?.tokenSymbol} with deBridge
+              </Button>
+            </div>
             <div className="text-xs text-muted-foreground">
               By proceeding, you acknowledge that the service is provided by third parties and that you are entering
               into the{" "}
