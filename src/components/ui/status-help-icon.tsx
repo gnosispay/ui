@@ -18,7 +18,7 @@ export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
       case "reversal":
         return "This payment is the reversal of a previous transaction.";
       case "rewards":
-        return <>Learn more about the <a href="https://help.gnosispay.com/en/articles/9813409-gno-cashback-how-to-get-the-reward" target="_blank" rel="noopener noreferrer" className="text-muted-foreground underline">Rewards program</a></>;
+        return <>Learn more about the <a href="https://help.gnosispay.com/hc/en-us/articles/39631920738452-About-the-Gnosis-Pay-GNO-Cashback-Programmes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground underline">Rewards program</a></>;
       default:
         return "";
     }
