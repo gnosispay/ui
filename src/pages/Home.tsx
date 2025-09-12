@@ -7,15 +7,64 @@ import { PendingCardOrder } from "@/components/pending-card-order";
 import { Rewards } from "@/components/rewards";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { PartnerBanner } from "@/components/ui/partner-banner";
 import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
+import { deleteApiV1IbansReset, getApiV1IbansSigningMessage, postApiV1IntegrationsMonerium } from "@/client/sdk.gen";
+import { useSignMessage } from "wagmi";
 
 export const Home = () => {
   const [sendFundsModalOpen, setSendFundsModalOpen] = useState(false);
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
+  const { signMessageAsync } = useSignMessage();
+
+  const handleMoneriumButtonClick = useCallback(async () => {
+    try {
+      const { data: messageToSign, error: messageToSignError } = await getApiV1IbansSigningMessage();
+
+      if (messageToSignError) {
+        console.error("Error getting message to sign", messageToSignError);
+        return;
+      }
+
+      if (!messageToSign?.data?.message) {
+        console.error("No message to sign", messageToSign);
+        return;
+      }
+
+      const signature = await signMessageAsync({
+        message: messageToSign.data?.message,
+      });
+
+      const { data: postMoneriumProfile, error: postMoneriumProfileError } = await postApiV1IntegrationsMonerium({
+        body: {
+          signature: signature,
+        },
+      });
+
+      console.log("postMoneriumProfile", postMoneriumProfile);
+      console.log("postMoneriumProfileError", postMoneriumProfileError);
+    } catch (error) {
+      console.error("Error posting monerium profile", error);
+    }
+  }, [signMessageAsync]);
+
+  const handleResetIBANButtonClick = useCallback(async () => {
+    try {
+      const { data: resetIBAN, error: resetIBANError } = await deleteApiV1IbansReset();
+
+      if (resetIBANError) {
+        console.error("Error resetting IBAN", resetIBANError);
+        return;
+      }
+
+      console.log("IBAN reset", resetIBAN);
+    } catch (error) {
+      console.error("Error resetting IBAN", error);
+    }
+  }, []);
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
@@ -30,6 +79,8 @@ export const Home = () => {
             <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
               <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
+              <Button onClick={handleMoneriumButtonClick}>Monerium</Button>
+              <Button onClick={handleResetIBANButtonClick}>Reset IBAN</Button>
             </div>
           </div>
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">

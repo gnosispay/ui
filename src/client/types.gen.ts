@@ -2031,7 +2031,7 @@ export type PostApiV1AccountsWithdrawData = {
          */
         to: string;
         /**
-         * The address of the token to withdraw. Use "0x0000000000000000000000000000000000000000" for native token (xDAI) withdrawals.
+         * The address of the token to withdraw.
          */
         tokenAddress: string;
         /**
@@ -2155,7 +2155,7 @@ export type GetApiV1AccountsWithdrawTransactionDataData = {
     path?: never;
     query: {
         /**
-         * The address of the token to withdraw. Use "0x0000000000000000000000000000000000000000" for native token (xDAI) withdrawals.
+         * The address of the token to withdraw.
          */
         tokenAddress: string;
         /**
@@ -2659,6 +2659,124 @@ export type GetApiV1IbansSigningMessageResponses = {
 };
 
 export type GetApiV1IbansSigningMessageResponse = GetApiV1IbansSigningMessageResponses[keyof GetApiV1IbansSigningMessageResponses];
+
+export type PostApiV1IntegrationsMoneriumData = {
+    body: {
+        /**
+         * Ethereum signature of the message "I hereby declare that I am the address owner."
+         * This signature must be created by signing the exact message with the user's wallet.
+         * The message can be retrieved from the /api/v1/ibans/signing-message endpoint.
+         * Used to verify ownership of the signer address on Monerium.
+         *
+         */
+        signature: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/integrations/monerium';
+};
+
+export type PostApiV1IntegrationsMoneriumErrors = {
+    /**
+     * Bad request - Invalid input data
+     */
+    400: {
+        message?: string;
+        errors?: {
+            validation?: string;
+        };
+    };
+    /**
+     * Unauthorized - Invalid or missing authentication token
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Forbidden - User doesn't meet requirements
+     */
+    403: {
+        message?: string;
+    };
+    /**
+     * User not found
+     */
+    404: {
+        message?: string;
+    };
+    /**
+     * Unprocessable Entity - Monerium API error
+     */
+    422: {
+        data?: {
+            success?: boolean;
+            /**
+             * HTTP status code from Monerium API
+             */
+            status?: number;
+            /**
+             * Error description
+             */
+            description?: string;
+            /**
+             * Error response data from Monerium API
+             */
+            responseData?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Profile ID if created before error occurred
+             */
+            moneriumProfileId?: string | null;
+        };
+    };
+    /**
+     * Internal server error
+     */
+    500: {
+        data?: {
+            errors?: {
+                message?: string;
+            };
+        };
+    };
+};
+
+export type PostApiV1IntegrationsMoneriumError = PostApiV1IntegrationsMoneriumErrors[keyof PostApiV1IntegrationsMoneriumErrors];
+
+export type PostApiV1IntegrationsMoneriumResponses = {
+    /**
+     * Successfully created Monerium integration
+     */
+    200: {
+        data?: {
+            /**
+             * Indicates if the integration was successful
+             */
+            success: boolean;
+            /**
+             * HTTP status code from Monerium API
+             */
+            status: number;
+            /**
+             * Human-readable description of the result
+             */
+            description: string;
+            /**
+             * Unique identifier for the created Monerium profile
+             */
+            moneriumProfileId?: string | null;
+            /**
+             * Additional response data from Monerium API
+             */
+            responseData?: {
+                [key: string]: unknown;
+            } | null;
+        };
+    };
+};
+
+export type PostApiV1IntegrationsMoneriumResponse = PostApiV1IntegrationsMoneriumResponses[keyof PostApiV1IntegrationsMoneriumResponses];
 
 export type GetApiV1KycIntegrationData = {
     body?: never;
