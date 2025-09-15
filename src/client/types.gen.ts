@@ -2051,6 +2051,10 @@ export type PostApiV1AccountsWithdrawData = {
              */
             data: string;
         };
+        /**
+         * Optional. If using a smart account, the address of the smart wallet to use for the withdraw.
+         */
+        smartWalletAddress?: string;
     };
     path?: never;
     query?: never;

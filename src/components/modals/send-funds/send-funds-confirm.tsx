@@ -73,6 +73,7 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
                 amount: amount.toString(),
                 tokenAddress: selectedToken.address,
                 message: typedData.message,
+                smartWalletAddress: "0x65aDF87D13c84a53daf57B4d5Cf07C5561BC91f5",
               },
             })
               .then(({ data, error }) => {
