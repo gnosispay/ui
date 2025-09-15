@@ -1654,3 +1654,12 @@ export const ZENDESK_USER_ID_FIELD_ID = "40875525876372";
 export const ZENDESK_PARTNER_TAG_VALUE = "GnosisPay v2app";
 
 export const HELP_CENTER_URL = "https://help.gnosispay.com/";
+
+// 6a222982-8fc6-11f0-96c6-9a340d906d67
+
+// Monerium Integration Constants
+export const MONERIUM_CONSTANTS = {
+  CLIENT_ID: "6a222982-8fc6-11f0-96c6-9a340d906d67",
+  API_BASE_URL: "https://api.monerium.dev",
+  REDIRECT_URI: "http://localhost:5173",
+} as const;

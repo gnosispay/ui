@@ -13,12 +13,25 @@ import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { PartnerBanner } from "@/components/ui/partner-banner";
 import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
 import { deleteApiV1IbansReset, getApiV1IbansSigningMessage, postApiV1IntegrationsMonerium } from "@/client/sdk.gen";
-import { useSignMessage } from "wagmi";
+import { useSignMessage, useAccount } from "wagmi";
+import { MONERIUM_CONSTANTS } from "@/constants";
+import { 
+  generateCodeVerifier, 
+  generateCodeChallenge, 
+  generateNonce, 
+  createMoneriumSiweMessage, 
+  sendMoneriumAuthRequest 
+} from "@/utils/moneriumAuth";
+import { StandardAlert } from "@/components/ui/standard-alert";
+import { extractErrorMessage } from "@/utils/errorHelpers";
 
 export const Home = () => {
   const [sendFundsModalOpen, setSendFundsModalOpen] = useState(false);
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
+  const [moneriumError, setMoneriumError] = useState<string | null>(null);
+  const [isMoneriumLoading, setIsMoneriumLoading] = useState(false);
   const { signMessageAsync } = useSignMessage();
+  const { address } = useAccount();
 
   const handleMoneriumButtonClick = useCallback(async () => {
     try {
@@ -66,12 +79,69 @@ export const Home = () => {
     }
   }, []);
 
+  const handleAuthenticateWithMonerium = useCallback(async () => {
+    if (!address) {
+      setMoneriumError("Wallet not connected");
+      return;
+    }
+
+    setIsMoneriumLoading(true);
+    setMoneriumError(null);
+
+    try {
+      // Step 1: Generate PKCE parameters
+      const codeVerifier = generateCodeVerifier();
+      const codeChallenge = await generateCodeChallenge(codeVerifier);
+      
+      // Step 2: Generate nonce and create SIWE message
+      const nonce = generateNonce();
+      const siweMessage = createMoneriumSiweMessage(address, nonce);
+      
+      // Step 3: Request user signature
+      const signature = await signMessageAsync({
+        message: siweMessage,
+      });
+
+      // Step 4: Send authentication request to Monerium
+      const response = await sendMoneriumAuthRequest(
+        MONERIUM_CONSTANTS.CLIENT_ID,
+        codeChallenge,
+        signature,
+        siweMessage
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        throw new Error(`Monerium authentication failed: ${response.status} ${errorData}`);
+      }
+
+      const result = await response.json();
+      console.log("Monerium authentication successful:", result);
+      
+      // TODO: Handle successful authentication (e.g., redirect or show success message)
+      
+    } catch (error) {
+      console.error("Error authenticating with Monerium:", error);
+      setMoneriumError(extractErrorMessage(error, "Failed to authenticate with Monerium"));
+    } finally {
+      setIsMoneriumLoading(false);
+    }
+  }, [address, signMessageAsync]);
+
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4">
         <div className="mx-4 lg:mx-0">
           <PendingCardOrder />
           <UnspendableAmountAlert />
+          {moneriumError && (
+            <div className="mb-4">
+              <StandardAlert 
+                variant="destructive" 
+                description={moneriumError} 
+              />
+            </div>
+          )}
         </div>
         <div className="grid grid-cols-3 gap-4">
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
@@ -81,6 +151,12 @@ export const Home = () => {
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
               <Button onClick={handleMoneriumButtonClick}>Monerium</Button>
               <Button onClick={handleResetIBANButtonClick}>Reset IBAN</Button>
+              <Button 
+                onClick={handleAuthenticateWithMonerium}
+                disabled={isMoneriumLoading || !address}
+              >
+                {isMoneriumLoading ? "Authenticating..." : "Auth Monerium"}
+              </Button>
             </div>
           </div>
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
