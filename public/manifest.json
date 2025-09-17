@@ -1,18 +1,30 @@
 {
   "background_color": "#ffffff",
   "display": "standalone",
-  "homepage_url": "https://gp-ui.pages.dev",
-  "description": "Gnosis Pay UI",
+  "homepage_url": "https://my.gnosispay.com",
+  "description": "My Gnosis Pay",
   "icons": [
     {
-      "src": "logo.svg",
+      "src": "favicon.svg",
       "type": "image/svg+xml",
       "sizes": "any"
+    },
+    {
+      "src": "/web-app-manifest-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/web-app-manifest-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ],
   "orientation": "portrait",
-  "name": "Gnosis Pay UI",
-  "short_name": "Gnosis Pay UI",
+  "name": "My Gnosis Pay",
+  "short_name": "My Gnosis Pay",
   "start_url": ".",
   "theme_color": "#ffffff"
 }
