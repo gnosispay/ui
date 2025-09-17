@@ -1655,4 +1655,4 @@ export const ZENDESK_PARTNER_TAG_VALUE = "GnosisPay v2app";
 
 export const HELP_CENTER_URL = "https://help.gnosispay.com/";
 
-export const PARTNER_ID = "gnosis_pay_ui";
+export const PARTNER_ID = "cmfo3b7c806fj8bbnp3zad7rb";
