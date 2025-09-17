@@ -14,7 +14,7 @@
     "dev:all": "concurrently \"dotenv -e .env -- pnpm dev\" \"cd pse-backend-demo && dotenv -e .env -- pnpm dev\""
   },
   "dependencies": {
-    "@gnosispay/account-kit": "^4.7.0",
+    "@gnosispay/account-kit": "^4.8.0",
     "@gnosispay/pse-sdk": "^1.2.2",
     "@hey-api/client-fetch": "^0.13.1",
     "@radix-ui/react-dialog": "^1.1.15",

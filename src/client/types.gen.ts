@@ -2051,6 +2051,10 @@ export type PostApiV1AccountsWithdrawData = {
              */
             data: string;
         };
+        /**
+         * Optional. If using a smart account, the address of the smart wallet to use for the withdraw.
+         */
+        smartWalletAddress?: string;
     };
     path?: never;
     query?: never;
@@ -3382,6 +3386,10 @@ export type DeleteApiV1OwnersData = {
              */
             data: string;
         };
+        /**
+         * Optional. If using a smart account, the address of the smart wallet to use for the operation.
+         */
+        smartWalletAddress?: string;
     };
     path?: never;
     query?: never;
@@ -3500,6 +3508,10 @@ export type PostApiV1OwnersData = {
              */
             data: string;
         };
+        /**
+         * Optional. If using a smart account, the address of the smart wallet to use for the operation.
+         */
+        smartWalletAddress?: string;
     };
     path?: never;
     query?: never;

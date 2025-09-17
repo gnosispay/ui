@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@gnosispay/account-kit':
-        specifier: ^4.7.0
-        version: 4.7.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+        specifier: ^4.8.0
+        version: 4.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       '@gnosispay/pse-sdk':
         specifier: ^1.2.2
         version: 1.2.2
@@ -768,8 +768,8 @@ packages:
   '@gnosis.pm/zodiac@3.5.2':
     resolution: {integrity: sha512-ra4iGOF8gPhYFZTQeH6mRC9TinY0eZ/l+uGhyskR46+IHjH3OFQbmfRu+UYJedYBka3vT3ai0iidKGDKRt61yA==}
 
-  '@gnosispay/account-kit@4.7.0':
-    resolution: {integrity: sha512-lXWlqV3qrk/386ylLlinsRL7yVWjprTb+ZH+XFhJhB5kV5do3uoeNGPWApL018Ix9pu9h9sL7sl6fNYxNwROYQ==}
+  '@gnosispay/account-kit@4.8.0':
+    resolution: {integrity: sha512-NOq68UO34H2pS4iZhk2UrrZteHVoSDITuEHODnnbNDdVtV8y2Vci0IGbgvrBReQKPzmoG8vp17Z5SVC37sQv7Q==}
 
   '@gnosispay/pse-sdk@1.2.2':
     resolution: {integrity: sha512-RCEMLbb9V95fFtyZh7ccJAFEX6iLFXZAa7N879VmvJXB27/8JsSIhmOM4KoYvkcJoLVXoyvowcV2M55DAvnc9w==}
@@ -4339,7 +4339,7 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
-  '@gnosispay/account-kit@4.7.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
+  '@gnosispay/account-kit@4.8.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)':
     dependencies:
       '@gnosis.pm/safe-contracts': 1.3.0(ethers@6.14.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       '@gnosis.pm/zodiac': 3.5.2(bufferutil@4.0.9)(utf-8-validate@5.0.10)

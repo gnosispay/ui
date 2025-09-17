@@ -8,6 +8,7 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 import { AlertTriangle } from "lucide-react";
 import type { Address } from "viem";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 interface SafeOwnersDeleteConfirmationProps {
   ownerAddress: string;
@@ -24,10 +25,15 @@ export const SafeOwnersDeleteConfirmation = ({
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { signTypedDataAsync } = useSignTypedData();
+  const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
 
   const handleDelete = useCallback(async () => {
     if (!safeConfig?.address) {
       setError("Safe configuration not found");
+      return;
+    }
+
+    if (isSmartWalletLoading) {
       return;
     }
 
@@ -72,6 +78,7 @@ export const SafeOwnersDeleteConfirmation = ({
           ownerToRemove: ownerAddress,
           signature,
           message: transactionData.data.message,
+          smartWalletAddress,
         },
       });
 
@@ -88,7 +95,7 @@ export const SafeOwnersDeleteConfirmation = ({
     } finally {
       setIsDeleting(false);
     }
-  }, [ownerAddress, safeConfig?.address, signTypedDataAsync, onSuccess]);
+  }, [ownerAddress, safeConfig?.address, signTypedDataAsync, onSuccess, smartWalletAddress, isSmartWalletLoading]);
 
   return (
     <div className="space-y-6">

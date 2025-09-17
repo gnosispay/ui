@@ -13,5 +13,9 @@ export default defineConfig({
   },
   server: {
     allowedHosts: ["verified-pug-renewing.ngrok-free.app"],
+    cors: {
+      origin: "https://app.safe.global",
+      allowedHeaders: ["Content-Type", "Authorization"],
+    },
   },
 });
