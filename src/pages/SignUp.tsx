@@ -10,6 +10,7 @@ import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { userTerms, type UserTermsTypeFromApi } from "@/constants";
+import { PARTNER_ID } from "@/constants";
 
 enum ScreenStep {
   EmailAndTos = "email-and-tos",
@@ -115,7 +116,7 @@ export const SignUpRoute = () => {
 
       try {
         const { error, data } = await postApiV1AuthSignup({
-          body: { authEmail: email, otp },
+          body: { authEmail: email, otp, partnerId: PARTNER_ID },
         });
 
         if (error || !data) {
