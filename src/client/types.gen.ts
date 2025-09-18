@@ -213,6 +213,10 @@ export type Transaction = {
 };
 
 export type BasePaymentish = {
+    /**
+     * Thread ID for the transaction
+     */
+    threadId?: string;
     createdAt?: string;
     /**
      * Date of the latest clearing record of the transaction
@@ -220,7 +224,11 @@ export type BasePaymentish = {
     clearedAt?: string | null;
     country?: Country;
     /**
-     * Whether the transaction is pending. Pending means awaiting settlement (if it is not a reversal or refund)
+     * Whether the transaction is pending settlement.
+     * - For Payments: true when authorized but not yet cleared, false when settled
+     * - For Refunds: can be true if additional clearing steps are pending, typically false since they require both auth + clearing to appear
+     * - For Reversals: typically false as they're usually processed quickly
+     *
      */
     isPending?: boolean;
     mcc?: string;
@@ -262,7 +270,7 @@ export type BasePaymentish = {
 
 export type Payment = BasePaymentish & {
     kind?: 'Payment';
-    status?: 'Approved' | 'IncorrectPin' | 'InsufficientFunds' | 'InvalidAmount' | 'PinEntryTriesExceeded' | 'IncorrectSecurityCode' | 'Reversal' | 'PartialReversal' | 'Other';
+    status?: 'Approved' | 'IncorrectPin' | 'InsufficientFunds' | 'ExceedsApprovalAmountLimit' | 'InvalidAmount' | 'PinEntryTriesExceeded' | 'IncorrectSecurityCode' | 'Reversal' | 'PartialReversal' | 'Other';
 };
 
 export type Refund = BasePaymentish & {
@@ -433,6 +441,28 @@ export type GetApiV1AccountBalancesResponses = {
 };
 
 export type GetApiV1AccountBalancesResponse = GetApiV1AccountBalancesResponses[keyof GetApiV1AccountBalancesResponses];
+
+export type PostApiV1AccountBalancesKytIntercomTicketData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/account-balances/kyt-intercom-ticket';
+};
+
+export type PostApiV1AccountBalancesKytIntercomTicketErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1AccountBalancesKytIntercomTicketError = PostApiV1AccountBalancesKytIntercomTicketErrors[keyof PostApiV1AccountBalancesKytIntercomTicketErrors];
 
 export type PostApiV1AccountData = {
     body: {
@@ -1346,7 +1376,7 @@ export type GetApiV1CardsTransactionsError = GetApiV1CardsTransactionsErrors[key
 
 export type GetApiV1CardsTransactionsResponses = {
     /**
-     * Successful response
+     * Successful response with paginated transaction events
      */
     200: {
         /**
@@ -1646,6 +1676,86 @@ export type PostApiV1SourceOfFundsResponses = {
 
 export type PostApiV1SourceOfFundsResponse = PostApiV1SourceOfFundsResponses[keyof PostApiV1SourceOfFundsResponses];
 
+export type PostApiV1TransactionsByThreadIdDisputeData = {
+    body: {
+        /**
+         * The reason for disputing the transaction
+         */
+        disputeReason: 'purchase_cancelled_but_no_refund_received' | 'problem_with_the_product_chargeback_' | 'problem_with_service_subscription_chargeback' | 'wrong_installment_number' | 'wrong_value' | 'charged_more_than_once' | 'unrecognized_transaction_report_fraudulent';
+    };
+    path: {
+        /**
+         * The thread ID of the transaction to dispute
+         */
+        threadId: string;
+    };
+    query?: never;
+    url: '/api/v1/transactions/{threadId}/dispute';
+};
+
+export type PostApiV1TransactionsByThreadIdDisputeErrors = {
+    /**
+     * Bad request - Thread ID or dispute reason is required/invalid
+     */
+    400: {
+        error?: string;
+        validReasons?: Array<string>;
+    };
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Transaction not found or does not belong to user
+     */
+    404: {
+        error?: string;
+    };
+    /**
+     * Internal server error
+     */
+    500: {
+        error?: string;
+    };
+};
+
+export type PostApiV1TransactionsByThreadIdDisputeError = PostApiV1TransactionsByThreadIdDisputeErrors[keyof PostApiV1TransactionsByThreadIdDisputeErrors];
+
+export type PostApiV1TransactionsByThreadIdDisputeResponses = {
+    /**
+     * Dispute submitted for review
+     */
+    202: {
+        message?: string;
+    };
+};
+
+export type PostApiV1TransactionsByThreadIdDisputeResponse = PostApiV1TransactionsByThreadIdDisputeResponses[keyof PostApiV1TransactionsByThreadIdDisputeResponses];
+
+export type PostApiV1TransactionsDisputeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/transactions/dispute';
+};
+
+export type PostApiV1TransactionsDisputeErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1TransactionsDisputeError = PostApiV1TransactionsDisputeErrors[keyof PostApiV1TransactionsDisputeErrors];
+
 export type GetApiV1TransactionsData = {
     body?: never;
     path?: never;
@@ -1705,6 +1815,28 @@ export type GetApiV1TransactionsResponses = {
 };
 
 export type GetApiV1TransactionsResponse = GetApiV1TransactionsResponses[keyof GetApiV1TransactionsResponses];
+
+export type PostApiV1TransactionsReportFraudulentData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/transactions/report-fraudulent';
+};
+
+export type PostApiV1TransactionsReportFraudulentErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1TransactionsReportFraudulentError = PostApiV1TransactionsReportFraudulentErrors[keyof PostApiV1TransactionsReportFraudulentErrors];
 
 export type PostApiV1VerificationCheckData = {
     body: {
