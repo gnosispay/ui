@@ -213,6 +213,10 @@ export type Transaction = {
 };
 
 export type BasePaymentish = {
+    /**
+     * Thread ID for the transaction
+     */
+    threadId?: string;
     createdAt?: string;
     /**
      * Date of the latest clearing record of the transaction
@@ -220,7 +224,11 @@ export type BasePaymentish = {
     clearedAt?: string | null;
     country?: Country;
     /**
-     * Whether the transaction is pending. Pending means awaiting settlement (if it is not a reversal or refund)
+     * Whether the transaction is pending settlement.
+     * - For Payments: true when authorized but not yet cleared, false when settled
+     * - For Refunds: can be true if additional clearing steps are pending, typically false since they require both auth + clearing to appear
+     * - For Reversals: typically false as they're usually processed quickly
+     *
      */
     isPending?: boolean;
     mcc?: string;
@@ -262,7 +270,7 @@ export type BasePaymentish = {
 
 export type Payment = BasePaymentish & {
     kind?: 'Payment';
-    status?: 'Approved' | 'IncorrectPin' | 'InsufficientFunds' | 'InvalidAmount' | 'PinEntryTriesExceeded' | 'IncorrectSecurityCode' | 'Reversal' | 'PartialReversal' | 'Other';
+    status?: 'Approved' | 'IncorrectPin' | 'InsufficientFunds' | 'ExceedsApprovalAmountLimit' | 'InvalidAmount' | 'PinEntryTriesExceeded' | 'IncorrectSecurityCode' | 'Reversal' | 'PartialReversal' | 'Other';
 };
 
 export type Refund = BasePaymentish & {
@@ -388,6 +396,7 @@ export type User = {
     bankingDetails?: BankingDetails;
     isSourceOfFundsAnswered?: boolean;
     isPhoneValidated?: boolean;
+    partnerId?: string | null;
 };
 
 export type GetApiV1AccountBalancesData = {
@@ -1255,8 +1264,9 @@ export type PostApiV1CardsVirtualErrors = {
     409: unknown;
     /**
      * Unprocessable Entity - User validation failed. Possible reasons:
-     * - User has reached the maximum number of active cards (10)
+     * - User has reached the maximum number of active cards (5)
      * - User needs to complete KYC successfully
+     * - User's source of funds is not completed
      * - User has incompatible risk score
      * - User does not have a verified phone number
      * - User's name is not set or contains invalid characters
@@ -1346,7 +1356,7 @@ export type GetApiV1CardsTransactionsError = GetApiV1CardsTransactionsErrors[key
 
 export type GetApiV1CardsTransactionsResponses = {
     /**
-     * Successful response
+     * Successful response with paginated transaction events
      */
     200: {
         /**
@@ -1645,6 +1655,110 @@ export type PostApiV1SourceOfFundsResponses = {
 };
 
 export type PostApiV1SourceOfFundsResponse = PostApiV1SourceOfFundsResponses[keyof PostApiV1SourceOfFundsResponses];
+
+export type PostApiV1TransactionsByThreadIdDisputeData = {
+    body?: never;
+    path: {
+        /**
+         * The thread ID of the transaction to dispute
+         */
+        threadId: string;
+    };
+    query?: never;
+    url: '/api/v1/transactions/{threadId}/dispute';
+};
+
+export type PostApiV1TransactionsByThreadIdDisputeErrors = {
+    /**
+     * Bad request - Thread ID is required
+     */
+    400: {
+        error?: string;
+    };
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Transaction not found or does not belong to user
+     */
+    404: {
+        error?: string;
+    };
+    /**
+     * Internal server error
+     */
+    500: {
+        error?: string;
+    };
+};
+
+export type PostApiV1TransactionsByThreadIdDisputeError = PostApiV1TransactionsByThreadIdDisputeErrors[keyof PostApiV1TransactionsByThreadIdDisputeErrors];
+
+export type PostApiV1TransactionsByThreadIdDisputeResponses = {
+    /**
+     * Dispute submitted for review
+     */
+    202: {
+        message?: string;
+    };
+};
+
+export type PostApiV1TransactionsByThreadIdDisputeResponse = PostApiV1TransactionsByThreadIdDisputeResponses[keyof PostApiV1TransactionsByThreadIdDisputeResponses];
+
+export type PostApiV1TransactionsByThreadIdReportData = {
+    body?: never;
+    path: {
+        /**
+         * The thread ID of the transaction to report as fraudulent
+         */
+        threadId: string;
+    };
+    query?: never;
+    url: '/api/v1/transactions/{threadId}/report';
+};
+
+export type PostApiV1TransactionsByThreadIdReportErrors = {
+    /**
+     * Bad request - missing or invalid thread ID
+     */
+    400: {
+        error?: string;
+    };
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Transaction not found or user has no active cards
+     */
+    404: {
+        error?: string;
+    };
+    /**
+     * Internal server error
+     */
+    500: {
+        error?: string;
+    };
+};
+
+export type PostApiV1TransactionsByThreadIdReportError = PostApiV1TransactionsByThreadIdReportErrors[keyof PostApiV1TransactionsByThreadIdReportErrors];
+
+export type PostApiV1TransactionsByThreadIdReportResponses = {
+    /**
+     * Successfully reported fraudulent transaction
+     */
+    200: {
+        message?: string;
+    };
+};
+
+export type PostApiV1TransactionsByThreadIdReportResponse = PostApiV1TransactionsByThreadIdReportResponses[keyof PostApiV1TransactionsByThreadIdReportResponses];
 
 export type GetApiV1TransactionsData = {
     body?: never;
