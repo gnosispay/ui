@@ -15,12 +15,12 @@ import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
 import { deleteApiV1IbansReset, getApiV1IbansSigningMessage, postApiV1IntegrationsMonerium } from "@/client/sdk.gen";
 import { useSignMessage, useAccount } from "wagmi";
 import { MONERIUM_CONSTANTS } from "@/constants";
-import { 
-  generateCodeVerifier, 
-  generateCodeChallenge, 
-  generateNonce, 
-  createMoneriumSiweMessage, 
-  sendMoneriumAuthRequest 
+import {
+  generateCodeVerifier,
+  generateCodeChallenge,
+  generateNonce,
+  createMoneriumSiweMessage,
+  sendMoneriumAuthRequest,
 } from "@/utils/moneriumAuth";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -92,23 +92,23 @@ export const Home = () => {
       // Step 1: Generate PKCE parameters
       const codeVerifier = generateCodeVerifier();
       const codeChallenge = await generateCodeChallenge(codeVerifier);
-      
+
       // Step 2: Generate nonce and create SIWE message
       const nonce = generateNonce();
       const siweMessage = createMoneriumSiweMessage(address, nonce);
-      
+
       // Step 3: Request user signature
       const signature = await signMessageAsync({
         message: siweMessage,
       });
 
       // Step 4: Send authentication request to Monerium
-      const response = await sendMoneriumAuthRequest(
-        MONERIUM_CONSTANTS.CLIENT_ID,
+      const response = await sendMoneriumAuthRequest({
+        clientId: MONERIUM_CONSTANTS.CLIENT_CREDENTIALS_AUTHORIZATION,
         codeChallenge,
         signature,
-        siweMessage
-      );
+        message: siweMessage,
+      });
 
       if (!response.ok) {
         const errorData = await response.text();
@@ -117,9 +117,8 @@ export const Home = () => {
 
       const result = await response.json();
       console.log("Monerium authentication successful:", result);
-      
+
       // TODO: Handle successful authentication (e.g., redirect or show success message)
-      
     } catch (error) {
       console.error("Error authenticating with Monerium:", error);
       setMoneriumError(extractErrorMessage(error, "Failed to authenticate with Monerium"));
@@ -136,10 +135,7 @@ export const Home = () => {
           <UnspendableAmountAlert />
           {moneriumError && (
             <div className="mb-4">
-              <StandardAlert 
-                variant="destructive" 
-                description={moneriumError} 
-              />
+              <StandardAlert variant="destructive" description={moneriumError} />
             </div>
           )}
         </div>
@@ -151,10 +147,7 @@ export const Home = () => {
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
               <Button onClick={handleMoneriumButtonClick}>Monerium</Button>
               <Button onClick={handleResetIBANButtonClick}>Reset IBAN</Button>
-              <Button 
-                onClick={handleAuthenticateWithMonerium}
-                disabled={isMoneriumLoading || !address}
-              >
+              <Button onClick={handleAuthenticateWithMonerium} disabled={isMoneriumLoading || !address}>
                 {isMoneriumLoading ? "Authenticating..." : "Auth Monerium"}
               </Button>
             </div>

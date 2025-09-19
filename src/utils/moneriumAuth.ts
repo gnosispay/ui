@@ -50,7 +50,7 @@ export const createMoneriumSiweMessage = (address: string, nonce: string): strin
   return `example.com wants you to sign in with your Ethereum account:
 ${address}
 
-Allow AppName to access my data on Monerium
+Allow Gnosis Pay - Sandbox to access my data on Monerium
 
 URI: http://localhost:5173
 Version: 1
@@ -67,12 +67,17 @@ Resources:
 /**
  * Sends the authentication request to Monerium API
  */
-export const sendMoneriumAuthRequest = async (
-  clientId: string,
-  codeChallenge: string,
-  signature: string,
-  message: string,
-): Promise<Response> => {
+export const sendMoneriumAuthRequest = async ({
+  clientId,
+  codeChallenge,
+  signature,
+  message,
+}: {
+  clientId: string;
+  codeChallenge: string;
+  signature: string;
+  message: string;
+}): Promise<Response> => {
   const formData = new URLSearchParams();
   formData.append("client_id", clientId);
   formData.append("code_challenge", codeChallenge);
@@ -90,4 +95,3 @@ export const sendMoneriumAuthRequest = async (
     body: formData,
   });
 };
-
