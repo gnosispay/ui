@@ -8,6 +8,7 @@ import { useSignTypedData } from "wagmi";
 import { type Address, isAddress } from "viem";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 interface SafeOwnersAddProps {
   onCancel: () => void;
@@ -21,7 +22,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signTypedDataAsync } = useSignTypedData();
-
+  const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const handleAddressChange = useCallback((value: string) => {
     setError(null);
     setNewOwnerAddress(value);
@@ -35,6 +36,11 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
 
     if (!safeConfig?.address) {
       setError("Safe configuration not found");
+      return;
+    }
+
+    if (isSmartWalletLoading) {
+      setError("Smart wallet loading");
       return;
     }
 
@@ -91,6 +97,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
           newOwner: trimmedAddress,
           signature,
           message: transactionData.data.message,
+          smartWalletAddress,
         },
       });
 
@@ -107,7 +114,15 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
     } finally {
       setIsSubmitting(false);
     }
-  }, [newOwnerAddress, safeConfig?.address, signTypedDataAsync, onSuccess, currentOwners]);
+  }, [
+    newOwnerAddress,
+    safeConfig?.address,
+    signTypedDataAsync,
+    onSuccess,
+    currentOwners,
+    smartWalletAddress,
+    isSmartWalletLoading,
+  ]);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

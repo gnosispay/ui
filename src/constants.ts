@@ -1663,3 +1663,5 @@ export const MONERIUM_CONSTANTS = {
   API_BASE_URL: "https://api.monerium.dev",
   REDIRECT_URI: "http://localhost:5173",
 } as const;
+
+export const PARTNER_ID = "cmfo3b7c806fj8bbnp3zad7rb";

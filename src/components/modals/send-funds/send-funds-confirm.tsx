@@ -11,6 +11,7 @@ import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { getApiV1AccountsWithdrawTransactionData, postApiV1AccountsWithdraw } from "@/client";
 import { useDelayRelay } from "@/context/DelayRelayContext";
 import { useUser } from "@/context/UserContext";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 interface SendFundsConfirmProps {
   selectedToken: TokenInfoWithBalance;
@@ -25,9 +26,14 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
   const { signTypedDataAsync } = useSignTypedData();
   const { fetchDelayQueue } = useDelayRelay();
   const { safeConfig } = useUser();
+  const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
 
   const handleConfirm = useCallback(async () => {
     if (!selectedToken || !toAddress || !amount || !safeConfig?.address || !selectedToken.address) {
+      return;
+    }
+
+    if (isSmartWalletLoading) {
       return;
     }
 
@@ -73,6 +79,7 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
                 amount: amount.toString(),
                 tokenAddress: selectedToken.address,
                 message: typedData.message,
+                smartWalletAddress,
               },
             })
               .then(({ data, error }) => {
@@ -104,7 +111,17 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
         console.error("Error fetching transaction data:", error);
         toast.error("Failed to fetch transaction data");
       });
-  }, [selectedToken, toAddress, amount, signTypedDataAsync, onSuccess, fetchDelayQueue, safeConfig?.address]);
+  }, [
+    selectedToken,
+    toAddress,
+    amount,
+    signTypedDataAsync,
+    onSuccess,
+    fetchDelayQueue,
+    safeConfig?.address,
+    smartWalletAddress,
+    isSmartWalletLoading,
+  ]);
 
   return (
     <div className="space-y-6">
