@@ -47,7 +47,7 @@ export const createMoneriumSiweMessage = (address: string, nonce: string): strin
   const now = new Date();
   const expirationTime = new Date(now.getTime() + 60 * 60 * 1000); // 1 hour from now
 
-  return `example.com wants you to sign in with your Ethereum account:
+  return `localhost:5173 wants you to sign in with your Ethereum account:
 ${address}
 
 Allow Gnosis Pay - Sandbox to access my data on Monerium
@@ -59,9 +59,7 @@ Nonce: ${nonce}
 Issued At: ${now.toISOString()}
 Expiration Time: ${expirationTime.toISOString()}
 Resources:
-- https://monerium.com/siwe
-- https://example.com/privacy-policy
-- https://example.com/terms-of-service`;
+- https://gnosispay.com`;
 };
 
 /**
