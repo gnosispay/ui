@@ -7,15 +7,33 @@ import { PendingCardOrder } from "@/components/pending-card-order";
 import { Rewards } from "@/components/rewards";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Link } from "react-router-dom";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { PartnerBanner } from "@/components/ui/partner-banner";
 import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
+import { postApiV1TransactionsByThreadIdDispute } from "@/client";
 
 export const Home = () => {
   const [sendFundsModalOpen, setSendFundsModalOpen] = useState(false);
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
+
+  const disputeTransaction = useCallback(() => {
+    postApiV1TransactionsByThreadIdDispute({
+      path: {
+        threadId: "2889513859841122536",
+      },
+      body: {
+        disputeReason: "purchase_cancelled_but_no_refund_received",
+      },
+    })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
@@ -30,6 +48,7 @@ export const Home = () => {
             <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
               <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
+              <Button onClick={() => disputeTransaction()}>Dispute transaction</Button>
             </div>
           </div>
           <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
