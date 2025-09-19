@@ -1427,6 +1427,41 @@ export type GetApiV1DelayRelayResponses = {
 
 export type GetApiV1DelayRelayResponse = GetApiV1DelayRelayResponses[keyof GetApiV1DelayRelayResponses];
 
+export type GetApiV1DisputeReasonsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/dispute-reasons';
+};
+
+export type GetApiV1DisputeReasonsErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type GetApiV1DisputeReasonsError = GetApiV1DisputeReasonsErrors[keyof GetApiV1DisputeReasonsErrors];
+
+export type GetApiV1DisputeReasonsResponses = {
+    /**
+     * Successfully retrieved dispute reasons
+     */
+    200: {
+        result?: {
+            [key: string]: string;
+        };
+    };
+};
+
+export type GetApiV1DisputeReasonsResponse = GetApiV1DisputeReasonsResponses[keyof GetApiV1DisputeReasonsResponses];
+
 export type GetApiV1OrderData = {
     body?: never;
     path?: never;
