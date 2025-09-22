@@ -1,9 +1,9 @@
 import { useCallback, useState, useEffect, useMemo } from "react";
 import { CheckCircle2 } from "lucide-react";
 import {
-  getApiV1DisputeReasons,
+  getApiV1TransactionsDispute,
   postApiV1TransactionsByThreadIdDispute,
-  type GetApiV1DisputeReasonsResponse,
+  type GetApiV1TransactionsDisputeResponse,
   type PostApiV1TransactionsByThreadIdDisputeData,
 } from "@/client";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ enum DisputeStep {
 
 type DisputeReason = PostApiV1TransactionsByThreadIdDisputeData["body"]["disputeReason"];
 
-type DisputeReasons = NonNullable<GetApiV1DisputeReasonsResponse["result"]>;
+type DisputeReasons = NonNullable<GetApiV1TransactionsDisputeResponse["result"]>;
 
 interface DisputeSectionProps {
   threadId: string;
@@ -43,7 +43,7 @@ export const DisputeSection = ({ threadId, onBack }: DisputeSectionProps) => {
     setIsLoadingReasons(true);
     setDisputeError("");
 
-    getApiV1DisputeReasons()
+    getApiV1TransactionsDispute()
       .then((response) => {
         if (response.data?.result) {
           setDisputeReasons(response.data.result);
