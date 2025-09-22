@@ -1907,6 +1907,202 @@ export type PostApiV1VerificationResponses = {
 
 export type PostApiV1VerificationResponse = PostApiV1VerificationResponses[keyof PostApiV1VerificationResponses];
 
+export type GetApiV1AccountsDailyLimitData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/daily-limit';
+};
+
+export type GetApiV1AccountsDailyLimitErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type GetApiV1AccountsDailyLimitResponses = {
+    /**
+     * Successfully retrieved the current daily spending limit.
+     */
+    200: {
+        data: {
+            /**
+             * The current daily spending limit in the Safe token's base units.
+             */
+            dailyLimit: number;
+            /**
+             * The remaining daily spending limit in the Safe token's base units.
+             */
+            dailyRemaining: number;
+        };
+    };
+};
+
+export type GetApiV1AccountsDailyLimitResponse = GetApiV1AccountsDailyLimitResponses[keyof GetApiV1AccountsDailyLimitResponses];
+
+export type PutApiV1AccountsDailyLimitData = {
+    body: {
+        /**
+         * The new daily spending limit to set (must be an integer).
+         */
+        newLimit: number;
+        /**
+         * The EIP-712 signature authorizing this limit change.
+         */
+        signature: string;
+        /**
+         * The message object containing transaction data and salt from the EIP-712 typed data.
+         */
+        message: {
+            /**
+             * The salt value used in the EIP-712 typed data.
+             */
+            salt: string;
+            /**
+             * The encoded transaction data from the typed data message.
+             */
+            data: string;
+        };
+        /**
+         * Optional. If using a smart account, the address of the smart wallet to use for the limit change.
+         */
+        smartWalletAddress?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/daily-limit';
+};
+
+export type PutApiV1AccountsDailyLimitErrors = {
+    /**
+     * Bad request - invalid signature.
+     */
+    400: unknown;
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in request body.
+     */
+    422: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type PutApiV1AccountsDailyLimitResponses = {
+    /**
+     * Successfully submitted the daily limit update request.
+     */
+    200: {
+        /**
+         * The created delayed transaction details.
+         */
+        data: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type PutApiV1AccountsDailyLimitResponse = PutApiV1AccountsDailyLimitResponses[keyof PutApiV1AccountsDailyLimitResponses];
+
+export type GetApiV1AccountsDailyLimitTransactionDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The new daily spending limit to set (1-8000, must be an integer).
+         */
+        newLimit: string;
+    };
+    url: '/api/v1/accounts/daily-limit/transaction-data';
+};
+
+export type GetApiV1AccountsDailyLimitTransactionDataErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in query parameters.
+     */
+    422: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type GetApiV1AccountsDailyLimitTransactionDataResponses = {
+    /**
+     * Successfully retrieved EIP-712 typed data for signing.
+     */
+    200: {
+        data: {
+            domain: {
+                /**
+                 * The contract address that will verify the signature.
+                 */
+                verifyingContract: string;
+                /**
+                 * The chain ID for the network.
+                 */
+                chainId: number;
+            };
+            /**
+             * The primary type for EIP-712 typed data signing.
+             */
+            primaryType: 'ModuleTx';
+            types: {
+                /**
+                 * Array of type definitions for the ModuleTx structure.
+                 */
+                ModuleTx: Array<{
+                    /**
+                     * The field type.
+                     */
+                    type: string;
+                    /**
+                     * The field name.
+                     */
+                    name: string;
+                }>;
+            };
+            message: {
+                /**
+                 * The encoded transaction data for the daily limit change.
+                 */
+                data: string;
+                /**
+                 * The salt value for the typed data.
+                 */
+                salt: string;
+            };
+        };
+    };
+};
+
+export type GetApiV1AccountsDailyLimitTransactionDataResponse = GetApiV1AccountsDailyLimitTransactionDataResponses[keyof GetApiV1AccountsDailyLimitTransactionDataResponses];
+
 export type GetApiV1AccountsOnchainDailyLimitData = {
     body?: never;
     path?: never;

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { getApiV1AccountsOnchainDailyLimit } from "@/client";
+import { getApiV1AccountsDailyLimit } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { currencies } from "@/constants";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -40,15 +40,15 @@ export const DailyLimitModal: React.FC<DailyLimitModalProps> = ({ open, onOpenCh
     setIsLoading(true);
     setError(null);
 
-    getApiV1AccountsOnchainDailyLimit()
+    getApiV1AccountsDailyLimit()
       .then((response) => {
         if (response.error) {
           setError("Failed to fetch daily limit");
           return;
         }
 
-        setDailyLimit(response.data?.data?.onchainDailyLimit ?? null);
-        setAllowance(response.data?.data?.onchainDailyRemaining ?? null);
+        setDailyLimit(response.data?.data?.dailyLimit ?? null);
+        setAllowance(response.data?.data?.dailyRemaining ?? null);
       })
       .catch((err) => {
         setError("Failed to fetch daily limit");
