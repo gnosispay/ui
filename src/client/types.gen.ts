@@ -58,7 +58,7 @@ export type TermsBody = {
     /**
      * Type of terms and conditions
      */
-    terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos';
+    terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos' | 'privacy-policy';
     /**
      * Version of the terms document
      */
@@ -1507,7 +1507,7 @@ export type GetApiV1SafeConfigData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/v1/safe-config';
+    url: '/api/v1/safe/config';
 };
 
 export type GetApiV1SafeConfigErrors = {
@@ -1533,6 +1533,100 @@ export type GetApiV1SafeConfigResponses = {
 };
 
 export type GetApiV1SafeConfigResponse = GetApiV1SafeConfigResponses[keyof GetApiV1SafeConfigResponses];
+
+export type GetApiV1SafeDeployData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/safe/deploy';
+};
+
+export type GetApiV1SafeDeployErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type GetApiV1SafeDeployError = GetApiV1SafeDeployErrors[keyof GetApiV1SafeDeployErrors];
+
+export type GetApiV1SafeDeployResponses = {
+    /**
+     * Successfully retrieved the deployment status of the Safe account.
+     */
+    200: {
+        /**
+         * The status of the deployment.
+         */
+        status?: 'ok' | 'not_deployed' | 'processing' | 'failed';
+        /**
+         * The timestamp of the last update.
+         */
+        updatedAt?: string;
+    };
+};
+
+export type GetApiV1SafeDeployResponse = GetApiV1SafeDeployResponses[keyof GetApiV1SafeDeployResponses];
+
+export type PostApiV1SafeDeployData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/safe/deploy';
+};
+
+export type PostApiV1SafeDeployErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Forbidden. Missing signer address.
+     */
+    403: {
+        /**
+         * Error message
+         */
+        error?: string;
+    };
+    /**
+     * Unprocessable Entity. Safe account already exists or user is not KYC approved.
+     */
+    422: {
+        /**
+         * Error message
+         */
+        error?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1SafeDeployError = PostApiV1SafeDeployErrors[keyof PostApiV1SafeDeployErrors];
+
+export type PostApiV1SafeDeployResponses = {
+    /**
+     * Accepted the deployment request. The partner should check the status of the deployment with the GET /api/v1/safe/deploy endpoint.
+     */
+    202: {
+        /**
+         * The status of the deployment.
+         */
+        status?: string;
+    };
+};
+
+export type PostApiV1SafeDeployResponse = PostApiV1SafeDeployResponses[keyof PostApiV1SafeDeployResponses];
 
 export type PostApiV1SafeSetCurrencyData = {
     body?: never;
@@ -1906,6 +2000,202 @@ export type PostApiV1VerificationResponses = {
 };
 
 export type PostApiV1VerificationResponse = PostApiV1VerificationResponses[keyof PostApiV1VerificationResponses];
+
+export type GetApiV1AccountsDailyLimitData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/daily-limit';
+};
+
+export type GetApiV1AccountsDailyLimitErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type GetApiV1AccountsDailyLimitResponses = {
+    /**
+     * Successfully retrieved the current daily spending limit.
+     */
+    200: {
+        data: {
+            /**
+             * The current daily spending limit in the Safe token's base units.
+             */
+            dailyLimit: number;
+            /**
+             * The remaining daily spending limit in the Safe token's base units.
+             */
+            dailyRemaining: number;
+        };
+    };
+};
+
+export type GetApiV1AccountsDailyLimitResponse = GetApiV1AccountsDailyLimitResponses[keyof GetApiV1AccountsDailyLimitResponses];
+
+export type PutApiV1AccountsDailyLimitData = {
+    body: {
+        /**
+         * The new daily spending limit to set (must be an integer).
+         */
+        newLimit: number;
+        /**
+         * The EIP-712 signature authorizing this limit change.
+         */
+        signature: string;
+        /**
+         * The message object containing transaction data and salt from the EIP-712 typed data.
+         */
+        message: {
+            /**
+             * The salt value used in the EIP-712 typed data.
+             */
+            salt: string;
+            /**
+             * The encoded transaction data from the typed data message.
+             */
+            data: string;
+        };
+        /**
+         * Optional. If using a smart account, the address of the smart wallet to use for the limit change.
+         */
+        smartWalletAddress?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/accounts/daily-limit';
+};
+
+export type PutApiV1AccountsDailyLimitErrors = {
+    /**
+     * Bad request - invalid signature.
+     */
+    400: unknown;
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in request body.
+     */
+    422: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type PutApiV1AccountsDailyLimitResponses = {
+    /**
+     * Successfully submitted the daily limit update request.
+     */
+    200: {
+        /**
+         * The created delayed transaction details.
+         */
+        data: {
+            [key: string]: unknown;
+        };
+    };
+};
+
+export type PutApiV1AccountsDailyLimitResponse = PutApiV1AccountsDailyLimitResponses[keyof PutApiV1AccountsDailyLimitResponses];
+
+export type GetApiV1AccountsDailyLimitTransactionDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * The new daily spending limit to set (1-8000, must be an integer).
+         */
+        newLimit: string;
+    };
+    url: '/api/v1/accounts/daily-limit/transaction-data';
+};
+
+export type GetApiV1AccountsDailyLimitTransactionDataErrors = {
+    /**
+     * Unauthorized - invalid or missing authentication token.
+     */
+    401: unknown;
+    /**
+     * Safe account or token not found for the user.
+     */
+    404: unknown;
+    /**
+     * Unprocessable Entity - validation errors in query parameters.
+     */
+    422: unknown;
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type GetApiV1AccountsDailyLimitTransactionDataResponses = {
+    /**
+     * Successfully retrieved EIP-712 typed data for signing.
+     */
+    200: {
+        data: {
+            domain: {
+                /**
+                 * The contract address that will verify the signature.
+                 */
+                verifyingContract: string;
+                /**
+                 * The chain ID for the network.
+                 */
+                chainId: number;
+            };
+            /**
+             * The primary type for EIP-712 typed data signing.
+             */
+            primaryType: 'ModuleTx';
+            types: {
+                /**
+                 * Array of type definitions for the ModuleTx structure.
+                 */
+                ModuleTx: Array<{
+                    /**
+                     * The field type.
+                     */
+                    type: string;
+                    /**
+                     * The field name.
+                     */
+                    name: string;
+                }>;
+            };
+            message: {
+                /**
+                 * The encoded transaction data for the daily limit change.
+                 */
+                data: string;
+                /**
+                 * The salt value for the typed data.
+                 */
+                salt: string;
+            };
+        };
+    };
+};
+
+export type GetApiV1AccountsDailyLimitTransactionDataResponse = GetApiV1AccountsDailyLimitTransactionDataResponses[keyof GetApiV1AccountsDailyLimitTransactionDataResponses];
 
 export type GetApiV1AccountsOnchainDailyLimitData = {
     body?: never;
@@ -2770,6 +3060,80 @@ export type GetApiV1IbansSigningMessageResponses = {
 };
 
 export type GetApiV1IbansSigningMessageResponse = GetApiV1IbansSigningMessageResponses[keyof GetApiV1IbansSigningMessageResponses];
+
+export type PostApiV1IntegrationsMoneriumData = {
+    body: {
+        /**
+         * Signature of the message "I hereby declare that I am the address owner."
+         * This signature is created by signing the message with the user's wallet.
+         * The exact message can be retrieved from the /api/v1/ibans/signing-message endpoint.
+         * The signature is used to verify ownership of the address on Monerium.
+         * Format: Ethereum signature string (e.g., "0x1234...").
+         *
+         */
+        signature?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/integrations/monerium';
+};
+
+export type PostApiV1IntegrationsMoneriumErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1IntegrationsMoneriumError = PostApiV1IntegrationsMoneriumErrors[keyof PostApiV1IntegrationsMoneriumErrors];
+
+export type PostApiV1IntegrationsMoneriumResponses = {
+    /**
+     * Successfully created a new Monerium integration
+     */
+    200: {
+        data?: {
+            /**
+             * Indicates whether the Monerium integration was successfully created
+             */
+            success: boolean;
+            /**
+             * HTTP status code of the operation
+             */
+            status: number;
+            /**
+             * Human-readable description of the operation result
+             */
+            description: string;
+            /**
+             * Raw response data from Monerium API (only present on errors)
+             */
+            responseData?: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * The Monerium profile ID assigned to the user (only present on success)
+             */
+            moneriumProfileId?: string | null;
+            /**
+             * The assigned IBAN number (only present on success)
+             */
+            iban?: string | null;
+            /**
+             * The assigned BIC code (only present on success)
+             */
+            bic?: string | null;
+        };
+    };
+};
+
+export type PostApiV1IntegrationsMoneriumResponse = PostApiV1IntegrationsMoneriumResponses[keyof PostApiV1IntegrationsMoneriumResponses];
 
 export type GetApiV1KycIntegrationData = {
     body?: never;
@@ -4003,7 +4367,7 @@ export type GetApiV1UserTermsResponses = {
             /**
              * Type of terms and conditions
              */
-            type?: 'general-tos' | 'card-monavate-tos' | 'cashback-tos';
+            type?: 'general-tos' | 'card-monavate-tos' | 'cashback-tos' | 'privacy-policy';
             /**
              * Current version of these terms
              */
