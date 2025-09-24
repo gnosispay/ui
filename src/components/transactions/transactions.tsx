@@ -14,6 +14,7 @@ import type { Erc20TokenEvent } from "@/types/transaction";
 import { useState, useCallback, useMemo } from "react";
 import { TransactionTabs, TransactionTab } from "@/components/ui/transaction-tabs";
 import { Button } from "@/components/ui/button";
+import { StandardAlert } from "../ui/standard-alert";
 
 enum TransactionType {
   CARD = "card",
@@ -106,8 +107,15 @@ export const Transactions = () => {
     }
   }, [selectedType, loadMoreCardTransactions, loadMoreOnchainTransactions]);
 
-  if (!safeConfig || isLoading) {
+  if (isLoading) {
     return <TransactionSkeleton />;
+  }
+
+  console.log("safeConfig", safeConfig);
+  console.log("transactionsByDate", transactionsByDate);
+
+  if (!safeConfig) {
+    return <StandardAlert variant="destructive" description="Safe configuration is missing." />;
   }
 
   if (error) {
