@@ -107,12 +107,12 @@ export const Transactions = () => {
     }
   }, [selectedType, loadMoreCardTransactions, loadMoreOnchainTransactions]);
 
+  console.log("safeConfig", safeConfig);
+  console.log("transactionsByDate", transactionsByDate);
+
   if (isLoading) {
     return <TransactionSkeleton />;
   }
-
-  console.log("safeConfig", safeConfig);
-  console.log("transactionsByDate", transactionsByDate);
 
   if (!safeConfig) {
     return <StandardAlert variant="destructive" description="Safe configuration is missing." />;
