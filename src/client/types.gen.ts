@@ -58,7 +58,7 @@ export type TermsBody = {
     /**
      * Type of terms and conditions
      */
-    terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos';
+    terms: 'general-tos' | 'card-monavate-tos' | 'cashback-tos' | 'privacy-policy';
     /**
      * Version of the terms document
      */
