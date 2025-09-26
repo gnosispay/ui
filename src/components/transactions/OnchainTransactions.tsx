@@ -7,7 +7,7 @@ import { useOnchainTransactions } from "@/context/OnchainTransactionsContext";
 import { currencies } from "@/constants";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { Button } from "@/components/ui/button";
-import { useMemo, useCallback } from "react";
+import { useMemo, useCallback, useEffect } from "react";
 
 export const OnchainTransactions = () => {
   const { safeConfig } = useUser();
@@ -18,6 +18,7 @@ export const OnchainTransactions = () => {
     hasNextPage,
     isLoadingMoreOnchainTransactions,
     loadMoreOnchainTransactions,
+    setFetchingEnabled,
   } = useOnchainTransactions();
 
   const handleLoadMore = useCallback(() => {
@@ -29,6 +30,10 @@ export const OnchainTransactions = () => {
     () => (safeConfig?.fiatSymbol ? currencies[safeConfig.fiatSymbol] : null),
     [safeConfig?.fiatSymbol],
   );
+
+  useEffect(() => {
+    setFetchingEnabled(true);
+  }, [setFetchingEnabled]);
 
   // Show loading skeleton if transactions are loading or if safeConfig is missing
   if (onchainTransactionsLoading || !safeConfig) {
