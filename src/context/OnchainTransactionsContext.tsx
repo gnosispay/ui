@@ -24,6 +24,7 @@ export type IOnchainTransactionsContext = {
   loadMoreOnchainTransactions: () => void;
   currentOldestDate: Date | null;
   hasNextPage: boolean;
+  setFetchingEnabled: (enabled: boolean) => void;
 };
 
 const OnchainTransactionsContext = createContext<IOnchainTransactionsContext | undefined>(undefined);
@@ -37,6 +38,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
   const [isLoadingMoreOnchainTransactions, setIsLoadingMoreOnchainTransactions] = useState(false);
   const [currentOldestDate, setCurrentOldestDate] = useState<Date | null>(null);
   const [hasNextPage, setHasNextPage] = useState(true);
+  const [fetchingEnabled, setFetchingEnabled] = useState(false);
   const currentDaysLoadedRef = useRef(DEFAULT_ONCHAIN_TRANSACTIONS_DAYS);
   const currentOldestDateRef = useRef<Date | null>(null);
 
@@ -148,7 +150,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
   );
 
   useEffect(() => {
-    if (!isAuthenticated || !safeConfig?.address || !tokenAddress) {
+    if (!fetchingEnabled || !isAuthenticated || !safeConfig?.address || !tokenAddress) {
       setOnchainTransactionsByDate({});
       setOnchainTransactionsLoading(false);
       setCurrentOldestDate(null);
@@ -168,7 +170,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
     return () => {
       clearInterval(intervalId);
     };
-  }, [fetchOnchainTransactions, isAuthenticated, safeConfig?.address, tokenAddress]);
+  }, [fetchingEnabled, fetchOnchainTransactions, isAuthenticated, safeConfig?.address, tokenAddress]);
 
   const loadMoreOnchainTransactions = useCallback(() => {
     if (!safeConfig?.address || !tokenAddress || isLoadingMoreOnchainTransactions || !hasNextPage) {
@@ -186,6 +188,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
       loadMoreOnchainTransactions,
       currentOldestDate,
       hasNextPage,
+      setFetchingEnabled,
     }),
     [
       onchainTransactionsByDate,
