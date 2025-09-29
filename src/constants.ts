@@ -4,6 +4,7 @@ import gbpLogo from "./assets/tokens/gbpe.png";
 import usdcLogo from "./assets/tokens/usdce.png";
 import gnoLogo from "./assets/tokens/gno.svg";
 import xdaiLogo from "./assets/tokens/xdai.svg";
+import wethLogo from "./assets/tokens/weth.svg";
 
 export interface CurrencyInfo {
   tokenSymbol?: string;
@@ -57,6 +58,13 @@ export const supportedTokens: Record<string, TokenInfo> = {
     decimals: 18,
     symbol: "XDAI",
     logo: xdaiLogo,
+  },
+  WETH: {
+    tokenSymbol: "WETH",
+    address: "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1",
+    decimals: 18,
+    symbol: "WETH",
+    logo: wethLogo,
   },
 };
 
