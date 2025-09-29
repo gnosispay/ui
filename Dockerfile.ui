@@ -57,6 +57,13 @@ server {
     listen  [::]:80;
     server_name  localhost;
 
+    # Cache static files
+    location ~* \.(png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+        root   /usr/share/nginx/html;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
     location / {
         root   /usr/share/nginx/html;
         index  index.html index.htm;
