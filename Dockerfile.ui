@@ -39,17 +39,34 @@ FROM nginx:alpine
 # Copy built files to nginx html directory
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config if needed (optional)
+# Copy nginx config
 COPY <<EOF /etc/nginx/conf.d/default.conf
+gzip on;
+gzip_vary on;
+gzip_min_length 1024;
+gzip_comp_level 6;
+gzip_types
+    text/plain
+    text/css
+    text/javascript
+    application/json
+    application/javascript;
+
 server {
     listen       80;
     listen  [::]:80;
     server_name  localhost;
 
+    # Cache static files
+    location ~* \.(png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+        root   /usr/share/nginx/html;
+        expires 30d;
+        add_header Cache-Control "public";
+    }
+
     location / {
         root   /usr/share/nginx/html;
         index  index.html index.htm;
-
         try_files \$uri /index.html;
     }
 
@@ -61,7 +78,6 @@ server {
     }
 
     # redirect server error pages to the static page /50x.html
-    #
     error_page   500 502 503 504  /50x.html;
     location = /50x.html {
         root   /usr/share/nginx/html;
