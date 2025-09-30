@@ -10,6 +10,51 @@ import { config } from "./wagmi.ts";
 
 import "./index.css";
 import "@rainbow-me/rainbowkit/styles.css";
+
+// Clickjacking protection - prevent the app from running in an iframe
+if (window.self !== window.top) {
+  // If we're in an iframe, redirect the top window to our URL
+  try {
+    window.top!.location.href = window.location.href;
+  } catch (error) {
+    // If we can't access the top window (cross-origin), show a warning
+    document.body.innerHTML = `
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        font-family: system-ui, -apple-system, sans-serif;
+        background: var(--color-background, #ffffff);
+        color: var(--color-foreground, #000000);
+        text-align: center;
+        padding: 2rem;
+      ">
+        <div>
+          <h1 style="margin-bottom: 1rem; color: var(--color-error, #dc2626);">
+            Security Warning
+          </h1>
+          <p style="margin-bottom: 1rem;">
+            For your security, this application cannot be displayed in a frame.
+          </p>
+          <a 
+            href="${window.location.href}" 
+            target="_top"
+            style="
+              color: var(--color-brand, #16a34a);
+              text-decoration: underline;
+              font-weight: 500;
+            "
+          >
+            Open Gnosis Pay in a new window
+          </a>
+        </div>
+      </div>
+    `;
+    throw new Error("Application blocked: running in iframe");
+  }
+}
+
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
