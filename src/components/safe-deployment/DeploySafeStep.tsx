@@ -4,6 +4,7 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle2, LoaderCircle } from "lucide-react";
+import { useUser } from "@/context/UserContext";
 
 enum DeploymentStep {
   Initializing = "initializing",
@@ -20,6 +21,7 @@ const DeploySafeStep = ({ setError }: DeploySafeStepProps) => {
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
   const pollingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const { refreshUser } = useUser();
 
   const stopPolling = useCallback(() => {
     if (pollingIntervalRef.current) {
@@ -47,6 +49,7 @@ const DeploySafeStep = ({ setError }: DeploySafeStepProps) => {
           setStep(DeploymentStep.Done);
           setIsProcessing(false);
           stopPolling();
+          refreshUser();
           return;
         }
 
@@ -64,7 +67,7 @@ const DeploySafeStep = ({ setError }: DeploySafeStepProps) => {
         setIsProcessing(false);
         stopPolling();
       });
-  }, [setError, stopPolling]);
+  }, [setError, stopPolling, refreshUser]);
 
   const startPolling = useCallback(() => {
     if (pollingIntervalRef.current) {
