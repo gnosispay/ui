@@ -1,5 +1,5 @@
 import { HeaderNavBar } from "./components/nav/header";
-import { Route, Routes, Outlet } from "react-router-dom";
+import { Route, Routes, Outlet, Navigate } from "react-router-dom";
 import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
 import { FooterNavBar } from "./components/nav/footer";
@@ -59,6 +59,18 @@ const publicRoutes = [
   {
     path: "/card-order/:orderId",
     element: <ExistingCardOrder />,
+  },
+  {
+    path: "/signup",
+    element: <Navigate to="/" replace />,
+  },
+  {
+    path: "/signin",
+    element: <Navigate to="/" replace />,
+  },
+  {
+    path: "/welcome",
+    element: <Navigate to="/" replace />,
   },
 ];
 
