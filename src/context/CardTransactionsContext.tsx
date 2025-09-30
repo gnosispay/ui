@@ -135,7 +135,13 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated || !cardTokens || cardTokens.length === 0) {
+    if (!isAuthenticated || !cardTokens) {
+      return;
+    }
+
+    if (cardTokens.length === 0) {
+      // prevent flashing of loading state
+      setCardTransactionsLoading(false);
       return;
     }
 
