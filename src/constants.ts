@@ -82,17 +82,22 @@ export const userTerms: Record<UserTermsTypeFromApi, { title: string; version: s
   "general-tos": {
     title: "Gnosis Pay Terms of Service",
     version: "TOS_GENERAL_VERSION_1",
-    url: "https://legal.gnosispay.com/en/articles/8911632-gnosis-pay-terms-of-service",
+    url: "https://help.gnosispay.com/hc/en-us/articles/39723036951444-Gnosis-Pay-WebApp-Terms-of-Service",
   },
   "card-monavate-tos": {
     title: "Cardholder Terms of Service",
     version: "TOS_CARD_VERSION_1",
-    url: "https://legal.gnosispay.com/en/articles/8911633-monavate-cardholder-terms-eea",
+    url: "https://help.gnosispay.com/hc/en-us/articles/39726634253076-Monavate-Cardholder-Terms-EEA",
   },
   "cashback-tos": {
     title: "Cardholder Cashback Terms of Service",
     version: "TOS_CASHBACK_2024-08-01",
     url: "https://forum.gnosis.io/t/gip-110-should-the-gnosis-dao-create-and-fund-a-gnosis-pay-rewards-program-with-10k-gno/8837",
+  },
+  "privacy-policy": {
+    title: "Gnosis Pay Privacy and Cookies Policy",
+    version: "PRIVACY_POLICY_VERSION_1",
+    url: "https://help.gnosispay.com/hc/en-us/articles/39723694982548-Gnosis-Pay-Privacy-and-Cookies-Policy",
   },
 };
 
