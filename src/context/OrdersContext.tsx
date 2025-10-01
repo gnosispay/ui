@@ -43,8 +43,6 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
       .then(({ data, error }) => {
         if (error) {
           console.error("Error fetching card orders:", error);
-          const message = extractErrorMessage(error, "Failed to fetch card orders");
-          toast.error(<CollapsedError title="Failed to fetch card orders" error={message} />);
           return;
         }
 
@@ -52,8 +50,6 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
       })
       .catch((error) => {
         console.error("Error fetching card orders:", error);
-        const message = extractErrorMessage(error, "Failed to fetch card orders");
-        toast.error(<CollapsedError title="Failed to fetch card orders" error={message} />);
       })
       .finally(() => {
         setIsLoading(false);
