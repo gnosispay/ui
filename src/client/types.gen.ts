@@ -401,6 +401,7 @@ export type User = {
     isSourceOfFundsAnswered?: boolean;
     isPhoneValidated?: boolean;
     partnerId?: string | null;
+    status?: 'ACTIVE' | 'DEACTIVATED';
 };
 
 export type GetApiV1AccountBalancesData = {
@@ -1404,7 +1405,7 @@ export type GetApiV1DelayRelayErrors = {
 
 export type GetApiV1DelayRelayResponses = {
     /**
-     * A list of delayed transactions for the current user.
+     * A list of delayed transactions for the authenticated user.
      */
     200: Array<DelayTransaction>;
 };
@@ -2683,7 +2684,7 @@ export type GetApiV1EoaAccountsErrors = {
 
 export type GetApiV1EoaAccountsResponses = {
     /**
-     * A list of EOA accounts for the current user.
+     * A list of addresses for the authenticated user.
      */
     200: {
         data?: {
@@ -3945,7 +3946,7 @@ export type GetApiV1OwnersError = GetApiV1OwnersErrors[keyof GetApiV1OwnersError
 
 export type GetApiV1OwnersResponses = {
     /**
-     * Successfully retrieved the list of Safe owners.
+     * Successfully retrieved the list.
      */
     200: {
         data: {
@@ -4113,7 +4114,7 @@ export type GetApiV1OwnersRemoveTransactionDataData = {
     path?: never;
     query: {
         /**
-         * The address to remove from Safe owners.
+         * The address to remove.
          */
         ownerToRemove: string;
     };
@@ -4235,100 +4236,6 @@ export type GetApiV1RewardsResponses = {
 };
 
 export type GetApiV1RewardsResponse = GetApiV1RewardsResponses[keyof GetApiV1RewardsResponses];
-
-export type PostApiV1UserReferrerCodeData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/user/referrer-code';
-};
-
-export type PostApiV1UserReferrerCodeErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Request validation error
-     */
-    422: {
-        message?: string;
-    };
-    /**
-     * Server error
-     */
-    500: {
-        error?: string;
-    };
-};
-
-export type PostApiV1UserReferrerCodeError = PostApiV1UserReferrerCodeErrors[keyof PostApiV1UserReferrerCodeErrors];
-
-export type PostApiV1UserReferrerCodeResponses = {
-    /**
-     * Successfully retrieved or created referral code
-     */
-    200: {
-        /**
-         * ID of the authenticated user
-         */
-        userId: string;
-        /**
-         * User's referral code for sharing
-         */
-        referrerCode: string;
-    };
-};
-
-export type PostApiV1UserReferrerCodeResponse = PostApiV1UserReferrerCodeResponses[keyof PostApiV1UserReferrerCodeResponses];
-
-export type GetApiV1UserReferralsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/user/referrals';
-};
-
-export type GetApiV1UserReferralsErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Server error
-     */
-    500: {
-        error?: string;
-    };
-};
-
-export type GetApiV1UserReferralsError = GetApiV1UserReferralsErrors[keyof GetApiV1UserReferralsErrors];
-
-export type GetApiV1UserReferralsResponses = {
-    /**
-     * Successfully retrieved referral status
-     */
-    200: {
-        /**
-         * Indicates if the user is an OG token holder
-         */
-        isOgTokenHolder?: boolean | null;
-        /**
-         * Number of pending referrals
-         */
-        pendingReferrals: number;
-        /**
-         * Number of completed referrals
-         */
-        completedReferrals: number;
-    };
-};
-
-export type GetApiV1UserReferralsResponse = GetApiV1UserReferralsResponses[keyof GetApiV1UserReferralsResponses];
 
 export type GetApiV1UserTermsData = {
     body?: never;
