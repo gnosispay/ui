@@ -72,6 +72,10 @@ const publicRoutes = [
     path: "/welcome",
     element: <Navigate to="/" replace />,
   },
+  {
+    path: "/activation/choose-partner",
+    element: <Navigate to="/partners" replace />,
+  },
 ];
 
 function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
