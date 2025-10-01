@@ -2,6 +2,7 @@ import { useCards } from "@/context/CardsContext";
 import { Skeleton } from "./ui/skeleton";
 import { CardsOrderModal } from "./modals/cards-order.tsx/cards-order";
 import CardFront from "./cards-carousel/card-front";
+import { CardStatusOverlay } from "./cards-carousel/card-status-overlay";
 import { PlusIcon } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
@@ -45,24 +46,46 @@ export const Cards = () => {
             </div>
           ))}
         {!isLoading &&
-          cards?.map((card, index) => (
-            <button
-              key={card.id}
-              type="button"
-              className="flex items-center gap-4 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              onClick={() => handleCardClick(index)}
-              aria-label={`Go to card ending in ${card.lastFourDigits}`}
-            >
-              <CardFront className="rounded-sm w-17" />
-              <div className="flex flex-col gap-2">
-                <div className="text-sm text-primary">
-                  <span className="mr-2">•••</span>
-                  {card.lastFourDigits}
+          cards?.map((card, index) => {
+            if (!card.cardToken) return null;
+            const cardInfo = cardInfoMap?.[card.cardToken];
+            const additionalInfo = cardInfo?.isFrozen
+              ? " - Frozen"
+              : cardInfo?.isStolen
+                ? " - Stolen"
+                : cardInfo?.isLost
+                  ? " - Lost"
+                  : cardInfo?.isVoid
+                    ? " - Void"
+                    : "";
+            return (
+              <button
+                key={card.id}
+                type="button"
+                className="flex items-center gap-4 w-full text-left hover:bg-muted/50 rounded-lg p-2 -m-2 transition-colors cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                onClick={() => handleCardClick(index)}
+                aria-label={`Go to card ending in ${card.lastFourDigits}`}
+              >
+                <div className="relative rounded-sm w-17 overflow-hidden">
+                  <CardFront className="rounded-sm w-17" />
+                  {cardInfo?.isFrozen && <CardStatusOverlay status="frozen" showText={false} iconSize={20} />}
+                  {cardInfo?.isStolen && <CardStatusOverlay status="stolen" showText={false} iconSize={20} />}
+                  {cardInfo?.isLost && <CardStatusOverlay status="lost" showText={false} iconSize={20} />}
+                  {cardInfo?.isVoid && <CardStatusOverlay status="void" showText={false} iconSize={20} />}
                 </div>
-                <div className="text-sm font-light text-secondary">{card.virtual ? "Virtual" : "Physical"}</div>
-              </div>
-            </button>
-          ))}
+                <div className="flex flex-col gap-2">
+                  <div className="text-sm text-primary">
+                    <span className="mr-2">•••</span>
+                    {card.lastFourDigits}
+                  </div>
+                  <div className="text-sm font-light text-secondary">
+                    {card.virtual ? "Virtual" : "Physical"}
+                    {additionalInfo}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         <div className="flex items-center gap-4">
           <button
             type="button"
