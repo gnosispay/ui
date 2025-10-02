@@ -73,7 +73,12 @@ export const DisputeSection = ({ threadId, onBack }: DisputeSectionProps) => {
         disputeReason: selectedReason,
       },
     })
-      .then(() => {
+      .then(({ error }) => {
+        if (error) {
+          setDisputeError(extractErrorMessage(error, "Failed to submit dispute"));
+          return;
+        }
+
         setDisputeStep(DisputeStep.Success);
         setSelectedReason("");
       })
