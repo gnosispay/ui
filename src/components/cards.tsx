@@ -6,6 +6,7 @@ import { CardStatusOverlay } from "./cards-carousel/card-status-overlay";
 import { PlusIcon } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { getStatusName } from "@/utils/getStatusName";
 
 export const Cards = () => {
   const { cards, cardInfoMap } = useCards();
@@ -49,15 +50,8 @@ export const Cards = () => {
           cards?.map((card, index) => {
             if (!card.cardToken) return null;
             const cardInfo = cardInfoMap?.[card.cardToken];
-            const additionalInfo = cardInfo?.isFrozen
-              ? " - Frozen"
-              : cardInfo?.isStolen
-                ? " - Stolen"
-                : cardInfo?.isLost
-                  ? " - Lost"
-                  : cardInfo?.isVoid
-                    ? " - Void"
-                    : "";
+            const statusName = getStatusName(card.statusCode, card.statusName);
+            const additionalInfo = statusName ? ` - ${statusName}` : "";
             return (
               <button
                 key={card.id}
