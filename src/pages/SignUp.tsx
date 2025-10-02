@@ -86,7 +86,7 @@ export const SignUpRoute = () => {
           const message = extractErrorMessage(error, "unknown");
           if (message.includes("already registered")) {
             setError(
-              `This email address is already registered in our system and linked to another wallet address. Please login with the wallet address associated with Gnosis Pay.`,
+              `This email is already associated with a Gnosis Pay account, make sure you are using the correct wallet account to connect.`,
             );
           } else {
             setError(`Error returned while signing up: ${message}`);
