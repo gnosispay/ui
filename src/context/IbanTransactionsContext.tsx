@@ -4,6 +4,7 @@ import type { IbanOrder } from "@/client";
 import { useAuth } from "./AuthContext";
 import { getApiV1IbansOrders } from "@/client";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { useUser } from "./UserContext";
 
 type IbanTransactionsContextProps = {
   children: ReactNode | ReactNode[];
@@ -18,7 +19,7 @@ export type IIbanTransactionsContext = {
 const IbanTransactionsContext = createContext<IIbanTransactionsContext | undefined>(undefined);
 
 const IbanTransactionsContextProvider = ({ children }: IbanTransactionsContextProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isOnboarded } = useUser();
   const [ibanTransactionsByDate, setIbanTransactionsByDate] = useState<Record<string, IbanOrder[]>>({});
   const [ibanTransactionsLoading, setIbanTransactionsLoading] = useState(true);
   const [ibanTransactionsError, setIbanTransactionsError] = useState("");
@@ -42,7 +43,7 @@ const IbanTransactionsContextProvider = ({ children }: IbanTransactionsContextPr
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isOnboarded) {
       setIbanTransactionsByDate({});
       setIbanTransactionsLoading(false);
       return;
@@ -59,7 +60,7 @@ const IbanTransactionsContextProvider = ({ children }: IbanTransactionsContextPr
     return () => {
       clearInterval(intervalId);
     };
-  }, [fetchIbanTransactions, isAuthenticated]);
+  }, [fetchIbanTransactions, isOnboarded]);
 
   const contextValue = useMemo(
     () => ({

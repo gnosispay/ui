@@ -8,7 +8,7 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useM
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 import { ConfirmationDialog } from "@/components/modals/confirmation-dialog";
-import { useAuth } from "./AuthContext";
+import { useUser } from "./UserContext";
 import { COUPON_CODES } from "@/constants";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 
@@ -34,7 +34,7 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
   const [pendingCancelOrderId, setPendingCancelOrderId] = useState<string | null>(null);
   const [isCancellingOrder, setIsCancellingOrder] = useState(false);
   const [onCancelSuccess, setOnCancelSuccess] = useState<(() => void) | null>(null);
-  const { isAuthenticated } = useAuth();
+  const { isOnboarded } = useUser();
 
   const fetchOrders = useCallback(() => {
     setIsLoading(true);
@@ -140,9 +140,9 @@ const OrdersContextProvider = ({ children }: OrdersContextProps) => {
   }, [pendingCancelOrderId, cancelOrder, onCancelSuccess]);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isOnboarded) return;
     fetchOrders();
-  }, [fetchOrders, isAuthenticated]);
+  }, [fetchOrders, isOnboarded]);
 
   return (
     <OrdersContext.Provider

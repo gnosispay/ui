@@ -1,10 +1,10 @@
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { groupByCardToken, groupByDate } from "@/utils/transactionUtils";
 import type { Event } from "@/client";
-import { useAuth } from "./AuthContext";
 import { getApiV1CardsTransactions } from "@/client";
 import { useCards } from "./CardsContext";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { useUser } from "./UserContext";
 
 // the lowest, the faster the initial load
 export const DEFAULT_CARD_TRANSACTIONS_AMOUNT = 20;
@@ -30,7 +30,7 @@ export type ICardTransactionsContext = {
 const CardTransactionsContext = createContext<ICardTransactionsContext | undefined>(undefined);
 
 const CardTransactionsContextProvider = ({ children }: CardTransactionsContextProps) => {
-  const { isAuthenticated } = useAuth();
+  const { isOnboarded } = useUser();
   const { cards } = useCards();
   const cardTokens = useMemo(
     () => cards?.map((card) => card.cardToken).filter((token): token is string => Boolean(token)),
@@ -135,7 +135,7 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated || !cardTokens) {
+    if (!isOnboarded || !cardTokens) {
       return;
     }
 
@@ -156,7 +156,7 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
     return () => {
       clearInterval(intervalId);
     };
-  }, [cardTokens, fetchCardTransactions, isAuthenticated]);
+  }, [cardTokens, fetchCardTransactions, isOnboarded]);
 
   const loadMoreCardTransactions = useCallback(() => {
     if (!cardTokens || cardTokens.length === 0 || !hasNextPage || isLoadingMoreCardTransactions) {
