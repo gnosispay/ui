@@ -5,7 +5,7 @@
   Referrer-Policy strict-origin-when-cross-origin
   Permissions-Policy camera=(), microphone=(), geolocation=(), payment=()
   Strict-Transport-Security max-age=31536000; includeSubDomains
-  Content-Security-Policy script-src 'strict-dynamic' 'unsafe-inline' http: https:; object-src 'none'; frame-ancestors https://app.safe.global
+  # Content-Security-Policy script-src 'strict-dynamic' 'unsafe-inline' http: https:; object-src 'none'; frame-ancestors https://app.safe.global
 
 /manifest.json
   Access-Control-Allow-Origin *
