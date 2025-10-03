@@ -1,7 +1,6 @@
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { groupByDate } from "@/utils/transactionUtils";
 import type { IbanOrder } from "@/client";
-import { useAuth } from "./AuthContext";
 import { getApiV1IbansOrders } from "@/client";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { useUser } from "./UserContext";
