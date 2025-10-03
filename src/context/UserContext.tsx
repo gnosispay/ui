@@ -117,10 +117,10 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   }, [isAuthenticated, isUserSignedUp, refreshUser]);
 
   useEffect(() => {
-    if (!isOnboarded) return;
+    if (!isAuthenticated || !isUserSignedUp) return;
 
     refreshSafeConfig();
-  }, [isOnboarded, refreshSafeConfig]);
+  }, [isAuthenticated, isUserSignedUp, refreshSafeConfig]);
 
   useEffect(() => {
     if (!isOnboarded) return;
