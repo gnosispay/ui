@@ -35,7 +35,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   const [isKycApproved, setIsKycApproved] = useState(false);
   const [isSafeConfigured, setIsSafeConfigured] = useState(false);
   const isOnboarded = useMemo(
-    () => isAuthenticated && (!isUserSignedUp || !isKycApproved || !isSafeConfigured),
+    () => isAuthenticated && isUserSignedUp && isKycApproved && isSafeConfigured,
     [isAuthenticated, isUserSignedUp, isKycApproved, isSafeConfigured],
   );
 
@@ -117,13 +117,13 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   }, [isAuthenticated, isUserSignedUp, refreshUser]);
 
   useEffect(() => {
-    if (!isAuthenticated || !isUserSignedUp) return;
+    if (!isOnboarded) return;
 
     refreshSafeConfig();
-  }, [isAuthenticated, isUserSignedUp, refreshSafeConfig]);
+  }, [isOnboarded, refreshSafeConfig]);
 
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
+    if (!isOnboarded) return;
 
     // Call immediately
     getAccountBalance();
@@ -134,7 +134,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [isAuthenticated, user, getAccountBalance]);
+  }, [isOnboarded, getAccountBalance]);
 
   return (
     <UserContext.Provider
