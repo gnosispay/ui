@@ -10,10 +10,6 @@ import { config } from "./wagmi.ts";
 
 import "./index.css";
 import "@rainbow-me/rainbowkit/styles.css";
-import { initializeClickjackingProtection } from "./utils/clickjackingProtection";
-
-initializeClickjackingProtection();
-
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
