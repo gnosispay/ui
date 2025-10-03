@@ -1,4 +1,11 @@
 /*
-  Access-Control-Allow-Origin *
-  Access-Control-Allow-Methods GET
-  Access-Control-Allow-Headers X-Requested-With, content-type, Authorization
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https:; object-src 'none'; base-uri 'none'
+
+/manifest.json
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET
+  Access-Control-Allow-Headers: X-Requested-With, content-type, Authorization 
