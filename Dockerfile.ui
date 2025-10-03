@@ -75,6 +75,7 @@ server {
         add_header Referrer-Policy "strict-origin-when-cross-origin" always;
         add_header Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+        add_header Content-Security-Policy "frame-ancestors https://app.safe.global" always;
     }
 
     location = /manifest.json {
