@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useAccount, useConnections } from "wagmi";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
@@ -12,21 +12,30 @@ export const useAppInitialization = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasCompletedInitialCheck = useRef(false);
 
+  const clearTimeoutRef = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  }, []);
+
+  const doneInitializing = useCallback(() => {
+    setIsInitializing(false);
+    hasCompletedInitialCheck.current = true;
+    clearTimeoutRef();
+  }, [clearTimeoutRef]);
+
   useEffect(() => {
     // Set up a fallback timeout to prevent infinite loading
     timeoutRef.current = setTimeout(() => {
       console.warn("App initialization timeout reached, forcing initialization to complete");
-      setIsInitializing(false);
-      hasCompletedInitialCheck.current = true;
+      doneInitializing();
     }, 5000); // 5 second timeout
 
     return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      clearTimeoutRef();
     };
-  }, []);
+  }, [clearTimeoutRef, doneInitializing]);
 
   useEffect(() => {
     // Don't proceed if we've already completed the initial check
@@ -41,12 +50,7 @@ export const useAppInitialization = () => {
 
     // If wallet is not connected, we can show the connect screen
     if (!isConnected) {
-      setIsInitializing(false);
-      hasCompletedInitialCheck.current = true;
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      doneInitializing();
       return;
     }
 
@@ -62,23 +66,13 @@ export const useAppInitialization = () => {
 
     // If wallet is connected but not authenticated, we can show the login screen
     if (!isAuthenticated) {
-      setIsInitializing(false);
-      hasCompletedInitialCheck.current = true;
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      doneInitializing();
       return;
     }
 
     // If authenticated but JWT doesn't contain user ID, we can show signup screen
     if (!isUserSignedUp) {
-      setIsInitializing(false);
-      hasCompletedInitialCheck.current = true;
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-        timeoutRef.current = null;
-      }
+      doneInitializing();
       return;
     }
 
@@ -93,14 +87,18 @@ export const useAppInitialization = () => {
     }
 
     // Once we have all necessary data, we can determine the user's state and show appropriate screen
-
-    setIsInitializing(false);
-    hasCompletedInitialCheck.current = true;
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-  }, [isConnecting, isConnected, connections, isAuthenticating, isAuthenticated, isUserSignedUp, user, safeConfig]);
+    doneInitializing();
+  }, [
+    isConnecting,
+    isConnected,
+    connections,
+    isAuthenticating,
+    isAuthenticated,
+    isUserSignedUp,
+    user,
+    safeConfig,
+    doneInitializing,
+  ]);
 
   return { isInitializing };
 };
