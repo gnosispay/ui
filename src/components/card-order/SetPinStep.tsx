@@ -74,6 +74,19 @@ export const SetPinStep = ({ cardToken }: SetPinStepProps) => {
         <p className="text-muted-foreground mt-2">
           Your card has been created successfully. Please set a secure PIN to complete the process.
         </p>
+        <StandardAlert
+          variant="info"
+          description={
+            <p className="text-left">
+              This step is required to use your card.
+              <br />
+              There will be no way to set the PIN after this step.
+              <br />
+              Do not refresh or close this page until the PIN is set.
+            </p>
+          }
+          className="mt-4"
+        />
       </div>
       {error && <StandardAlert variant="destructive" description={error} className="mb-6" />}
 

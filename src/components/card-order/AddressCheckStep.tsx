@@ -23,7 +23,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
   const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
 
   const [globalError, setGlobalError] = useState<string | null>(null);
-  const { orders, isLoading: isLoadingOrders, applyCoupon, cancelOrderWithConfirmation } = useOrders();
+  const { orders, isLoading: isLoadingOrders, applyCoupon, cancelOrderWithConfirmation, refetch } = useOrders();
   const navigate = useNavigate();
 
   const totalAmount = useMemo(() => order?.totalAmountEUR || 0, [order]);
@@ -31,6 +31,30 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
   const finalAmount = useMemo(() => {
     return totalAmount - discount;
   }, [totalAmount, discount]);
+
+  const canCancel = useMemo(() => {
+    if (!order) return false;
+    return ["PENDINGTRANSACTION"].includes(order.status);
+  }, [order]);
+
+  const canSubmit = useMemo(() => {
+    if (!order) return false;
+    return ["PENDINGTRANSACTION", "TRANSACTIONCOMPLETE", "READY"].includes(order.status);
+  }, [order]);
+
+  const canContinue = useMemo(() => {
+    if (!order) return false;
+    return !["FAILEDTRANSACTION", "CANCELLED", "CARDCREATED"].includes(order.status);
+  }, [order]);
+
+  useEffect(() => {
+    if (!order) return;
+
+    if (!canContinue) {
+      setGlobalError(`This order has already been processed, status: ${order.status}`);
+      return;
+    }
+  }, [canContinue, order]);
 
   useEffect(() => {
     if (isLoadingOrders) return;
@@ -138,9 +162,10 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
       setGlobalError(errorMessage);
       console.error("Error completing order:", error);
     } finally {
+      refetch();
       setIsCompletingOrder(false);
     }
-  }, [order, onNext]);
+  }, [order, onNext, refetch]);
 
   if (isNotFound) {
     return (
@@ -223,17 +248,20 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
       {globalError && <StandardAlert variant="destructive" description={globalError} className="mb-6" />}
 
       <div className="flex justify-end gap-3 mt-6">
-        <Button
-          variant="outline"
-          onClick={() => cancelOrderWithConfirmation({ orderId, onSuccess: () => navigate("/") })}
-        >
-          Cancel Order
-        </Button>
+        {canCancel && (
+          <Button
+            variant="outline"
+            disabled={isCompletingOrder || isApplyingCoupon}
+            onClick={() => cancelOrderWithConfirmation({ orderId, onSuccess: () => navigate("/") })}
+          >
+            Cancel Order
+          </Button>
+        )}
         <Button
           className="bg-button-bg hover:bg-button-bg-hover text-button-black"
           onClick={handleCompleteOrder}
           loading={isCompletingOrder || isApplyingCoupon}
-          disabled={isCompletingOrder || isApplyingCoupon}
+          disabled={isCompletingOrder || isApplyingCoupon || !canSubmit}
         >
           Create Card & Set PIN
         </Button>

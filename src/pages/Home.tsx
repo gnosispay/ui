@@ -24,26 +24,24 @@ export const Home = () => {
           <PendingCardOrder />
           <UnspendableAmountAlert />
         </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
+
+        <div className="lg:grid lg:grid-cols-3 lg:gap-x-4">
+          {/* Balances - Row 1 Left on desktop */}
+          <div className="mx-4 lg:mx-0 lg:col-span-2 lg:row-start-1">
             <Balances />
             <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
               <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
             </div>
           </div>
-          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
+
+          {/* Partner Banner - After Balances on mobile, Row 1 Right on desktop */}
+          <div className="m-4 lg:mx-0 lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:mb-0">
             <PartnerBanner />
           </div>
-        </div>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="font-bold text-secondary text-lg">Transactions</h1>
-            </div>
-            <Transactions />
-          </div>
-          <div className="col-span-3 mx-4 lg:mx-0 lg:col-span-1 lg:col-start-3">
+
+          {/* Rewards and Cards - After Partner on mobile, Row 2 Right on desktop */}
+          <div className="m-4 lg:mx-0 lg:col-span-1 lg:col-start-3 lg:row-start-2 lg:mb-0">
             <div className="flex items-center justify-between mb-4">
               <h1 className="font-bold text-secondary text-lg">
                 Rewards <StatusHelpIcon type="rewards" />
@@ -57,6 +55,14 @@ export const Home = () => {
               </Link>
             </div>
             <Cards />
+          </div>
+
+          {/* Transactions - Last on mobile, Row 2 Left on desktop */}
+          <div className="mx-4 lg:mx-0 lg:col-span-2 lg:row-start-2">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="font-bold text-secondary text-lg">Transactions</h1>
+            </div>
+            <Transactions />
           </div>
         </div>
       </div>
