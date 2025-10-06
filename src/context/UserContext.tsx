@@ -22,6 +22,7 @@ export type IUserContext = {
   refreshUser: () => void;
   refreshSafeConfig: () => void;
   isOnboarded: boolean;
+  showInitializingLoader: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -38,6 +39,25 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     () => isAuthenticated && isUserSignedUp && isKycApproved && isSafeConfigured,
     [isAuthenticated, isUserSignedUp, isKycApproved, isSafeConfigured],
   );
+
+  const showInitializingLoader = useMemo(() => {
+    // If user is not signed up, we don't need to show loader (will show signup screen)
+    if (!isUserSignedUp) {
+      return false;
+    }
+
+    // If user is signed up but user data hasn't loaded yet
+    if (user === undefined) {
+      return true;
+    }
+
+    // For KYC approved users, wait for safe config
+    if (user.kycStatus === "approved" && safeConfig === undefined) {
+      return true;
+    }
+
+    return false;
+  }, [isUserSignedUp, user, safeConfig]);
 
   useEffect(() => {
     if (!isAuthenticated || !isUserSignedUp || !user) return;
@@ -146,6 +166,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         refreshUser,
         refreshSafeConfig,
         isOnboarded,
+        showInitializingLoader,
       }}
     >
       {children}

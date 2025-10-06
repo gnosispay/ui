@@ -7,8 +7,8 @@ export const useAppInitialization = () => {
   const [isInitializing, setIsInitializing] = useState(true);
   const { isConnected, isConnecting } = useAccount();
   const connections = useConnections();
-  const { isAuthenticated, isAuthenticating } = useAuth();
-  const { user, safeConfig, isUserSignedUp } = useUser();
+  const { isAuthenticated, showInitializingLoader: authShowsLoader } = useAuth();
+  const { showInitializingLoader: userShowsLoader } = useUser();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const hasCompletedInitialCheck = useRef(false);
 
@@ -59,8 +59,8 @@ export const useAppInitialization = () => {
       return;
     }
 
-    // If wallet is connected but we're still authenticating, wait
-    if (isAuthenticating) {
+    // If auth context needs to show loader (e.g., still authenticating)
+    if (authShowsLoader) {
       return;
     }
 
@@ -70,35 +70,14 @@ export const useAppInitialization = () => {
       return;
     }
 
-    // If authenticated but JWT doesn't contain user ID, we can show signup screen
-    if (!isUserSignedUp) {
-      doneInitializing();
-      return;
-    }
-
-    // If authenticated and JWT contains user ID, wait for user data to load
-    if (user === undefined) {
-      return;
-    }
-
-    // For KYC approved users, also wait for safe config to determine full onboarding status
-    if (user.kycStatus === "approved" && safeConfig === undefined) {
+    // If user context needs to show loader (e.g., loading user data, waiting for safe config)
+    if (userShowsLoader) {
       return;
     }
 
     // Once we have all necessary data, we can determine the user's state and show appropriate screen
     doneInitializing();
-  }, [
-    isConnecting,
-    isConnected,
-    connections,
-    isAuthenticating,
-    isAuthenticated,
-    isUserSignedUp,
-    user,
-    safeConfig,
-    doneInitializing,
-  ]);
+  }, [isConnecting, isConnected, connections, authShowsLoader, isAuthenticated, userShowsLoader, doneInitializing]);
 
   return { isInitializing };
 };
