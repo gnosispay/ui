@@ -1,8 +1,4 @@
 /*
-  X-Content-Type-Options: nosniff
-  X-XSS-Protection: 1; mode=block
-  Referrer-Policy: strict-origin-when-cross-origin
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
   Content-Security-Policy: frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https:; object-src 'none'; base-uri 'none'
 
 /manifest.json
