@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { StandardAlert } from "@/components/ui/standard-alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   getApiV1OwnersRemoveTransactionData,
   deleteApiV1Owners,
@@ -30,6 +31,7 @@ export const SafeOwnersDeleteConfirmation = ({
   const { safeConfig } = useUser();
   const [error, setError] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [removeSignInAccess, setRemoveSignInAccess] = useState(true);
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
 
@@ -93,44 +95,45 @@ export const SafeOwnersDeleteConfirmation = ({
         return;
       }
 
-      // now deleting as a Sign-in Wallet
-      // first we need to get the current sign-in accounts
+      // Conditionally delete as a Sign-in Wallet if checkbox is checked
+      if (removeSignInAccess) {
+        // first we need to get the current sign-in accounts
+        getApiV1EoaAccounts()
+          .then((response) => {
+            let signInWallets: EoaAccount[] = [];
 
-      getApiV1EoaAccounts()
-        .then((response) => {
-          let signInWallets: EoaAccount[] = [];
+            if (response.data?.data?.eoaAccounts) {
+              signInWallets = response.data.data.eoaAccounts;
+            }
 
-          if (response.data?.data?.eoaAccounts) {
-            signInWallets = response.data.data.eoaAccounts;
-          }
+            // find the sign-in wallet to delete
+            const signInWalletToDelete = signInWallets.find((account) => account.address === ownerAddress);
 
-          // find the sign-in wallet to delete
-          const signInWalletToDelete = signInWallets.find((account) => account.address === ownerAddress);
+            if (!signInWalletToDelete?.id) {
+              return;
+            }
 
-          if (!signInWalletToDelete?.id) {
-            return;
-          }
-
-          deleteApiV1EoaAccountsById({
-            path: { id: signInWalletToDelete.id },
-          })
-            .then((response) => {
-              if (response.error) {
-                setError(extractErrorMessage(response.error, "Failed to delete wallet address"));
-                return;
-              }
-
-              toast.success("Sign-in address deleted successfully");
+            deleteApiV1EoaAccountsById({
+              path: { id: signInWalletToDelete.id },
             })
-            .catch((err) => {
-              console.error("Error deleting EOA account:", err);
-              setError("Failed to delete wallet address");
-            });
-        })
-        .catch((error) => {
-          console.error("Failed to fetch sign-in wallets:", error);
-          setError("Failed to load sign-in wallets");
-        });
+              .then((response) => {
+                if (response.error) {
+                  setError(extractErrorMessage(response.error, "Failed to delete wallet address"));
+                  return;
+                }
+
+                toast.success("Sign-in address deleted successfully");
+              })
+              .catch((err) => {
+                console.error("Error deleting EOA account:", err);
+                setError("Failed to delete wallet address");
+              });
+          })
+          .catch((error) => {
+            console.error("Failed to fetch sign-in wallets:", error);
+            setError("Failed to load sign-in wallets");
+          });
+      }
 
       toast.success("Owner removal queued successfully");
       onSuccess();
@@ -140,7 +143,15 @@ export const SafeOwnersDeleteConfirmation = ({
     } finally {
       setIsDeleting(false);
     }
-  }, [ownerAddress, safeConfig?.address, signTypedDataAsync, onSuccess, smartWalletAddress, isSmartWalletLoading]);
+  }, [
+    ownerAddress,
+    safeConfig?.address,
+    signTypedDataAsync,
+    onSuccess,
+    smartWalletAddress,
+    isSmartWalletLoading,
+    removeSignInAccess,
+  ]);
 
   return (
     <div className="space-y-6">
@@ -161,6 +172,21 @@ export const SafeOwnersDeleteConfirmation = ({
           <div className="text-xs text-muted-foreground mb-1">Owner Address</div>
           <div className="font-mono text-sm text-foreground break-all">{ownerAddress}</div>
         </div>
+      </div>
+
+      <div className="flex items-start space-x-3">
+        <Checkbox
+          id="remove-signin-access"
+          checked={removeSignInAccess}
+          onCheckedChange={(checked: boolean) => setRemoveSignInAccess(checked === true)}
+          disabled={isDeleting}
+        />
+        <label
+          htmlFor="remove-signin-access"
+          className="text-sm text-foreground leading-none cursor-pointer select-none"
+        >
+          Remove this address from being able to sign-in
+        </label>
       </div>
 
       <StandardAlert

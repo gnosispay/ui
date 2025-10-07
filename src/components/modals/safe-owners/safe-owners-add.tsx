@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StandardAlert } from "@/components/ui/standard-alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import { getApiV1OwnersAddTransactionData, postApiV1EoaAccounts, postApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { useSignTypedData } from "wagmi";
@@ -21,6 +22,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
   const [newOwnerAddress, setNewOwnerAddress] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [addAsSignInWallet, setAddAsSignInWallet] = useState(true);
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const handleAddressChange = useCallback((value: string) => {
@@ -106,24 +108,26 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
         return;
       }
 
-      // now adding as a Sign-n Wallet
-      postApiV1EoaAccounts({
-        body: {
-          address: trimmedAddress,
-        },
-      })
-        .then((response) => {
-          if (response.error) {
-            setError(extractErrorMessage(response.error, "Failed to add wallet address"));
-            return;
-          }
-
-          toast.success("Sign-in Wallet added successfully");
+      // Conditionally add as a Sign-in Wallet if checkbox is checked
+      if (addAsSignInWallet) {
+        postApiV1EoaAccounts({
+          body: {
+            address: trimmedAddress,
+          },
         })
-        .catch((err) => {
-          console.error("Error adding Sign In Wallet account:", err);
-          setError("Failed to add wallet address");
-        });
+          .then((response) => {
+            if (response.error) {
+              setError(extractErrorMessage(response.error, "Failed to add wallet address"));
+              return;
+            }
+
+            toast.success("Sign-in Wallet added successfully");
+          })
+          .catch((err) => {
+            console.error("Error adding Sign In Wallet account:", err);
+            setError("Failed to add wallet address");
+          });
+      }
 
       toast.success("Owner addition queued successfully");
       onSuccess();
@@ -141,6 +145,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
     currentOwners,
     smartWalletAddress,
     isSmartWalletLoading,
+    addAsSignInWallet,
   ]);
 
   const onChange = useCallback(
@@ -167,6 +172,18 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
         <div className="text-xs text-muted-foreground">
           Enter a valid wallet address that will become a new owner of your Safe
         </div>
+      </div>
+
+      <div className="flex items-start space-x-3">
+        <Checkbox
+          id="add-signin-wallet"
+          checked={addAsSignInWallet}
+          onCheckedChange={(checked: boolean) => setAddAsSignInWallet(checked === true)}
+          disabled={isSubmitting}
+        />
+        <label htmlFor="add-signin-wallet" className="text-sm text-foreground leading-none cursor-pointer select-none">
+          Add this address as a sign-in wallet
+        </label>
       </div>
 
       <StandardAlert
