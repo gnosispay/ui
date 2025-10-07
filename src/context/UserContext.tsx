@@ -21,8 +21,8 @@ export type IUserContext = {
   isUserSignedUp?: boolean;
   refreshUser: () => void;
   refreshSafeConfig: () => void;
-  isKycApproved: boolean;
-  isSafeConfigured: boolean;
+  isOnboarded: boolean;
+  showInitializingLoader: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -35,6 +35,29 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   const isUserSignedUp = useMemo(() => jwtContainsUserId, [jwtContainsUserId]);
   const [isKycApproved, setIsKycApproved] = useState(false);
   const [isSafeConfigured, setIsSafeConfigured] = useState(false);
+  const isOnboarded = useMemo(
+    () => isAuthenticated && isUserSignedUp && isKycApproved && isSafeConfigured,
+    [isAuthenticated, isUserSignedUp, isKycApproved, isSafeConfigured],
+  );
+
+  const showInitializingLoader = useMemo(() => {
+    // If user is not signed up, we don't need to show loader (will show signup screen)
+    if (!isUserSignedUp) {
+      return false;
+    }
+
+    // If user is signed up but user data hasn't loaded yet
+    if (user === undefined) {
+      return true;
+    }
+
+    // For KYC approved users, wait for safe config
+    if (user.kycStatus === "approved" && safeConfig === undefined) {
+      return true;
+    }
+
+    return false;
+  }, [isUserSignedUp, user, safeConfig]);
 
   useEffect(() => {
     if (!isAuthenticated || !isUserSignedUp || !user) return;
@@ -83,7 +106,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   }, [isAuthenticated, isUserSignedUp]);
 
   const getAccountBalance = useCallback(() => {
-    if (!isAuthenticated || !user) {
+    if (!isOnboarded || !user) {
       return;
     }
 
@@ -105,7 +128,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
       .catch((error) => {
         console.error("Error fetching account balances:", error);
       });
-  }, [isAuthenticated, user]);
+  }, [isOnboarded, user]);
 
   useEffect(() => {
     if (!isAuthenticated || !isUserSignedUp) return;
@@ -120,7 +143,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   }, [isAuthenticated, isUserSignedUp, refreshSafeConfig]);
 
   useEffect(() => {
-    if (!isAuthenticated || !user) return;
+    if (!isOnboarded) return;
 
     // Call immediately
     getAccountBalance();
@@ -131,7 +154,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     }, 30000);
 
     return () => clearInterval(interval);
-  }, [isAuthenticated, user, getAccountBalance]);
+  }, [isOnboarded, getAccountBalance]);
 
   return (
     <UserContext.Provider
@@ -142,8 +165,8 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         isUserSignedUp,
         refreshUser,
         refreshSafeConfig,
-        isKycApproved,
-        isSafeConfigured,
+        isOnboarded,
+        showInitializingLoader,
       }}
     >
       {children}

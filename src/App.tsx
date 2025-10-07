@@ -12,6 +12,8 @@ import { AccountRoute } from "./pages/Account";
 import { PartnersRoute } from "./pages/Partners";
 import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
 import { useZendeskUserId } from "./hooks/useZendeskUserId";
+import { AppLoader } from "./components/AppLoader";
+import { useAppInitialization } from "./hooks/useAppInitialization";
 
 export const menuRoutes = [
   {
@@ -88,6 +90,11 @@ function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
 
 function App() {
   useZendeskUserId();
+  const { isInitializing } = useAppInitialization();
+
+  if (isInitializing) {
+    return <AppLoader />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

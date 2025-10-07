@@ -23,6 +23,7 @@ export type IAuthContext = {
   jwtContainsUserId: boolean;
   updateJwt: (newJwt: string) => void;
   updateClient: (optionalJwt?: string) => void;
+  showInitializingLoader: boolean;
 };
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
@@ -67,6 +68,11 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
 
     return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0;
   }, [jwt, isAuthenticating, address, chainId, connections]);
+
+  const showInitializingLoader = useMemo(() => {
+    // Show loader while authenticating
+    return isAuthenticating;
+  }, [isAuthenticating]);
 
   const updateClient = useCallback(
     (optionalJwt?: string) => {
@@ -275,7 +281,15 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isAuthenticating, getJWT, jwtContainsUserId, updateJwt, updateClient }}
+      value={{
+        isAuthenticated,
+        isAuthenticating,
+        getJWT,
+        jwtContainsUserId,
+        updateJwt,
+        updateClient,
+        showInitializingLoader,
+      }}
     >
       {children}
     </AuthContext.Provider>
