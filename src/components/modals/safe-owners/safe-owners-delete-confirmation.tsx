@@ -1,7 +1,13 @@
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { StandardAlert } from "@/components/ui/standard-alert";
-import { getApiV1OwnersRemoveTransactionData, deleteApiV1Owners } from "@/client";
+import {
+  getApiV1OwnersRemoveTransactionData,
+  deleteApiV1Owners,
+  getApiV1EoaAccounts,
+  type EoaAccount,
+  deleteApiV1EoaAccountsById,
+} from "@/client";
 import { useUser } from "@/context/UserContext";
 import { useSignTypedData } from "wagmi";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -85,6 +91,42 @@ export const SafeOwnersDeleteConfirmation = ({
       if (deleteError) {
         setError(extractErrorMessage(deleteError, "Failed to remove owner"));
         return;
+      }
+
+      // now deleting as a Sign-in Wallet
+      // first we need to get the current sign-in accounts
+      let signInWallets: EoaAccount[] = [];
+
+      getApiV1EoaAccounts()
+        .then((response) => {
+          if (response.data?.data?.eoaAccounts) {
+            signInWallets = response.data.data.eoaAccounts;
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to fetch EOA accounts:", error);
+          setError("Failed to load sign-in wallets");
+        });
+
+      // find the sign-in wallet to delete
+      const signInWalletToDelete = signInWallets.find((account) => account.address === ownerAddress);
+
+      if (signInWalletToDelete?.id) {
+        deleteApiV1EoaAccountsById({
+          path: { id: signInWalletToDelete.id },
+        })
+          .then((response) => {
+            if (response.error) {
+              setError(extractErrorMessage(response.error, "Failed to delete wallet address"));
+              return;
+            }
+
+            toast.success("Sign-in address deleted successfully");
+          })
+          .catch((err) => {
+            console.error("Error deleting EOA account:", err);
+            setError("Failed to delete wallet address");
+          });
       }
 
       toast.success("Owner removal queued successfully");

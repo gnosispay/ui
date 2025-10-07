@@ -2,7 +2,7 @@ import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StandardAlert } from "@/components/ui/standard-alert";
-import { getApiV1OwnersAddTransactionData, postApiV1Owners } from "@/client";
+import { getApiV1OwnersAddTransactionData, postApiV1EoaAccounts, postApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { useSignTypedData } from "wagmi";
 import { type Address, isAddress } from "viem";
@@ -106,7 +106,26 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
         return;
       }
 
-      toast.success("Owner added successfully");
+      // now adding as a Sign-n Wallet
+      postApiV1EoaAccounts({
+        body: {
+          address: trimmedAddress,
+        },
+      })
+        .then((response) => {
+          if (response.error) {
+            setError(extractErrorMessage(response.error, "Failed to add wallet address"));
+            return;
+          }
+
+          toast.success("Sign-in Wallet added successfully");
+        })
+        .catch((err) => {
+          console.error("Error adding Sign In Wallet account:", err);
+          setError("Failed to add wallet address");
+        });
+
+      toast.success("Owner addition queued successfully");
       onSuccess();
     } catch (err) {
       console.error("Error adding owner:", err);

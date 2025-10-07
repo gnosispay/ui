@@ -38,7 +38,7 @@ export const SignInWalletsDeleteConfirmation = ({
           return;
         }
 
-        toast.success("Wallet address deleted successfully");
+        toast.success("Sign-in address deleted successfully");
         onSuccess();
       })
       .catch((err) => {
