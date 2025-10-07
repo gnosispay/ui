@@ -104,12 +104,8 @@ export const SafeOwnersDeleteConfirmation = ({
             signInWallets = response.data.data.eoaAccounts;
           }
 
-          console.log("signInWallets", signInWallets);
-
           // find the sign-in wallet to delete
           const signInWalletToDelete = signInWallets.find((account) => account.address === ownerAddress);
-
-          console.log("signInWalletToDelete", signInWalletToDelete);
 
           if (!signInWalletToDelete?.id) {
             return;
