@@ -3,7 +3,7 @@ import CardFront from "./card-front";
 
 export const CardSkeleton = () => {
   return (
-    <div className="rounded-xl overflow-hidden w-xs bg-black relative">
+    <div className="rounded-xl overflow-hidden w-xs bg-black relative lg:mx-0 mx-auto">
       <CardFront />
       <div className="absolute left-4 bottom-4 flex flex-col items-start z-10">
         <div className="mb-1">

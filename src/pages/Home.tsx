@@ -36,12 +36,12 @@ export const Home = () => {
           </div>
 
           {/* Partner Banner - After Balances on mobile, Row 1 Right on desktop */}
-          <div className="m-4 lg:mx-0 lg:col-span-1 lg:col-start-3 lg:row-start-1 lg:mb-0">
+          <div className="m-4 lg:mx-0 lg:mb-0 lg:col-span-1 lg:col-start-3 lg:row-start-1">
             <PartnerBanner />
           </div>
 
           {/* Rewards and Cards - After Partner on mobile, Row 2 Right on desktop */}
-          <div className="m-4 lg:mx-0 lg:col-span-1 lg:col-start-3 lg:row-start-2 lg:mb-0">
+          <div className="m-4 lg:m-0 lg:col-span-1 lg:col-start-3 lg:row-start-2">
             <div className="flex items-center justify-between mb-4">
               <h1 className="font-bold text-secondary text-lg">
                 Rewards <StatusHelpIcon type="rewards" />
