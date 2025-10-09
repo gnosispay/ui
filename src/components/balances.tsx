@@ -18,8 +18,8 @@ export const Balances = () => {
   }, [safeConfig?.fiatSymbol]);
 
   const formattedBalance = useMemo(
-    () => formatCurrency(balances?.total, currencyInfo),
-    [balances?.total, currencyInfo],
+    () => formatCurrency(balances?.spendable, currencyInfo),
+    [balances?.spendable, currencyInfo],
   );
 
   const formattedPending = useMemo(
