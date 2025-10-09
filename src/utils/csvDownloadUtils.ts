@@ -1,5 +1,4 @@
 import type { Event, Payment } from "@/client";
-import { formatCurrency } from "@/utils/formatCurrency";
 
 // Date range types and enums
 export type DateRange = {
@@ -27,10 +26,10 @@ export const DATE_RANGE_OPTIONS = [
 export const CSV_HEADERS = [
   "date",
   "merchant_name",
-  "transaction_amount_formatted",
-  "transaction_currency_symbol",
-  "billing_amount_formatted",
-  "billing_currency_symbol",
+  "transaction_amount",
+  "transaction_currency",
+  "billing_amount",
+  "billing_currency",
   "transaction_type_description",
   "status",
   "card_last_four",
@@ -82,6 +81,30 @@ export const getTransactionStatus = (transaction: Event): string => {
 };
 
 /**
+ * Format currency for CSV export (avoiding special character issues)
+ * Returns a plain number format suitable for CSV
+ */
+const formatCurrencyForCSV = (
+  value: string | undefined,
+  currencyInfo: { decimals?: number; symbol?: string } | undefined,
+): string => {
+  if (!value || !currencyInfo || !currencyInfo.decimals) {
+    return "";
+  }
+
+  try {
+    const bigIntValue = BigInt(value);
+    const valueInUnits = Number(bigIntValue) / 10 ** currencyInfo.decimals;
+
+    // Format as plain number with appropriate decimal places
+    return valueInUnits.toFixed(currencyInfo.decimals).replace(/\.?0+$/, "");
+  } catch (e) {
+    console.error("Error formatting currency for CSV:", e);
+    return "";
+  }
+};
+
+/**
  * Convert array of transactions to CSV format
  */
 export const convertTransactionsToCSV = (
@@ -98,15 +121,15 @@ export const convertTransactionsToCSV = (
   // Map transactions to CSV rows
   const rows = transactions
     .map((tx) => {
-      // Format amounts using the same utility as transaction-row
-      const formattedBillingAmount = formatCurrency(tx.billingAmount, {
+      // Format amounts for CSV (plain numbers without currency symbols)
+      const formattedBillingAmount = formatCurrencyForCSV(tx.billingAmount, {
         decimals: tx.billingCurrency?.decimals,
-        fiatSymbol: tx.billingCurrency?.symbol,
+        symbol: tx.billingCurrency?.symbol,
       });
 
-      const formattedTransactionAmount = formatCurrency(tx.transactionAmount, {
+      const formattedTransactionAmount = formatCurrencyForCSV(tx.transactionAmount, {
         decimals: tx.transactionCurrency?.decimals,
-        fiatSymbol: tx.transactionCurrency?.symbol,
+        symbol: tx.transactionCurrency?.symbol,
       });
 
       const row = [
