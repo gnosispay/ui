@@ -8,6 +8,7 @@ import { useSearchParams } from "react-router-dom";
 import { useCards } from "@/context/CardsContext";
 import { CardActions } from "@/components/cards-carousel/card-actions";
 import { CardTransactions } from "@/components/transactions/card-transactions";
+import { CSVDownloadModal } from "@/components/modals/csv-download-modal";
 
 export const CardsRoute = () => {
   const [open, setOpen] = useState(false);
@@ -88,6 +89,12 @@ export const CardsRoute = () => {
       <div className="col-span-6 mx-4 lg:mx-0 lg:col-span-4 lg:col-start-2">
         <div className="flex items-center justify-between mb-4">
           <h1 className="font-bold text-secondary">Transactions</h1>
+          {selectedCard?.cardToken && (
+            <CSVDownloadModal
+              preSelectedCardToken={selectedCard.cardToken}
+              className="text-muted-foreground hover:text-foreground"
+            />
+          )}
         </div>
         <CardTransactions cardToken={selectedCard?.cardToken} />
       </div>
