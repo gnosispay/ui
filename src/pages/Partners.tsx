@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import MetriLogo from "@/assets/partners-logos/metri.svg";
 import ZealLogo from "@/assets/partners-logos/zeal.png";
 import PicnicLogo from "@/assets/partners-logos/picnic.png";
+import GreenhoodLogo from "@/assets/partners-logos/greenhood.svg";
 
 interface PartnerApp {
   id: string;
@@ -37,6 +38,14 @@ const partnerApps: PartnerApp[] = [
     logo: PicnicLogo,
     logoAlt: "Picnic logo",
     url: "https://usepicnic.com/",
+  },
+  {
+    id: "greenhood",
+    name: "Greenhood",
+    description: "Discover a new world of secure and easy payments with the Greenhood wallet.",
+    logo: GreenhoodLogo,
+    logoAlt: "Greenhood logo",
+    url: "https://www.greenhoodwallet.com",
   },
 ];
 

@@ -3,8 +3,12 @@ import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import PartnerAppsImage from "@/assets/Partner-apps.png";
-
-const BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v1";
+import {
+  shouldShowBanner,
+  getBannerDismissalData,
+  setBannerDismissalData,
+  createDismissalData,
+} from "@/utils/bannerUtils";
 
 interface PartnerBannerProps {
   className?: string;
@@ -14,12 +18,16 @@ export function PartnerBanner({ className }: PartnerBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const isDismissed = localStorage.getItem(BANNER_STORAGE_KEY) === "true";
-    setIsVisible(!isDismissed);
+    const dismissalData = getBannerDismissalData();
+    const shouldShow = shouldShowBanner(dismissalData);
+    setIsVisible(shouldShow);
   }, []);
 
   const handleDismiss = useCallback(() => {
-    localStorage.setItem(BANNER_STORAGE_KEY, "true");
+    const currentData = getBannerDismissalData();
+    const newData = createDismissalData(currentData);
+    
+    setBannerDismissalData(newData);
     setIsVisible(false);
   }, []);
 
