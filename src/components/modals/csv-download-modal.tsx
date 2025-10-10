@@ -49,6 +49,8 @@ export const CSVDownloadModal = ({ className, preSelectedCardToken }: CSVDownloa
 
   // Handle checkbox selection for cards
   const handleCardSelection = useCallback((cardToken: string, checked: boolean) => {
+    setError("");
+
     setSelectedCardTokens((prev) => {
       if (checked) {
         return [...prev, cardToken];
@@ -133,11 +135,15 @@ export const CSVDownloadModal = ({ className, preSelectedCardToken }: CSVDownloa
     }
 
     setIsDownloading(true);
-    setError("");
 
     try {
       const dateRange = getDateRange(parseInt(selectedDateRange, 10));
       const transactions = await fetchAllTransactions(selectedCardTokens, dateRange);
+
+      if (transactions.length === 0) {
+        setError("No transactions found for the selected cards and date range");
+        return;
+      }
 
       const csvData = convertToCSV(transactions);
       const filename = generateCSVFilename(selectedCardTokens, availableCards, selectedDateRange);
@@ -233,7 +239,10 @@ export const CSVDownloadModal = ({ className, preSelectedCardToken }: CSVDownloa
             </label>
             <Select
               value={selectedDateRange}
-              onValueChange={(value) => setSelectedDateRange(value as DateRangeOptions)}
+              onValueChange={(value) => {
+                setSelectedDateRange(value as DateRangeOptions);
+                setError("");
+              }}
             >
               <SelectTrigger id="date-range-select" className="w-full">
                 <SelectValue />
@@ -258,7 +267,7 @@ export const CSVDownloadModal = ({ className, preSelectedCardToken }: CSVDownloa
           </Button>
           <Button
             onClick={handleDownload}
-            disabled={selectedCardTokens.length === 0 || !selectedDateRange || isDownloading}
+            disabled={selectedCardTokens.length === 0 || !selectedDateRange || isDownloading || !!error}
             loading={isDownloading}
           >
             {isDownloading ? "Downloading..." : "Download CSV"}
