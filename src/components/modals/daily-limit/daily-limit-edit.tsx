@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { type CurrencyInfo, MAX_DAILY_LIMIT } from "@/constants";
-import { getApiV1AccountsOnchainDailyLimitTransactionData, putApiV1AccountsOnchainDailyLimit } from "@/client";
+import { getApiV1AccountsDailyLimitTransactionData, putApiV1AccountsDailyLimit } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { formatDisplayAmount } from "@/utils/formatCurrency";
-import { populateExecuteEnqueue } from "@gnosispay/account-kit";
-import { gnosis } from "viem/chains";
 import { useSignTypedData } from "wagmi";
+import { extractErrorMessage } from "@/utils/errorHelpers";
+import type { Address } from "viem";
+import { useSmartWallet } from "@/hooks/useSmartWallet";
 
 interface DailyLimitEditProps {
   initialLimit: number | null;
@@ -23,6 +24,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signTypedDataAsync } = useSignTypedData();
+  const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
 
   const handleLimitChange = useCallback((value: string) => {
     setError(null);
@@ -37,6 +39,11 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
 
   const handleSave = useCallback(async () => {
     if (!safeConfig?.address || !currency) {
+      return;
+    }
+
+    if (isSmartWalletLoading) {
+      setError("Smart wallet loading");
       return;
     }
 
@@ -56,48 +63,70 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
     setError(null);
 
     try {
-      const { error, data } = await getApiV1AccountsOnchainDailyLimitTransactionData({
+      const { error: transactionError, data: transactionData } = await getApiV1AccountsDailyLimitTransactionData({
         query: {
-          onchainDailyLimit: limitNumber.toString(),
+          newLimit: limitNumber.toString(),
         },
       });
 
-      if (error) {
-        setError("Failed to create transaction");
+      if (transactionError) {
+        setError(extractErrorMessage(transactionError, "Failed to create daily limit transaction"));
         return;
       }
 
-      const { data: signature } = await populateExecuteEnqueue(
-        { account: safeConfig.address, chainId: gnosis.id },
-        data?.data?.transaction,
-        signTypedDataAsync,
-      );
+      if (!transactionData?.data) {
+        setError("No daily limit transaction data received");
+        return;
+      }
+
+      const signature = await signTypedDataAsync({
+        ...transactionData.data,
+        domain: {
+          ...transactionData.data.domain,
+          verifyingContract: transactionData.data.domain.verifyingContract as Address,
+        },
+      });
 
       if (!signature) {
-        setError("Failed to sign transaction");
+        setError("Failed to sign daily limit transaction");
         return;
       }
 
-      const { error: putError } = await putApiV1AccountsOnchainDailyLimit({
+      if (!signature) {
+        setError("Failed to sign daily limit transaction");
+        return;
+      }
+
+      const { error: putError } = await putApiV1AccountsDailyLimit({
         body: {
-          onchainDailyLimit: limitNumber,
+          newLimit: limitNumber,
           signature,
+          message: transactionData.data.message,
+          smartWalletAddress,
         },
       });
 
       if (putError) {
-        setError("Failed to update daily limit");
+        setError(extractErrorMessage(putError, "Failed to update daily limit"));
         return;
       }
 
       onSuccess();
     } catch (err) {
-      setError("Failed to create transaction");
-      console.error("Error creating transaction:", err);
+      setError("Failed to create daily limit transaction");
+      console.error("Error creating daily limit transaction:", err);
     } finally {
       setIsSubmitting(false);
     }
-  }, [newLimit, currency, safeConfig?.address, signTypedDataAsync, onSuccess]);
+  }, [
+    newLimit,
+    currency,
+    safeConfig?.address,
+    signTypedDataAsync,
+    onSuccess,
+    smartWalletAddress,
+    isSmartWalletLoading,
+  ]);
 
   const onChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

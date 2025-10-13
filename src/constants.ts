@@ -4,6 +4,7 @@ import gbpLogo from "./assets/tokens/gbpe.png";
 import usdcLogo from "./assets/tokens/usdce.png";
 import gnoLogo from "./assets/tokens/gno.svg";
 import xdaiLogo from "./assets/tokens/xdai.svg";
+import wethLogo from "./assets/tokens/weth.svg";
 
 export interface CurrencyInfo {
   tokenSymbol?: string;
@@ -58,6 +59,13 @@ export const supportedTokens: Record<string, TokenInfo> = {
     symbol: "XDAI",
     logo: xdaiLogo,
   },
+  WETH: {
+    tokenSymbol: "WETH",
+    address: "0x6a023ccd1ff6f2045c3309768ead9e68f978f6e1",
+    decimals: 18,
+    symbol: "WETH",
+    logo: wethLogo,
+  },
 };
 
 export const ADD_FUNDS_CONSTANTS = {
@@ -74,17 +82,22 @@ export const userTerms: Record<UserTermsTypeFromApi, { title: string; version: s
   "general-tos": {
     title: "Gnosis Pay Terms of Service",
     version: "TOS_GENERAL_VERSION_1",
-    url: "https://legal.gnosispay.com/en/articles/8911632-gnosis-pay-terms-of-service",
+    url: "https://help.gnosispay.com/hc/en-us/articles/39723036951444-Gnosis-Pay-WebApp-Terms-of-Service",
   },
   "card-monavate-tos": {
     title: "Cardholder Terms of Service",
     version: "TOS_CARD_VERSION_1",
-    url: "https://legal.gnosispay.com/en/articles/8911633-monavate-cardholder-terms-eea",
+    url: "https://help.gnosispay.com/hc/en-us/articles/39726634253076-Monavate-Cardholder-Terms-EEA",
   },
   "cashback-tos": {
     title: "Cardholder Cashback Terms of Service",
     version: "TOS_CASHBACK_2024-08-01",
     url: "https://forum.gnosis.io/t/gip-110-should-the-gnosis-dao-create-and-fund-a-gnosis-pay-rewards-program-with-10k-gno/8837",
+  },
+  "privacy-policy": {
+    title: "Gnosis Pay Privacy and Cookies Policy",
+    version: "PRIVACY_POLICY_VERSION_1",
+    url: "https://help.gnosispay.com/hc/en-us/articles/39723694982548-Gnosis-Pay-Privacy-and-Cookies-Policy",
   },
 };
 

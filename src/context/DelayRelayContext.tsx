@@ -3,7 +3,6 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 import { formatCountdown } from "@/utils/timeUtils";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useState, useRef } from "react";
 import { toast } from "sonner";
-import { useAuth } from "./AuthContext";
 import { getTxTitle } from "@/utils/delayUtils";
 import { useUser } from "./UserContext";
 
@@ -21,8 +20,7 @@ export type IDelayRelayContext = {
 const DelayRelayContext = createContext<IDelayRelayContext | undefined>(undefined);
 
 const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
-  const { safeConfig } = useUser();
-  const { isAuthenticated } = useAuth();
+  const { safeConfig, isOnboarded } = useUser();
   const [queue, setQueue] = useState<DelayTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +93,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
 
   // Dynamic fetch interval management
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isOnboarded) return;
 
     // Clear existing interval
     if (fetchIntervalRef.current) {
@@ -115,7 +113,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
         clearInterval(fetchIntervalRef.current);
       }
     };
-  }, [isAuthenticated, hasExecutingTransactions, nonExecutedQueue.length, fetchDelayQueue]);
+  }, [isOnboarded, hasExecutingTransactions, nonExecutedQueue.length, fetchDelayQueue]);
 
   // Executing transactions
   useEffect(() => {

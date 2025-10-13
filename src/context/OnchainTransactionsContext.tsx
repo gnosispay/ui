@@ -1,7 +1,6 @@
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { groupByDate } from "@/utils/transactionUtils";
 import type { Erc20TokenEvent } from "@/types/transaction";
-import { useAuth } from "./AuthContext";
 import { useUser } from "./UserContext";
 import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -24,19 +23,20 @@ export type IOnchainTransactionsContext = {
   loadMoreOnchainTransactions: () => void;
   currentOldestDate: Date | null;
   hasNextPage: boolean;
+  setFetchingEnabled: (enabled: boolean) => void;
 };
 
 const OnchainTransactionsContext = createContext<IOnchainTransactionsContext | undefined>(undefined);
 
 const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsContextProps) => {
-  const { isAuthenticated } = useAuth();
-  const { safeConfig } = useUser();
+  const { safeConfig, isOnboarded } = useUser();
   const [onchainTransactionsByDate, setOnchainTransactionsByDate] = useState<Record<string, Erc20TokenEvent[]>>({});
   const [onchainTransactionsLoading, setOnchainTransactionsLoading] = useState(true);
   const [onchainTransactionsError, setOnchainTransactionsError] = useState("");
   const [isLoadingMoreOnchainTransactions, setIsLoadingMoreOnchainTransactions] = useState(false);
   const [currentOldestDate, setCurrentOldestDate] = useState<Date | null>(null);
   const [hasNextPage, setHasNextPage] = useState(true);
+  const [fetchingEnabled, setFetchingEnabled] = useState(false);
   const currentDaysLoadedRef = useRef(DEFAULT_ONCHAIN_TRANSACTIONS_DAYS);
   const currentOldestDateRef = useRef<Date | null>(null);
 
@@ -148,7 +148,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
   );
 
   useEffect(() => {
-    if (!isAuthenticated || !safeConfig?.address || !tokenAddress) {
+    if (!fetchingEnabled || !isOnboarded || !safeConfig?.address || !tokenAddress) {
       setOnchainTransactionsByDate({});
       setOnchainTransactionsLoading(false);
       setCurrentOldestDate(null);
@@ -168,7 +168,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
     return () => {
       clearInterval(intervalId);
     };
-  }, [fetchOnchainTransactions, isAuthenticated, safeConfig?.address, tokenAddress]);
+  }, [fetchingEnabled, fetchOnchainTransactions, isOnboarded, safeConfig?.address, tokenAddress]);
 
   const loadMoreOnchainTransactions = useCallback(() => {
     if (!safeConfig?.address || !tokenAddress || isLoadingMoreOnchainTransactions || !hasNextPage) {
@@ -186,6 +186,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
       loadMoreOnchainTransactions,
       currentOldestDate,
       hasNextPage,
+      setFetchingEnabled,
     }),
     [
       onchainTransactionsByDate,

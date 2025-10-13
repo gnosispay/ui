@@ -101,6 +101,11 @@
   --switch-unchecked-thumb: var(--neutral-50);
   --switch-checked-bg: var(--brand-500);
   --switch-checked-thumb: var(--neutral-50);
+  --checkbox-unchecked-bg: var(--neutral-50);
+  --checkbox-unchecked-border: var(--neutral-400);
+  --checkbox-checked-bg: var(--brand-500);
+  --checkbox-checked-border: var(--brand-500);
+  --checkbox-checked-foreground: var(--neutral-900);
   --color-icon-background: var(--neutral-300);
 }
 
@@ -167,6 +172,11 @@
   --color-switch-unchecked-thumb: var(--switch-unchecked-thumb);
   --color-switch-checked-bg: var(--switch-checked-bg);
   --color-switch-checked-thumb: var(--switch-checked-thumb);
+  --color-checkbox-unchecked-bg: var(--checkbox-unchecked-bg);
+  --color-checkbox-unchecked-border: var(--checkbox-unchecked-border);
+  --color-checkbox-checked-bg: var(--checkbox-checked-bg);
+  --color-checkbox-checked-border: var(--checkbox-checked-border);
+  --color-checkbox-checked-foreground: var(--checkbox-checked-foreground);
   --color-icon-background: var(--color-icon-background);
 }
 
@@ -225,6 +235,11 @@
   --switch-unchecked-thumb: var(--neutral-50);
   --switch-checked-bg: var(--brand-500);
   --switch-checked-thumb: var(--neutral-900);
+  --checkbox-unchecked-bg: var(--neutral-700);
+  --checkbox-unchecked-border: var(--neutral-500);
+  --checkbox-checked-bg: var(--brand-500);
+  --checkbox-checked-border: var(--brand-500);
+  --checkbox-checked-foreground: var(--neutral-900);
   --color-icon-background: var(--neutral-500);
 }
 
@@ -248,4 +263,21 @@
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
+}
+
+/* Custom animations */
+@keyframes breathing {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.animate-breathing {
+  animation: breathing 2s ease-in-out infinite;
 }

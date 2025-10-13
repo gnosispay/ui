@@ -1,7 +1,8 @@
 import {
-  type Card,
   getApiV1Cards,
   getApiV1CardsByCardIdStatus,
+  type GetApiV1CardsByCardIdStatusResponse,
+  type GetApiV1CardsResponse,
   postApiV1CardsByCardIdActivate,
   postApiV1CardsByCardIdFreeze,
   postApiV1CardsByCardIdLost,
@@ -11,27 +12,18 @@ import {
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
-import { useAuth } from "./AuthContext";
+import { useUser } from "./UserContext";
 
 type CardContextProps = {
   children: ReactNode | ReactNode[];
 };
 
-export interface CardInfo extends Card {
-  cardToken?: string;
-  activatedAt?: string | null;
-  statusCode: number;
-  isFrozen: boolean;
-  isStolen: boolean;
-  isLost: boolean;
-  isBlocked: boolean;
-  isVoid: boolean;
-}
+export type CardInfo = GetApiV1CardsResponse[number] & GetApiV1CardsByCardIdStatusResponse;
 
 type CardInfoMap = Record<string, CardInfo>;
 
 export type ICardContext = {
-  cards: Card[] | undefined;
+  cards: GetApiV1CardsResponse | undefined;
   cardInfoMap: CardInfoMap | undefined;
   isHideVoidedCards: boolean;
   setIsHideVoidedCards: (hide: boolean) => void;
@@ -49,7 +41,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
   const [fetchedCards, setFetchedCards] = useState<ICardContext["cards"]>(undefined);
   const [cardInfoMap, setCardInfoMap] = useState<ICardContext["cardInfoMap"]>(undefined);
   const [isHideVoidedCards, setIsHideVoidedCards] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const { isOnboarded } = useUser();
 
   const cards = useMemo(() => {
     if (!fetchedCards || !cardInfoMap) return undefined;
@@ -62,7 +54,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
     });
   }, [fetchedCards, cardInfoMap, isHideVoidedCards]);
 
-  const setCardsInfo = useCallback(async (cards: Card[]) => {
+  const setCardsInfo = useCallback(async (cards: GetApiV1CardsResponse) => {
     const newMap: CardInfoMap = {};
 
     for (const card of cards || []) {
@@ -84,7 +76,12 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
 
       if (!card.cardToken) return;
 
-      newMap[card.cardToken] = { ...card, ...data };
+      newMap[card.cardToken] = {
+        ...card,
+        ...data,
+        statusCode: card.statusCode,
+        activatedAt: data.activatedAt ?? "",
+      };
     }
 
     setCardInfoMap(newMap);
@@ -233,9 +230,9 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
   );
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isOnboarded) return;
     refreshCards();
-  }, [refreshCards, isAuthenticated]);
+  }, [refreshCards, isOnboarded]);
 
   return (
     <CardsContext.Provider

@@ -50,7 +50,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
 
 export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated } = useAuth();
-  const { isUserSignedUp, isKycApproved, isSafeConfigured } = useUser();
+  const { isOnboarded } = useUser();
   const { openConnectModal } = useConnectModal();
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
@@ -100,7 +100,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
     };
   }, [handleConnect, isConnecting]);
 
-  const needsSignup = checkForSignup && isAuthenticated && (!isUserSignedUp || !isKycApproved || !isSafeConfigured);
+  const needsSignup = checkForSignup && !isOnboarded;
 
   // this is purely related to the wallet
   if (!isConnected) {
