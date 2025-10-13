@@ -86,7 +86,7 @@ export const sendMoneriumAuthRequest = async ({
     message,
   });
 
-  return fetch("https://api.monerium.dev/auth", {
+  return fetch("https://api.monerium.app/auth", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

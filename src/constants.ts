@@ -1670,8 +1670,8 @@ export const HELP_CENTER_URL = "https://help.gnosispay.com/";
 
 // Monerium Integration Constants
 export const MONERIUM_CONSTANTS = {
-  CLIENT_CREDENTIALS_AUTHORIZATION: "f6d628a4-dd9c-11ef-9c15-46b175783035",
-  AUTHORIZATION_CODE_FLOW: "f6d54935-dd9c-11ef-9c15-46b175783035",
+  CLIENT_CREDENTIALS_AUTHORIZATION: "cf3fcdeb-a849-11f0-950c-1ab61b7dfcaf",
+  AUTHORIZATION_CODE_FLOW: "cf3c8fd3-a849-11f0-950c-1ab61b7dfcaf",
   API_BASE_URL: "https://api.monerium.dev",
   REDIRECT_URI: "http://localhost:5173",
 } as const;

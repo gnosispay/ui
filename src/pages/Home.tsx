@@ -19,7 +19,7 @@ import {
   postApiV1IntegrationsMonerium,
 } from "@/client/sdk.gen";
 import { useSignMessage, useAccount } from "wagmi";
-import { MONERIUM_CONSTANTS } from "@/constants";
+import { MONERIUM_CONSTANTS, userTerms } from "@/constants";
 import { generateCodeVerifier, generateCodeChallenge, sendMoneriumAuthRequest } from "@/utils/moneriumAuth";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -119,10 +119,10 @@ export const Home = () => {
         uri: "http://localhost:5173",
         nonce,
         version: "1",
-        resources: ["https://monerium.com/siwe", "http://localhost:5173", "http://localhost:5173"],
+        resources: ["https://monerium.com/siwe", userTerms["privacy-policy"].url, userTerms["general-tos"].url],
         issuedAt: new Date(),
         expirationTime: new Date(Date.now() + 60 * 60 * 1000),
-        statement: "Allow Gnosis Pay - Sandbox to access my data on Monerium",
+        statement: "Allow My Gnosis Pay to access my data on Monerium",
       });
 
       // Step 3: Request user signature
