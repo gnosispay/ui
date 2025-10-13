@@ -113,7 +113,8 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
             setCardTransactionsByTokenDate(cardTransactionsMap);
           }
 
-          currentOffsetRef.current = offset + DEFAULT_CARD_TRANSACTIONS_AMOUNT;
+          currentOffsetRef.current =
+            offset + (isLoadMore ? LOAD_MORE_CARD_TRANSACTIONS_AMOUNT : DEFAULT_CARD_TRANSACTIONS_AMOUNT);
 
           // Increment load more count if this was a load more operation
           if (isLoadMore) {
