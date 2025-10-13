@@ -171,7 +171,7 @@ export const postApiV1AuthChallenge = <ThrowOnError extends boolean = false>(opt
 
 /**
  * Create a new User
- * This endpoint creates a new `User` associating it with the provided email address. During transition period, OTP verification is optional.
+ * This endpoint creates a new `User` associating it with the provided email address.
  */
 export const postApiV1AuthSignup = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupData, ThrowOnError>) => {
     return (options.client ?? client).post<PostApiV1AuthSignupResponses, PostApiV1AuthSignupErrors, ThrowOnError>({
@@ -954,8 +954,55 @@ export const getApiV1IbansAvailable = <ThrowOnError extends boolean = false>(opt
 };
 
 /**
+ * Get the message that needs to be signed for IBAN activation
+ * Returns the standard message that users need to sign with their wallet to verify ownership for Monerium IBAN activation.
+ */
+export const getApiV1IbansSigningMessage = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansSigningMessageData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetApiV1IbansSigningMessageResponses, GetApiV1IbansSigningMessageErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/ibans/signing-message',
+        ...options
+    });
+};
+
+/**
+ * Create a new Monerium integration
+ * Creates a new Monerium integration for the authenticated user and associates it with the authenticated user's EOA address.
+ * All operations on Monerium are done through their API, this endpoint is just a way to reuse the GP KYC to open an account on Monerium.
+ *
+ * - If the user does not have a Monerium account, this endpoint will create a new one and associate it with the authenticated user's EOA address.
+ * - If the user already has a Monerium account, you do not need to call this endpoint again.
+ *
+ * Just use the Monerium API directly to request access to the user's monerium account.
+ * Check their documentation for more information: https://monerium.dev/api-docs/v2
+ *
+ */
+export const postApiV1IntegrationsMonerium = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IntegrationsMoneriumData, ThrowOnError>) => {
+    return (options.client ?? client).post<PostApiV1IntegrationsMoneriumResponses, PostApiV1IntegrationsMoneriumErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/integrations/monerium',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
  * Retrieve IBAN details
  * Returns IBAN details including the IBAN number, BIC, and Status.
+ * @deprecated
  */
 export const getApiV1IbansDetails = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansDetailsData, ThrowOnError>) => {
     return (options?.client ?? client).get<GetApiV1IbansDetailsResponses, GetApiV1IbansDetailsErrors, ThrowOnError>({
@@ -1016,6 +1063,7 @@ export const getApiV1IbansOauthRedirectUrl = <ThrowOnError extends boolean = fal
 /**
  * Resets the IBAN integration for this User
  * Remove the IBAN information from our DB and deletes the User's IBAN functionality.
+ * @deprecated
  */
 export const deleteApiV1IbansReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1IbansResetData, ThrowOnError>) => {
     return (options?.client ?? client).delete<DeleteApiV1IbansResetResponses, DeleteApiV1IbansResetErrors, ThrowOnError>({
@@ -1045,52 +1093,6 @@ export const getApiV1IbansOrders = <ThrowOnError extends boolean = false>(option
         ],
         url: '/api/v1/ibans/orders',
         ...options
-    });
-};
-
-/**
- * Get the message that needs to be signed for IBAN activation
- * Returns the standard message that users need to sign with their wallet to verify ownership for Monerium IBAN activation.
- */
-export const getApiV1IbansSigningMessage = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansSigningMessageData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansSigningMessageResponses, GetApiV1IbansSigningMessageErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/signing-message',
-        ...options
-    });
-};
-
-/**
- * Create a new Monerium integration
- * Creates a new Monerium integration for the authenticated user and associates it with the authenticated user's EOA address.
- * All operations on Monerium are done through their API, this endpoint is just a way to reuse the GP KYC to open an account on Monerium.
- *
- * - If the user does not have a Monerium account, this endpoint will create a new one and associate it with the authenticated user's EOA address.
- * - If the user already has a Monerium account, you do not need to call this endpoint again.
- *
- * Just use the Monerium API directly to request access to the user's monerium account.
- * Check their documentation for more information: https://monerium.dev/api-docs/v2
- *
- */
-export const postApiV1IntegrationsMonerium = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IntegrationsMoneriumData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1IntegrationsMoneriumResponses, PostApiV1IntegrationsMoneriumErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/integrations/monerium',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
     });
 };
 

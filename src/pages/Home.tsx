@@ -12,7 +12,12 @@ import { Link } from "react-router-dom";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { PartnerBanner } from "@/components/ui/partner-banner";
 import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
-import { deleteApiV1IbansReset, getApiV1IbansSigningMessage } from "@/client/sdk.gen";
+import {
+  deleteApiV1IbansReset,
+  getApiV1IbansAvailable,
+  getApiV1IbansSigningMessage,
+  postApiV1IntegrationsMonerium,
+} from "@/client/sdk.gen";
 import { useSignMessage, useAccount } from "wagmi";
 import { MONERIUM_CONSTANTS } from "@/constants";
 import {
@@ -32,37 +37,53 @@ export const Home = () => {
   const [isMoneriumLoading, setIsMoneriumLoading] = useState(false);
   const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
+  const [ibanAvailable, setIbanAvailable] = useState(false);
+  const handleIbanAvailableButtonClick = useCallback(async () => {
+    try {
+      const { data: ibanAvailable, error: ibanAvailableError } = await getApiV1IbansAvailable();
 
-  // const handleMoneriumButtonClick = useCallback(async () => {
-  //   try {
-  //     const { data: messageToSign, error: messageToSignError } = await getApiV1IbansSigningMessage();
+      if (ibanAvailableError) {
+        console.error("Error getting IBAN available", ibanAvailableError);
+        return;
+      }
 
-  //     if (messageToSignError) {
-  //       console.error("Error getting message to sign", messageToSignError);
-  //       return;
-  //     }
+      console.log("IBAN available", ibanAvailable);
+      setIbanAvailable(ibanAvailable.data.available);
+    } catch (error) {
+      console.error("Error getting IBAN available", error);
+    }
+  }, []);
 
-  //     if (!messageToSign?.data?.message) {
-  //       console.error("No message to sign", messageToSign);
-  //       return;
-  //     }
+  const handleIntegrationMoneriumButtonClick = useCallback(async () => {
+    try {
+      const { data: messageToSign, error: messageToSignError } = await getApiV1IbansSigningMessage();
 
-  //     const signature = await signMessageAsync({
-  //       message: messageToSign.data?.message,
-  //     });
+      if (messageToSignError) {
+        console.error("Error getting message to sign", messageToSignError);
+        return;
+      }
 
-  //     const { data: postMoneriumProfile, error: postMoneriumProfileError } = await postApiV1IntegrationsMonerium({
-  //       body: {
-  //         signature: signature,
-  //       },
-  //     });
+      if (!messageToSign?.data?.message) {
+        console.error("No message to sign", messageToSign);
+        return;
+      }
 
-  //     console.log("postMoneriumProfile", postMoneriumProfile);
-  //     console.log("postMoneriumProfileError", postMoneriumProfileError);
-  //   } catch (error) {
-  //     console.error("Error posting monerium profile", error);
-  //   }
-  // }, [signMessageAsync]);
+      const signature = await signMessageAsync({
+        message: messageToSign.data?.message,
+      });
+
+      const { data: postMoneriumProfile, error: postMoneriumProfileError } = await postApiV1IntegrationsMonerium({
+        body: {
+          signature: signature,
+        },
+      });
+
+      console.log("postMoneriumProfile", postMoneriumProfile);
+      console.log("postMoneriumProfileError", postMoneriumProfileError);
+    } catch (error) {
+      console.error("Error posting monerium profile", error);
+    }
+  }, [signMessageAsync]);
 
   const handleResetIBANButtonClick = useCallback(async () => {
     try {
@@ -147,7 +168,8 @@ export const Home = () => {
             <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
               <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
-              {/* <Button onClick={handleMoneriumButtonClick}>Monerium</Button> */}
+              <Button onClick={handleIbanAvailableButtonClick}>IBAN Available: {ibanAvailable ? "Yes" : "No"}</Button>
+              <Button onClick={handleIntegrationMoneriumButtonClick}>Integration Monerium</Button>
               <Button onClick={handleResetIBANButtonClick}>Reset IBAN</Button>
               <Button onClick={handleAuthenticateWithMonerium} disabled={isMoneriumLoading || !address}>
                 {isMoneriumLoading ? "Authenticating..." : "Auth Monerium"}
