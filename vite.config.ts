@@ -12,9 +12,9 @@ export default defineConfig({
     },
   },
   server: {
-    allowedHosts: ["verified-pug-renewing.ngrok-free.app"],
+    allowedHosts: ["verified-pug-renewing.ngrok-free.app", "localhost"],
     cors: {
-      origin: "https://app.safe.global",
+      origin: ["https://app.safe.global", "https://api.monerium.dev", "http://localhost:5173"],
       allowedHeaders: ["Content-Type", "Authorization"],
     },
   },

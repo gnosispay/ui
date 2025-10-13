@@ -20,15 +20,10 @@ import {
 } from "@/client/sdk.gen";
 import { useSignMessage, useAccount } from "wagmi";
 import { MONERIUM_CONSTANTS } from "@/constants";
-import {
-  generateCodeVerifier,
-  generateCodeChallenge,
-  generateNonce,
-  createMoneriumSiweMessage,
-  sendMoneriumAuthRequest,
-} from "@/utils/moneriumAuth";
+import { generateCodeVerifier, generateCodeChallenge, sendMoneriumAuthRequest } from "@/utils/moneriumAuth";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { createSiweMessage, generateSiweNonce } from "viem/siwe";
 
 export const Home = () => {
   const [sendFundsModalOpen, setSendFundsModalOpen] = useState(false);
@@ -38,6 +33,7 @@ export const Home = () => {
   const { signMessageAsync } = useSignMessage();
   const { address } = useAccount();
   const [ibanAvailable, setIbanAvailable] = useState(false);
+
   const handleIbanAvailableButtonClick = useCallback(async () => {
     try {
       const { data: ibanAvailable, error: ibanAvailableError } = await getApiV1IbansAvailable();
@@ -115,8 +111,19 @@ export const Home = () => {
       const codeChallenge = await generateCodeChallenge(codeVerifier);
 
       // Step 2: Generate nonce and create SIWE message
-      const nonce = generateNonce();
-      const siweMessage = createMoneriumSiweMessage(address, nonce);
+      const nonce = generateSiweNonce();
+      const siweMessage = createSiweMessage({
+        address: address,
+        chainId: 100,
+        domain: "localhost:5173",
+        uri: "http://localhost:5173",
+        nonce,
+        version: "1",
+        resources: ["https://monerium.com/siwe", "http://localhost:5173", "http://localhost:5173"],
+        issuedAt: new Date(),
+        expirationTime: new Date(Date.now() + 60 * 60 * 1000),
+        statement: "Allow Gnosis Pay - Sandbox to access my data on Monerium",
+      });
 
       // Step 3: Request user signature
       const signature = await signMessageAsync({
@@ -165,13 +172,13 @@ export const Home = () => {
           {/* Balances - Row 1 Left on desktop */}
           <div className="mx-4 lg:mx-0 lg:col-span-2 lg:row-start-1">
             <Balances />
-            <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
+            <div className="mb-12 mt-4 flex flex-col gap-4 mx-4 lg:mx-0">
               <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
               <Button onClick={handleIbanAvailableButtonClick}>IBAN Available: {ibanAvailable ? "Yes" : "No"}</Button>
               <Button onClick={handleIntegrationMoneriumButtonClick}>Integration Monerium</Button>
               <Button onClick={handleResetIBANButtonClick}>Reset IBAN</Button>
-              <Button onClick={handleAuthenticateWithMonerium} disabled={isMoneriumLoading || !address}>
+              <Button onClick={handleAuthenticateWithMonerium} disabled={isMoneriumLoading}>
                 {isMoneriumLoading ? "Authenticating..." : "Auth Monerium"}
               </Button>
             </div>
