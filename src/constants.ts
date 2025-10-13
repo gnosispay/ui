@@ -17,6 +17,8 @@ export interface CurrencyInfo {
 
 export type TokenInfo = Omit<CurrencyInfo, "fiatSymbol">;
 
+export const REWARD_ADDRESS = "0xCdF50be9061086e2eCfE6e4a1BF9164d43568EEC";
+
 export const currencies: Record<string, CurrencyInfo> = {
   EUR: {
     tokenSymbol: "EURe",

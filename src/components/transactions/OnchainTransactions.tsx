@@ -58,7 +58,13 @@ export const OnchainTransactions = () => {
           <div className="text-xs text-secondary mb-2 p-2">{date}</div>
           {currency &&
             (transactionsByDate as Record<string, Erc20TokenEvent[]>)[date].map((transfer: Erc20TokenEvent) => {
-              return <OnchainTransferRow key={transfer.hash} transfer={transfer} currency={currency} />;
+              return (
+                <OnchainTransferRow
+                  key={`${transfer.hash}-${transfer.date}-${transfer.value}`}
+                  transfer={transfer}
+                  currency={currency}
+                />
+              );
             })}
         </div>
       ))}
