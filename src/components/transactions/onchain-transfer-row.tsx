@@ -34,18 +34,21 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
   const sign = isIncoming ? "+" : "-";
   const Icon = isRewardTransfer ? Gift : isIncoming ? Plus : Minus;
 
-  // Determine if this is a GNO transaction
-  const isGnoTransaction = useMemo(() => {
-    return transfer.tokenAddress?.toLowerCase() === supportedTokens.GNO.address?.toLowerCase();
+  // Find matching supported token by address
+  const supportedTokenInfo = useMemo(() => {
+    if (!transfer.tokenAddress) return null;
+
+    const tokenEntry = Object.values(supportedTokens).find(
+      (token) => token.address?.toLowerCase() === transfer.tokenAddress?.toLowerCase(),
+    );
+    return tokenEntry || null;
   }, [transfer.tokenAddress]);
 
   // Use appropriate token info for formatting
   const tokenInfo = useMemo(() => {
-    if (isGnoTransaction) {
-      return supportedTokens.GNO;
-    }
-    return currency;
-  }, [isGnoTransaction, currency]);
+    // Use supported token info if available, otherwise fall back to currency
+    return supportedTokenInfo || currency;
+  }, [supportedTokenInfo, currency]);
 
   const formattedValue = useMemo(() => {
     return formatTokenAmount(transfer.value.toString(), tokenInfo);

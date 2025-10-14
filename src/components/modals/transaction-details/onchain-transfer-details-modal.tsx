@@ -25,23 +25,25 @@ export const OnchainTransferDetailsModal = ({
 }: OnchainTransferDetailsModalProps) => {
   const { copyToClipboard } = useCopyToClipboard();
 
-  // Determine if this is a GNO transaction
-  const isGnoTransaction = useMemo(() => {
-    return transfer?.tokenAddress?.toLowerCase() === supportedTokens.GNO.address?.toLowerCase();
-  }, [transfer?.tokenAddress]);
-
-  // Check if this is a reward transfer (from reward address)
   const isRewardTransfer = useMemo(() => {
     return transfer?.from.toLowerCase() === REWARD_ADDRESS.toLowerCase();
   }, [transfer?.from]);
 
+  // Find matching supported token by address
+  const supportedTokenInfo = useMemo(() => {
+    if (!transfer?.tokenAddress) return null;
+
+    const tokenEntry = Object.values(supportedTokens).find(
+      (token) => token.address?.toLowerCase() === transfer.tokenAddress?.toLowerCase(),
+    );
+    return tokenEntry || null;
+  }, [transfer?.tokenAddress]);
+
   // Determine appropriate token info for formatting
   const tokenInfo = useMemo(() => {
-    if (isGnoTransaction) {
-      return supportedTokens.GNO;
-    }
-    return currency;
-  }, [isGnoTransaction, currency]);
+    // Use supported token info if available, otherwise fall back to currency
+    return supportedTokenInfo || currency;
+  }, [supportedTokenInfo, currency]);
 
   // Format value based on token type
   const formattedValue = useMemo(() => {
