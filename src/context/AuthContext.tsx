@@ -33,6 +33,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [jwt, setJwt] = useState<string | null>(null);
   const [jwtContainsUserId, setJwtContainsUserId] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isLocaStorageLoading, setIsLocaStorageLoading] = useState(true);
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
@@ -57,11 +58,20 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       return;
     }
 
+    // Reset loading state when address changes
+    setIsLocaStorageLoading(true);
+
     const storedJwt = localStorage.getItem(jwtAddressKey);
 
     if (storedJwt) {
       setJwt(storedJwt);
+    } else {
+      // Clear JWT if no stored token for this address
+      setJwt(null);
     }
+
+    // Mark loading as complete after localStorage read
+    setIsLocaStorageLoading(false);
   }, [jwtAddressKey]);
 
   const isAuthenticated = useMemo(() => {
@@ -260,6 +270,11 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   }, [jwt, renewToken]);
 
   useEffect(() => {
+    // Don't proceed until localStorage loading is complete
+    if (isLocaStorageLoading) {
+      return;
+    }
+
     const expired = isTokenExpired(jwt);
 
     if (jwt !== null && !expired) {
@@ -268,7 +283,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     }
 
     renewToken();
-  }, [renewToken, jwt]);
+  }, [jwt, isLocaStorageLoading, renewToken]);
 
   const getJWT = useCallback(async () => {
     const expired = isTokenExpired(jwt);
