@@ -49,7 +49,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
 };
 
 export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
-  const { isAuthenticating, isAuthenticated } = useAuth();
+  const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
   const { isOnboarded } = useUser();
   const { openConnectModal } = useConnectModal();
   const navigate = useNavigate();
@@ -82,12 +82,12 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
       description: "Please sign the message request to login.",
       buttonText,
       buttonProps: {
-        onClick: handleConnect,
+        onClick: renewToken,
         disabled: isAuthenticating,
         loading: isAuthenticating,
       },
     };
-  }, [handleConnect, isAuthenticating]);
+  }, [renewToken, isAuthenticating]);
 
   const connectionScreenConfig = useMemo((): AuthScreenProps => {
     const buttonText = isConnecting ? "Connecting..." : "Connect wallet";
