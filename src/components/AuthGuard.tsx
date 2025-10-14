@@ -43,6 +43,14 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
         >
           {buttonText}
         </Button>
+        <a
+          className="text-xs text-muted-foreground text-center underline"
+          href="https://help.gnosispay.com/hc/en-us/articles/41558567635988-The-Gnosis-Pay-Web-App"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Trouble logging in? Get help
+        </a>
       </div>
     </div>
   );
