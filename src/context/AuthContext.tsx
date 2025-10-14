@@ -24,6 +24,7 @@ export type IAuthContext = {
   updateJwt: (newJwt: string) => void;
   updateClient: (optionalJwt?: string) => void;
   showInitializingLoader: boolean;
+  renewToken: () => Promise<string | undefined>;
 };
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
@@ -289,6 +290,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         updateJwt,
         updateClient,
         showInitializingLoader,
+        renewToken,
       }}
     >
       {children}
