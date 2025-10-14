@@ -11,7 +11,7 @@ import { Package, MapPin } from "lucide-react";
 import { useCallback, useState, useEffect, useMemo } from "react";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { StandardAlert } from "../ui/standard-alert";
-import { SUPPORTED_SHIPPING_COUNTRIES } from "@/constants";
+import { SUPPORTED_SHIPPING_COUNTRIES } from "@/countries";
 
 interface ShippingAddress {
   address1: string;
