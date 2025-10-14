@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { useAccount } from "wagmi";
+import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -45,7 +46,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
         </Button>
         <a
           className="text-xs text-muted-foreground text-center underline"
-          href="https://help.gnosispay.com/hc/en-us/articles/41558567635988-The-Gnosis-Pay-Web-App"
+          href={TROUBLE_LOGGING_IN_URL}
           target="_blank"
           rel="noopener noreferrer"
         >
