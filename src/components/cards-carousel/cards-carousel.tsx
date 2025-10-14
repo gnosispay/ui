@@ -19,34 +19,8 @@ export const CardsCarousel = ({
   const { cards, cardInfoMap } = useCards();
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchEndX, setTouchEndX] = useState<number | null>(null);
-
-  const onTouchStart = (e: React.TouchEvent) => {
-    setTouchEndX(null);
-    setTouchStartX(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEndX(e.targetTouches[0].clientX);
-  };
-
-  const onTouchEnd = () => {
-    if (touchStartX === null || touchEndX === null) return;
-    const distance = touchStartX - touchEndX;
-    if (Math.abs(distance) > minSwipeDistance) {
-      if (distance > 0) {
-        // Swiped left
-        nextCard();
-      } else {
-        // Swiped right
-        prevCard();
-      }
-    } else {
-      // Small swipe: revert to current card smoothly
-      scrollToCard(currentIndex);
-    }
-    setTouchStartX(null);
-    setTouchEndX(null);
-  };
+  const [isDragging, setIsDragging] = useState(false);
+  const initialScrollLeft = useRef<number>(0);
 
   const scrollToCard = useCallback((index: number) => {
     const cardElement = scrollContainerRef.current?.children[index] as HTMLElement;
@@ -85,6 +59,113 @@ export const CardsCarousel = ({
     [cards, scrollToCard, setCurrentIndex, onCardChange],
   );
 
+  // Add non-passive touch event listeners to allow preventDefault
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      if (!container) return;
+
+      setTouchEndX(null);
+      setTouchStartX(e.touches[0].clientX);
+      setIsDragging(true);
+
+      // Store the initial scroll position
+      initialScrollLeft.current = container.scrollLeft;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (touchStartX === null || !isDragging) return;
+
+      if (!container || !cards || cards.length === 0) return;
+
+      const currentX = e.touches[0].clientX;
+      const rawDistance = touchStartX - currentX; // Positive = left swipe, negative = right swipe
+      setTouchEndX(currentX);
+
+      // Calculate the maximum allowed scroll distance to adjacent cards
+      const containerWidth = container.offsetWidth;
+      const cardWidth = containerWidth * 0.8; // Approximate card width
+      const maxScrollDistance = cardWidth + 16; // Card width + gap
+
+      // Apply resistance when approaching boundaries
+      let constrainedDistance = rawDistance;
+
+      // Check boundaries and apply resistance
+      if (rawDistance > 0 && currentIndex >= cards.length - 1) {
+        // Trying to swipe left at last card - apply strong resistance
+        constrainedDistance = rawDistance * 0.1;
+      } else if (rawDistance < 0 && currentIndex <= 0) {
+        // Trying to swipe right at first card - apply strong resistance
+        constrainedDistance = rawDistance * 0.1;
+      } else {
+        // Normal case - limit to adjacent card distance with some resistance
+        const maxDistance = maxScrollDistance * 0.7; // Allow 70% of card width for smooth feel
+        if (Math.abs(rawDistance) > maxDistance) {
+          constrainedDistance = Math.sign(rawDistance) * maxDistance;
+        }
+      }
+
+      // Apply the scroll offset
+      container.scrollLeft = initialScrollLeft.current + constrainedDistance;
+
+      // Prevent default scrolling behavior
+      e.preventDefault();
+    };
+
+    const handleTouchEnd = () => {
+      if (touchStartX === null || touchEndX === null || !isDragging) return;
+
+      const distance = touchStartX - touchEndX;
+      const shouldChangeCard = Math.abs(distance) > minSwipeDistance;
+
+      setIsDragging(false);
+
+      if (shouldChangeCard && cards) {
+        if (distance > 0 && currentIndex < cards.length - 1) {
+          // Swiped left and not at last card
+          nextCard();
+        } else if (distance < 0 && currentIndex > 0) {
+          // Swiped right and not at first card
+          prevCard();
+        } else {
+          // At boundary - snap back to current card
+          scrollToCard(currentIndex);
+        }
+      } else {
+        // Small swipe: revert to current card smoothly
+        scrollToCard(currentIndex);
+      }
+
+      setTouchStartX(null);
+      setTouchEndX(null);
+    };
+
+    const handleTouchCancel = () => {
+      // Handle touch cancel (e.g., when user drags outside the container)
+      if (isDragging) {
+        setIsDragging(false);
+        scrollToCard(currentIndex);
+      }
+      setTouchStartX(null);
+      setTouchEndX(null);
+    };
+
+    // Add non-passive event listeners
+    container.addEventListener("touchstart", handleTouchStart, { passive: false });
+    container.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("touchend", handleTouchEnd, { passive: false });
+    container.addEventListener("touchcancel", handleTouchCancel, { passive: false });
+
+    return () => {
+      container.removeEventListener("touchstart", handleTouchStart);
+      container.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("touchend", handleTouchEnd);
+      container.removeEventListener("touchcancel", handleTouchCancel);
+    };
+  }, [touchStartX, touchEndX, isDragging, cards, currentIndex, nextCard, prevCard, scrollToCard]);
+
   // Ensure carousel scrolls to correct position when currentIndex changes
   // This is especially important after cards refresh (e.g., after freeze/unfreeze)
   useEffect(() => {
@@ -120,13 +201,7 @@ export const CardsCarousel = ({
           </button>
         )}
         {/* Cards Row */}
-        <div
-          ref={scrollContainerRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide select-none"
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
+        <div ref={scrollContainerRef} className="flex gap-4 overflow-x-auto scrollbar-hide select-none">
           {cards.map((card, index) => {
             const cardInfo = !!card.cardToken && cardInfoMap?.[card.cardToken];
 
