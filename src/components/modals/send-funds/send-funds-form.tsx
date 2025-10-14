@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { StandardAlert } from "@/components/ui/standard-alert";
+import { Switch } from "@/components/ui/switch";
 import { Coins } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { isAddress } from "viem";
 import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./token-amount-input";
+import { CustomTokenAmountInput } from "./custom-token-amount-input.tsx";
 import { AddressInput } from "./address-input";
 import { useAccount } from "wagmi";
 import { useDelayRelay } from "@/context/DelayRelayContext";
@@ -31,6 +33,7 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
   const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
   const [amount, setAmount] = useState<bigint>(0n);
   const [amountError, setAmountError] = useState("");
+  const [isCustomToken, setIsCustomToken] = useState(false);
   const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
 
   const handleAddressChange = useCallback((value: string) => {
@@ -40,6 +43,14 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
     if (value && !isAddress(value)) {
       setAddressError("Invalid address");
     }
+  }, []);
+
+  // Reset form state when switching between token modes
+  const handleCustomTokenChange = useCallback((checked: boolean) => {
+    setIsCustomToken(checked);
+    setSelectedToken(undefined);
+    setAmount(0n);
+    setAmountError("");
   }, []);
 
   const isFormValid = useMemo(() => {
@@ -87,8 +98,25 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="amount">Amount</Label>
-        <TokenAmountInput onTokenChange={setSelectedToken} onAmountChange={setAmount} setError={setAmountError} />
+        <div className="flex items-center justify-end">
+          <div className="flex items-center gap-2">
+            <Label htmlFor="custom-token-switch" className="text-sm text-muted-foreground">
+              Custom token
+            </Label>
+            <Switch id="custom-token-switch" checked={isCustomToken} onCheckedChange={handleCustomTokenChange} />
+          </div>
+        </div>
+
+        {isCustomToken ? (
+          <CustomTokenAmountInput
+            onTokenChange={setSelectedToken}
+            onAmountChange={setAmount}
+            setError={setAmountError}
+          />
+        ) : (
+          <TokenAmountInput onTokenChange={setSelectedToken} onAmountChange={setAmount} setError={setAmountError} />
+        )}
+
         {amountError && (
           <StandardAlert variant="destructive" description={amountError} customIcon={<Coins className="h-4 w-4" />} />
         )}
