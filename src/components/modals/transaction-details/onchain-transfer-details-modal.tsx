@@ -1,9 +1,10 @@
 import { useMemo } from "react";
 import { format } from "date-fns";
-import { ExternalLink, Copy, Minus, Plus } from "lucide-react";
+import { ExternalLink, Copy, Minus, Plus, Gift } from "lucide-react";
 import type { CurrencyInfo } from "@/constants";
+import { supportedTokens, REWARD_ADDRESS } from "@/constants";
 import { Erc20TokenEventDirection, type Erc20TokenEvent } from "@/types/transaction";
-import { formatCurrency } from "@/utils/formatCurrency";
+import { formatTokenAmount } from "@/utils/formatCurrency";
 import { shortenAddress } from "@/utils/shortenAddress";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -24,36 +25,59 @@ export const OnchainTransferDetailsModal = ({
 }: OnchainTransferDetailsModalProps) => {
   const { copyToClipboard } = useCopyToClipboard();
 
+  const isRewardTransfer = useMemo(() => {
+    return transfer?.from.toLowerCase() === REWARD_ADDRESS.toLowerCase();
+  }, [transfer?.from]);
+
+  // Find matching supported token by address
+  const supportedTokenInfo = useMemo(() => {
+    if (!transfer?.tokenAddress) return null;
+
+    const tokenEntry = Object.values(supportedTokens).find(
+      (token) => token.address?.toLowerCase() === transfer.tokenAddress?.toLowerCase(),
+    );
+    return tokenEntry || null;
+  }, [transfer?.tokenAddress]);
+
+  // Determine appropriate token info for formatting
+  const tokenInfo = useMemo(() => {
+    // Use supported token info if available, otherwise fall back to currency
+    return supportedTokenInfo || currency;
+  }, [supportedTokenInfo, currency]);
+
+  // Format value based on token type
+  const formattedValue = useMemo(() => {
+    if (!transfer || !tokenInfo) return null;
+    return formatTokenAmount(transfer.value.toString(), tokenInfo);
+  }, [transfer, tokenInfo]);
+
   const transferDetails = useMemo(() => {
     if (!transfer || !currency) return null;
 
     const isIncoming = transfer.direction === Erc20TokenEventDirection.Incoming;
     const sign = isIncoming ? "+" : "-";
-    const Icon = isIncoming ? Plus : Minus;
-
-    const formattedValue = formatCurrency(transfer.value.toString(), currency);
+    const Icon = isRewardTransfer ? Gift : isIncoming ? Plus : Minus;
     const formattedDate = format(transfer.date, "MMM dd, yyyy 'at' HH:mm");
 
     return {
       isIncoming,
       sign,
       Icon,
-      formattedValue,
       formattedDate,
       fromAddress: transfer.from,
       toAddress: transfer.to,
       hash: transfer.hash,
       currency,
     };
-  }, [transfer, currency]);
+  }, [transfer, currency, isRewardTransfer]);
 
   if (!transfer || !transferDetails) {
     return null;
   }
 
-  const { isIncoming, sign, Icon, formattedValue, formattedDate, fromAddress, toAddress, hash } = transferDetails;
+  const { isIncoming, sign, Icon, formattedDate, fromAddress, toAddress, hash } = transferDetails;
 
-  const transferTitle = isIncoming ? "Incoming Transfer" : "Outgoing Transfer";
+  const transferTitle = isRewardTransfer ? "Reward" : isIncoming ? "Incoming Transfer" : "Outgoing Transfer";
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -121,7 +145,7 @@ export const OnchainTransferDetailsModal = ({
           {/* Currency */}
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Currency</span>
-            <span className="font-medium text-foreground">{currency?.tokenSymbol}</span>
+            <span className="font-medium text-foreground">{tokenInfo?.tokenSymbol}</span>
           </div>
 
           {/* Transaction Hash */}
