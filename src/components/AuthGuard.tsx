@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { useAccount } from "wagmi";
+import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -43,6 +44,14 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
         >
           {buttonText}
         </Button>
+        <a
+          className="text-xs text-muted-foreground text-center underline"
+          href={TROUBLE_LOGGING_IN_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Trouble logging in? Get help
+        </a>
       </div>
     </div>
   );
