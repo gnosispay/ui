@@ -34,11 +34,13 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [jwtContainsUserId, setJwtContainsUserId] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isLocaStorageLoading, setIsLocaStorageLoading] = useState(true);
+  const [contextKey, setContextKey] = useState(0);
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
   const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const renewalInProgressRef = useRef(false);
+  const previousAddressRef = useRef<string | undefined>(address);
   const jwtAddressKey = useMemo(() => {
     if (!address) return "";
     return `${LOCALSTORAGE_JWT_KEY}.${address}`;
@@ -73,6 +75,34 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     // Mark loading as complete after localStorage read
     setIsLocaStorageLoading(false);
   }, [jwtAddressKey]);
+
+  // Handle app refresh when address changes
+  useEffect(() => {
+    const currentAddress = address;
+    const previousAddress = previousAddressRef.current;
+
+    // Skip on initial mount (when both are the same)
+    if (previousAddress === currentAddress) {
+      return;
+    }
+
+    // Skip if this is the first address being set (from undefined to an address)
+    if (previousAddress === undefined && currentAddress) {
+      previousAddressRef.current = currentAddress;
+      return;
+    }
+
+    // Address changed from one valid address to another - remount context children
+    if (previousAddress && currentAddress && previousAddress !== currentAddress) {
+      previousAddressRef.current = currentAddress;
+      setIsLocaStorageLoading(true);
+      setContextKey((prev) => prev + 1); // Force remount of children
+      return;
+    }
+
+    // Update the ref for other cases
+    previousAddressRef.current = currentAddress;
+  }, [address]);
 
   const isAuthenticated = useMemo(() => {
     const isExpired = isTokenExpired(jwt);
@@ -308,7 +338,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         renewToken,
       }}
     >
-      {children}
+      <div key={contextKey}>{children}</div>
     </AuthContext.Provider>
   );
 };
