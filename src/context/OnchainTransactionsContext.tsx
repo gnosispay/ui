@@ -2,7 +2,7 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useM
 import { groupByDate } from "@/utils/transactionUtils";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useUser } from "./UserContext";
-import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
+import { fetchErc20Transfers } from "@/utils/fetchErc20Transfers";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { subDays, formatISO, format } from "date-fns";
 import { currencies, supportedTokens } from "@/constants";
@@ -94,7 +94,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
       const formattedToDate = toDate ? formatISO(toDate) : undefined;
 
       // Fetch transactions for both the user's currency token and GNO token
-      const result = await fetchErc20Transfers({
+      const { data, error, reachedGenesisBlock } = await fetchErc20Transfers({
         address: safeConfig.address as Address,
         tokenAddresses: [tokenAddress as Address, GNOAddress as Address],
         fromDate: formattedFromDate,
@@ -102,18 +102,15 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
         skipSettlementTransfers: true,
       });
 
-      // Check for errors
-      if (result.error) {
+      if (error) {
         const errorMessage = isLoadMore
           ? `Error loading more transactions from ${format(fromDate, "MMM dd, yyyy")}`
           : "Error fetching onchain transactions";
-        setOnchainTransactionsError(extractErrorMessage(result.error, errorMessage));
-        console.error("Error fetching onchain transactions:", result.error);
+        setOnchainTransactionsError(extractErrorMessage(error, errorMessage));
+        console.error("Error fetching onchain transactions:", error);
       } else {
-        const combinedData = result.data || [];
-
+        const combinedData = data || [];
         // Update hasNextPage based on whether we've reached genesis block
-        const reachedGenesisBlock = result.reachedGenesisBlock;
         if (reachedGenesisBlock) {
           setHasNextPage(false);
         }

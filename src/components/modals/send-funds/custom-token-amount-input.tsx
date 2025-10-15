@@ -10,38 +10,7 @@ import { config } from "@/wagmi";
 import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { useUser } from "@/context/UserContext";
 import { Coins } from "lucide-react";
-
-// Standard ERC20 ABI for reading token metadata and balance
-const ERC20_ABI = [
-  {
-    inputs: [],
-    name: "decimals",
-    outputs: [{ internalType: "uint8", name: "", type: "uint8" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "symbol",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "name",
-    outputs: [{ internalType: "string", name: "", type: "string" }],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [{ internalType: "address", name: "account", type: "address" }],
-    name: "balanceOf",
-    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const;
+import { ERC20_ABI } from "@/utils/ERC20Abi";
 
 interface CustomTokenAmountInputProps {
   onTokenChange: (token: TokenInfoWithBalance) => void;
