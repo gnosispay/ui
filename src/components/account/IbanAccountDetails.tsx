@@ -53,7 +53,7 @@ export const IbanAccountDetails = () => {
       <div className="space-y-4">
         {!isSuccessIbanIntegration && (
           <div className="text-center text-muted-foreground mb-4">
-            You're eligible for an IBAN. Create one to receive bank transfers directly to your account.
+            Create an IBAN to receive bank transfers directly to your account.
           </div>
         )}
         <IbanIntegrationFlow showCancelButton={false} onSuccess={() => setIsSuccessIbanIntegration(true)} />
