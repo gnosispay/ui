@@ -73,7 +73,6 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     }
   }, [safeConfig]);
 
-
   const refreshSafeConfig = useCallback(() => {
     getApiV1SafeConfig()
       .then(({ data, error }) => {

@@ -56,20 +56,20 @@ ReactDOM.createRoot(rootElement).render(
                 <IBANContextProvider>
                   <ZendeskProvider apiKey={zendeskKey}>
                     <CardsContextProvider>
-                    <OrdersContextProvider>
-                      <CardTransactionsContextProvider>
-                        <OnchainTransactionsContextProvider>
-                          <IbanTransactionsContextProvider>
-                            <DelayRelayContextProvider>
-                              <App />
-                              <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
-                            </DelayRelayContextProvider>
-                          </IbanTransactionsContextProvider>
-                        </OnchainTransactionsContextProvider>
-                      </CardTransactionsContextProvider>
-                    </OrdersContextProvider>
-                  </CardsContextProvider>
-                </ZendeskProvider>
+                      <OrdersContextProvider>
+                        <CardTransactionsContextProvider>
+                          <OnchainTransactionsContextProvider>
+                            <IbanTransactionsContextProvider>
+                              <DelayRelayContextProvider>
+                                <App />
+                                <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
+                              </DelayRelayContextProvider>
+                            </IbanTransactionsContextProvider>
+                          </OnchainTransactionsContextProvider>
+                        </CardTransactionsContextProvider>
+                      </OrdersContextProvider>
+                    </CardsContextProvider>
+                  </ZendeskProvider>
                 </IBANContextProvider>
               </UserContextProvider>
             </AuthContextProvider>
