@@ -23,6 +23,7 @@ export type IUserContext = {
   refreshSafeConfig: () => void;
   isOnboarded: boolean;
   showInitializingLoader: boolean;
+  hasIbanSet: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -35,6 +36,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   const isUserSignedUp = useMemo(() => jwtContainsUserId, [jwtContainsUserId]);
   const [isKycApproved, setIsKycApproved] = useState(false);
   const [isSafeConfigured, setIsSafeConfigured] = useState(false);
+  const hasIbanSet = useMemo(() => user?.bankingDetails?.moneriumIban !== undefined, [user]);
   const isOnboarded = useMemo(
     () => isAuthenticated && isUserSignedUp && isKycApproved && isSafeConfigured,
     [isAuthenticated, isUserSignedUp, isKycApproved, isSafeConfigured],
@@ -167,6 +169,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         refreshSafeConfig,
         isOnboarded,
         showInitializingLoader,
+        hasIbanSet,
       }}
     >
       {children}

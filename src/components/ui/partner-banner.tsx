@@ -19,16 +19,16 @@ export function PartnerBanner({ className }: PartnerBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const dismissalData = getBannerDismissalData();
+    const dismissalData = getBannerDismissalData('partner');
     const shouldShow = shouldShowBanner(dismissalData);
     setIsVisible(shouldShow);
   }, []);
 
   const handleDismiss = useCallback(() => {
-    const currentData = getBannerDismissalData();
+    const currentData = getBannerDismissalData('partner');
     const newData = createDismissalData(currentData);
     
-    setBannerDismissalData(newData);
+    setBannerDismissalData(newData, 'partner');
     setIsVisible(false);
   }, []);
 
@@ -38,7 +38,7 @@ export function PartnerBanner({ className }: PartnerBannerProps) {
 
   return (
     <Link to={PARTNERS_URL} className={cn(
-        "block relative rounded-lg overflow-hidden bg-card",
+        "block relative rounded-lg overflow-hidden bg-card mb-4",
         "w-full cursor-pointer hover:bg-card/80 transition-colors",
         className
       )}>

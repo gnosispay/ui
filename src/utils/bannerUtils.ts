@@ -1,8 +1,22 @@
-const BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v2";
+const PARTNER_BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v2";
+const IBAN_BANNER_STORAGE_KEY = "gp-ui.iban-banner-dismissed.v1";
 
 export interface BannerDismissalData {
   nextShowTimestamp: number;
   count: number;
+}
+
+export type BannerType = 'partner' | 'iban';
+
+function getBannerStorageKey(bannerType: BannerType): string {
+  switch (bannerType) {
+    case 'partner':
+      return PARTNER_BANNER_STORAGE_KEY;
+    case 'iban':
+      return IBAN_BANNER_STORAGE_KEY;
+    default:
+      throw new Error(`Unknown banner type: ${bannerType}`);
+  }
 }
 
 // Utility functions for exponential backoff
@@ -23,13 +37,14 @@ export function shouldShowBanner(dismissalData: BannerDismissalData | null): boo
   return Date.now() >= dismissalData.nextShowTimestamp;
 }
 
-export function getBannerDismissalData(): BannerDismissalData | null {
+export function getBannerDismissalData(bannerType: BannerType = 'partner'): BannerDismissalData | null {
   try {
-    const stored = localStorage.getItem(BANNER_STORAGE_KEY);
+    const storageKey = getBannerStorageKey(bannerType);
+    const stored = localStorage.getItem(storageKey);
     if (!stored) return null;
 
-    // Handle legacy format (just "true")
-    if (stored === "true") {
+    // Handle legacy format (just "true") - only for partner banner
+    if (stored === "true" && bannerType === 'partner') {
       return null; // Treat as never dismissed to show banner again
     }
 
@@ -39,8 +54,9 @@ export function getBannerDismissalData(): BannerDismissalData | null {
   }
 }
 
-export function setBannerDismissalData(data: BannerDismissalData): void {
-  localStorage.setItem(BANNER_STORAGE_KEY, JSON.stringify(data));
+export function setBannerDismissalData(data: BannerDismissalData, bannerType: BannerType = 'partner'): void {
+  const storageKey = getBannerStorageKey(bannerType);
+  localStorage.setItem(storageKey, JSON.stringify(data));
 }
 
 export function createDismissalData(currentData: BannerDismissalData | null): BannerDismissalData {
