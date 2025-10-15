@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog, LifeBuoyIcon } from "lucide-react";
+import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog, LifeBuoyIcon, Scale } from "lucide-react";
 import {
   AccountSection,
   PersonalDetailsModal,
@@ -9,7 +9,7 @@ import {
 } from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
 import { SafeOwnersModal } from "@/components/modals/safe-owners";
-import { HELP_CENTER_URL } from "@/constants";
+import { HELP_CENTER_URL, LEGAL_LINK } from "@/constants";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import { Button } from "@/components/ui/button";
 
@@ -78,6 +78,11 @@ export const AccountRoute = () => {
             icon={<LifeBuoyIcon className="w-6 h-6" />}
             title="Help Center"
             onClick={() => window.open(HELP_CENTER_URL, "_blank")}
+          />
+          <AccountSection
+            icon={<Scale className="w-6 h-6" />}
+            title="Legal, Terms and Policies"
+            onClick={() => window.open(LEGAL_LINK, "_blank")}
           />
         </div>
       </div>
