@@ -82,6 +82,10 @@ const publicRoutes = [
     path: "/activation/choose-partner",
     element: <ExternalRedirect url={PARTNERS_URL} />,
   },
+  {
+    path: "/partners",
+    element: <ExternalRedirect url={PARTNERS_URL} />,
+  },
 ];
 
 function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
