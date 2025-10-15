@@ -187,10 +187,10 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       }
 
       const message = new SiweMessage({
-        domain: "my.gnosispay.com",
+        domain: "app.gnosispay.com",
         address,
         statement: "Sign in with Ethereum to the app.",
-        uri: "https://my.gnosispay.com",
+        uri: "https://app.gnosispay.com",
         version: "1",
         chainId,
         nonce: data,
