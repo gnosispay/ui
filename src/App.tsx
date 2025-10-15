@@ -10,6 +10,7 @@ import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AccountRoute } from "./pages/Account";
+import { NotFound } from "./pages/NotFound";
 import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
 import { useZendeskUserId } from "./hooks/useZendeskUserId";
 import { AppLoader } from "./components/AppLoader";
@@ -86,6 +87,10 @@ const publicRoutes = [
     path: "/partners",
     element: <ExternalRedirect url={PARTNERS_URL} />,
   },
+  {
+    path: "/dashboard",
+    element: <Navigate to="/" replace />,
+  },
 ];
 
 function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
@@ -117,6 +122,10 @@ function App() {
           {menuRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
+        </Route>
+        {/* Catch-all route for 404 pages */}
+        <Route element={<ProtectedLayout checkForSignup={false} />}>
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
       <FooterNavBar />
