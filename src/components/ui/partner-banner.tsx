@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 import { Link } from "react-router-dom";
 import PartnerAppsImage from "@/assets/Partner-apps.png";
 import {

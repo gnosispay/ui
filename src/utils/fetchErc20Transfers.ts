@@ -14,6 +14,7 @@ import { fromUnixTime } from "date-fns";
 import { GNOSIS_PAY_SETTLEMENT_ADDRESS } from "@/constants";
 import { Erc20TokenEventDirection } from "@/types/transaction";
 import type { Erc20TokenEvent } from "@/types/transaction";
+import { ERC20_ABI } from "./ERC20Abi";
 
 // Gnosis Chain average block time is approximately 5 seconds
 const GNOSIS_AVERAGE_BLOCK_TIME = 5;
@@ -47,37 +48,9 @@ const estimateBlockFromDate = async (provider: PublicClient, targetDate: Date): 
   }
 };
 
-const ERC20Abi = [
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "transfer",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "success",
-        type: "bool",
-      },
-    ],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-];
-
-export const encodeErc20Transfer = (recipient: string, amount: bigint) => {
+export const encodeErc20Transfer = (recipient: Address, amount: bigint) => {
   return encodeFunctionData({
-    abi: ERC20Abi,
+    abi: ERC20_ABI,
     functionName: "transfer",
     args: [recipient, amount],
   });
@@ -85,22 +58,20 @@ export const encodeErc20Transfer = (recipient: string, amount: bigint) => {
 
 export const decodeErc20Transfer = (data: Address) => {
   return decodeFunctionData({
-    abi: ERC20Abi,
+    abi: ERC20_ABI,
     data,
   });
 };
 
 export const fetchErc20Transfers = async ({
   address,
-  tokenAddress,
   tokenAddresses,
   fromDate,
   toDate,
   skipSettlementTransfers,
 }: {
   address: Address;
-  tokenAddress?: Address;
-  tokenAddresses?: Address[];
+  tokenAddresses?: Address | Address[];
   fromDate?: string;
   toDate?: string;
   skipSettlementTransfers: boolean;
@@ -112,7 +83,7 @@ export const fetchErc20Transfers = async ({
     });
 
     // Determine which token addresses to fetch
-    const addressesToFetch = tokenAddresses || (tokenAddress ? [tokenAddress] : []);
+    const addressesToFetch = Array.isArray(tokenAddresses) ? tokenAddresses : [tokenAddresses];
 
     if (addressesToFetch.length === 0) {
       throw new Error("Either tokenAddress or tokenAddresses must be provided");
