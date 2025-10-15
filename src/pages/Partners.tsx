@@ -4,6 +4,7 @@ import MetriLogo from "@/assets/partners-logos/metri.svg";
 import ZealLogo from "@/assets/partners-logos/zeal.png";
 import PicnicLogo from "@/assets/partners-logos/picnic.png";
 import GreenhoodLogo from "@/assets/partners-logos/greenhood.svg";
+import RebindLogo from "@/assets/partners-logos/rebind.png";
 
 interface PartnerApp {
   id: string;
@@ -46,6 +47,14 @@ const partnerApps: PartnerApp[] = [
     logo: GreenhoodLogo,
     logoAlt: "Greenhood logo",
     url: "https://www.greenhoodwallet.com",
+  },
+  {
+    id: "rebind",
+    name: "Rebind",
+    description: "Onramp for free. Earn across chains & protocols. Spend without fees.",
+    logo: RebindLogo,
+    logoAlt: "Rebind logo",
+    url: "https://rebind.co/",
   },
 ];
 
