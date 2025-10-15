@@ -9,6 +9,7 @@ import {
   setBannerDismissalData,
   createDismissalData,
 } from "@/utils/bannerUtils";
+import { PARTNERS_URL } from "@/constants";
 
 interface PartnerBannerProps {
   className?: string;
@@ -36,7 +37,7 @@ export function PartnerBanner({ className }: PartnerBannerProps) {
   }
 
   return (
-    <Link to="/partners" className={cn(
+    <Link to={PARTNERS_URL} className={cn(
         "block relative rounded-lg overflow-hidden bg-card",
         "w-full cursor-pointer hover:bg-card/80 transition-colors",
         className
