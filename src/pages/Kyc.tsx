@@ -19,7 +19,9 @@ export const KycRoute = () => {
     // an issue happened during the KYC process, sumsub rejected the application
     // or an action is required, they need to contact your support
     if (kycStatusesRequiringContact.includes(user.kycStatus)) {
-      setError("Your KYC application has encountered an issue. Please contact support at help@gnosispay.com");
+      setError(
+        "Your KYC application has encountered an issue. Please contact support using the chat widget in the bottom right corner of the screen.",
+      );
       return;
     }
 

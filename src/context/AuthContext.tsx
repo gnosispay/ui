@@ -33,11 +33,14 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [jwt, setJwt] = useState<string | null>(null);
   const [jwtContainsUserId, setJwtContainsUserId] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [isLocaStorageLoading, setIsLocaStorageLoading] = useState(true);
+  const [contextKey, setContextKey] = useState(0);
   const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
   const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const renewalInProgressRef = useRef(false);
+  const previousAddressRef = useRef<string | undefined>(address);
   const jwtAddressKey = useMemo(() => {
     if (!address) return "";
     return `${LOCALSTORAGE_JWT_KEY}.${address}`;
@@ -57,12 +60,49 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       return;
     }
 
+    // Reset loading state when address changes
+    setIsLocaStorageLoading(true);
+
     const storedJwt = localStorage.getItem(jwtAddressKey);
 
     if (storedJwt) {
       setJwt(storedJwt);
+    } else {
+      // Clear JWT if no stored token for this address
+      setJwt(null);
     }
+
+    // Mark loading as complete after localStorage read
+    setIsLocaStorageLoading(false);
   }, [jwtAddressKey]);
+
+  // Handle app refresh when address changes
+  useEffect(() => {
+    const currentAddress = address;
+    const previousAddress = previousAddressRef.current;
+
+    // Skip on initial mount (when both are the same)
+    if (previousAddress === currentAddress) {
+      return;
+    }
+
+    // Skip if this is the first address being set (from undefined to an address)
+    if (previousAddress === undefined && currentAddress) {
+      previousAddressRef.current = currentAddress;
+      return;
+    }
+
+    // Address changed from one valid address to another - remount context children
+    if (previousAddress && currentAddress && previousAddress !== currentAddress) {
+      previousAddressRef.current = currentAddress;
+      setIsLocaStorageLoading(true);
+      setContextKey((prev) => prev + 1); // Force remount of children
+      return;
+    }
+
+    // Update the ref for other cases
+    previousAddressRef.current = currentAddress;
+  }, [address]);
 
   const isAuthenticated = useMemo(() => {
     const isExpired = isTokenExpired(jwt);
@@ -260,6 +300,11 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   }, [jwt, renewToken]);
 
   useEffect(() => {
+    // Don't proceed until localStorage loading is complete
+    if (isLocaStorageLoading) {
+      return;
+    }
+
     const expired = isTokenExpired(jwt);
 
     if (jwt !== null && !expired) {
@@ -268,7 +313,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     }
 
     renewToken();
-  }, [renewToken, jwt]);
+  }, [jwt, isLocaStorageLoading, renewToken]);
 
   const getJWT = useCallback(async () => {
     const expired = isTokenExpired(jwt);
@@ -293,7 +338,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         renewToken,
       }}
     >
-      {children}
+      <div key={contextKey}>{children}</div>
     </AuthContext.Provider>
   );
 };
