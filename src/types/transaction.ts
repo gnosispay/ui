@@ -13,6 +13,7 @@ export interface Erc20TokenEvent {
   from: Address;
   to: Address;
   value: bigint;
+  tokenAddress?: Address;
 }
 
 export enum TransactionType {

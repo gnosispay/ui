@@ -14,6 +14,7 @@ import { fromUnixTime } from "date-fns";
 import { GNOSIS_PAY_SETTLEMENT_ADDRESS } from "@/constants";
 import { Erc20TokenEventDirection } from "@/types/transaction";
 import type { Erc20TokenEvent } from "@/types/transaction";
+import { ERC20_ABI } from "./ERC20Abi";
 
 // Gnosis Chain average block time is approximately 5 seconds
 const GNOSIS_AVERAGE_BLOCK_TIME = 5;
@@ -47,37 +48,9 @@ const estimateBlockFromDate = async (provider: PublicClient, targetDate: Date): 
   }
 };
 
-const ERC20Abi = [
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "recipient",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "amount",
-        type: "uint256",
-      },
-    ],
-    name: "transfer",
-    outputs: [
-      {
-        internalType: "bool",
-        name: "success",
-        type: "bool",
-      },
-    ],
-    payable: false,
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-];
-
-export const encodeErc20Transfer = (recipient: string, amount: bigint) => {
+export const encodeErc20Transfer = (recipient: Address, amount: bigint) => {
   return encodeFunctionData({
-    abi: ERC20Abi,
+    abi: ERC20_ABI,
     functionName: "transfer",
     args: [recipient, amount],
   });
@@ -85,20 +58,20 @@ export const encodeErc20Transfer = (recipient: string, amount: bigint) => {
 
 export const decodeErc20Transfer = (data: Address) => {
   return decodeFunctionData({
-    abi: ERC20Abi,
+    abi: ERC20_ABI,
     data,
   });
 };
 
 export const fetchErc20Transfers = async ({
   address,
-  tokenAddress,
+  tokenAddresses,
   fromDate,
   toDate,
   skipSettlementTransfers,
 }: {
   address: Address;
-  tokenAddress: Address;
+  tokenAddresses?: Address | Address[];
   fromDate?: string;
   toDate?: string;
   skipSettlementTransfers: boolean;
@@ -108,6 +81,13 @@ export const fetchErc20Transfers = async ({
       chain: gnosis,
       transport: http(),
     });
+
+    // Determine which token addresses to fetch
+    const addressesToFetch = Array.isArray(tokenAddresses) ? tokenAddresses : [tokenAddresses];
+
+    if (addressesToFetch.length === 0) {
+      throw new Error("Either tokenAddress or tokenAddresses must be provided");
+    }
 
     // Calculate block range from date parameters
     let fromBlock = 0n;
@@ -124,22 +104,34 @@ export const fetchErc20Transfers = async ({
     const eventFilters = [{ from: address }, { to: address }];
     const transferEvent = parseAbiItem("event Transfer(address indexed from, address indexed to, uint256 value)");
 
-    const [outgoingEvents = [], incomingEvents = []] = await Promise.all(
-      eventFilters.map(
-        async (args) =>
-          await provider.getLogs({
-            address: tokenAddress,
-            event: transferEvent,
-            args,
-            fromBlock,
-            toBlock,
-          }),
-      ),
+    // Fetch events for all token addresses
+    const allEvents = await Promise.all(
+      addressesToFetch.map(async (tokenAddr) => {
+        const [outgoingEvents = [], incomingEvents = []] = await Promise.all(
+          eventFilters.map(
+            async (args) =>
+              await provider.getLogs({
+                address: tokenAddr,
+                event: transferEvent,
+                args,
+                fromBlock,
+                toBlock,
+              }),
+          ),
+        );
+
+        // Add tokenAddress to each event for later identification
+        const eventsWithToken = [...outgoingEvents, ...incomingEvents].map((event) => ({
+          ...event,
+          tokenAddress: tokenAddr,
+        }));
+
+        return eventsWithToken;
+      }),
     );
 
-    const events = [...outgoingEvents, ...incomingEvents].sort(
-      (event1, event2) => Number(event2.blockNumber) - Number(event1.blockNumber),
-    );
+    // Flatten and sort all events
+    const events = allEvents.flat().sort((event1, event2) => Number(event2.blockNumber) - Number(event1.blockNumber));
 
     const transfers = await Promise.all(
       events.map(async (event) => {
@@ -154,7 +146,7 @@ export const fetchErc20Transfers = async ({
 
         const parsedLog = parsedLogs[0];
         const { from, to, value } = parsedLog.args;
-        const { transactionHash, blockNumber } = event;
+        const { transactionHash, blockNumber, tokenAddress: eventTokenAddress } = event;
 
         if (!from || !to || value === undefined || !blockNumber || !transactionHash) {
           return null;
@@ -184,11 +176,14 @@ export const fetchErc20Transfers = async ({
           from,
           to,
           value,
+          tokenAddress: eventTokenAddress,
         };
       }),
     );
 
-    const filteredTransfers = transfers.filter((transfer): transfer is Erc20TokenEvent => transfer !== null);
+    const filteredTransfers = transfers.filter(
+      (transfer): transfer is NonNullable<typeof transfer> => transfer !== null,
+    );
 
     // Check if we've reached the genesis block (block 0)
     const reachedGenesisBlock = fromBlock === 0n;

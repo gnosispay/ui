@@ -1,5 +1,5 @@
 import { currencies, supportedTokens, type TokenInfo } from "@/constants";
-import { decodeErc20Transfer } from "@/lib/fetchErc20Transfers";
+import { decodeErc20Transfer } from "@/utils/fetchErc20Transfers";
 import { DelayedTransactionType, profileDelayedTransaction, type TransactionRequest } from "@gnosispay/account-kit";
 import { shortenAddress } from "./shortenAddress";
 import type { Address } from "viem";

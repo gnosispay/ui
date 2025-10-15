@@ -2,10 +2,10 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useM
 import { groupByDate } from "@/utils/transactionUtils";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { useUser } from "./UserContext";
-import { fetchErc20Transfers } from "@/lib/fetchErc20Transfers";
+import { fetchErc20Transfers } from "@/utils/fetchErc20Transfers";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { subDays, formatISO, format } from "date-fns";
-import { currencies } from "@/constants";
+import { currencies, supportedTokens } from "@/constants";
 import type { Address } from "viem";
 
 export const DEFAULT_ONCHAIN_TRANSACTIONS_DAYS = 30;
@@ -48,6 +48,10 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
     return safeCurrencyEntry?.address;
   }, [safeConfig?.tokenSymbol]);
 
+  const GNOAddress = useMemo(() => {
+    return supportedTokens.GNO.address;
+  }, []);
+
   // Sync ref with state to avoid dependency issues
   useEffect(() => {
     currentOldestDateRef.current = currentOldestDate;
@@ -89,9 +93,10 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
       const formattedFromDate = formatISO(fromDate);
       const formattedToDate = toDate ? formatISO(toDate) : undefined;
 
+      // Fetch transactions for both the user's currency token and GNO token
       const { data, error, reachedGenesisBlock } = await fetchErc20Transfers({
         address: safeConfig.address as Address,
-        tokenAddress: tokenAddress as Address,
+        tokenAddresses: [tokenAddress as Address, GNOAddress as Address],
         fromDate: formattedFromDate,
         toDate: formattedToDate,
         skipSettlementTransfers: true,
@@ -103,7 +108,8 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
           : "Error fetching onchain transactions";
         setOnchainTransactionsError(extractErrorMessage(error, errorMessage));
         console.error("Error fetching onchain transactions:", error);
-      } else if (data !== undefined) {
+      } else {
+        const combinedData = data || [];
         // Update hasNextPage based on whether we've reached genesis block
         if (reachedGenesisBlock) {
           setHasNextPage(false);
@@ -112,25 +118,31 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
         if (isLoadMore) {
           // Merge new transactions with existing ones (even if empty - that's fine)
           setOnchainTransactionsByDate((prev) => {
-            const combined = [...Object.values(prev).flat(), ...data];
+            const combined = [...Object.values(prev).flat(), ...combinedData];
             return groupByDate(combined);
           });
 
           // Update the oldest date - use the search fromDate if no transactions found
-          if (data.length > 0) {
-            const oldestTransaction = data.reduce((oldest, tx) => (tx.date < oldest.date ? tx : oldest), data[0]);
+          if (combinedData.length > 0) {
+            const oldestTransaction = combinedData.reduce(
+              (oldest, tx) => (tx.date < oldest.date ? tx : oldest),
+              combinedData[0],
+            );
             setCurrentOldestDate(oldestTransaction.date);
           } else {
             setCurrentOldestDate(fromDate);
           }
         } else {
           // Initial load - replace existing transactions
-          setOnchainTransactionsByDate(groupByDate(data));
+          setOnchainTransactionsByDate(groupByDate(combinedData));
           setHasNextPage(true); // Reset hasNextPage on initial load
 
           // Set the oldest date from initial load
-          if (data.length > 0) {
-            const oldestTransaction = data.reduce((oldest, tx) => (tx.date < oldest.date ? tx : oldest), data[0]);
+          if (combinedData.length > 0) {
+            const oldestTransaction = combinedData.reduce(
+              (oldest, tx) => (tx.date < oldest.date ? tx : oldest),
+              combinedData[0],
+            );
             setCurrentOldestDate(oldestTransaction.date);
           } else {
             setCurrentOldestDate(fromDate);
@@ -144,7 +156,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
         setOnchainTransactionsLoading(false);
       }
     },
-    [safeConfig?.address, tokenAddress],
+    [safeConfig?.address, tokenAddress, GNOAddress],
   );
 
   useEffect(() => {

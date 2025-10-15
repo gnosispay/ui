@@ -17,6 +17,8 @@ export interface CurrencyInfo {
 
 export type TokenInfo = Omit<CurrencyInfo, "fiatSymbol">;
 
+export const REWARD_ADDRESS = "0xCdF50be9061086e2eCfE6e4a1BF9164d43568EEC";
+
 export const currencies: Record<string, CurrencyInfo> = {
   EUR: {
     tokenSymbol: "EURe",
@@ -100,6 +102,11 @@ export const userTerms: Record<UserTermsTypeFromApi, { title: string; version: s
     url: "https://help.gnosispay.com/hc/en-us/articles/39723694982548-Gnosis-Pay-Privacy-and-Cookies-Policy",
   },
 };
+
+export const TROUBLE_LOGGING_IN_URL =
+  "https://help.gnosispay.com/hc/en-us/articles/41558567635988-The-Gnosis-Pay-Web-App";
+
+export const LEGAL_LINK = "https://help.gnosispay.com/hc/en-us/categories/41384871493524-Legal-Terms-and-Policies";
 
 export const GNOSIS_PAY_SETTLEMENT_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";
 

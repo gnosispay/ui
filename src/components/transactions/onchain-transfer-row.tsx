@@ -1,10 +1,11 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { CurrencyInfo } from "@/constants";
+import { supportedTokens, REWARD_ADDRESS } from "@/constants";
 import { Erc20TokenEventDirection, type Erc20TokenEvent } from "@/types/transaction";
-import { formatCurrency } from "@/utils/formatCurrency";
+import { formatTokenAmount } from "@/utils/formatCurrency";
 import { shortenAddress } from "@/utils/shortenAddress";
 import { format } from "date-fns";
-import { Minus, Plus } from "lucide-react";
+import { Minus, Plus, Gift } from "lucide-react";
 import { OnchainTransferDetailsModal } from "@/components/modals/transaction-details/onchain-transfer-details-modal";
 
 interface OnchainTransferRowProps {
@@ -24,10 +25,34 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
   }, []);
 
   const isIncoming = transfer.direction === Erc20TokenEventDirection.Incoming;
-  const sign = isIncoming ? "+" : "-";
-  const Icon = isIncoming ? Plus : Minus;
 
-  const formattedValue = formatCurrency(transfer.value.toString(), currency);
+  // Check if this is a reward transfer (from reward address)
+  const isRewardTransfer = useMemo(() => {
+    return transfer.from.toLowerCase() === REWARD_ADDRESS.toLowerCase();
+  }, [transfer.from]);
+
+  const sign = isIncoming ? "+" : "-";
+  const Icon = isRewardTransfer ? Gift : isIncoming ? Plus : Minus;
+
+  // Find matching supported token by address
+  const supportedTokenInfo = useMemo(() => {
+    if (!transfer.tokenAddress) return null;
+
+    const tokenEntry = Object.values(supportedTokens).find(
+      (token) => token.address?.toLowerCase() === transfer.tokenAddress?.toLowerCase(),
+    );
+    return tokenEntry || null;
+  }, [transfer.tokenAddress]);
+
+  // Use appropriate token info for formatting
+  const tokenInfo = useMemo(() => {
+    // Use supported token info if available, otherwise fall back to currency
+    return supportedTokenInfo || currency;
+  }, [supportedTokenInfo, currency]);
+
+  const formattedValue = useMemo(() => {
+    return formatTokenAmount(transfer.value.toString(), tokenInfo);
+  }, [transfer.value, tokenInfo]);
 
   return (
     <>
@@ -42,7 +67,9 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
           </div>
           <div className="flex flex-col">
             <div className="text-lg text-primary">
-              {isIncoming ? "From" : "To"} {shortenAddress(isIncoming ? transfer.from : transfer.to)}
+              {isRewardTransfer
+                ? "Reward"
+                : `${isIncoming ? "From" : "To"} ${shortenAddress(isIncoming ? transfer.from : transfer.to)}`}
             </div>
             <div className="text-xs text-secondary mt-1">{format(transfer.date, "HH:mm")}</div>
           </div>
@@ -54,7 +81,7 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
 
       <OnchainTransferDetailsModal
         transfer={transfer}
-        currency={currency}
+        currency={tokenInfo}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
       />

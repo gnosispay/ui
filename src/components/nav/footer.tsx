@@ -5,7 +5,7 @@ import { MessageCircle } from "lucide-react";
 import { useZendesk } from "react-use-zendesk";
 import { useCallback, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/utils/cn";
 
 export const FooterNavBar = () => {
   const { open, show } = useZendesk();
