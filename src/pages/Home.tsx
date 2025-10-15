@@ -108,6 +108,7 @@ export const Home = () => {
     try {
       // Step 1: Generate PKCE parameters
       const codeVerifier = generateCodeVerifier();
+
       const codeChallenge = await generateCodeChallenge(codeVerifier);
 
       // Step 2: Generate nonce and create SIWE message
@@ -122,7 +123,7 @@ export const Home = () => {
         resources: ["https://monerium.com/siwe", userTerms["privacy-policy"].url, userTerms["general-tos"].url],
         issuedAt: new Date(),
         expirationTime: new Date(Date.now() + 60 * 60 * 1000),
-        statement: "Allow My Gnosis Pay to access my data on Monerium",
+        statement: "Allow Gnosis Pay to access my data on Monerium",
       });
 
       // Step 3: Request user signature

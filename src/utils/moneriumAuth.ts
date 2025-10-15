@@ -95,6 +95,8 @@ export const sendMoneriumAuthRequest = async ({
   });
 };
 
+const CODE_CHALLENGE_LOCAL_STORAGE_KEY = "gp-ui.code-challenge";
+
 export async function generateCodeChallenge(codeVerifier: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(codeVerifier);
@@ -105,7 +107,13 @@ export async function generateCodeChallenge(codeVerifier: string): Promise<strin
   const base64 = btoa(String.fromCharCode(...hashArray));
 
   // Convert to base64url format (no padding, + to -, / to _)
-  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  const result = base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  localStorage.setItem(CODE_CHALLENGE_LOCAL_STORAGE_KEY, result);
+  return result;
+}
+
+export function getCodeChallenge(): string {
+  return localStorage.getItem(CODE_CHALLENGE_LOCAL_STORAGE_KEY) || "";
 }
 
 export function generateCodeVerifier(length = 64): string {
