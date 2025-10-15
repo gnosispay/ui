@@ -8,7 +8,7 @@ import {
   createDismissalData,
 } from "@/utils/bannerUtils";
 import { IbanIntegrationModal } from "@/components/modals/iban-integration-modal";
-// import { useIBAN } from "@/context/IBANContext";
+import { useIBAN } from "@/context/IBANContext";
 
 interface IbanBannerProps {
   className?: string;
@@ -17,9 +17,8 @@ interface IbanBannerProps {
 export function IbanBanner({ className }: IbanBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const { hasIbanSet, isEligibleForIban } = useIBAN();
-const hasIbanSet = false;
-const isEligibleForIban = true;
+  const { hasIbanSet, isEligibleForIban } = useIBAN();
+
 
   useEffect(() => {
     // Only show if user doesn't have IBAN set
