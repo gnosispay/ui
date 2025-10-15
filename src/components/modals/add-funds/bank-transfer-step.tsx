@@ -18,7 +18,7 @@ export const BankTransferStep = ({ onBack }: BankTransferStepProps) => {
         </Button>
         <div className="flex items-center gap-3">
           <p className="text-sm text-muted-foreground">
-            Use these account details to send {safeConfig?.fiatSymbol} to your Gnosis Pay Card account
+            Use these account details to send {safeConfig?.fiatSymbol} to your linked account
           </p>
         </div>
       </div>

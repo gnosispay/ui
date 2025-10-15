@@ -26,10 +26,6 @@ export const AccountDetailsModal = ({ open, onOpenChange }: AccountDetailsModalP
         </DialogHeader>
 
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Use these account details to send {safeConfig?.fiatSymbol} to your Gnosis Pay Card account.
-          </p>
-
           {/* Tab Navigation */}
           <div className="flex bg-muted/50 rounded-lg p-1">
             <button
