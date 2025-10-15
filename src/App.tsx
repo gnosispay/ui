@@ -1,5 +1,6 @@
 import { HeaderNavBar } from "./components/nav/header";
 import { Route, Routes, Outlet, Navigate } from "react-router-dom";
+import { useEffect } from "react";
 import { CardsRoute } from "./pages/Cards";
 import { Home } from "./pages/Home";
 import { FooterNavBar } from "./components/nav/footer";
@@ -9,11 +10,19 @@ import { KycRoute } from "./pages/Kyc";
 import { SafeDeploymentRoute } from "./pages/SafeDeployment";
 import { AuthGuard } from "@/components/AuthGuard";
 import { AccountRoute } from "./pages/Account";
-import { PartnersRoute } from "./pages/Partners";
 import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
 import { useZendeskUserId } from "./hooks/useZendeskUserId";
 import { AppLoader } from "./components/AppLoader";
 import { useAppInitialization } from "./hooks/useAppInitialization";
+import { PARTNERS_URL } from "./constants";
+
+const ExternalRedirect = ({ url }: { url: string }) => {
+  useEffect(() => {
+    window.location.href = url;
+  }, [url]);
+
+  return <div className="p-4">Redirecting to {url}...</div>;
+};
 
 export const menuRoutes = [
   {
@@ -37,11 +46,6 @@ export const menuRoutes = [
 ];
 
 const publicRoutes = [
-  {
-    path: "/partners",
-    element: <PartnersRoute />,
-    label: "Apps",
-  },
   {
     path: "/register",
     element: <SignUpRoute />,
@@ -76,7 +80,11 @@ const publicRoutes = [
   },
   {
     path: "/activation/choose-partner",
-    element: <Navigate to="/partners" replace />,
+    element: <ExternalRedirect url={PARTNERS_URL} />,
+  },
+  {
+    path: "/partners",
+    element: <ExternalRedirect url={PARTNERS_URL} />,
   },
 ];
 
