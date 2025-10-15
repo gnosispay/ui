@@ -6,13 +6,13 @@ export interface BannerDismissalData {
   count: number;
 }
 
-export type BannerType = 'partner' | 'iban';
+export type BannerType = "partner" | "iban";
 
 function getBannerStorageKey(bannerType: BannerType): string {
   switch (bannerType) {
-    case 'partner':
+    case "partner":
       return PARTNER_BANNER_STORAGE_KEY;
-    case 'iban':
+    case "iban":
       return IBAN_BANNER_STORAGE_KEY;
     default:
       throw new Error(`Unknown banner type: ${bannerType}`);
@@ -37,14 +37,14 @@ export function shouldShowBanner(dismissalData: BannerDismissalData | null): boo
   return Date.now() >= dismissalData.nextShowTimestamp;
 }
 
-export function getBannerDismissalData(bannerType: BannerType = 'partner'): BannerDismissalData | null {
+export function getBannerDismissalData(bannerType: BannerType = "partner"): BannerDismissalData | null {
   try {
     const storageKey = getBannerStorageKey(bannerType);
     const stored = localStorage.getItem(storageKey);
     if (!stored) return null;
 
     // Handle legacy format (just "true") - only for partner banner
-    if (stored === "true" && bannerType === 'partner') {
+    if (stored === "true" && bannerType === "partner") {
       return null; // Treat as never dismissed to show banner again
     }
 
@@ -54,7 +54,7 @@ export function getBannerDismissalData(bannerType: BannerType = 'partner'): Bann
   }
 }
 
-export function setBannerDismissalData(data: BannerDismissalData, bannerType: BannerType = 'partner'): void {
+export function setBannerDismissalData(data: BannerDismissalData, bannerType: BannerType = "partner"): void {
   const storageKey = getBannerStorageKey(bannerType);
   localStorage.setItem(storageKey, JSON.stringify(data));
 }

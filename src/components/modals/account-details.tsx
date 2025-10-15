@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useUser } from "@/context/UserContext";
-import { IbanAccountDetails } from "./IbanAccountDetails";
-import { SafeAccountDetails } from "./SafeAccountDetails";
+import { IbanAccountDetails } from "../account/IbanAccountDetails";
+import { SafeAccountDetails } from "../account/SafeAccountDetails";
 
 interface AccountDetailsModalProps {
   open: boolean;
@@ -15,7 +14,6 @@ enum AccountDetailsTab {
 }
 
 export const AccountDetailsModal = ({ open, onOpenChange }: AccountDetailsModalProps) => {
-  const { safeConfig } = useUser();
   const [activeTab, setActiveTab] = useState<AccountDetailsTab>(AccountDetailsTab.SAFE);
 
   return (
