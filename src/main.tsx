@@ -13,6 +13,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
+import { IBANContextProvider } from "./context/IBANContext.tsx";
 import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
 import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
@@ -52,8 +53,9 @@ ReactDOM.createRoot(rootElement).render(
           <RainbowKitWrapper>
             <AuthContextProvider>
               <UserContextProvider>
-                <ZendeskProvider apiKey={zendeskKey}>
-                  <CardsContextProvider>
+                <IBANContextProvider>
+                  <ZendeskProvider apiKey={zendeskKey}>
+                    <CardsContextProvider>
                     <OrdersContextProvider>
                       <CardTransactionsContextProvider>
                         <OnchainTransactionsContextProvider>
@@ -68,6 +70,7 @@ ReactDOM.createRoot(rootElement).render(
                     </OrdersContextProvider>
                   </CardsContextProvider>
                 </ZendeskProvider>
+                </IBANContextProvider>
               </UserContextProvider>
             </AuthContextProvider>
           </RainbowKitWrapper>
