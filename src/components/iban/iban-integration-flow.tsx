@@ -51,9 +51,9 @@ export function IbanIntegrationFlow({ onSuccess, onCancel, showCancelButton = tr
         message: messageToSign.data.message,
       });
 
-      const { data: postMoneriumProfile, error: postMoneriumProfileError } = await postApiV1IntegrationsMonerium({
+      const { error: postMoneriumProfileError } = await postApiV1IntegrationsMonerium({
         body: {
-          signature: signature,
+          signature,
         },
       });
 
@@ -64,8 +64,6 @@ export function IbanIntegrationFlow({ onSuccess, onCancel, showCancelButton = tr
         setError(message ?? "Failed to create Monerium integration");
         return;
       }
-
-      console.log("postMoneriumProfile", postMoneriumProfile);
 
       setSuccess(true);
       refreshUser();
