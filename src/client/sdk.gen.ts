@@ -20,6 +20,7 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 
 /**
  * Retrieve Account Balance
+ *
  * Retrieves the balance information for the authenticated user (total, spendable and pending balances)
  */
 export const getApiV1AccountBalances = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountBalancesData, ThrowOnError>) => {
@@ -37,6 +38,7 @@ export const getApiV1AccountBalances = <ThrowOnError extends boolean = false>(op
 
 /**
  * Create or Deploy a Safe (pending Setup)
+ *
  * This endpoint serves two purposes - it first checks if a Safe account exists for the user. If no account exists, it creates one and initiates deployment.
  * If an account already exists but is not deployed, it initiates the deployment process.
  *
@@ -55,6 +57,7 @@ export const getApiV1AccountBalances = <ThrowOnError extends boolean = false>(op
  * the KYC process successfully.
  * - Then, the user should call the `/api/v1/account/signature-payload` endpoint to get the signature data for the account setup.
  * - Finally, the user should call the `/api/v1/account/deploy-safe-modules` endpoint to deploy the Safe modules with the user's signature.
+ *
  *
  * @deprecated
  */
@@ -77,6 +80,7 @@ export const postApiV1Account = <ThrowOnError extends boolean = false>(options: 
 
 /**
  * Retrieve Signature Data for Account Setup
+ *
  * Returns the domain, types, and message objects needed for EIP-712 typed data signing.
  * This is typically used to prepare the data that needs to be signed by the user's wallet
  * to set up account allowances and delays.
@@ -88,6 +92,7 @@ export const postApiV1Account = <ThrowOnError extends boolean = false>(options: 
  * Prerequisites:
  * - User must have a deployed Safe account
  * - The Safe account must have a currency set (via `/api/v1/safe/set-currency`)
+ *
  *
  * @deprecated
  */
@@ -106,6 +111,7 @@ export const getApiV1AccountSignaturePayload = <ThrowOnError extends boolean = f
 
 /**
  * Setup Safe with Signature
+ *
  * Takes an EIP-712 signature provided by the user's wallet and executes the account setup transaction.
  * This is the second step in the account setup process, after obtaining the signature data
  * from the GET /api/v1/account/signature-payload endpoint.
@@ -125,6 +131,7 @@ export const getApiV1AccountSignaturePayload = <ThrowOnError extends boolean = f
  * - User must have a deployed Safe account
  * - The Safe account must have a currency set (via /api/v1/safe/set-currency)
  * - User must have signed the data from GET /api/v1/account/signature-payload
+ *
  *
  * @deprecated
  */
@@ -171,7 +178,8 @@ export const postApiV1AuthChallenge = <ThrowOnError extends boolean = false>(opt
 
 /**
  * Create a new User
- * This endpoint creates a new `User` associating it with the provided email address. During transition period, OTP verification is optional.
+ *
+ * This endpoint creates a new `User` associating it with the provided email address.
  */
 export const postApiV1AuthSignup = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupData, ThrowOnError>) => {
     return (options.client ?? client).post<PostApiV1AuthSignupResponses, PostApiV1AuthSignupErrors, ThrowOnError>({
@@ -192,6 +200,7 @@ export const postApiV1AuthSignup = <ThrowOnError extends boolean = false>(option
 
 /**
  * Request OTP for email verification
+ *
  * This endpoint generates and sends a one-time password (OTP) to the provided email address for verification purposes.
  */
 export const postApiV1AuthSignupOtp = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupOtpData, ThrowOnError>) => {
@@ -207,6 +216,7 @@ export const postApiV1AuthSignupOtp = <ThrowOnError extends boolean = false>(opt
 
 /**
  * Activate a Card
+ *
  * ## Prerequisites
  * - Card must have not been activated
  * - A Safe Account should be set for the authenticated user
@@ -242,6 +252,7 @@ export const postApiV1CardsByCardIdActivate = <ThrowOnError extends boolean = fa
 
 /**
  * Freeze a Card
+ *
  * This will prevent the card from being used for any transactions.
  *
  * :::info
@@ -312,6 +323,7 @@ export const postApiV1CardsByCardIdStolen = <ThrowOnError extends boolean = fals
 
 /**
  * Revert a Card freeze
+ *
  * This will allow the card to be used for transactions. The card needs to be active and in a frozen state.
  *
  * :::info
@@ -334,6 +346,7 @@ export const postApiV1CardsByCardIdUnfreeze = <ThrowOnError extends boolean = fa
 
 /**
  * Void a Virtual Card
+ *
  * Void a virtual card. Only virtual cards can be voided using this endpoint.
  */
 export const postApiV1CardsByCardIdVoid = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdVoidData, ThrowOnError>) => {
@@ -367,6 +380,7 @@ export const getApiV1Cards = <ThrowOnError extends boolean = false>(options?: Op
 
 /**
  * Create a Virtual Card
+ *
  * Creates a virtual card without requiring a Card Order.
  * Virtual cards are free and activated immediately.
  * No shipping address or payment validation is required.
@@ -390,6 +404,7 @@ export const postApiV1CardsVirtual = <ThrowOnError extends boolean = false>(opti
 
 /**
  * List Card Transactions
+ *
  * Retrieves paginated transactions for all activated cards of the authenticated user.
  *
  * Returns three types of transaction events:
@@ -415,6 +430,7 @@ export const getApiV1CardsTransactions = <ThrowOnError extends boolean = false>(
 
 /**
  * List Delayed Transactions
+ *
  * Returns an array of delayed transactions associated with the authenticated user, excluding failed transactions.
  */
 export const getApiV1DelayRelay = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DelayRelayData, ThrowOnError>) => {
@@ -432,6 +448,7 @@ export const getApiV1DelayRelay = <ThrowOnError extends boolean = false>(options
 
 /**
  * List Physical Card Orders
+ *
  * Retrieves all physical card orders for the authenticated user
  */
 export const getApiV1Order = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1OrderData, ThrowOnError>) => {
@@ -449,6 +466,7 @@ export const getApiV1Order = <ThrowOnError extends boolean = false>(options?: Op
 
 /**
  * Retrieve Safe Configuration
+ *
  * Returns the configuration of the Safe account associated with the authenticated user, including deployment status, approvals, and account status and allowance details from the chain.
  */
 export const getApiV1SafeConfig = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SafeConfigData, ThrowOnError>) => {
@@ -466,6 +484,7 @@ export const getApiV1SafeConfig = <ThrowOnError extends boolean = false>(options
 
 /**
  * Get the Safe deployment status.
+ *
  * Returns the deployment status of the Safe account for the authenticated user.
  */
 export const getApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SafeDeployData, ThrowOnError>) => {
@@ -483,6 +502,7 @@ export const getApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options
 
 /**
  * Deploy and Setup a Safe
+ *
  * Deploys and sets up the Safe account for the authenticated user.
  * The User needs to be KYC approved.
  *
@@ -507,6 +527,7 @@ export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(option
 
 /**
  * Set Safe Currency
+ *
  * This endpoint sets the appropriate token symbol (currency) for a user's Safe account based on their country.
  * It should be called after deploying a Safe account using the /api/v1/account endpoint.
  *
@@ -516,6 +537,7 @@ export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(option
  * - Users from other countries: EURe (default)
  *
  * Prerequisite: User must have completed and passed KYC verification.
+ *
  *
  * @deprecated
  */
@@ -570,6 +592,7 @@ export const postApiV1SourceOfFunds = <ThrowOnError extends boolean = false>(opt
 
 /**
  * Dispute a Transaction
+ *
  * Create a ticket to dispute a transaction. The list of available dispute reason keys can be found in the `GET /api/v1/transactions/dispute` endpoint.
  * If the dispute reason is `unrecognized_transaction_report_fraudulent`, the user's card will be restricted.
  *
@@ -593,6 +616,7 @@ export const postApiV1TransactionsByThreadIdDispute = <ThrowOnError extends bool
 
 /**
  * List Dispute Reasons
+ *
  * Returns a list of available dispute reasons keys with their human-readable text. The keys need to be used in the dispute reason field when creating a dispute.
  */
 export const getApiV1TransactionsDispute = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1TransactionsDisputeData, ThrowOnError>) => {
@@ -610,7 +634,9 @@ export const getApiV1TransactionsDispute = <ThrowOnError extends boolean = false
 
 /**
  * List Transactions (without pagination)
+ *
  * This endpoint is deprecated. Please use [/api/v1/cards/transactions](#/Transactions/get_api_v1_cards_transactions) instead. Retrieves transactions for all activated cards of the authenticated user
+ *
  *
  * @deprecated
  */
@@ -649,6 +675,7 @@ export const postApiV1VerificationCheck = <ThrowOnError extends boolean = false>
 
 /**
  * Retrieve an OTP code to verify a Phone Number
+ *
  * This call replaces the existing phone number for a user if it exists, whether it's verified or not.
  */
 export const postApiV1Verification = <ThrowOnError extends boolean = false>(options: Options<PostApiV1VerificationData, ThrowOnError>) => {
@@ -670,6 +697,7 @@ export const postApiV1Verification = <ThrowOnError extends boolean = false>(opti
 
 /**
  * Get current daily spending limit
+ *
  * Retrieves the current daily spending limit for the authenticated user's Safe account.
  */
 export const getApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountsDailyLimitData, ThrowOnError>) => {
@@ -687,6 +715,7 @@ export const getApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>
 
 /**
  * Set new daily spending limit
+ *
  * Sets a new daily spending limit for the authenticated user's Safe account.
  *
  * The signature should be generated by signing the EIP-712 typed data obtained from
@@ -717,6 +746,7 @@ export const putApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>
 
 /**
  * Get EIP-712 typed data for setting daily limit
+ *
  * Returns the EIP-712 typed data that needs to be signed by the user's wallet to set a new daily limit.
  * This endpoint is used as part of a three-step process:
  * 1. Call this endpoint to get the EIP-712 typed data
@@ -741,10 +771,12 @@ export const getApiV1AccountsDailyLimitTransactionData = <ThrowOnError extends b
 
 /**
  * Retrieve Onchain Daily Limit
+ *
  * This endpoint is deprecated and will be removed in a future version.
  * Please use `GET /api/v1/accounts/daily-limit` instead.
  *
  * Retrieves the current onchain daily spending limit for the authenticated user's Safe account.
+ *
  *
  * @deprecated
  */
@@ -763,6 +795,7 @@ export const getApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
 
 /**
  * Change Onchain Daily Limit with Signature
+ *
  * This endpoint is deprecated and will be removed in a future version.
  * Please use `PUT /api/v1/accounts/daily-limit` instead.
  *
@@ -775,6 +808,7 @@ export const getApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
  * The limit update is processed through a delay relay mechanism that executes after 3 minutes.
  *
  * **Note:** The onchainDailyLimit must be an integer value between 1 and 8000.
+ *
  *
  * @deprecated
  */
@@ -797,6 +831,7 @@ export const putApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
 
 /**
  * Retrieve Transaction Data for changing Daily Limit
+ *
  * This endpoint is deprecated and will be removed in a future version.
  * Please use `GET /api/v1/accounts/daily-limit/transaction-data` instead.
  *
@@ -807,6 +842,7 @@ export const putApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
  * 3. Submit the signature to the PUT `/api/v1/accounts/onchain-daily-limit` endpoint
  *
  * **Note:** The onchainDailyLimit must be an integer value between 1 and 8000.
+ *
  *
  * @deprecated
  */
@@ -825,6 +861,7 @@ export const getApiV1AccountsOnchainDailyLimitTransactionData = <ThrowOnError ex
 
 /**
  * Withdraw from Safe with Signature
+ *
  * Withdraws ERC20 tokens or native tokens (xDAI) from the user's Safe account.
  *
  * For ERC20 tokens, provide the token contract address.
@@ -855,6 +892,7 @@ export const postApiV1AccountsWithdraw = <ThrowOnError extends boolean = false>(
 
 /**
  * Retrieve Transaction Data for Withdrawing from Safe
+ *
  * Returns the EIP-712 typed data that needs to be signed by the user's wallet to withdraw ERC20 tokens or native tokens (xDAI) from the user's Safe account.
  *
  * For ERC20 tokens, provide the token contract address.
@@ -881,6 +919,7 @@ export const getApiV1AccountsWithdrawTransactionData = <ThrowOnError extends boo
 
 /**
  * List authenticated account addresses
+ *
  * Returns a list of addresses associated with the authenticated user.
  */
 export const getApiV1EoaAccounts = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1EoaAccountsData, ThrowOnError>) => {
@@ -898,6 +937,7 @@ export const getApiV1EoaAccounts = <ThrowOnError extends boolean = false>(option
 
 /**
  * Add a new account address for authentication
+ *
  * Registers a new authenticated account address for the authenticated user.
  * This address can be used to sign in via SIWE and to start new API sessions.
  *
@@ -921,6 +961,7 @@ export const postApiV1EoaAccounts = <ThrowOnError extends boolean = false>(optio
 
 /**
  * Remove account address for authentication
+ *
  * Removes the account address associated with the authenticated user.
  */
 export const deleteApiV1EoaAccountsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1EoaAccountsByIdData, ThrowOnError>) => {
@@ -938,6 +979,7 @@ export const deleteApiV1EoaAccountsById = <ThrowOnError extends boolean = false>
 
 /**
  * Check IBAN Availability
+ *
  * Returns whether the user is eligible to enable an IBAN on their account.
  */
 export const getApiV1IbansAvailable = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansAvailableData, ThrowOnError>) => {
@@ -954,102 +996,8 @@ export const getApiV1IbansAvailable = <ThrowOnError extends boolean = false>(opt
 };
 
 /**
- * Retrieve IBAN details
- * Returns IBAN details including the IBAN number, BIC, and Status.
- */
-export const getApiV1IbansDetails = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansDetailsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansDetailsResponses, GetApiV1IbansDetailsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/details',
-        ...options
-    });
-};
-
-/**
- * Create a new Monerium profile
- * This endpoint attempts to create a new Monerium profile for the authenticated user. If the user already has a Monerium profile, it will return a redirect URL for the OAuth flow to link the existing profile.
- * @deprecated
- */
-export const postApiV1IbansMoneriumProfile = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IbansMoneriumProfileData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1IbansMoneriumProfileResponses, PostApiV1IbansMoneriumProfileErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/monerium-profile',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
-
-/**
- * Retrieves the redirect URL for the Monerium oAuth flow
- * This is the same URL we return on /monerium-profile,
- * in the case something goes wrong you have this endpoint
- * if you need to redirect your users without calling /monerium-profile.
- *
- * @deprecated
- */
-export const getApiV1IbansOauthRedirectUrl = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOauthRedirectUrlData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOauthRedirectUrlErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/oauth/redirect_url',
-        ...options
-    });
-};
-
-/**
- * Resets the IBAN integration for this User
- * Remove the IBAN information from our DB and deletes the User's IBAN functionality.
- */
-export const deleteApiV1IbansReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1IbansResetData, ThrowOnError>) => {
-    return (options?.client ?? client).delete<DeleteApiV1IbansResetResponses, DeleteApiV1IbansResetErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/reset',
-        ...options
-    });
-};
-
-/**
- * Retrieve a list of Monerium IBAN orders
- * Returns a list of IBAN orders associated with the authenticated user.
- * @deprecated
- */
-export const getApiV1IbansOrders = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOrdersData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansOrdersResponses, GetApiV1IbansOrdersErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/orders',
-        ...options
-    });
-};
-
-/**
  * Get the message that needs to be signed for IBAN activation
+ *
  * Returns the standard message that users need to sign with their wallet to verify ownership for Monerium IBAN activation.
  */
 export const getApiV1IbansSigningMessage = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansSigningMessageData, ThrowOnError>) => {
@@ -1067,6 +1015,7 @@ export const getApiV1IbansSigningMessage = <ThrowOnError extends boolean = false
 
 /**
  * Create a new Monerium integration
+ *
  * Creates a new Monerium integration for the authenticated user and associates it with the authenticated user's EOA address.
  * All operations on Monerium are done through their API, this endpoint is just a way to reuse the GP KYC to open an account on Monerium.
  *
@@ -1095,7 +1044,115 @@ export const postApiV1IntegrationsMonerium = <ThrowOnError extends boolean = fal
 };
 
 /**
+ * Retrieve IBAN details
+ *
+ * Returns IBAN details including the IBAN number, BIC, and Status.
+ *
+ * @deprecated
+ */
+export const getApiV1IbansDetails = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansDetailsData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetApiV1IbansDetailsResponses, GetApiV1IbansDetailsErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/ibans/details',
+        ...options
+    });
+};
+
+/**
+ * Create a new Monerium profile
+ *
+ * This endpoint attempts to create a new Monerium profile for the authenticated user. If the user already has a Monerium profile, it will return a redirect URL for the OAuth flow to link the existing profile.
+ *
+ * @deprecated
+ */
+export const postApiV1IbansMoneriumProfile = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IbansMoneriumProfileData, ThrowOnError>) => {
+    return (options.client ?? client).post<PostApiV1IbansMoneriumProfileResponses, PostApiV1IbansMoneriumProfileErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/ibans/monerium-profile',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
+ * Retrieves the redirect URL for the Monerium oAuth flow
+ *
+ * This is the same URL we return on /monerium-profile,
+ * in the case something goes wrong you have this endpoint
+ * if you need to redirect your users without calling /monerium-profile.
+ *
+ *
+ * @deprecated
+ */
+export const getApiV1IbansOauthRedirectUrl = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOauthRedirectUrlData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOauthRedirectUrlErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/ibans/oauth/redirect_url',
+        ...options
+    });
+};
+
+/**
+ * Resets the IBAN integration for this User
+ *
+ * Remove the IBAN information from our DB and deletes the User's IBAN functionality.
+ *
+ * @deprecated
+ */
+export const deleteApiV1IbansReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1IbansResetData, ThrowOnError>) => {
+    return (options?.client ?? client).delete<DeleteApiV1IbansResetResponses, DeleteApiV1IbansResetErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/ibans/reset',
+        ...options
+    });
+};
+
+/**
+ * Retrieve a list of Monerium IBAN orders
+ *
+ * Returns a list of IBAN orders associated with the authenticated user.
+ *
+ * @deprecated
+ */
+export const getApiV1IbansOrders = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOrdersData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetApiV1IbansOrdersResponses, GetApiV1IbansOrdersErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/ibans/orders',
+        ...options
+    });
+};
+
+/**
  * Retrieve Link for Web Integration
+ *
  * Retrieve the specification to follow with the KYC integration.
  */
 export const getApiV1KycIntegration = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1KycIntegrationData, ThrowOnError>) => {
@@ -1113,6 +1170,7 @@ export const getApiV1KycIntegration = <ThrowOnError extends boolean = false>(opt
 
 /**
  * Retrieve Access Token for Sumsub SDK Integration
+ *
  * Retrieve the specification to follow with the KYC integration.
  */
 export const getApiV1KycIntegrationSdk = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1KycIntegrationSdkData, ThrowOnError>) => {
@@ -1150,6 +1208,7 @@ export const postApiV1KycImportPartnerApplicant = <ThrowOnError extends boolean 
 
 /**
  * Create a Physical Card
+ *
  * The last step in the physical card creation process.
  *
  * **Validation Requirements:**
@@ -1182,6 +1241,7 @@ export const postApiV1OrderByOrderIdCreateCard = <ThrowOnError extends boolean =
 
 /**
  * Register payment for a Physical Card Order
+ *
  * This endpoint associates a provided on-chain transaction hash with an existing card order by its `orderId`. If the card is free, you can skip this step.
  */
 export const putApiV1OrderByOrderIdAttachTransaction = <ThrowOnError extends boolean = false>(options: Options<PutApiV1OrderByOrderIdAttachTransactionData, ThrowOnError>) => {
@@ -1203,6 +1263,7 @@ export const putApiV1OrderByOrderIdAttachTransaction = <ThrowOnError extends boo
 
 /**
  * Attach a coupon to a Physical Card Order
+ *
  * This endpoint associates a provided coupon code with an existing card order by its `orderId`. Use the `GPDOCS` coupon code to get the card for free.
  */
 export const postApiV1OrderByOrderIdAttachCoupon = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdAttachCouponData, ThrowOnError>) => {
@@ -1224,6 +1285,7 @@ export const postApiV1OrderByOrderIdAttachCoupon = <ThrowOnError extends boolean
 
 /**
  * Retrieve details of a Physical Card Order
+ *
  * This endpoint retrieves details of a card order by its `orderId`.
  */
 export const getApiV1OrderByOrderId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OrderByOrderIdData, ThrowOnError>) => {
@@ -1241,6 +1303,7 @@ export const getApiV1OrderByOrderId = <ThrowOnError extends boolean = false>(opt
 
 /**
  * Confirm the payment for a Physical Card Order
+ *
  * This endpoint marks the Card Order with `orderId` as paid. Even if the card is free, you need to call this endpoint to confirm the payment.
  */
 export const putApiV1OrderByOrderIdConfirmPayment = <ThrowOnError extends boolean = false>(options: Options<PutApiV1OrderByOrderIdConfirmPaymentData, ThrowOnError>) => {
@@ -1258,6 +1321,7 @@ export const putApiV1OrderByOrderIdConfirmPayment = <ThrowOnError extends boolea
 
 /**
  * Cancel a Physical Card Order
+ *
  * This endpoint transitions the card order to the cancelled state.
  */
 export const postApiV1OrderByOrderIdCancel = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdCancelData, ThrowOnError>) => {
@@ -1275,6 +1339,7 @@ export const postApiV1OrderByOrderIdCancel = <ThrowOnError extends boolean = fal
 
 /**
  * Create Physical Card Order
+ *
  * Orders a new physical card for the authenticated user.
  * This is the first step in the physical card order process, the card is not created yet.
  *
@@ -1303,6 +1368,7 @@ export const postApiV1OrderCreate = <ThrowOnError extends boolean = false>(optio
 
 /**
  * Remove Safe Owner
+ *
  * Removes an existing owner from the user's Safe account.
  *
  * The signature should be generated by signing the transaction data obtained from
@@ -1330,6 +1396,7 @@ export const deleteApiV1Owners = <ThrowOnError extends boolean = false>(options:
 
 /**
  * List Safe Owners
+ *
  * Returns the list of addresses that are owners of the user's Safe account.
  * These owners have the ability to sign transactions and manage the Safe.
  *
@@ -1349,6 +1416,7 @@ export const getApiV1Owners = <ThrowOnError extends boolean = false>(options?: O
 
 /**
  * Add Safe Owner
+ *
  * Adds a new owner to the user's Safe account.
  *
  * The signature should be generated by signing the transaction data obtained from
@@ -1376,6 +1444,7 @@ export const postApiV1Owners = <ThrowOnError extends boolean = false>(options: O
 
 /**
  * Get typed data for adding a Safe Owner
+ *
  * Returns the EIP-712 typed data that needs to be signed by the user's wallet to add a new owner to the Safe.
  * This endpoint is used as part of a three-step process:
  * 1. Call this endpoint to get the EIP-712 typed data
@@ -1398,6 +1467,7 @@ export const getApiV1OwnersAddTransactionData = <ThrowOnError extends boolean = 
 
 /**
  * Get typed data for removing a Safe Owner
+ *
  * Returns the EIP-712 typed data that needs to be signed by the user's wallet to remove an owner from the Safe.
  * This endpoint is used as part of a three-step process:
  * 1. Call this endpoint to get the EIP-712 typed data
@@ -1420,6 +1490,7 @@ export const getApiV1OwnersRemoveTransactionData = <ThrowOnError extends boolean
 
 /**
  * Retrieve Rewards Information
+ *
  * Returns user's OG status, GNO balance of Safe, and calculated base cashback rate.
  * Note that the cashbackRate returned does not include the +1% bonus for OG NFT holders - to get the total cashback rate, add 1% to the cashbackRate if isOg is true.
  *
@@ -1439,6 +1510,7 @@ export const getApiV1Rewards = <ThrowOnError extends boolean = false>(options?: 
 
 /**
  * Retrieve Terms and Conditions Status
+ *
  * Returns the status of all terms and conditions, including whether the user has accepted
  * the latest version, when they were accepted, and links to the terms documents.
  *
@@ -1458,6 +1530,7 @@ export const getApiV1UserTerms = <ThrowOnError extends boolean = false>(options?
 
 /**
  * Accept Terms and Conditions
+ *
  * Accept specific terms and conditions based on type and version.
  */
 export const postApiV1UserTerms = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UserTermsData, ThrowOnError>) => {
@@ -1479,6 +1552,7 @@ export const postApiV1UserTerms = <ThrowOnError extends boolean = false>(options
 
 /**
  * Retrieve User profile
+ *
  * Get the User profile information.
  */
 export const getApiV1User = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserData, ThrowOnError>) => {
@@ -1496,6 +1570,7 @@ export const getApiV1User = <ThrowOnError extends boolean = false>(options?: Opt
 
 /**
  * Retrieve Message to Sign for Webhook Subscription
+ *
  * Generates a message for the user to sign. This message must be sent on `POST /api/v1/webhooks/subscribe/{partnerId}` to subscribe to webhook notifications.
  */
 export const getApiV1WebhooksMessageByPartnerId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1WebhooksMessageByPartnerIdData, ThrowOnError>) => {
@@ -1507,6 +1582,7 @@ export const getApiV1WebhooksMessageByPartnerId = <ThrowOnError extends boolean 
 
 /**
  * Subscribe to Webhooks
+ *
  * Allows a partner to receive webhook notifications for the authenticated user.
  */
 export const postApiV1WebhooksSubscribeByPartnerId = <ThrowOnError extends boolean = false>(options: Options<PostApiV1WebhooksSubscribeByPartnerIdData, ThrowOnError>) => {
