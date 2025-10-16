@@ -176,9 +176,12 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
                 <span className="ml-2 font-medium text-foreground">Eligible</span>
               </>
             ) : (
-              <div className="flex items-center justify-center bg-muted w-8 h-8 rounded-full">
-                <X className="w-4 h-4 text-button-black" />
-              </div>
+              <>
+                <div className="flex items-center justify-center bg-muted w-8 h-8 rounded-full">
+                  <X className="w-4 h-4 text-button-black" />
+                </div>
+                <span className="ml-2 font-medium text-foreground">None</span>
+              </>
             )}
           </div>
         </div>
