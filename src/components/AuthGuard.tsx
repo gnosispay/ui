@@ -34,7 +34,6 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
 
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
-  console.log("type", type);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="flex flex-col items-center space-y-6 max-w-md w-full">

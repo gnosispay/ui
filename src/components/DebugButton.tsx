@@ -28,7 +28,7 @@ export const DebugButton = ({ className }: DebugButtonProps) => {
       size="icon"
       className={cn(
         "fixed bottom-4 left-4 z-50 size-8 rounded-full bg-muted/80 hover:bg-muted text-muted-foreground hover:text-foreground backdrop-blur-sm border border-border/50 shadow-sm",
-        className
+        className,
       )}
       title="Copy debug information"
     >
