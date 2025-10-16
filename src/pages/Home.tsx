@@ -11,6 +11,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { PartnerBanner } from "@/components/ui/partner-banner";
+import { IbanBanner } from "@/components/ui/iban-banner";
 import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
 
 export const Home = () => {
@@ -35,9 +36,10 @@ export const Home = () => {
             </div>
           </div>
 
-          {/* Partner Banner - After Balances on mobile, Row 1 Right on desktop */}
+          {/* Banners - After Balances on mobile, Row 1 Right on desktop */}
           <div className="m-4 lg:mx-0 lg:mb-0 lg:col-span-1 lg:col-start-3 lg:row-start-1">
             <PartnerBanner />
+            <IbanBanner />
           </div>
 
           {/* Rewards and Cards - After Partner on mobile, Row 2 Right on desktop */}

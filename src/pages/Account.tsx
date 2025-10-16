@@ -1,17 +1,14 @@
 import { useState } from "react";
 import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog, LifeBuoyIcon, Scale } from "lucide-react";
-import {
-  AccountSection,
-  PersonalDetailsModal,
-  UserProfileHeader,
-  AccountDetailsModal,
-  SignInWalletsModal,
-} from "@/components/account";
+import { AccountSection, UserProfileHeader } from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
 import { SafeOwnersModal } from "@/components/modals/safe-owners";
 import { HELP_CENTER_URL, LEGAL_LINK } from "@/constants";
 import { useAccountModal } from "@rainbow-me/rainbowkit";
 import { Button } from "@/components/ui/button";
+import { PersonalDetailsModal } from "@/components/modals/personal-details";
+import { AccountDetailsModal } from "@/components/modals/account-details";
+import { SignInWalletsModal } from "@/components/modals/sign-in-wallets";
 
 enum ModalType {
   NONE = "none",

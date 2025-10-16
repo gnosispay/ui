@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { useUser } from "@/context/UserContext";
-import { IbanAccountDetails } from "./IbanAccountDetails";
-import { SafeAccountDetails } from "./SafeAccountDetails";
+import { IbanAccountDetails } from "../account/IbanAccountDetails";
+import { SafeAccountDetails } from "../account/SafeAccountDetails";
 
 interface AccountDetailsModalProps {
   open: boolean;
@@ -15,7 +14,6 @@ enum AccountDetailsTab {
 }
 
 export const AccountDetailsModal = ({ open, onOpenChange }: AccountDetailsModalProps) => {
-  const { safeConfig } = useUser();
   const [activeTab, setActiveTab] = useState<AccountDetailsTab>(AccountDetailsTab.SAFE);
 
   return (
@@ -26,10 +24,6 @@ export const AccountDetailsModal = ({ open, onOpenChange }: AccountDetailsModalP
         </DialogHeader>
 
         <div className="space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Use these account details to send {safeConfig?.fiatSymbol} to your Gnosis Pay Card account.
-          </p>
-
           {/* Tab Navigation */}
           <div className="flex bg-muted/50 rounded-lg p-1">
             <button

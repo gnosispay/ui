@@ -1,6 +1,5 @@
-export function shortenAddress(address: string): string {
+export function shortenAddress(address?: string): string {
   if (!address) {
-    console.warn("No address provided for shortening");
     return "";
   }
 
