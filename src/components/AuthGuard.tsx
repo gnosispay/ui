@@ -10,6 +10,7 @@ import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { useAccount } from "wagmi";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
+import { DebugButton } from "./DebugButton";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -25,15 +26,15 @@ interface AuthScreenProps {
     disabled?: boolean;
     loading?: boolean;
   };
+  type: "connection" | "login" | "signup";
 }
 
-const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenProps) => {
+const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
-  const { isOnboarded, isUserSignedUp, isKycApproved, isSafeConfigured, user, safeConfig } = useUser();
-  const { isAuthenticated } = useAuth();
 
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
+  console.log("type", type);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <div className="flex flex-col items-center space-y-6 max-w-md w-full">
@@ -54,15 +55,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
         >
           Trouble logging in? Get help
         </a>
-        <ul>
-          <li>isOnboarded: {isOnboarded ? "true" : "false"}</li>
-          <li>isAuthenticated: {isAuthenticated ? "true" : "false"}</li>
-          <li>isUserSignedUp: {isUserSignedUp ? "true" : "false"}</li>
-          <li>isKycApproved: {isKycApproved ? "true" : "false"}</li>
-          <li>isSafeConfigured: {isSafeConfigured ? "true" : "false"}</li>
-        </ul>
-        <pre>{JSON.stringify(safeConfig, null, 2)}</pre>
-        <pre>{JSON.stringify(user, null, 2)}</pre>
+        {type === "signup" && <DebugButton />}
       </div>
     </div>
   );
@@ -91,6 +84,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
       buttonProps: {
         onClick: handleNavigateToRegister,
       },
+      type: "signup",
     }),
     [handleNavigateToRegister],
   );
@@ -106,6 +100,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
         disabled: isAuthenticating,
         loading: isAuthenticating,
       },
+      type: "login",
     };
   }, [renewToken, isAuthenticating]);
 
@@ -117,6 +112,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
       description: "Please connect your wallet to continue.",
       buttonText,
       buttonProps: { onClick: handleConnect, disabled: isConnecting, loading: isConnecting },
+      type: "connection",
     };
   }, [handleConnect, isConnecting]);
 
