@@ -29,7 +29,7 @@ interface AuthScreenProps {
 
 const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
-  const { isOnboarded, isUserSignedUp, isKycApproved, isSafeConfigured, user } = useUser();
+  const { isOnboarded, isUserSignedUp, isKycApproved, isSafeConfigured, user, safeConfig } = useUser();
   const { isAuthenticated } = useAuth();
 
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
@@ -61,6 +61,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
           <li>isKycApproved: {isKycApproved ? "true" : "false"}</li>
           <li>isSafeConfigured: {isSafeConfigured ? "true" : "false"}</li>
         </ul>
+        <pre>{JSON.stringify(safeConfig, null, 2)}</pre>
         <pre>{JSON.stringify(user, null, 2)}</pre>
       </div>
     </div>
