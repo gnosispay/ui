@@ -29,6 +29,8 @@ interface AuthScreenProps {
 
 const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
+  const { isOnboarded, isUserSignedUp, isKycApproved, isSafeConfigured, user } = useUser();
+  const { isAuthenticated } = useAuth();
 
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
@@ -52,6 +54,14 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
         >
           Trouble logging in? Get help
         </a>
+        <ul>
+          <li>isOnboarded: {isOnboarded ? "true" : "false"}</li>
+          <li>isAuthenticated: {isAuthenticated ? "true" : "false"}</li>
+          <li>isUserSignedUp: {isUserSignedUp ? "true" : "false"}</li>
+          <li>isKycApproved: {isKycApproved ? "true" : "false"}</li>
+          <li>isSafeConfigured: {isSafeConfigured ? "true" : "false"}</li>
+        </ul>
+        <pre>{JSON.stringify(user, null, 2)}</pre>
       </div>
     </div>
   );

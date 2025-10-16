@@ -23,6 +23,8 @@ export type IUserContext = {
   refreshSafeConfig: () => void;
   isOnboarded: boolean;
   showInitializingLoader: boolean;
+  isKycApproved: boolean;
+  isSafeConfigured: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -167,6 +169,8 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         refreshSafeConfig,
         isOnboarded,
         showInitializingLoader,
+        isKycApproved,
+        isSafeConfigured,
       }}
     >
       {children}
