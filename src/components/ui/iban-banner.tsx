@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { X, Landmark } from "lucide-react";
+import { X } from "lucide-react";
 import { cn } from "@/utils/cn";
+import IbanIcon from "@/assets/IBAN-banner.png";
 import {
   shouldShowBanner,
   getBannerDismissalData,
@@ -59,7 +60,7 @@ export function IbanBanner({ className }: IbanBannerProps) {
         onClick={handleClick}
       >
         <div className="absolute top-0 right-0 bottom-0 w-1/3 flex items-center justify-center">
-          <Landmark size={32} className="text-muted-foreground" />
+          <img src={IbanIcon} alt="IBAN" className="w-3/4 h-3/4 object-cover" />
         </div>
         
         <div className="relative p-4 flex flex-col justify-center">
