@@ -25,6 +25,7 @@ export type ICardTransactionsContext = {
   isLoadingMoreCardTransactions: boolean;
   loadMoreCardTransactions: () => void;
   transactionCount: number;
+  nextTransactionRangeTo: number | null;
 };
 
 const CardTransactionsContext = createContext<ICardTransactionsContext | undefined>(undefined);
@@ -44,6 +45,7 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
   const [hasNextPage, setHasNextPage] = useState(false);
   const [isLoadingMoreCardTransactions, setIsLoadingMoreCardTransactions] = useState(false);
   const [loadMoreCount, setLoadMoreCount] = useState(0);
+  const [nextTransactionRangeTo, setNextTransactionRangeTo] = useState<number | null>(null);
   const currentOffsetRef = useRef(0);
 
   const fetchCardTransactions = useCallback(async (cardTokens: string[], isLoadMore = false) => {
@@ -120,6 +122,10 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
           if (isLoadMore) {
             setLoadMoreCount((prev) => prev + 1);
           }
+
+          const currentTotal = currentOffsetRef.current;
+          const nextTo = currentTotal + LOAD_MORE_CARD_TRANSACTIONS_AMOUNT;
+          setNextTransactionRangeTo(nextTo);
         }
       })
       .catch((error) => {
@@ -181,6 +187,7 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
       isLoadingMoreCardTransactions,
       loadMoreCardTransactions,
       transactionCount,
+      nextTransactionRangeTo,
     }),
     [
       cardTransactionsByTokenDate,
@@ -191,6 +198,7 @@ const CardTransactionsContextProvider = ({ children }: CardTransactionsContextPr
       isLoadingMoreCardTransactions,
       loadMoreCardTransactions,
       transactionCount,
+      nextTransactionRangeTo,
     ],
   );
 
