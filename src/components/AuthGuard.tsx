@@ -10,6 +10,7 @@ import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { useAccount } from "wagmi";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
+import { DebugButton } from "./DebugButton";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -25,9 +26,10 @@ interface AuthScreenProps {
     disabled?: boolean;
     loading?: boolean;
   };
+  type: "connection" | "login" | "signup";
 }
 
-const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenProps) => {
+const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
 
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
@@ -52,6 +54,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps }: AuthScreenP
         >
           Trouble logging in? Get help
         </a>
+        {type === "signup" && <DebugButton />}
       </div>
     </div>
   );
@@ -80,6 +83,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
       buttonProps: {
         onClick: handleNavigateToRegister,
       },
+      type: "signup",
     }),
     [handleNavigateToRegister],
   );
@@ -95,6 +99,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
         disabled: isAuthenticating,
         loading: isAuthenticating,
       },
+      type: "login",
     };
   }, [renewToken, isAuthenticating]);
 
@@ -106,6 +111,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
       description: "Please connect your wallet to continue.",
       buttonText,
       buttonProps: { onClick: handleConnect, disabled: isConnecting, loading: isConnecting },
+      type: "connection",
     };
   }, [handleConnect, isConnecting]);
 
