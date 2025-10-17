@@ -1,11 +1,11 @@
 import { useState, useCallback, useMemo } from "react";
 import type { CurrencyInfo } from "@/constants";
-import { supportedTokens, REWARD_ADDRESS } from "@/constants";
+import { supportedTokens, REWARD_ADDRESS, REFUND_ADDRESS } from "@/constants";
 import { Erc20TokenEventDirection, type Erc20TokenEvent } from "@/types/transaction";
 import { formatTokenAmount } from "@/utils/formatCurrency";
 import { shortenAddress } from "@/utils/shortenAddress";
 import { format } from "date-fns";
-import { Minus, Plus, Gift } from "lucide-react";
+import { Minus, Plus, Gift, ArrowDownUpIcon } from "lucide-react";
 import { OnchainTransferDetailsModal } from "@/components/modals/transaction-details/onchain-transfer-details-modal";
 
 interface OnchainTransferRowProps {
@@ -31,8 +31,12 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
     return transfer.from.toLowerCase() === REWARD_ADDRESS.toLowerCase();
   }, [transfer.from]);
 
+  const isRefundTransfer = useMemo(() => {
+    return transfer.from.toLowerCase() === REFUND_ADDRESS.toLowerCase();
+  }, [transfer.from]);
+
   const sign = isIncoming ? "+" : "-";
-  const Icon = isRewardTransfer ? Gift : isIncoming ? Plus : Minus;
+  const Icon = isRewardTransfer ? Gift : isRefundTransfer ? ArrowDownUpIcon : isIncoming ? Plus : Minus;
 
   // Find matching supported token by address
   const supportedTokenInfo = useMemo(() => {
@@ -69,7 +73,9 @@ export const OnchainTransferRow = ({ transfer, currency }: OnchainTransferRowPro
             <div className="text-lg text-primary">
               {isRewardTransfer
                 ? "Reward"
-                : `${isIncoming ? "From" : "To"} ${shortenAddress(isIncoming ? transfer.from : transfer.to)}`}
+                : isRefundTransfer
+                  ? "Refund"
+                  : `${isIncoming ? "From" : "To"} ${shortenAddress(isIncoming ? transfer.from : transfer.to)}`}
             </div>
             <div className="text-xs text-secondary mt-1">{format(transfer.date, "HH:mm")}</div>
           </div>

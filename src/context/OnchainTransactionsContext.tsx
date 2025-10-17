@@ -22,6 +22,7 @@ export type IOnchainTransactionsContext = {
   isLoadingMoreOnchainTransactions: boolean;
   loadMoreOnchainTransactions: () => void;
   currentOldestDate: Date | null;
+  nextSearchFromDate: Date | null;
   hasNextPage: boolean;
   setFetchingEnabled: (enabled: boolean) => void;
 };
@@ -35,6 +36,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
   const [onchainTransactionsError, setOnchainTransactionsError] = useState("");
   const [isLoadingMoreOnchainTransactions, setIsLoadingMoreOnchainTransactions] = useState(false);
   const [currentOldestDate, setCurrentOldestDate] = useState<Date | null>(null);
+  const [nextSearchFromDate, setNextSearchFromDate] = useState<Date | null>(null);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [fetchingEnabled, setFetchingEnabled] = useState(false);
   const currentDaysLoadedRef = useRef(DEFAULT_ONCHAIN_TRANSACTIONS_DAYS);
@@ -148,6 +150,9 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
             setCurrentOldestDate(fromDate);
           }
         }
+
+        // Update next search from date for the Load More button
+        setNextSearchFromDate(subDays(fromDate, LOAD_MORE_ONCHAIN_TRANSACTIONS_DAYS));
       }
 
       if (isLoadMore) {
@@ -164,6 +169,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
       setOnchainTransactionsByDate({});
       setOnchainTransactionsLoading(false);
       setCurrentOldestDate(null);
+      setNextSearchFromDate(null);
       setHasNextPage(true);
       currentDaysLoadedRef.current = DEFAULT_ONCHAIN_TRANSACTIONS_DAYS;
       return;
@@ -197,6 +203,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
       isLoadingMoreOnchainTransactions,
       loadMoreOnchainTransactions,
       currentOldestDate,
+      nextSearchFromDate,
       hasNextPage,
       setFetchingEnabled,
     }),
@@ -207,6 +214,7 @@ const OnchainTransactionsContextProvider = ({ children }: OnchainTransactionsCon
       isLoadingMoreOnchainTransactions,
       loadMoreOnchainTransactions,
       currentOldestDate,
+      nextSearchFromDate,
       hasNextPage,
     ],
   );

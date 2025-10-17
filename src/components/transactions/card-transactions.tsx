@@ -19,6 +19,7 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
     isLoadingMoreCardTransactions,
     loadMoreCardTransactions,
     transactionCount,
+    nextTransactionRangeTo,
   } = useCardTransactions();
 
   const transactions = useMemo(
@@ -29,6 +30,18 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
   const handleLoadMore = useCallback(() => {
     loadMoreCardTransactions();
   }, [loadMoreCardTransactions]);
+
+  const loadMoreButtonText = useMemo(() => {
+    if (isLoadingMoreCardTransactions && nextTransactionRangeTo) {
+      return `Loading last ${nextTransactionRangeTo} transactions...`;
+    }
+
+    if (isLoadingMoreCardTransactions) {
+      return "Loading...";
+    }
+
+    return "Load More";
+  }, [isLoadingMoreCardTransactions, nextTransactionRangeTo]);
 
   if (!cardToken || cardTransactionsLoading) {
     return <TransactionSkeleton />;
@@ -69,7 +82,7 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
             loading={isLoadingMoreCardTransactions}
             className="w-full"
           >
-            {isLoadingMoreCardTransactions ? "Loading..." : "Load More"}
+            {loadMoreButtonText}
           </Button>
         </div>
       )}
