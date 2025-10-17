@@ -235,6 +235,14 @@ export type BasePaymentish = {
      *
      */
     isPending?: boolean;
+    /**
+     * Indicates whether this transaction impacted cashback eligibility:
+     * - `true`: Transaction was eligible for and impacted cashback
+     * - `false`: Transaction did not impact cashback (not eligible)
+     * - `null`: Unable to determine (e.g., before user accepted cashback terms)
+     *
+     */
+    impactsCashback?: boolean | null;
     mcc?: string;
     merchant?: {
         name?: string;
@@ -302,6 +310,47 @@ export type EoaAccount = {
     address?: string;
     userId?: string;
     createdAt?: string;
+};
+
+export type MoneriumIntegrationResponse = {
+    data?: {
+        /**
+         * Indicates whether the Monerium integration was successfully created
+         */
+        success: boolean;
+        /**
+         * HTTP status code of the operation
+         */
+        status: number;
+        /**
+         * Human-readable description of the operation result
+         */
+        description: string;
+        /**
+         * Raw response data from Monerium API (only present on errors)
+         */
+        responseData?: {
+            [key: string]: unknown;
+        } | null;
+        /**
+         * The Monerium profile ID assigned to the user (only present on success)
+         */
+        moneriumProfileId?: string | null;
+        /**
+         * The assigned IBAN number (only present on success)
+         */
+        iban?: string | null;
+        /**
+         * The assigned BIC code (only present on success)
+         */
+        bic?: string | null;
+        /**
+         * Headers from the Monerium API response (only present on errors)
+         */
+        responseHeaders?: {
+            [key: string]: unknown;
+        } | null;
+    };
 };
 
 export type IbanOrder = {
@@ -969,6 +1018,12 @@ export type PostApiV1CardsByCardIdLostErrors = {
      */
     404: unknown;
     /**
+     * Card is already marked as lost
+     */
+    409: {
+        error: 'Card is already marked as lost';
+    };
+    /**
      * Internal Server Error
      */
     500: _Error;
@@ -1052,6 +1107,12 @@ export type PostApiV1CardsByCardIdStolenErrors = {
      * No card found
      */
     404: unknown;
+    /**
+     * Card is already marked as stolen
+     */
+    409: {
+        error: 'Card is already marked as stolen';
+    };
     /**
      * Internal Server Error
      */
@@ -1791,6 +1852,13 @@ export type PostApiV1TransactionsByThreadIdDisputeErrors = {
      */
     404: {
         error?: string;
+    };
+    /**
+     * Transaction has already been disputed
+     */
+    409: {
+        error?: string;
+        message?: string;
     };
     /**
      * Internal server error
@@ -2817,6 +2885,94 @@ export type GetApiV1IbansAvailableResponses = {
 
 export type GetApiV1IbansAvailableResponse = GetApiV1IbansAvailableResponses[keyof GetApiV1IbansAvailableResponses];
 
+export type GetApiV1IbansSigningMessageData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/ibans/signing-message';
+};
+
+export type GetApiV1IbansSigningMessageErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type GetApiV1IbansSigningMessageError = GetApiV1IbansSigningMessageErrors[keyof GetApiV1IbansSigningMessageErrors];
+
+export type GetApiV1IbansSigningMessageResponses = {
+    /**
+     * Successfully retrieved the signing message
+     */
+    200: {
+        data?: {
+            message?: string;
+        };
+    };
+};
+
+export type GetApiV1IbansSigningMessageResponse = GetApiV1IbansSigningMessageResponses[keyof GetApiV1IbansSigningMessageResponses];
+
+export type PostApiV1IntegrationsMoneriumData = {
+    body: {
+        /**
+         * Signature of the message "I hereby declare that I am the address owner."
+         * This signature is created by signing the message with the user's wallet.
+         * The exact message can be retrieved from the /api/v1/ibans/signing-message endpoint.
+         * The signature is used to verify ownership of the address on Monerium.
+         * Format: Ethereum signature string (e.g., "0x1234...").
+         *
+         */
+        signature?: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/integrations/monerium';
+};
+
+export type PostApiV1IntegrationsMoneriumErrors = {
+    /**
+     * Validation error on Monerium side.
+     */
+    400: MoneriumIntegrationResponse;
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * User not found.
+     */
+    404: _Error;
+    /**
+     * Validation errors on GP side.
+     */
+    422: _Error;
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type PostApiV1IntegrationsMoneriumError = PostApiV1IntegrationsMoneriumErrors[keyof PostApiV1IntegrationsMoneriumErrors];
+
+export type PostApiV1IntegrationsMoneriumResponses = {
+    /**
+     * Successfully created a new Monerium integration
+     */
+    200: MoneriumIntegrationResponse;
+};
+
+export type PostApiV1IntegrationsMoneriumResponse = PostApiV1IntegrationsMoneriumResponses[keyof PostApiV1IntegrationsMoneriumResponses];
+
 export type GetApiV1IbansDetailsData = {
     body?: never;
     path?: never;
@@ -3026,115 +3182,6 @@ export type GetApiV1IbansOrdersResponses = {
 };
 
 export type GetApiV1IbansOrdersResponse = GetApiV1IbansOrdersResponses[keyof GetApiV1IbansOrdersResponses];
-
-export type GetApiV1IbansSigningMessageData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/ibans/signing-message';
-};
-
-export type GetApiV1IbansSigningMessageErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: _Error;
-};
-
-export type GetApiV1IbansSigningMessageError = GetApiV1IbansSigningMessageErrors[keyof GetApiV1IbansSigningMessageErrors];
-
-export type GetApiV1IbansSigningMessageResponses = {
-    /**
-     * Successfully retrieved the signing message
-     */
-    200: {
-        data?: {
-            message?: string;
-        };
-    };
-};
-
-export type GetApiV1IbansSigningMessageResponse = GetApiV1IbansSigningMessageResponses[keyof GetApiV1IbansSigningMessageResponses];
-
-export type PostApiV1IntegrationsMoneriumData = {
-    body: {
-        /**
-         * Signature of the message "I hereby declare that I am the address owner."
-         * This signature is created by signing the message with the user's wallet.
-         * The exact message can be retrieved from the /api/v1/ibans/signing-message endpoint.
-         * The signature is used to verify ownership of the address on Monerium.
-         * Format: Ethereum signature string (e.g., "0x1234...").
-         *
-         */
-        signature?: string;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/v1/integrations/monerium';
-};
-
-export type PostApiV1IntegrationsMoneriumErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: _Error;
-};
-
-export type PostApiV1IntegrationsMoneriumError = PostApiV1IntegrationsMoneriumErrors[keyof PostApiV1IntegrationsMoneriumErrors];
-
-export type PostApiV1IntegrationsMoneriumResponses = {
-    /**
-     * Successfully created a new Monerium integration
-     */
-    200: {
-        data?: {
-            /**
-             * Indicates whether the Monerium integration was successfully created
-             */
-            success: boolean;
-            /**
-             * HTTP status code of the operation
-             */
-            status: number;
-            /**
-             * Human-readable description of the operation result
-             */
-            description: string;
-            /**
-             * Raw response data from Monerium API (only present on errors)
-             */
-            responseData?: {
-                [key: string]: unknown;
-            } | null;
-            /**
-             * The Monerium profile ID assigned to the user (only present on success)
-             */
-            moneriumProfileId?: string | null;
-            /**
-             * The assigned IBAN number (only present on success)
-             */
-            iban?: string | null;
-            /**
-             * The assigned BIC code (only present on success)
-             */
-            bic?: string | null;
-        };
-    };
-};
-
-export type PostApiV1IntegrationsMoneriumResponse = PostApiV1IntegrationsMoneriumResponses[keyof PostApiV1IntegrationsMoneriumResponses];
 
 export type GetApiV1KycIntegrationData = {
     body?: never;
