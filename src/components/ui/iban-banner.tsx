@@ -18,9 +18,7 @@ interface IbanBannerProps {
 export function IbanBanner({ className }: IbanBannerProps) {
   const [isVisible, setIsVisible] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // const { hasIbanSet, isEligibleForIban } = useIBAN();
-  const hasIbanSet = false;
-  const isEligibleForIban = true;
+  const { hasIbanSet, isEligibleForIban } = useIBAN();
 
 
   useEffect(() => {
