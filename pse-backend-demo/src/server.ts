@@ -13,11 +13,7 @@ import { tokenRouter } from "./api/token/tokenRouter";
 
 const CORS_CONFIG = {
   // Static origins that are always allowed
-  staticOrigins: [
-    "https://verified-pug-renewing.ngrok-free.app",
-    "http://localhost",
-    "https://app.gnosispay.com"
-  ],
+  staticOrigins: ["https://verified-pug-renewing.ngrok-free.app", "http://localhost", "https://app.gnosispay.com"],
   // Pattern for dynamic subdomain matching
   patterns: [
     /^https:\/\/([a-zA-Z0-9-]+\.)*gp-ui\.pages\.dev$/,
