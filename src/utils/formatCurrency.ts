@@ -19,10 +19,13 @@ export const formatCurrency = (
 };
 
 export const formatDisplayAmount = (value: number, currencyInfo: CurrencyInfo) => {
+  // Floor the value to 2 decimal places to prevent rounding up
+  const flooredValue = Math.floor(value * 100) / 100;
+
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: currencyInfo.fiatSymbol,
-  }).format(value);
+  }).format(flooredValue);
 };
 
 /**
