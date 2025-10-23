@@ -1,32 +1,42 @@
-import { connectorsForWallets } from "@rainbow-me/rainbowkit";
+import { createAppKit } from "@reown/appkit/react";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { createConfig, http } from "wagmi";
 import { gnosis } from "wagmi/chains";
-import { safe } from "wagmi/connectors";
-import { injectedWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets";
+import { safe, injected, walletConnect } from "wagmi/connectors";
 
-const connectors = connectorsForWallets(
-  [
-    {
-      groupName: "Recommended",
-      wallets: [injectedWallet, walletConnectWallet],
-    },
-  ],
-  {
-    appName: "Gnosis Pay",
-    // it's fine to have the id here, it has an allow list for the domains we use
-    projectId: "02e652f4cb3974c4c3a822aa56ec09f6",
+const projectId = "02e652f4cb3974c4c3a822aa56ec09f6";
+
+const wagmiAdapter = new WagmiAdapter({
+  networks: [gnosis],
+  projectId,
+});
+
+createAppKit({
+  adapters: [wagmiAdapter],
+  projectId,
+  networks: [gnosis],
+  defaultNetwork: gnosis,
+  metadata: {
+    name: "Gnosis Pay",
+    description: "Decentralization. Accepted Everywhere.",
+    url: "https://gnosispay.com",
+    icons: ["https://gnosispay.com/favicon.ico"],
   },
-);
+  features: {
+    analytics: false,
+  },
+});
 
 export const config = createConfig({
   chains: [gnosis],
   connectors: [
-    ...connectors,
+    injected(),
     safe({
       allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
       debug: false,
       shimDisconnect: false,
     }),
+    walletConnect({ projectId }),
   ],
   transports: {
     [gnosis.id]: http(),

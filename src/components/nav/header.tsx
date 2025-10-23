@@ -1,4 +1,3 @@
-import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import darklogo from "../../assets/GP-logo-white.svg";
 import lightLogo from "../../assets/GP-logo-black.svg";
@@ -7,16 +6,18 @@ import { useTheme } from "../../context/ThemeContext";
 import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
 import { Button } from "@/components/ui/button";
+import { useAppKit } from "@reown/appkit/react";
+
 import { useCallback } from "react";
 
 export const HeaderNavBar = () => {
   const { effectiveTheme } = useTheme();
   const { isConnected } = useAccount();
-  const { openConnectModal } = useConnectModal();
+  const { open } = useAppKit();
 
   const handleConnect = useCallback(() => {
-    openConnectModal?.();
-  }, [openConnectModal]);
+    open();
+  }, [open]);
 
   return (
     <header className="w-full border-b hidden lg:block">
@@ -49,21 +50,7 @@ export const HeaderNavBar = () => {
           </div>
           {/* Actions */}
           <div className="flex gap-2 items-center justify-end">
-            {!isConnected ? (
-              <Button onClick={handleConnect}>Connect</Button>
-            ) : (
-              <ConnectButton
-                label="Connect"
-                accountStatus={{
-                  smallScreen: "avatar",
-                  largeScreen: "full",
-                }}
-                showBalance={{
-                  smallScreen: false,
-                  largeScreen: true,
-                }}
-              />
-            )}
+            {isConnected ? <appkit-account-button /> : <Button onClick={handleConnect}>Connect</Button>}
             <ModeToggle />
           </div>
         </div>

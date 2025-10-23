@@ -2,7 +2,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
@@ -63,13 +63,13 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
 export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
   const { isOnboarded } = useUser();
-  const { openConnectModal } = useConnectModal();
+  const { open } = useAppKit();
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
 
   const handleConnect = useCallback(() => {
-    openConnectModal?.();
-  }, [openConnectModal]);
+    open();
+  }, [open]);
 
   const handleNavigateToRegister = useCallback(() => {
     navigate("/register");

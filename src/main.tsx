@@ -9,7 +9,6 @@ import App from "./App.tsx";
 import { config } from "./wagmi.ts";
 
 import "./index.css";
-import "@rainbow-me/rainbowkit/styles.css";
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
@@ -21,7 +20,6 @@ import { CardTransactionsContextProvider } from "./context/CardTransactionsConte
 import { OnchainTransactionsContextProvider } from "./context/OnchainTransactionsContext.tsx";
 import { IbanTransactionsContextProvider } from "./context/IbanTransactionsContext.tsx";
 import { OrdersContextProvider } from "./context/OrdersContext.tsx";
-import { RainbowKitWrapper } from "./context/CustomRainbowKitProvider.tsx";
 import { ZendeskProvider } from "react-use-zendesk";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
@@ -50,30 +48,28 @@ ReactDOM.createRoot(rootElement).render(
     <ThemeProvider defaultTheme="system" storageKey="gp-ui-theme">
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
-          <RainbowKitWrapper>
-            <AuthContextProvider>
-              <UserContextProvider>
-                <IBANContextProvider>
-                  <ZendeskProvider apiKey={zendeskKey}>
-                    <CardsContextProvider>
-                      <OrdersContextProvider>
-                        <CardTransactionsContextProvider>
-                          <OnchainTransactionsContextProvider>
-                            <IbanTransactionsContextProvider>
-                              <DelayRelayContextProvider>
-                                <App />
-                                <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
-                              </DelayRelayContextProvider>
-                            </IbanTransactionsContextProvider>
-                          </OnchainTransactionsContextProvider>
-                        </CardTransactionsContextProvider>
-                      </OrdersContextProvider>
-                    </CardsContextProvider>
-                  </ZendeskProvider>
-                </IBANContextProvider>
-              </UserContextProvider>
-            </AuthContextProvider>
-          </RainbowKitWrapper>
+          <AuthContextProvider>
+            <UserContextProvider>
+              <IBANContextProvider>
+                <ZendeskProvider apiKey={zendeskKey}>
+                  <CardsContextProvider>
+                    <OrdersContextProvider>
+                      <CardTransactionsContextProvider>
+                        <OnchainTransactionsContextProvider>
+                          <IbanTransactionsContextProvider>
+                            <DelayRelayContextProvider>
+                              <App />
+                              <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
+                            </DelayRelayContextProvider>
+                          </IbanTransactionsContextProvider>
+                        </OnchainTransactionsContextProvider>
+                      </CardTransactionsContextProvider>
+                    </OrdersContextProvider>
+                  </CardsContextProvider>
+                </ZendeskProvider>
+              </IBANContextProvider>
+            </UserContextProvider>
+          </AuthContextProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </ThemeProvider>
