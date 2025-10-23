@@ -62,7 +62,7 @@ export const IbanAccountDetails = () => {
   }
 
   // If user is not eligible for IBAN
-  if (!isEligibleForIban) {
+  if (!isEligibleForIban && !hasIbanSet) {
     return (
       <div className="flex flex-col items-center justify-center mt-4">
         <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
