@@ -24,7 +24,12 @@ createAppKit({
   },
   features: {
     analytics: false,
+    email: false,
+    swaps: false,
+    onramp: false,
+    socials: false,
   },
+  enableNetworkSwitch: false,
 });
 
 export const config = createConfig({
