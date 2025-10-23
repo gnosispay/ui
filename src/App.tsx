@@ -15,6 +15,7 @@ import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
 import { useZendeskUserId } from "./hooks/useZendeskUserId";
 import { AppLoader } from "./components/AppLoader";
 import { useAppInitialization } from "./hooks/useAppInitialization";
+import { useAppKitTheme } from "./hooks/useAppKitTheme";
 import { PARTNERS_URL } from "./constants";
 
 const ExternalRedirect = ({ url }: { url: string }) => {
@@ -103,6 +104,7 @@ function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
 
 function App() {
   useZendeskUserId();
+  useAppKitTheme();
   const { isInitializing } = useAppInitialization();
 
   if (isInitializing) {

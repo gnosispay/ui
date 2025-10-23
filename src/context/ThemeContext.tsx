@@ -11,7 +11,7 @@ type ThemeProviderProps = {
 type ThemeProviderState = {
   theme: Theme;
   setTheme: (theme: Theme) => void;
-  effectiveTheme: Omit<Theme, "setTheme">;
+  effectiveTheme: Theme;
 };
 
 const initialState: ThemeProviderState = {
