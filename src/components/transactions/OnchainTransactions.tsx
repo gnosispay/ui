@@ -8,6 +8,7 @@ import { currencies } from "@/constants";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { Button } from "@/components/ui/button";
 import { useMemo, useCallback, useEffect } from "react";
+import { format } from "date-fns";
 
 export const OnchainTransactions = () => {
   const { safeConfig } = useUser();
@@ -18,6 +19,7 @@ export const OnchainTransactions = () => {
     hasNextPage,
     isLoadingMoreOnchainTransactions,
     loadMoreOnchainTransactions,
+    nextSearchFromDate,
     setFetchingEnabled,
   } = useOnchainTransactions();
 
@@ -30,6 +32,19 @@ export const OnchainTransactions = () => {
     () => (safeConfig?.fiatSymbol ? currencies[safeConfig.fiatSymbol] : null),
     [safeConfig?.fiatSymbol],
   );
+
+  const loadMoreButtonText = useMemo(() => {
+    if (isLoadingMoreOnchainTransactions && nextSearchFromDate) {
+      const formattedDate = format(nextSearchFromDate, "MMM do, yyyy");
+      return `Loading from ${formattedDate}...`;
+    }
+
+    if (isLoadingMoreOnchainTransactions) {
+      return "Loading...";
+    }
+
+    return "Load More";
+  }, [isLoadingMoreOnchainTransactions, nextSearchFromDate]);
 
   useEffect(() => {
     setFetchingEnabled(true);
@@ -78,7 +93,7 @@ export const OnchainTransactions = () => {
             loading={isLoadingMoreOnchainTransactions}
             className="w-full"
           >
-            {isLoadingMoreOnchainTransactions ? "Loading..." : "Load More"}
+            {loadMoreButtonText}
           </Button>
         </div>
       )}
