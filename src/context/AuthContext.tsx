@@ -3,7 +3,7 @@ import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
 import { isTokenExpired } from "@/utils/isTokenExpired";
 import { isTokenWithUserId } from "@/utils/isTokenWithUserId";
-import { useAppKitAccount, useAppKitConnections } from "@reown/appkit/react";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { differenceInMilliseconds, fromUnixTime } from "date-fns";
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -39,7 +39,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const { address } = useAppKitAccount();
   const chainId = useChainId();
   const { signMessageAsync } = useSignMessage();
-  const { connections } = useAppKitConnections();
   const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const renewalInProgressRef = useRef(false);
   const previousAddressRef = useRef<string | undefined>(address);
@@ -109,8 +108,8 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const isAuthenticated = useMemo(() => {
     const isExpired = isTokenExpired(jwt);
 
-    return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0;
-  }, [jwt, isAuthenticating, address, chainId, connections]);
+    return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId;
+  }, [jwt, isAuthenticating, address, chainId]);
 
   const showInitializingLoader = useMemo(() => {
     // Show loader while authenticating
@@ -160,11 +159,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
 
     if (!jwtAddressKey) {
       console.info("No jwtAddressKey");
-      return;
-    }
-
-    if (connections.length === 0) {
-      console.info("No connections - wallet not connected yet");
       return;
     }
 
@@ -254,7 +248,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     } finally {
       renewalInProgressRef.current = false;
     }
-  }, [address, chainId, signMessageAsync, connections, jwtAddressKey, updateJwt]);
+  }, [address, chainId, signMessageAsync, jwtAddressKey, updateJwt]);
 
   // Set up automatic JWT renewal timeout, simpler approach than with an interceptor
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors

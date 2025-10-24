@@ -1,12 +1,11 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
-import { useAppKitAccount, useAppKitConnections } from "@reown/appkit/react";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 export const useAppInitialization = () => {
   const [isInitializing, setIsInitializing] = useState(true);
   const { isConnected, status } = useAppKitAccount();
-  const { connections } = useAppKitConnections();
   const isConnecting = useMemo(() => status === "connecting", [status]);
   const { isAuthenticated, showInitializingLoader: authShowsLoader } = useAuth();
   const { showInitializingLoader: userShowsLoader } = useUser();
@@ -56,7 +55,7 @@ export const useAppInitialization = () => {
     }
 
     // If wallet is connected, wait for connections to be established
-    if (isConnected && connections.length === 0) {
+    if (isConnected) {
       return;
     }
 
@@ -78,7 +77,7 @@ export const useAppInitialization = () => {
 
     // Once we have all necessary data, we can determine the user's state and show appropriate screen
     doneInitializing();
-  }, [isConnecting, isConnected, connections, authShowsLoader, isAuthenticated, userShowsLoader, doneInitializing]);
+  }, [isConnecting, isConnected, authShowsLoader, isAuthenticated, userShowsLoader, doneInitializing]);
 
   return { isInitializing };
 };
