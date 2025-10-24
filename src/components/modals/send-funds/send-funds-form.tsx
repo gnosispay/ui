@@ -12,7 +12,7 @@ import { AddressInput } from "./address-input";
 import { useDelayRelay } from "@/context/DelayRelayContext";
 import { QueueNotEmptyAlert } from "@/components/QueueNotEmptyAlert";
 import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useAccount } from "wagmi";
 
 interface ValidatedFormData {
   toAddress: string;
@@ -25,7 +25,7 @@ interface SendFundsFormProps {
 }
 
 export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
-  const { address: connectedAddress } = useAppKitAccount();
+  const { address: connectedAddress } = useAccount();
   const { queue } = useDelayRelay();
   const isQueueNotEmpty = useMemo(() => queue.length > 0, [queue]);
   const [toAddress, setToAddress] = useState("");

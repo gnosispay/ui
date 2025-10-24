@@ -2,7 +2,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
+import { useAppKit } from "@reown/appkit/react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
@@ -10,6 +10,7 @@ import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { DebugButton } from "./DebugButton";
+import { useAccount } from "wagmi";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -32,9 +33,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
   const { effectiveTheme } = useTheme();
   const { isAuthenticating, isAuthenticated } = useAuth();
   const { isOnboarded } = useUser();
-  const { isConnected, status } = useAppKitAccount();
-
-  const isConnecting = useMemo(() => status === "connecting", [status]);
+  const { isConnected, isConnecting } = useAccount();
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
   return (
@@ -76,9 +75,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isOnboarded } = useUser();
   const { open } = useAppKit();
   const navigate = useNavigate();
-  const { isConnected, status } = useAppKitAccount();
-
-  const isConnecting = useMemo(() => status === "connecting", [status]);
+  const { isConnected, isConnecting } = useAccount();
 
   const handleConnect = useCallback(() => {
     open();

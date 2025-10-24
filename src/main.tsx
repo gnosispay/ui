@@ -6,7 +6,7 @@ import { WagmiProvider } from "wagmi";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "./App.tsx";
-import { config } from "./wagmi.ts";
+import { wagmiAdapter } from "./wagmi.ts";
 
 import "./index.css";
 import { client } from "./client/client.gen.ts";
@@ -46,7 +46,7 @@ client.setConfig({
 ReactDOM.createRoot(rootElement).render(
   <BrowserRouter>
     <ThemeProvider defaultTheme="system" storageKey="gp-ui-theme">
-      <WagmiProvider config={config}>
+      <WagmiProvider config={wagmiAdapter.wagmiConfig}>
         <QueryClientProvider client={queryClient}>
           <AuthContextProvider>
             <UserContextProvider>

@@ -6,9 +6,21 @@ import { safe, injected, walletConnect } from "wagmi/connectors";
 
 const projectId = "02e652f4cb3974c4c3a822aa56ec09f6";
 
-const wagmiAdapter = new WagmiAdapter({
+export const wagmiAdapter = new WagmiAdapter({
   networks: [gnosis],
   projectId,
+  connectors: [
+    injected(),
+    safe({
+      allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
+      debug: false,
+      shimDisconnect: false,
+    }),
+    walletConnect({ projectId }),
+  ],
+  transports: {
+    [gnosis.id]: http(),
+  },
 });
 
 export const appKit = createAppKit({
@@ -44,18 +56,18 @@ export const appKit = createAppKit({
   } as Record<string, string | number>,
 });
 
-export const config = createConfig({
-  chains: [gnosis],
-  connectors: [
-    injected(),
-    safe({
-      allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
-      debug: false,
-      shimDisconnect: false,
-    }),
-    walletConnect({ projectId }),
-  ],
-  transports: {
-    [gnosis.id]: http(),
-  },
-});
+// export const config = createConfig({
+//   chains: [gnosis],
+//   connectors: [
+//     injected(),
+//     safe({
+//       allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
+//       debug: false,
+//       shimDisconnect: false,
+//     }),
+//     walletConnect({ projectId }),
+//   ],
+//   transports: {
+//     [gnosis.id]: http(),
+//   },
+// });

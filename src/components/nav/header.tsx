@@ -5,13 +5,13 @@ import { useTheme } from "../../context/ThemeContext";
 import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
 import { Button } from "@/components/ui/button";
-import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
-
+import { useAppKit } from "@reown/appkit/react";
+import { useAccount } from "wagmi";
 import { useCallback } from "react";
 
 export const HeaderNavBar = () => {
   const { effectiveTheme } = useTheme();
-  const { isConnected } = useAppKitAccount();
+  const { isConnected } = useAccount();
   const { open } = useAppKit();
 
   const handleConnect = useCallback(() => {

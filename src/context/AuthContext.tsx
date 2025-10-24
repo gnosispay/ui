@@ -3,13 +3,12 @@ import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
 import { isTokenExpired } from "@/utils/isTokenExpired";
 import { isTokenWithUserId } from "@/utils/isTokenWithUserId";
-import { useAppKitAccount } from "@reown/appkit/react";
 import { differenceInMilliseconds, fromUnixTime } from "date-fns";
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
-import { useSignMessage, useChainId } from "wagmi";
+import { useSignMessage, useAccount, useConnections } from "wagmi";
 
 export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
@@ -36,9 +35,9 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isLocaStorageLoading, setIsLocaStorageLoading] = useState(true);
   const [contextKey, setContextKey] = useState(0);
-  const { address } = useAppKitAccount();
-  const chainId = useChainId();
+  const { address, chainId } = useAccount();
   const { signMessageAsync } = useSignMessage();
+  const connections = useConnections();
   const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const renewalInProgressRef = useRef(false);
   const previousAddressRef = useRef<string | undefined>(address);
@@ -108,8 +107,8 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const isAuthenticated = useMemo(() => {
     const isExpired = isTokenExpired(jwt);
 
-    return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId;
-  }, [jwt, isAuthenticating, address, chainId]);
+    return !!jwt && !isExpired && !isAuthenticating && !!address && !!chainId && connections.length > 0;
+  }, [jwt, isAuthenticating, address, chainId, connections]);
 
   const showInitializingLoader = useMemo(() => {
     // Show loader while authenticating
@@ -159,6 +158,11 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
 
     if (!jwtAddressKey) {
       console.info("No jwtAddressKey");
+      return;
+    }
+
+    if (connections.length === 0) {
+      console.info("No connections - wallet not connected yet");
       return;
     }
 
@@ -248,7 +252,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     } finally {
       renewalInProgressRef.current = false;
     }
-  }, [address, chainId, signMessageAsync, jwtAddressKey, updateJwt]);
+  }, [address, chainId, signMessageAsync, jwtAddressKey, updateJwt, connections]);
 
   // Set up automatic JWT renewal timeout, simpler approach than with an interceptor
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors

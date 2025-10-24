@@ -1,12 +1,12 @@
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useAccount, useConnections } from "wagmi";
 
 export const useAppInitialization = () => {
   const [isInitializing, setIsInitializing] = useState(true);
-  const { isConnected, status } = useAppKitAccount();
-  const isConnecting = useMemo(() => status === "connecting", [status]);
+  const { isConnected, isConnecting } = useAccount();
+  const connections = useConnections();
   const { isAuthenticated, showInitializingLoader: authShowsLoader } = useAuth();
   const { showInitializingLoader: userShowsLoader } = useUser();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -49,7 +49,7 @@ export const useAppInitialization = () => {
     }
 
     // If wallet is not connected, we can show the connect screen
-    if (!isConnected) {
+    if (!isConnected && connections.length === 0) {
       doneInitializing();
       return;
     }
@@ -77,7 +77,7 @@ export const useAppInitialization = () => {
 
     // Once we have all necessary data, we can determine the user's state and show appropriate screen
     doneInitializing();
-  }, [isConnecting, isConnected, authShowsLoader, isAuthenticated, userShowsLoader, doneInitializing]);
+  }, [isConnecting, isConnected, connections, authShowsLoader, isAuthenticated, userShowsLoader, doneInitializing]);
 
   return { isInitializing };
 };

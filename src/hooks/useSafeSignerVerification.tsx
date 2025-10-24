@@ -3,7 +3,7 @@ import type { Address } from "viem";
 import { getApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useAccount } from "wagmi";
 
 interface UseSafeSignerVerificationResult {
   isSignerConnected: boolean;
@@ -12,7 +12,7 @@ interface UseSafeSignerVerificationResult {
 }
 
 export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => {
-  const { address: connectedAddress } = useAppKitAccount();
+  const { address: connectedAddress } = useAccount();
   const { safeConfig } = useUser();
 
   const [safeSigners, setSafeSigners] = useState<Address[] | null>(null);
