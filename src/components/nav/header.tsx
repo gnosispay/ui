@@ -1,4 +1,3 @@
-import { useAccount } from "wagmi";
 import darklogo from "../../assets/GP-logo-white.svg";
 import lightLogo from "../../assets/GP-logo-black.svg";
 import { ModeToggle } from "../theme-toggle";
@@ -6,13 +5,13 @@ import { useTheme } from "../../context/ThemeContext";
 import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
 import { Button } from "@/components/ui/button";
-import { useAppKit } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 
 import { useCallback } from "react";
 
 export const HeaderNavBar = () => {
   const { effectiveTheme } = useTheme();
-  const { isConnected } = useAccount();
+  const { isConnected } = useAppKitAccount();
   const { open } = useAppKit();
 
   const handleConnect = useCallback(() => {

@@ -2,13 +2,12 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAppKit } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount } from "@reown/appkit/react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
-import { useAccount } from "wagmi";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { DebugButton } from "./DebugButton";
 
@@ -31,7 +30,11 @@ interface AuthScreenProps {
 
 const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
+  const { isAuthenticating, isAuthenticated } = useAuth();
+  const { isOnboarded } = useUser();
+  const { isConnected, status } = useAppKitAccount();
 
+  const isConnecting = useMemo(() => status === "connecting", [status]);
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
   return (
@@ -55,6 +58,14 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
           Trouble logging in? Get help
         </a>
         {type === "signup" && <DebugButton />}
+        <ul>
+          <li>isAuthenticating: {isAuthenticating.toString()}</li>
+          <li>isAuthenticated: {isAuthenticated.toString()}</li>
+          <li>isOnboarded: {isOnboarded.toString()}</li>
+          <li>isConnected: {isConnected.toString()}</li>
+          <li>isConnecting: {isConnecting.toString()}</li>
+          <li>status: {status}</li>
+        </ul>
       </div>
     </div>
   );
@@ -65,7 +76,9 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isOnboarded } = useUser();
   const { open } = useAppKit();
   const navigate = useNavigate();
-  const { isConnected, isConnecting } = useAccount();
+  const { isConnected, status } = useAppKitAccount();
+
+  const isConnecting = useMemo(() => status === "connecting", [status]);
 
   const handleConnect = useCallback(() => {
     open();

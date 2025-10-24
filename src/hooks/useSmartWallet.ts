@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
-import { useAccount, usePublicClient } from "wagmi";
+import { usePublicClient } from "wagmi";
 import type { Address } from "viem";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 interface UseSmartWalletReturn {
   smartWalletAddress: Address | undefined;
@@ -11,7 +12,7 @@ interface UseSmartWalletReturn {
 export const useSmartWallet = (): UseSmartWalletReturn => {
   const [isSmartWallet, setIsSmartWallet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { address } = useAccount();
+  const { address } = useAppKitAccount();
   const publicClient = usePublicClient();
 
   const checkSmartWallet = useCallback(() => {
@@ -24,7 +25,7 @@ export const useSmartWallet = (): UseSmartWalletReturn => {
     setIsLoading(true);
 
     publicClient
-      .getCode({ address })
+      .getCode({ address: address as Address })
       .then((bytecode) => {
         // if the bytecode is not empty, it's a smart wallet
         const isContract = !!bytecode;

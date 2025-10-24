@@ -3,12 +3,13 @@ import { client } from "@/client/client.gen";
 import { CollapsedError } from "@/components/collapsedError";
 import { isTokenExpired } from "@/utils/isTokenExpired";
 import { isTokenWithUserId } from "@/utils/isTokenWithUserId";
+import { useAppKitAccount, useAppKitConnections } from "@reown/appkit/react";
 import { differenceInMilliseconds, fromUnixTime } from "date-fns";
 import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
-import { useAccount, useConnections, useSignMessage } from "wagmi";
+import { useSignMessage, useChainId } from "wagmi";
 
 export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
@@ -35,9 +36,10 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isLocaStorageLoading, setIsLocaStorageLoading] = useState(true);
   const [contextKey, setContextKey] = useState(0);
-  const { address, chainId } = useAccount();
+  const { address } = useAppKitAccount();
+  const chainId = useChainId();
   const { signMessageAsync } = useSignMessage();
-  const connections = useConnections();
+  const { connections } = useAppKitConnections();
   const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const renewalInProgressRef = useRef(false);
   const previousAddressRef = useRef<string | undefined>(address);

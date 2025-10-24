@@ -4,10 +4,11 @@ import { Button } from "@/components/ui/button";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { getApiV1IbansSigningMessage, postApiV1IntegrationsMonerium } from "@/client";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { useAccount, useSignMessage } from "wagmi";
+import { useSignMessage } from "wagmi";
 import { useUser } from "@/context/UserContext";
 import { shortenAddress } from "@/utils/shortenAddress";
 import { currencies } from "@/constants";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 interface IbanIntegrationFlowProps {
   onSuccess?: () => void;
@@ -21,7 +22,7 @@ export function IbanIntegrationFlow({ onSuccess, onCancel, showCancelButton = tr
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string>("");
   const [success, setSuccess] = useState(false);
-  const { address } = useAccount();
+  const { address } = useAppKitAccount();
 
   const currency = useMemo(() => {
     if (!safeConfig?.fiatSymbol) return null;
