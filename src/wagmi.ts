@@ -20,6 +20,7 @@ export const wagmiAdapter = new WagmiAdapter({
   transports: {
     [gnosis.id]: http(),
   },
+  ssr: false,
 });
 
 export const appKit = createAppKit({
@@ -53,4 +54,10 @@ export const appKit = createAppKit({
     "--apkt-border-radius-master": "var(--radius)", // Uses your design system's border radius
     "--apkt-z-index": 1000,
   } as Record<string, string | number>,
+  // Force Gnosis chain for WalletConnect
+  enableWalletConnect: true,
+  enableInjected: true,
+  enableCoinbase: false,
+  // Ensure only Gnosis chain is available
+  allowUnsupportedChain: false,
 });
