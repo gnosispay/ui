@@ -31,9 +31,6 @@ interface AuthScreenProps {
 
 const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
-  const { isAuthenticating, isAuthenticated } = useAuth();
-  const { isOnboarded } = useUser();
-  const { isConnected, isConnecting } = useAccount();
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
   return (
@@ -57,14 +54,6 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
           Trouble logging in? Get help
         </a>
         {type === "signup" && <DebugButton />}
-        <ul>
-          <li>isAuthenticating: {isAuthenticating.toString()}</li>
-          <li>isAuthenticated: {isAuthenticated.toString()}</li>
-          <li>isOnboarded: {isOnboarded.toString()}</li>
-          <li>isConnected: {isConnected.toString()}</li>
-          <li>isConnecting: {isConnecting.toString()}</li>
-          <li>status: {status}</li>
-        </ul>
       </div>
     </div>
   );

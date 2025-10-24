@@ -53,11 +53,4 @@ export const appKit = createAppKit({
     "--apkt-border-radius-master": "var(--radius)", // Uses your design system's border radius
     "--apkt-z-index": 1000,
   } as Record<string, string | number>,
-  // // Enable connectors - AppKit will handle WalletConnect internally
-  // enableWalletConnect: true,
-  // enableInjected: true,
-  // enableCoinbase: false,
-  // // Ensure WalletConnect modal is properly configured
-  // includeWalletIds: [],
-  // excludeWalletIds: [],
 });
