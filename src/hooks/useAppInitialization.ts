@@ -49,13 +49,13 @@ export const useAppInitialization = () => {
     }
 
     // If wallet is not connected, we can show the connect screen
-    if (!isConnected && connections.length === 0) {
+    if (!isConnected) {
       doneInitializing();
       return;
     }
 
     // If wallet is connected, wait for connections to be established
-    if (isConnected) {
+    if (isConnected && connections.length === 0) {
       return;
     }
 
