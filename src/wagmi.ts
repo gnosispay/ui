@@ -1,6 +1,6 @@
 import { createAppKit } from "@reown/appkit/react";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
-import { createConfig, http } from "wagmi";
+import { http } from "wagmi";
 import { gnosis } from "wagmi/chains";
 import { safe, injected, walletConnect } from "wagmi/connectors";
 
