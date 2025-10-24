@@ -78,7 +78,12 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isConnected, isConnecting } = useAccount();
 
   const handleConnect = useCallback(() => {
-    open();
+    console.log("Opening AppKit modal...");
+    try {
+      open();
+    } catch (error) {
+      console.error("Error opening AppKit modal:", error);
+    }
   }, [open]);
 
   const handleNavigateToRegister = useCallback(() => {
