@@ -13,8 +13,6 @@ export const useGnosisChainEnforcer = () => {
   useEffect(() => {
     // Only enforce if wallet is connected and on wrong chain
     if (isConnected && chainId && chainId !== gnosis.id) {
-      console.log(`Wrong network detected (Chain ID: ${chainId}). Switching to Gnosis chain...`);
-      
       try {
         switchChain({ chainId: gnosis.id });
       } catch (error) {

@@ -9,6 +9,7 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useM
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
 import { useSignMessage, useAccount, useConnections } from "wagmi";
+import { getAddress } from "viem";
 
 export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
@@ -186,9 +187,21 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
+      // Ensure address is properly checksummed for EIP-55 compliance
+      let checksummedAddress: string;
+      try {
+        checksummedAddress = getAddress(address);
+        console.log("Address checksummed:", address, "->", checksummedAddress);
+      } catch (error) {
+        console.error("Invalid address format:", address, error);
+        toast.error("Invalid wallet address format");
+        setIsAuthenticating(false);
+        return;
+      }
+
       const message = new SiweMessage({
         domain: "app.gnosispay.com",
-        address,
+        address: checksummedAddress,
         statement: "Sign in with Ethereum to the app.",
         uri: "https://app.gnosispay.com",
         version: "1",

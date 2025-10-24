@@ -11,6 +11,7 @@ import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { DebugButton } from "./DebugButton";
 import { useAccount } from "wagmi";
+import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -65,6 +66,9 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { open } = useAppKit();
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
+
+  // Ensure wallet is always on Gnosis chain
+  useGnosisChainEnforcer();
 
   const handleConnect = useCallback(() => {
     console.log("Opening AppKit modal...");
