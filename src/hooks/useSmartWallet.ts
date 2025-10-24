@@ -24,7 +24,7 @@ export const useSmartWallet = (): UseSmartWalletReturn => {
     setIsLoading(true);
 
     publicClient
-      .getCode({ address })
+      .getCode({ address: address as Address })
       .then((bytecode) => {
         // if the bytecode is not empty, it's a smart wallet
         const isContract = !!bytecode;

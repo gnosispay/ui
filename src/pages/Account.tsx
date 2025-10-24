@@ -4,7 +4,7 @@ import { AccountSection, UserProfileHeader } from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
 import { SafeOwnersModal } from "@/components/modals/safe-owners";
 import { HELP_CENTER_URL, LEGAL_LINK } from "@/constants";
-import { useAccountModal } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { Button } from "@/components/ui/button";
 import { PersonalDetailsModal } from "@/components/modals/personal-details";
 import { AccountDetailsModal } from "@/components/modals/account-details";
@@ -22,13 +22,13 @@ enum ModalType {
 export const AccountRoute = () => {
   const [openModal, setOpenModal] = useState<ModalType>(ModalType.NONE);
   const closeModal = () => setOpenModal(ModalType.NONE);
-  const { openAccountModal } = useAccountModal();
+  const { open } = useAppKit();
 
   return (
     <div className="w-full max-w-xl mx-auto p-4 space-y-8">
       <UserProfileHeader />
       <div className="lg:hidden w-full flex justify-center mb-4">
-        <Button onClick={() => openAccountModal?.()}>Disconnect</Button>
+        <Button onClick={() => open()}>Disconnect</Button>
       </div>
       <div className="space-y-4">
         <h2 className="text-lg font-medium text-foreground">Account</h2>

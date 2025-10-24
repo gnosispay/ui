@@ -6,7 +6,7 @@ import { StandardAlert } from "@/components/ui/standard-alert";
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { formatUnits, parseUnits, isAddress, type Address } from "viem";
 import { readContracts } from "wagmi/actions";
-import { config } from "@/wagmi";
+import { wagmiAdapter } from "@/wagmi";
 import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { useUser } from "@/context/UserContext";
 import { Coins } from "lucide-react";
@@ -77,7 +77,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
 
       try {
         // Fetch all token data in a single batched call
-        const results = await readContracts(config, {
+        const results = await readContracts(wagmiAdapter.wagmiConfig, {
           contracts: [
             {
               address: address as Address,
