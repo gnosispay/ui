@@ -71,7 +71,6 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   useGnosisChainEnforcer();
 
   const handleConnect = useCallback(() => {
-    console.log("Opening AppKit modal...");
     try {
       open();
     } catch (error) {
