@@ -191,7 +191,6 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       let checksummedAddress: string;
       try {
         checksummedAddress = getAddress(address);
-        console.log("Address checksummed:", address, "->", checksummedAddress);
       } catch (error) {
         console.error("Invalid address format:", address, error);
         toast.error("Invalid wallet address format");
