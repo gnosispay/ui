@@ -1,9 +1,9 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import type { Address } from "viem";
+import { useAccount } from "wagmi";
 import { getApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { useAccount } from "wagmi";
 
 interface UseSafeSignerVerificationResult {
   isSignerConnected: boolean;

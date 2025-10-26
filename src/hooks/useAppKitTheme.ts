@@ -3,9 +3,7 @@ import { useTheme } from "@/context/ThemeContext";
 import { appKit } from "@/wagmi";
 
 /**
- * Hook to synchronize AppKit theme with your application's theme context
- *
- * Uses AppKit's setThemeMode method to properly update the theme.
+ * Hook to synchronize AppKit theme with the theme context
  */
 export function useAppKitTheme() {
   const { effectiveTheme } = useTheme();

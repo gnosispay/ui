@@ -20,9 +20,4 @@ export const useGnosisChainEnforcer = () => {
       }
     }
   }, [isConnected, chainId, switchChain]);
-
-  return {
-    isOnGnosisChain: chainId === gnosis.id,
-    gnosisChainId: gnosis.id,
-  };
 };

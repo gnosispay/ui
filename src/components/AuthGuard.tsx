@@ -67,7 +67,6 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
 
-  // Ensure wallet is always on Gnosis chain
   useGnosisChainEnforcer();
 
   const handleConnect = useCallback(() => {

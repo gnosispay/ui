@@ -9,10 +9,10 @@ import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./token-amount-input";
 import { CustomTokenAmountInput } from "./custom-token-amount-input.tsx";
 import { AddressInput } from "./address-input";
+import { useAccount } from "wagmi";
 import { useDelayRelay } from "@/context/DelayRelayContext";
 import { QueueNotEmptyAlert } from "@/components/QueueNotEmptyAlert";
 import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
-import { useAccount } from "wagmi";
 
 interface ValidatedFormData {
   toAddress: string;
