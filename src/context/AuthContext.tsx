@@ -8,7 +8,8 @@ import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
-import { useAccount, useConnections, useSignMessage } from "wagmi";
+import { useSignMessage, useAccount, useConnections } from "wagmi";
+import { getAddress } from "viem";
 
 export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
 
@@ -186,9 +187,20 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         return;
       }
 
+      // Ensure address is properly checksummed for EIP-55 compliance
+      let checksummedAddress: string;
+      try {
+        checksummedAddress = getAddress(address);
+      } catch (error) {
+        console.error("Invalid address format:", address, error);
+        toast.error("Invalid wallet address format");
+        setIsAuthenticating(false);
+        return;
+      }
+
       const message = new SiweMessage({
         domain: "app.gnosispay.com",
-        address,
+        address: checksummedAddress,
         statement: "Sign in with Ethereum to the app.",
         uri: "https://app.gnosispay.com",
         version: "1",
@@ -252,7 +264,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     } finally {
       renewalInProgressRef.current = false;
     }
-  }, [address, chainId, signMessageAsync, connections, jwtAddressKey, updateJwt]);
+  }, [address, chainId, signMessageAsync, jwtAddressKey, updateJwt, connections]);
 
   // Set up automatic JWT renewal timeout, simpler approach than with an interceptor
   // see https://heyapi.dev/openapi-ts/clients/fetch#interceptors

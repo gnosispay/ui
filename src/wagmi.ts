@@ -1,27 +1,16 @@
-import { connectorsForWallets } from "@rainbow-me/rainbowkit";
-import { createConfig, http } from "wagmi";
+import { createAppKit } from "@reown/appkit/react";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import { http } from "wagmi";
 import { gnosis } from "wagmi/chains";
-import { safe } from "wagmi/connectors";
-import { injectedWallet, walletConnectWallet } from "@rainbow-me/rainbowkit/wallets";
+import { safe, injected } from "wagmi/connectors";
 
-const connectors = connectorsForWallets(
-  [
-    {
-      groupName: "Recommended",
-      wallets: [injectedWallet, walletConnectWallet],
-    },
-  ],
-  {
-    appName: "Gnosis Pay",
-    // it's fine to have the id here, it has an allow list for the domains we use
-    projectId: "02e652f4cb3974c4c3a822aa56ec09f6",
-  },
-);
+const projectId = "02e652f4cb3974c4c3a822aa56ec09f6";
 
-export const config = createConfig({
-  chains: [gnosis],
+export const wagmiAdapter = new WagmiAdapter({
+  networks: [gnosis],
+  projectId,
   connectors: [
-    ...connectors,
+    injected(),
     safe({
       allowedDomains: [/gnosis-safe.io$/, /app.safe.global$/],
       debug: false,
@@ -31,4 +20,44 @@ export const config = createConfig({
   transports: {
     [gnosis.id]: http(),
   },
+  ssr: false,
+});
+
+export const appKit = createAppKit({
+  adapters: [wagmiAdapter],
+  projectId,
+  networks: [gnosis],
+  defaultNetwork: gnosis,
+  metadata: {
+    name: "Gnosis Pay",
+    description: "Decentralization. Accepted Everywhere.",
+    url: "https://gnosispay.com",
+    icons: ["https://gnosispay.com/favicon.ico"],
+  },
+  features: {
+    analytics: false,
+    email: false,
+    swaps: false,
+    onramp: false,
+    socials: false,
+    send: false,
+    receive: false,
+  },
+  enableNetworkSwitch: false,
+  themeMode: "light",
+  themeVariables: {
+    "--apkt-font-family": '"DM Sans", system-ui, Avenir, Helvetica, Arial, sans-serif',
+    "--apkt-accent": "var(--color-brand)",
+    "--apkt-color-mix": "var(--color-brand)",
+    "--apkt-color-mix-strength": 20,
+    "--apkt-font-size-master": "16px",
+    "--apkt-border-radius-master": "var(--radius)", // Uses your design system's border radius
+    "--apkt-z-index": 1000,
+  } as Record<string, string | number>,
+  // Force Gnosis chain for WalletConnect
+  enableWalletConnect: true,
+  enableInjected: true,
+  enableCoinbase: false,
+  // Ensure only Gnosis chain is available
+  allowUnsupportedChain: false,
 });

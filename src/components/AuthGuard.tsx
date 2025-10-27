@@ -2,15 +2,16 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useConnectModal } from "@rainbow-me/rainbowkit";
+import { useAppKit } from "@reown/appkit/react";
 import { useTheme } from "@/context/ThemeContext";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
-import { useAccount } from "wagmi";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { DebugButton } from "./DebugButton";
+import { useAccount } from "wagmi";
+import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
 
 interface AuthGuardProps {
   children: ReactNode;
@@ -31,7 +32,6 @@ interface AuthScreenProps {
 
 const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
-
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
   return (
@@ -63,13 +63,19 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
 export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
   const { isOnboarded } = useUser();
-  const { openConnectModal } = useConnectModal();
+  const { open } = useAppKit();
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
 
+  useGnosisChainEnforcer();
+
   const handleConnect = useCallback(() => {
-    openConnectModal?.();
-  }, [openConnectModal]);
+    try {
+      open();
+    } catch (error) {
+      console.error("Error opening AppKit modal:", error);
+    }
+  }, [open]);
 
   const handleNavigateToRegister = useCallback(() => {
     navigate("/register");
