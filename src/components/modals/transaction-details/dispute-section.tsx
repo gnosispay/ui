@@ -23,19 +23,29 @@ type DisputeReasons = NonNullable<GetApiV1TransactionsDisputeResponse["result"]>
 
 interface DisputeSectionProps {
   threadId: string;
+  transactionDate?: string;
   onBack: () => void;
 }
 
-export const DisputeSection = ({ threadId, onBack }: DisputeSectionProps) => {
+export const DisputeSection = ({ threadId, onBack, transactionDate }: DisputeSectionProps) => {
   const [disputeStep, setDisputeStep] = useState<DisputeStep>(DisputeStep.SelectReason);
   const [selectedReason, setSelectedReason] = useState<DisputeReason | "">("");
   const [disputeReasons, setDisputeReasons] = useState<DisputeReasons>({});
   const [isLoadingReasons, setIsLoadingReasons] = useState(false);
   const [isSubmittingDispute, setIsSubmittingDispute] = useState(false);
   const [disputeError, setDisputeError] = useState<string>("");
-  const hasAdditionalWarning = useMemo(() => {
+  const showCardRestrictionWarning = useMemo(() => {
     return selectedReason === "unrecognized_transaction_report_fraudulent";
   }, [selectedReason]);
+  const isLessThan24hOld = useMemo(() => {
+    if (!transactionDate) return false;
+
+    return new Date(transactionDate) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+  }, [transactionDate]);
+
+  const canDispute = useMemo(() => {
+    return !isLessThan24hOld || selectedReason === "unrecognized_transaction_report_fraudulent";
+  }, [isLessThan24hOld, selectedReason]);
 
   const fetchDisputeReasons = useCallback(() => {
     if (Object.keys(disputeReasons).length > 0) return; // Already loaded
@@ -133,10 +143,17 @@ export const DisputeSection = ({ threadId, onBack }: DisputeSectionProps) => {
           </div>
 
           {/* Additional Warning for Fraudulent Transaction */}
-          {hasAdditionalWarning && (
+          {showCardRestrictionWarning && (
             <StandardAlert
               variant="warning"
               description="Important: If you report this transaction as fraudulent, your card will be temporarily restricted until this issue is resolved to protect your account."
+            />
+          )}
+
+          {!canDispute && (
+            <StandardAlert
+              variant="destructive"
+              description="This transaction is less than 24 hours old. Please wait before disputing as refunds for reversed or failed transactions are automatically processed within one business day."
             />
           )}
 
@@ -144,7 +161,11 @@ export const DisputeSection = ({ threadId, onBack }: DisputeSectionProps) => {
             <Button variant="outline" onClick={onBack} disabled={isSubmittingDispute}>
               Back
             </Button>
-            <Button onClick={submitDispute} className="flex-1" disabled={!selectedReason || isSubmittingDispute}>
+            <Button
+              onClick={submitDispute}
+              className="flex-1"
+              disabled={!selectedReason || isSubmittingDispute || !canDispute}
+            >
               {isSubmittingDispute ? "Submitting..." : "Submit Dispute"}
             </Button>
           </div>

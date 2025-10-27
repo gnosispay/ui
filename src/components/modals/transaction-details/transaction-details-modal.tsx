@@ -45,7 +45,12 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
         )}
 
         {currentView === ModalView.Dispute && transaction.threadId && (
-          <DisputeSection key={transaction.threadId} threadId={transaction.threadId} onBack={handleBackToDetails} />
+          <DisputeSection
+            key={transaction.threadId}
+            transactionDate={transaction.createdAt}
+            threadId={transaction.threadId}
+            onBack={handleBackToDetails}
+          />
         )}
       </DialogContent>
     </Dialog>
