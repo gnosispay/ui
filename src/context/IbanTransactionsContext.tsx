@@ -4,6 +4,7 @@ import type { IbanOrder } from "@/client";
 import { getApiV1IbansOrders } from "@/client";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { useUser } from "./UserContext";
+import { useIBAN } from "./IBANContext";
 
 type IbanTransactionsContextProps = {
   children: ReactNode | ReactNode[];
@@ -19,11 +20,14 @@ const IbanTransactionsContext = createContext<IIbanTransactionsContext | undefin
 
 const IbanTransactionsContextProvider = ({ children }: IbanTransactionsContextProps) => {
   const { isOnboarded } = useUser();
+  const { hasIbanSet } = useIBAN();
   const [ibanTransactionsByDate, setIbanTransactionsByDate] = useState<Record<string, IbanOrder[]>>({});
   const [ibanTransactionsLoading, setIbanTransactionsLoading] = useState(true);
   const [ibanTransactionsError, setIbanTransactionsError] = useState("");
 
   const fetchIbanTransactions = useCallback(async () => {
+    if (!hasIbanSet) return;
+
     setIbanTransactionsLoading(true);
     setIbanTransactionsError("");
 
@@ -39,7 +43,7 @@ const IbanTransactionsContextProvider = ({ children }: IbanTransactionsContextPr
     }
 
     setIbanTransactionsLoading(false);
-  }, []);
+  }, [hasIbanSet]);
 
   useEffect(() => {
     if (!isOnboarded) {
