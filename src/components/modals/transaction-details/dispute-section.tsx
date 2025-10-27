@@ -1,5 +1,6 @@
 import { useCallback, useState, useEffect, useMemo } from "react";
 import { CheckCircle2 } from "lucide-react";
+import { isAfter, subHours } from "date-fns";
 import {
   getApiV1TransactionsDispute,
   postApiV1TransactionsByThreadIdDispute,
@@ -40,7 +41,10 @@ export const DisputeSection = ({ threadId, onBack, transactionDate }: DisputeSec
   const isLessThan24hOld = useMemo(() => {
     if (!transactionDate) return false;
 
-    return new Date(transactionDate) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const transactionDateTime = new Date(transactionDate);
+    const twentyFourHoursAgo = subHours(new Date(), 24);
+
+    return isAfter(transactionDateTime, twentyFourHoursAgo);
   }, [transactionDate]);
 
   const canDispute = useMemo(() => {
