@@ -20,6 +20,7 @@ export const OnchainTransactions = () => {
     isLoadingMoreOnchainTransactions,
     loadMoreOnchainTransactions,
     nextSearchFromDate,
+    currentOldestDate,
     setFetchingEnabled,
   } = useOnchainTransactions();
 
@@ -46,6 +47,12 @@ export const OnchainTransactions = () => {
     return "Load More";
   }, [isLoadingMoreOnchainTransactions, nextSearchFromDate]);
 
+  const checkedUntilText = useMemo(() => {
+    if (!currentOldestDate) return null;
+    const formattedDate = format(currentOldestDate, "MMM do, yyyy");
+    return `Loaded from ${formattedDate}`;
+  }, [currentOldestDate]);
+
   useEffect(() => {
     setFetchingEnabled(true);
   }, [setFetchingEnabled]);
@@ -64,7 +71,10 @@ export const OnchainTransactions = () => {
       {Object.keys(transactionsByDate).length === 0 && (
         <div className="flex flex-col items-center justify-center py-8">
           <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
-          <div className="text-center text-secondary">No onchain transactions to display</div>
+          <div className="text-center text-secondary">
+            No onchain transactions to display
+            {checkedUntilText && <div className="text-xs text-muted-foreground">{checkedUntilText}</div>}
+          </div>
         </div>
       )}
 
