@@ -117,6 +117,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.2.5
         version: 2.2.5
+      '@johanneskares/wallet-mock':
+        specifier: ^1.4.1
+        version: 1.4.1(@playwright/test@1.56.1)(viem@2.38.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))
       '@playwright/test':
         specifier: ^1.56.1
         version: 1.56.1
@@ -636,6 +639,12 @@ packages:
   '@isaacs/fs-minipass@4.0.1':
     resolution: {integrity: sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==}
     engines: {node: '>=18.0.0'}
+
+  '@johanneskares/wallet-mock@1.4.1':
+    resolution: {integrity: sha512-Jkg5JLKkaYt13LvvAUg23jvWdae9wxzoJlGWqWq0m4ssQXO6IoI9tYX9Nzjqtq8jst4Wxn/pFgzk7Y4Rdx7AEA==}
+    peerDependencies:
+      '@playwright/test': ^1.44.1
+      viem: ^2.13.8
 
   '@jridgewell/gen-mapping@0.3.13':
     resolution: {integrity: sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==}
@@ -4274,6 +4283,11 @@ snapshots:
   '@isaacs/fs-minipass@4.0.1':
     dependencies:
       minipass: 7.1.2
+
+  '@johanneskares/wallet-mock@1.4.1(@playwright/test@1.56.1)(viem@2.38.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12))':
+    dependencies:
+      '@playwright/test': 1.56.1
+      viem: 2.38.0(bufferutil@4.0.9)(typescript@5.9.3)(utf-8-validate@5.0.10)(zod@4.1.12)
 
   '@jridgewell/gen-mapping@0.3.13':
     dependencies:
