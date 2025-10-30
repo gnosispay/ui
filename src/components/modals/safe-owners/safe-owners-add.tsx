@@ -10,6 +10,7 @@ import { type Address, isAddress } from "viem";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useDelayRelay } from "@/context/DelayRelayContext";
 
 interface SafeOwnersAddProps {
   onCancel: () => void;
@@ -25,6 +26,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
   const [addAsSignInWallet, setAddAsSignInWallet] = useState(true);
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
+  const { fetchDelayQueue } = useDelayRelay();
   const handleAddressChange = useCallback((value: string) => {
     setError(null);
     setNewOwnerAddress(value);
@@ -130,6 +132,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
       }
 
       toast.success("Owner addition queued successfully");
+      fetchDelayQueue();
       onSuccess();
     } catch (err) {
       console.error("Error adding owner:", err);
@@ -146,6 +149,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
     smartWalletAddress,
     isSmartWalletLoading,
     addAsSignInWallet,
+    fetchDelayQueue,
   ]);
 
   const onChange = useCallback(
