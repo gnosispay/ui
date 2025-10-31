@@ -5,6 +5,7 @@ import usdcLogo from "./assets/tokens/usdce.png";
 import gnoLogo from "./assets/tokens/gno.svg";
 import xdaiLogo from "./assets/tokens/xdai.svg";
 import wethLogo from "./assets/tokens/weth.svg";
+import safeLogo from "./assets/tokens/safe.png";
 
 export interface CurrencyInfo {
   tokenSymbol?: string;
@@ -54,12 +55,12 @@ export const supportedTokens: Record<string, TokenInfo> = {
     symbol: "GNO",
     logo: gnoLogo,
   },
-  XDAI: {
-    tokenSymbol: "XDAI",
-    address: "0x0000000000000000000000000000000000000000",
+  SAFE: {
+    tokenSymbol: "SAFE",
+    address: "0x4d18815d14fe5c3304e87b3fa18318baa5c23820",
     decimals: 18,
-    symbol: "XDAI",
-    logo: xdaiLogo,
+    symbol: "SAFE",
+    logo: safeLogo,
   },
   WETH: {
     tokenSymbol: "WETH",
@@ -67,6 +68,13 @@ export const supportedTokens: Record<string, TokenInfo> = {
     decimals: 18,
     symbol: "WETH",
     logo: wethLogo,
+  },
+  XDAI: {
+    tokenSymbol: "XDAI",
+    address: "0x0000000000000000000000000000000000000000",
+    decimals: 18,
+    symbol: "XDAI",
+    logo: xdaiLogo,
   },
 };
 
