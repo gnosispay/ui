@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { type EoaAccount, getApiV1EoaAccounts } from "@/client";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { SignInWalletsView } from "./sign-in-wallets-view";
-import { SignInWalletsEdit } from "./sign-in-wallets-edit";
+import { SignInWalletsAddition } from "./sign-in-wallets-addition";
 import { SignInWalletsSuccessAddition } from "./sign-in-wallets-success-addition";
 import { SignInWalletsDeleteConfirmation } from "./sign-in-wallets-delete-confirmation";
 import { SignInWalletsSuccessDeletion } from "./sign-in-wallets-success-deletion";
@@ -109,7 +109,7 @@ export const SignInWalletsModal = ({ open, onOpenChange }: SignInWalletsModalPro
           )}
 
           {step === SignInWalletsStep.Editing && (
-            <SignInWalletsEdit onCancel={handleCancel} onSuccess={handleSuccessAddition} />
+            <SignInWalletsAddition onCancel={handleCancel} onSuccess={handleSuccessAddition} />
           )}
 
           {step === SignInWalletsStep.SuccessAddition && <SignInWalletsSuccessAddition onBack={handleBack} />}

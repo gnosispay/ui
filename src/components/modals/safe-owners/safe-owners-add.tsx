@@ -11,6 +11,7 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 import { toast } from "sonner";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useDelayRelay } from "@/context/DelayRelayContext";
+import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
 
 interface SafeOwnersAddProps {
   onCancel: () => void;
@@ -27,6 +28,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const { fetchDelayQueue } = useDelayRelay();
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
   const handleAddressChange = useCallback((value: string) => {
     setError(null);
     setNewOwnerAddress(value);
@@ -161,6 +163,13 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
 
   return (
     <div className="space-y-6">
+      {!isSignerConnected && !isDataLoading && (
+        <StandardAlert
+          variant="destructive"
+          description="Please make sure to be connected with an account that is a signer of the Gnosis Pay account"
+        />
+      )}
+
       <div className="space-y-2">
         <label htmlFor="owner-address" className="text-sm text-muted-foreground">
           Owner address
@@ -197,6 +206,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
       />
 
       {error && <StandardAlert variant="destructive" title="Error" description={error} />}
+      {signerError && <StandardAlert variant="destructive" description={signerError.message} />}
 
       <div className="flex gap-3">
         <Button variant="outline" className="flex-1" onClick={onCancel} disabled={isSubmitting}>
@@ -205,7 +215,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
         <Button
           className="flex-1 bg-button-bg hover:bg-button-bg-hover text-button-black font-medium"
           onClick={handleSave}
-          disabled={isSubmitting || !newOwnerAddress.trim()}
+          disabled={isSubmitting || !newOwnerAddress.trim() || !isSignerConnected || !!signerError}
           loading={isSubmitting}
         >
           {isSubmitting ? "Adding..." : "Add owner"}

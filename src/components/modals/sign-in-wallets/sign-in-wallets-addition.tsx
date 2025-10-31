@@ -12,7 +12,7 @@ interface SignInWalletsEditProps {
   onSuccess: () => void;
 }
 
-export const SignInWalletsEdit = ({ onCancel, onSuccess }: SignInWalletsEditProps) => {
+export const SignInWalletsAddition = ({ onCancel, onSuccess }: SignInWalletsEditProps) => {
   const [address, setAddress] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
