@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
 
-export const homePage = "http://localhost:5173";
-
 // test("has correct title and wallet connection heading", async ({ page }) => {
 //   await page.goto(homePage);
 
@@ -17,7 +15,7 @@ import { gnosis } from "viem/chains";
 
 test("wallet connection flow - no wallet initially", async ({ page }) => {
   // First, test that without any wallet, we see the connect button
-  await page.goto(homePage);
+  await page.goto('/');
 
   // Should show connect wallet button when no wallet is available
   await expect(page.getByRole("button", { name: "Connect wallet" })).toBeVisible();
@@ -32,7 +30,7 @@ test("wallet connection flow - with mock wallet", async ({ page }) => {
   });
 
   // Navigate to the page
-  await page.goto(homePage);
+  await page.goto('/');
 
   // Verify the button shows "Signing message..." text, is disabled, and shows loader
   const signingButton = page.getByRole("button", { name: "Signing message..." });
