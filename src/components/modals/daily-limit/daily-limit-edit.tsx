@@ -10,6 +10,7 @@ import { useSignTypedData } from "wagmi";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import type { Address } from "viem";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useDelayRelay } from "@/context/DelayRelayContext";
 
 interface DailyLimitEditProps {
   initialLimit: number | null;
@@ -25,6 +26,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
+  const { fetchDelayQueue } = useDelayRelay();
 
   const handleLimitChange = useCallback((value: string) => {
     setError(null);
@@ -111,6 +113,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
         return;
       }
 
+      fetchDelayQueue();
       onSuccess();
     } catch (err) {
       setError("Failed to create daily limit transaction");
@@ -126,6 +129,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
     onSuccess,
     smartWalletAddress,
     isSmartWalletLoading,
+    fetchDelayQueue,
   ]);
 
   const onChange = useCallback(

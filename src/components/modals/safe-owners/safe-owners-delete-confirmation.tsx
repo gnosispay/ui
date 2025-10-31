@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import { AlertTriangle } from "lucide-react";
 import type { Address } from "viem";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
+import { useDelayRelay } from "@/context/DelayRelayContext";
 
 interface SafeOwnersDeleteConfirmationProps {
   ownerAddress: string;
@@ -34,6 +35,7 @@ export const SafeOwnersDeleteConfirmation = ({
   const [removeSignInAccess, setRemoveSignInAccess] = useState(true);
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
+  const { fetchDelayQueue } = useDelayRelay();
 
   const handleDelete = useCallback(async () => {
     if (!safeConfig?.address) {
@@ -136,6 +138,7 @@ export const SafeOwnersDeleteConfirmation = ({
       }
 
       toast.success("Owner removal queued successfully");
+      fetchDelayQueue();
       onSuccess();
     } catch (err) {
       console.error("Error removing owner:", err);
@@ -151,6 +154,7 @@ export const SafeOwnersDeleteConfirmation = ({
     smartWalletAddress,
     isSmartWalletLoading,
     removeSignInAccess,
+    fetchDelayQueue,
   ]);
 
   return (

@@ -5,6 +5,7 @@ import { type ReactNode, createContext, useCallback, useContext, useEffect, useM
 import { toast } from "sonner";
 import { getTxTitle } from "@/utils/delayUtils";
 import { useUser } from "./UserContext";
+import { currencies } from "@/constants";
 
 type DelayRelayContextProps = {
   children: ReactNode | ReactNode[];
@@ -24,6 +25,11 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
   const [queue, setQueue] = useState<DelayTransaction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const currencyInfo = useMemo(() => {
+    if (!safeConfig?.fiatSymbol) return null;
+    return currencies[safeConfig.fiatSymbol];
+  }, [safeConfig?.fiatSymbol]);
 
   // Refs for tracking transactions with active toasts (to avoid dependency cycles)
   const executingTxsRef = useRef<Set<string>>(new Set());
@@ -123,7 +129,11 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     // Show toasts for new executing transactions
     for (const tx of executingQueue) {
       if (tx.transactionData && tx.id && !executingTxsRef.current.has(tx.id)) {
-        const title = getTxTitle(safeConfig?.address, tx.transactionData);
+        const title = getTxTitle({
+          account: safeConfig?.address,
+          transactionDataString: tx.transactionData,
+          currencyInfo,
+        });
         toast.loading(title, {
           id: `${prefix}-${tx.id}`,
           description: "Processing on-chain...",
@@ -143,7 +153,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     }
 
     executingTxsRef.current = currentExecutingIds;
-  }, [executingQueue, safeConfig?.address]);
+  }, [executingQueue, safeConfig?.address, currencyInfo]);
 
   // Processing transactions (QUEUING/WAITING without readyAt or with past readyAt)
   useEffect(() => {
@@ -153,7 +163,11 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     // Show toasts for new processing transactions
     for (const tx of processingQueue) {
       if (tx.id && !processingTxsRef.current.has(tx.id)) {
-        const title = getTxTitle(safeConfig?.address, tx.transactionData);
+        const title = getTxTitle({
+          account: safeConfig?.address,
+          transactionDataString: tx.transactionData,
+          currencyInfo,
+        });
         toast.loading(title, {
           id: `${prefix}-${tx.id}`,
           description: "Processing...",
@@ -170,7 +184,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
     }
 
     processingTxsRef.current = currentProcessingIds;
-  }, [processingQueue, safeConfig?.address]);
+  }, [processingQueue, safeConfig?.address, currencyInfo]);
 
   // Transactions with countdown (future readyAt)
   useEffect(() => {
@@ -182,7 +196,11 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
       const diff = readyDate.getTime() - Date.now();
 
       if (tx.id && !countDownTxsRef.current.has(tx.id)) {
-        const title = getTxTitle(safeConfig?.address, tx.transactionData);
+        const title = getTxTitle({
+          account: safeConfig?.address,
+          transactionDataString: tx.transactionData,
+          currencyInfo,
+        });
         toast.loading(title, {
           id: `${prefix}-${tx.id}`,
           description: `Executing in ${formatCountdown(diff)}`,
@@ -216,7 +234,11 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
           if (diff > 0) {
             activeTransactions = true;
             // Update toast with fresh countdown
-            const title = getTxTitle(safeConfig?.address, tx.transactionData);
+            const title = getTxTitle({
+              account: safeConfig?.address,
+              transactionDataString: tx.transactionData,
+              currencyInfo,
+            });
             toast.loading(title, {
               id: `${prefix}-${tx.id}`,
               description: `Executing in ${formatCountdown(diff)}`,
@@ -236,7 +258,7 @@ const DelayRelayContextProvider = ({ children }: DelayRelayContextProps) => {
         clearInterval(countdownIntervalRef.current);
       }
     };
-  }, [countDownQueue, safeConfig?.address]);
+  }, [countDownQueue, safeConfig?.address, currencyInfo]);
 
   return (
     <DelayRelayContext.Provider value={{ queue: nonExecutedQueue, isLoading, error, fetchDelayQueue }}>
