@@ -12,6 +12,12 @@
     "indentStyle": "space"
   },
   "assist": { "actions": { "source": { "organizeImports": "off" } } },
+  "css": {
+    "parser": {
+      "cssModules": false,
+      "tailwindDirectives": true
+    }
+  },
   "linter": {
     "enabled": true,
     "rules": {
