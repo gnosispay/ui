@@ -11,6 +11,7 @@ import { extractErrorMessage } from "@/utils/errorHelpers";
 import type { Address } from "viem";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useDelayRelay } from "@/context/DelayRelayContext";
+import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
 
 interface DailyLimitEditProps {
   initialLimit: number | null;
@@ -27,6 +28,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const { fetchDelayQueue } = useDelayRelay();
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
 
   const handleLimitChange = useCallback((value: string) => {
     setError(null);
@@ -145,6 +147,13 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
 
   return (
     <div className="space-y-6">
+      {!isSignerConnected && !isDataLoading && (
+        <StandardAlert
+          variant="destructive"
+          description="You must be connected with an account that is a signer of the Gnosis Pay account"
+        />
+      )}
+
       <div className="space-y-2">
         <label htmlFor="daily-limit" className="text-sm text-muted-foreground">
           Daily limit
@@ -176,6 +185,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
       </div>
 
       {error && <StandardAlert variant="destructive" title="Error" description={error} />}
+      {signerError && <StandardAlert variant="destructive" description={signerError.message} />}
 
       <div className="flex gap-3">
         <Button variant="outline" className="flex-1" onClick={onCancel} disabled={isSubmitting}>
@@ -184,7 +194,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
         <Button
           className="flex-1 bg-button-bg hover:bg-button-bg-hover text-button-black font-medium"
           onClick={handleSave}
-          disabled={isSubmitting || !!error}
+          disabled={isSubmitting || !!error || !isSignerConnected || !!signerError}
           loading={isSubmitting}
         >
           {isSubmitting ? "Saving..." : "Save"}
