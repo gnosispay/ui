@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { format, parseISO } from "date-fns";
-import { ExternalLink, Gift, X } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import type { Event } from "@/client";
 import { getIconForMcc, getMccCategory } from "@/utils/mccUtils";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -10,6 +10,7 @@ import { useTransactionStatus } from "@/hooks/useTransactionStatus";
 import { DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
+import { CashbackEligibilityStatus } from "@/components/ui/cashback-eligibility-status";
 import { shortenAddress } from "@/utils/shortenAddress";
 import { useCards } from "@/context/CardsContext";
 
@@ -47,7 +48,6 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
       countryFlag,
       txHash,
       threadId: transaction?.threadId,
-      eligibleForReward: transaction.impactsCashback,
     };
 
     if (isRefund || isReversal) {
@@ -117,7 +117,6 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
     status,
     txHash,
     threadId,
-    eligibleForReward,
   } = transactionDetails;
 
   return (
@@ -167,23 +166,7 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
         {/* Cashback Eligibility */}
         <div className="flex justify-between items-center py-3">
           <span className="text-muted-foreground">Cashback</span>
-          <div className="flex items-center">
-            {eligibleForReward ? (
-              <>
-                <div className="flex items-center justify-center bg-brand w-8 h-8 rounded-full">
-                  <Gift className="w-4 h-4 text-button-black" />
-                </div>
-                <span className="ml-2 font-medium text-foreground">Eligible</span>
-              </>
-            ) : (
-              <>
-                <div className="flex items-center justify-center bg-muted w-8 h-8 rounded-full">
-                  <X className="w-4 h-4 text-button-black" />
-                </div>
-                <span className="ml-2 font-medium text-foreground">None</span>
-              </>
-            )}
-          </div>
+          <CashbackEligibilityStatus transactionDetails={transaction} />
         </div>
 
         {cardInfo && (

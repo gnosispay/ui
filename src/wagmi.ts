@@ -60,4 +60,5 @@ export const appKit = createAppKit({
   enableCoinbase: false,
   // Ensure only Gnosis chain is available
   allowUnsupportedChain: false,
+  enableReconnect: true,
 });
