@@ -166,7 +166,7 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
       {!isSignerConnected && !isDataLoading && (
         <StandardAlert
           variant="destructive"
-          description="Please make sure to be connected with an account that is a signer of the Gnosis Pay account"
+          description="You must be connected with an account that is a signer of the Gnosis Pay account"
         />
       )}
 

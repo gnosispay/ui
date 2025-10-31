@@ -150,7 +150,7 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
       {!isSignerConnected && !isDataLoading && (
         <StandardAlert
           variant="destructive"
-          description="Please make sure to be connected with an account that is a signer of the Gnosis Pay account"
+          description="You must be connected with an account that is a signer of the Gnosis Pay account"
         />
       )}
 
