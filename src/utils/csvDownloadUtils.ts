@@ -25,6 +25,7 @@ export const DATE_RANGE_OPTIONS = [
 // CSV column headers for card transactions
 export const CSV_HEADERS = [
   "date",
+  "clearing_date",
   "merchant_name",
   "transaction_amount",
   "transaction_currency",
@@ -134,6 +135,7 @@ export const convertTransactionsToCSV = (
 
       const row = [
         tx.createdAt || "",
+        tx.clearedAt || "",
         tx.merchant?.name || "",
         formattedTransactionAmount || "",
         tx.transactionCurrency?.symbol || "",
