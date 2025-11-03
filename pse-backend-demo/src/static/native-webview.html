@@ -17,10 +17,7 @@
       <div id="secure-frame-container"></div>
     </div>
     <script type="module">
-      import GPSDK, {
-        ElementType,
-        IframeMessageType,
-      } from "@gnosispay/pse-sdk";
+      import GPSDK from "@gnosispay/pse-sdk";
 
       async function loadEphemeralToken() {
         try {
@@ -28,7 +25,7 @@
           const data = await response.json();
           return data.responseObject.data.ephemeralToken;
         } catch (error) {
-          alert("Failed to load ephemeral token");
+          alert("Failed to load ephemeral token", error);
         }
       }
 
@@ -42,7 +39,7 @@
             gnosisPayApiAuthToken,
           });
 
-          const cardDisplay = gp.init(
+          gp.init(
             elementType,
             "#secure-frame-container",
             { cardToken },
@@ -54,7 +51,7 @@
       }
 
       // Listen for messages from React Native
-      window.addEventListener('message', function(event) {
+      window.addEventListener('message', (event) => {
         try {
           const data = JSON.parse(event.data);
           
