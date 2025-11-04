@@ -105,7 +105,8 @@ export async function mockDelayRelay(
         const defaultDelayTransactions: DelayRelayMockData = [];
 
         // Apply any overrides
-        const finalDelayTransactions: DelayRelayMockData = delayRelayOverrides || testUser.delayRelay || defaultDelayTransactions;
+        const finalDelayTransactions: DelayRelayMockData =
+          delayRelayOverrides || testUser.delayRelay || defaultDelayTransactions;
 
         await route.fulfill({
           status: 200,
@@ -142,7 +143,8 @@ export function createDelayTransaction(config: {
   createdAt?: string;
 }): DelayTransactionData {
   const now = new Date().toISOString();
-  const readyAt = config.readyAt !== undefined ? config.readyAt : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+  const readyAt =
+    config.readyAt !== undefined ? config.readyAt : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
   return {
     id: config.id,

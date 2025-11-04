@@ -54,7 +54,7 @@ export interface SafeConfigMockData {
 export async function mockSafeConfig(
   page: Page,
   testUser: TestUser,
-  configOverrides?: SafeConfigMockData
+  configOverrides?: SafeConfigMockData,
 ): Promise<void> {
   await page.route("**/api/v1/safe/config", async (route) => {
     const request = route.request();
@@ -244,7 +244,7 @@ export const SAFE_CONFIG_SCENARIOS = {
 export async function mockSafeConfigScenario(
   page: Page,
   testUser: TestUser,
-  scenario: keyof typeof SAFE_CONFIG_SCENARIOS
+  scenario: keyof typeof SAFE_CONFIG_SCENARIOS,
 ): Promise<void> {
   await mockSafeConfig(page, testUser, SAFE_CONFIG_SCENARIOS[scenario]);
 }

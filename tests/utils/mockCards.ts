@@ -171,7 +171,7 @@ export async function mockCards(
       try {
         // Extract card ID from URL
         const url = request.url();
-        const cardIdMatch = url.match(/\/api\/v1\/cards\/([^\/]+)\/status/);
+        const cardIdMatch = url.match(/\/api\/v1\/cards\/([^/]+)\/status/);
         const cardId = cardIdMatch?.[1];
 
         if (!cardId) {

@@ -48,11 +48,7 @@ export interface RewardsMockData extends RewardsData {}
  * });
  * ```
  */
-export async function mockRewards(
-  page: Page,
-  testUser: TestUser,
-  rewardsOverrides?: RewardsMockData
-): Promise<void> {
+export async function mockRewards(page: Page, testUser: TestUser, rewardsOverrides?: RewardsMockData): Promise<void> {
   await page.route("**/api/v1/rewards", async (route) => {
     const request = route.request();
 
@@ -200,7 +196,7 @@ export const REWARDS_SCENARIOS = {
 export async function mockRewardsScenario(
   page: Page,
   testUser: TestUser,
-  scenario: keyof typeof REWARDS_SCENARIOS
+  scenario: keyof typeof REWARDS_SCENARIOS,
 ): Promise<void> {
   await mockRewards(page, testUser, REWARDS_SCENARIOS[scenario]);
 }
@@ -227,10 +223,7 @@ export function calculateCashbackRateFromBalance(gnoBalance: number): number {
 /**
  * Helper function to create realistic rewards data based on GNO balance
  */
-export function createRewardsFromBalance(
-  gnoBalance: number,
-  isOg: boolean = false
-): RewardsData {
+export function createRewardsFromBalance(gnoBalance: number, isOg: boolean = false): RewardsData {
   return {
     isOg,
     gnoBalance,

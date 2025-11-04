@@ -127,16 +127,13 @@ export async function mockIbansAvailableScenario(
 export function determineIbanAvailability(testUser: TestUser): IbansAvailableMockData {
   // Logic to determine IBAN availability based on user characteristics
   const user = testUser.user;
-  
+
   // Generally available if:
   // - User is approved for KYC
   // - User is active
   // - User has completed required steps
-  const isEligible = 
-    user.kycStatus === "approved" &&
-    user.status === "ACTIVE" &&
-    user.isPhoneValidated &&
-    user.isSourceOfFundsAnswered;
+  const isEligible =
+    user.kycStatus === "approved" && user.status === "ACTIVE" && user.isPhoneValidated && user.isSourceOfFundsAnswered;
 
   return {
     available: isEligible,
