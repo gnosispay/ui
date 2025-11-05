@@ -2,9 +2,10 @@ import { cn } from "@/utils/cn";
 
 interface OgnftBadgeProps {
   className?: string;
+  "data-testid"?: string;
 }
 
-export const OgnftBadge = ({ className }: OgnftBadgeProps) => {
+export const OgnftBadge = ({ className, "data-testid": dataTestId }: OgnftBadgeProps) => {
   return (
     <div
       className={cn(
@@ -13,8 +14,9 @@ export const OgnftBadge = ({ className }: OgnftBadgeProps) => {
         "border border-border",
         className
       )}
+      data-testid={dataTestId}
     >
-     🧑‍🚀 OG
+      🧑‍🚀 OG
     </div>
   );
 };

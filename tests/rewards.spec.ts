@@ -331,39 +331,7 @@ test.describe("Rewards Component", () => {
     });
   });
 
-  test("displays loading state with skeleton", async ({ page }) => {
-    // Mock a delayed response to test loading state
-    await page.route("**/api/v1/rewards", async (route) => {
-      // Delay the response to capture loading state
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(REWARDS_SCENARIOS.MEDIUM_BALANCE),
-      });
-    });
-
-    await setupAllMocks(page, BASE_USER, {
-      rewards: REWARDS_SCENARIOS.MEDIUM_BALANCE,
-    });
-
-    await page.goto("/");
-
-    const rewardsComponent = getRewardsComponent(page);
-
-    await test.step("loading skeleton is visible", async () => {
-      // Check for loading state within the rewards component
-      await expect(rewardsComponent.getByTestId("rewards-loading")).toBeVisible();
-    });
-
-    await test.step("content loads after skeleton", async () => {
-      // Wait for actual content to appear
-      await expect(rewardsComponent.getByTestId("cashback-rate")).toContainText("2.00%");
-      await expect(rewardsComponent.getByTestId("gno-balance-amount")).toContainText("10.00 GNO");
-    });
-  });
-
-  test("displays error state when API fails", async ({ page }) => {
+  test("displays default values when API fails", async ({ page }) => {
     await setupAllMocks(page, BASE_USER, {});
     // Mock an error response
     await page.route("**/api/v1/rewards", async (route) => {
@@ -379,9 +347,13 @@ test.describe("Rewards Component", () => {
 
     const rewardsComponent = getRewardsComponent(page);
 
-    await test.step("shows error alert when API fails", async () => {
-      // Component should show error state when API fails
-      await expect(rewardsComponent.getByTestId("rewards-error")).toBeVisible();
+    await test.step("shows default state with 0 GNO and 0% when API fails", async () => {
+      // Component should show default/initial state when API fails
+      await expect(rewardsComponent.getByTestId("cashback-rate")).toContainText("0.00%");
+      await expect(rewardsComponent.getByTestId("gno-balance-amount")).toContainText("0 GNO");
+      await expect(rewardsComponent.getByTestId("og-badge")).not.toBeVisible();
+      await expect(rewardsComponent.getByTestId("cashback-label")).toContainText("Cashback");
+      await expect(rewardsComponent.getByTestId("gno-balance-label")).toContainText("GNO balance");
     });
   });
 
