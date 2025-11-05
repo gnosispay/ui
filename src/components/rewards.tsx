@@ -17,6 +17,7 @@ export const Rewards = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  console.log("error", error);
   const fetchRewards = useCallback(() => {
     setIsLoading(true);
     setError(null);
@@ -61,16 +62,16 @@ export const Rewards = () => {
 
   if (error) {
     return (
-      <div className="bg-card p-4 rounded-lg">
-        <StandardAlert variant="destructive" description={error} />
+      <div className="bg-card p-4 rounded-lg" data-testid="rewards-component">
+        <StandardAlert variant="destructive" description={error} data-testid="rewards-error" />
       </div>
     );
   }
 
   return (
-    <div className="bg-card p-4 rounded-lg">
+    <div className="bg-card p-4 rounded-lg" data-testid="rewards-component">
       {isLoading ? (
-        <div className="space-y-4">
+        <div className="space-y-4" data-testid="rewards-loading">
           <div className="flex items-center gap-2">
             <Skeleton className="w-6 h-6" />
             <Skeleton className="w-20 h-4" />
@@ -84,17 +85,17 @@ export const Rewards = () => {
           </div>
         </div>
       ) : (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <Wallet className="w-5 h-5 text-foreground" />
-            <span className="text-sm font-medium text-foreground">Cashback</span>
-            {rewardsData?.isOg && <OgnftBadge />}
+        <div className="space-y-4" data-testid="rewards-content">
+          <div className="flex items-center gap-2" data-testid="cashback-row">
+            <Wallet className="w-5 h-5 text-foreground" data-testid="wallet-icon" />
+            <span className="text-sm font-medium text-foreground" data-testid="cashback-label">Cashback</span>
+            {rewardsData?.isOg && <OgnftBadge data-testid="og-badge" />}
             <div className="flex-1" />
-            <span className="text-sm font-medium text-foreground">{totalCashbackRateFormatted}%</span>
+            <span className="text-sm font-medium text-foreground" data-testid="cashback-rate">{totalCashbackRateFormatted}%</span>
           </div>
-          <div className="flex justify-between items-center">
-            <span className="text-sm text-muted-foreground">GNO balance</span>
-            <span className="text-sm font-medium text-foreground">{formattedGnoBalance} GNO</span>
+          <div className="flex justify-between items-center" data-testid="gno-balance-row">
+            <span className="text-sm text-muted-foreground" data-testid="gno-balance-label">GNO balance</span>
+            <span className="text-sm font-medium text-foreground" data-testid="gno-balance-amount">{formattedGnoBalance} GNO</span>
           </div>
         </div>
       )}

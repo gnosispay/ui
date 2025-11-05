@@ -38,7 +38,12 @@ test.describe("Balances Component", () => {
 
     // Navigate to the page and wait for the component to load
     await page.goto("/");
-    await page.waitForSelector("text=Balance");
+    await page.waitForSelector('[data-testid="balances-component"]');
+  };
+
+  // Helper function to get the balances component
+  const getBalancesComponent = (page: Page) => {
+    return page.getByTestId("balances-component");
   };
 
   test("displays basic balance with no pending or unspendable amounts", async ({ page }) => {
@@ -53,16 +58,18 @@ test.describe("Balances Component", () => {
       },
     });
 
+    const balancesComponent = getBalancesComponent(page);
+
     await test.step("balance amount is visible", async () => {
-      await expect(page.locator("text=1,000.00")).toBeVisible();
+      await expect(balancesComponent.getByTestId("balance-amount")).toContainText("1,000.00");
     });
 
     await test.step("pending amount is not visible", async () => {
-      await expect(page.locator("text=pending")).not.toBeVisible();
+      await expect(balancesComponent.getByTestId("pending-amount")).not.toBeVisible();
     });
 
     await test.step("unspendable amount is not visible", async () => {
-      await expect(page.locator("text=not spendable")).not.toBeVisible();
+      await expect(balancesComponent.getByTestId("unspendable-amount")).not.toBeVisible();
     });
   });
 
@@ -78,12 +85,14 @@ test.describe("Balances Component", () => {
       },
     });
 
+    const balancesComponent = getBalancesComponent(page);
+
     await test.step("main balance is visible", async () => {
-      await expect(page.locator("text=1,000.00")).toBeVisible();
+      await expect(balancesComponent.getByTestId("balance-amount")).toContainText("1,000.00");
     });
 
     await test.step("pending amount is visible", async () => {
-      await expect(page.locator("text=50.00 pending")).toBeVisible();
+      await expect(balancesComponent.getByTestId("pending-amount")).toContainText("50.00 pending");
     });
   });
 
@@ -99,11 +108,17 @@ test.describe("Balances Component", () => {
       },
     });
 
+    const balancesComponent = getBalancesComponent(page);
+
     await test.step("main balance is visible", async () => {
-      await expect(page.locator("text=1,000.00")).toBeVisible();
+      await expect(balancesComponent.getByTestId("balance-amount")).toContainText("1,000.00");
     });
 
     await test.step("unspendable amount is visible", async () => {
+      // The unspendable amount shows in the balances component
+      await expect(balancesComponent.getByTestId("unspendable-amount")).toContainText("75.00 not spendable");
+
+      // The alert with detailed message and actions appears elsewhere on the page
       const alert = page.getByRole("alert");
       await expect(alert).toBeVisible();
       await expect(alert).toContainText(
@@ -132,17 +147,22 @@ test.describe("Balances Component", () => {
       },
     });
 
+    const balancesComponent = getBalancesComponent(page);
+
     await test.step("main balance is visible", async () => {
-      await expect(page.locator("text=1,000.00")).toBeVisible();
+      await expect(balancesComponent.getByTestId("balance-amount")).toContainText("1,000.00");
     });
 
     await test.step("pending amount is visible", async () => {
-      await expect(page.locator("text=50.00 pending")).toBeVisible();
+      await expect(balancesComponent.getByTestId("pending-amount")).toContainText("50.00 pending");
     });
 
     await test.step("unspendable amount is visible", async () => {
-      const alert = page.getByRole("alert");
+      // The unspendable amount shows in the balances component
+      await expect(balancesComponent.getByTestId("unspendable-amount")).toContainText("75.00 not spendable");
 
+      // The alert with detailed message and actions appears elsewhere on the page
+      const alert = page.getByRole("alert");
       await expect(alert).toBeVisible();
       await expect(alert).toContainText(
         "A deposit into your account did not pass validation check and €75.00 are unspendable",
@@ -169,8 +189,10 @@ test.describe("Balances Component", () => {
       },
     });
 
+    const balancesComponent = getBalancesComponent(page);
+
     await test.step("displays USD format", async () => {
-      await expect(page.locator("text=$1,000.00")).toBeVisible();
+      await expect(balancesComponent.getByTestId("balance-amount")).toContainText("$1,000.00");
     });
   });
 
@@ -186,8 +208,10 @@ test.describe("Balances Component", () => {
       },
     });
 
+    const balancesComponent = getBalancesComponent(page);
+
     await test.step("displays GBP format", async () => {
-      await expect(page.locator("text=£1,000.00")).toBeVisible();
+      await expect(balancesComponent.getByTestId("balance-amount")).toContainText("£1,000.00");
     });
   });
 
@@ -203,8 +227,10 @@ test.describe("Balances Component", () => {
       },
     });
 
+    const balancesComponent = getBalancesComponent(page);
+
     await test.step("displays zero balance correctly", async () => {
-      await expect(page.locator("text=€0.00")).toBeVisible();
+      await expect(balancesComponent.getByTestId("balance-amount")).toContainText("€0.00");
     });
   });
 });

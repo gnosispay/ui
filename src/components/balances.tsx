@@ -27,26 +27,26 @@ export const Balances = () => {
     [balances?.pending, currencyInfo],
   );
   return (
-    <div className="flex flex-col gap-2 mb-4 mx-4 lg:mx-0">
+    <div className="flex flex-col gap-2 mb-4 mx-4 lg:mx-0" data-testid="balances-component">
       <h1 className="font-bold text-secondary text-lg">Balance</h1>
       {formattedBalance ? (
-        <div className="text-4xl text-primary font-bold">
+        <div className="text-4xl text-primary font-bold" data-testid="balance-amount">
           {formattedBalance.split(".")[0]}
           <span className="text-secondary">
             {formattedBalance.split(".")[1] ? `.${formattedBalance.split(".")[1]}` : ""}
           </span>
         </div>
       ) : (
-        <Skeleton className="h-10 w-32 rounded-lg" />
+        <Skeleton className="h-10 w-32 rounded-lg" data-testid="balance-loading" />
       )}
       {balances?.pending && balances.pending !== "0" && (
-        <div className="text-secondary flex items-center gap-1">
+        <div className="text-secondary flex items-center gap-1" data-testid="pending-amount">
           <Clock className="w-4 h-4" aria-hidden="true" />
           {formattedPending} pending
         </div>
       )}
       {hasUnspendableAmount && (
-        <div className="text-secondary flex items-center gap-1">
+        <div className="text-secondary flex items-center gap-1" data-testid="unspendable-amount">
           <CircleMinus className="w-4 h-4" aria-hidden="true" />
           {unspendableFormatted} not spendable
         </div>
