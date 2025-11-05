@@ -88,14 +88,22 @@ export const Rewards = () => {
         <div className="space-y-4" data-testid="rewards-content">
           <div className="flex items-center gap-2" data-testid="cashback-row">
             <Wallet className="w-5 h-5 text-foreground" data-testid="wallet-icon" />
-            <span className="text-sm font-medium text-foreground" data-testid="cashback-label">Cashback</span>
+            <span className="text-sm font-medium text-foreground" data-testid="cashback-label">
+              Cashback
+            </span>
             {rewardsData?.isOg && <OgnftBadge data-testid="og-badge" />}
             <div className="flex-1" />
-            <span className="text-sm font-medium text-foreground" data-testid="cashback-rate">{totalCashbackRateFormatted}%</span>
+            <span className="text-sm font-medium text-foreground" data-testid="cashback-rate">
+              {totalCashbackRateFormatted}%
+            </span>
           </div>
           <div className="flex justify-between items-center" data-testid="gno-balance-row">
-            <span className="text-sm text-muted-foreground" data-testid="gno-balance-label">GNO balance</span>
-            <span className="text-sm font-medium text-foreground" data-testid="gno-balance-amount">{formattedGnoBalance} GNO</span>
+            <span className="text-sm text-muted-foreground" data-testid="gno-balance-label">
+              GNO balance
+            </span>
+            <span className="text-sm font-medium text-foreground" data-testid="gno-balance-amount">
+              {formattedGnoBalance} GNO
+            </span>
           </div>
         </div>
       )}
