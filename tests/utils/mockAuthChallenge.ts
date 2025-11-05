@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import type { Page } from "@playwright/test";
 import type { PostApiV1AuthChallengeData, Authorization } from "../../src/client/types.gen";
+import type { TestUser } from "./testUsers";
 
 // Use generated types from API client
 type AuthChallengeRequest = PostApiV1AuthChallengeData["body"];
@@ -16,14 +17,8 @@ const DEFAULT_CHAIN_ID = "100"; // Gnosis chain
  * Configuration options for the auth challenge mock
  */
 export interface MockAuthChallengeOptions {
-  /** Custom user ID for the JWT payload. Defaults to "test-user-12345" */
-  userId?: string;
-  /** Custom signer address for the JWT payload. Defaults to "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266" */
-  signerAddress?: string;
-  /** Custom chain ID for the JWT payload. Defaults to "100" (Gnosis chain) */
+  /** Chain ID for the JWT payload. Defaults to "100" (Gnosis chain) */
   chainId?: string;
-  /** Whether the user has signed up. Defaults to true */
-  hasSignedUp?: boolean;
   /** Custom JWT secret for signing. Defaults to "test-secret-key" */
   jwtSecret?: string;
 }
@@ -32,18 +27,23 @@ export interface MockAuthChallengeOptions {
  * Generates a mock JWT token with the specified configuration
  *
  * @param ttlInSeconds - Token time-to-live in seconds (default: 3600 = 1 hour)
- * @param options - Configuration options for the JWT payload
+ * @param testUser - Test user data for the JWT payload
+ * @param options - Additional configuration options for the JWT payload
  * @returns A signed JWT token string
  */
-function generateMockJWT(ttlInSeconds: number = 3600, options: MockAuthChallengeOptions = {}): string {
+function generateMockJWT(
+  ttlInSeconds: number = 3600,
+  testUser: TestUser,
+  options: MockAuthChallengeOptions = {},
+): string {
   const now = Math.floor(Date.now() / 1000);
   const payload: JWTPayload = {
-    userId: options.userId || MOCK_USER_ID,
-    signerAddress: options.signerAddress || DEFAULT_SIGNER_ADDRESS,
+    userId: testUser.userId,
+    signerAddress: testUser.signerAddress,
     chainId: options.chainId || DEFAULT_CHAIN_ID,
     iat: now,
     exp: now + ttlInSeconds,
-    hasSignedUp: options.hasSignedUp ?? true,
+    hasSignedUp: testUser.hasSignedUp,
   };
 
   return jwt.sign(payload, options.jwtSecret || JWT_SECRET);
@@ -56,29 +56,38 @@ function generateMockJWT(ttlInSeconds: number = 3600, options: MockAuthChallenge
  * a mock JWT token response that matches the API specification.
  *
  * @param page - The Playwright page instance
- * @param options - Configuration options for the mock behavior
+ * @param testUser - Test user data for the JWT payload
+ * @param options - Additional configuration options for the mock behavior
  *
  * @example
  * ```typescript
  * import { mockAuthChallenge } from "./utils/mockAuthChallenge";
+ * import { TEST_USER_APPROVED } from "./testUsers";
  *
  * test("user authentication flow", async ({ page }) => {
- *   // Set up the auth challenge mock
- *   await mockAuthChallenge(page);
+ *   // Set up the auth challenge mock with test user data
+ *   await mockAuthChallenge(page, TEST_USER_APPROVED);
  *
  *   // Your test code here...
  * });
  *
- * // With custom options
- * test("custom user authentication", async ({ page }) => {
- *   await mockAuthChallenge(page, {
- *     userId: "custom-user-123",
- *     hasSignedUp: false
+ * // With additional custom options
+ * test("custom chain authentication", async ({ page }) => {
+ *   await mockAuthChallenge(page, TEST_USER_APPROVED, {
+ *     chainId: "1", // Ethereum mainnet
  *   });
  * });
  * ```
  */
-export async function mockAuthChallenge(page: Page, options: MockAuthChallengeOptions = {}): Promise<void> {
+export async function mockAuthChallenge({
+  page,
+  testUser,
+  options = {},
+}: {
+  page: Page;
+  testUser: TestUser;
+  options?: MockAuthChallengeOptions;
+}): Promise<void> {
   await page.route("**/api/v1/auth/challenge", async (route) => {
     const request = route.request();
 
@@ -88,7 +97,7 @@ export async function mockAuthChallenge(page: Page, options: MockAuthChallengeOp
         const ttlInSeconds = requestBody.ttlInSeconds || 3600;
 
         const mockResponse = {
-          token: generateMockJWT(ttlInSeconds, options),
+          token: generateMockJWT(ttlInSeconds, testUser, options),
         };
 
         await route.fulfill({

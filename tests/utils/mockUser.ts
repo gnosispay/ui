@@ -23,7 +23,7 @@ import type { TestUser } from "./testUsers";
  * });
  * ```
  */
-export async function mockUser(page: Page, testUser: TestUser): Promise<void> {
+export async function mockUser({ page, testUser }: { page: Page; testUser: TestUser }): Promise<void> {
   await page.route("**/api/v1/user", async (route) => {
     const request = route.request();
 
@@ -48,18 +48,8 @@ export async function mockUser(page: Page, testUser: TestUser): Promise<void> {
   });
 }
 
-// Re-export test users for convenience
+// Re-export test user for convenience
 export {
-  TEST_USER_APPROVED,
-  TEST_USER_NOT_STARTED,
-  TEST_USER_PENDING_KYC,
-  TEST_USER_REJECTED,
-  TEST_USER_REQUIRES_ACTION,
-  TEST_USER_FULLY_SETUP,
-  TEST_USER_DEACTIVATED,
-  TEST_USER_GERMANY,
-  TEST_USER_MULTIPLE_CARDS,
-  ALL_TEST_USERS,
-  getTestUser,
+  BASE_USER as BASED_USER,
   type TestUser,
 } from "./testUsers";

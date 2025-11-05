@@ -109,7 +109,15 @@ export interface OrderMockData extends Array<OrderData> {}
  * });
  * ```
  */
-export async function mockOrder(page: Page, testUser: TestUser, orderOverrides?: OrderMockData): Promise<void> {
+export async function mockOrder({
+  page,
+  testUser,
+  orderOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  orderOverrides?: OrderMockData;
+}): Promise<void> {
   await page.route("**/api/v1/order/", async (route) => {
     const request = route.request();
 
@@ -391,7 +399,7 @@ export async function mockOrderScenario(
   testUser: TestUser,
   scenario: keyof typeof ORDER_SCENARIOS,
 ): Promise<void> {
-  await mockOrder(page, testUser, ORDER_SCENARIOS[scenario]);
+  await mockOrder({ page, testUser, orderOverrides: ORDER_SCENARIOS[scenario] });
 }
 
 /**

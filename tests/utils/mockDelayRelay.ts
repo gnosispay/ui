@@ -91,11 +91,15 @@ export interface DelayRelayMockData extends Array<DelayTransactionData> {}
  * });
  * ```
  */
-export async function mockDelayRelay(
-  page: Page,
-  testUser: TestUser,
-  delayRelayOverrides?: DelayRelayMockData,
-): Promise<void> {
+export async function mockDelayRelay({
+  page,
+  testUser,
+  delayRelayOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  delayRelayOverrides?: DelayRelayMockData;
+}): Promise<void> {
   await page.route("**/api/v1/delay-relay", async (route) => {
     const request = route.request();
 
@@ -287,7 +291,7 @@ export async function mockDelayRelayScenario(
   testUser: TestUser,
   scenario: keyof typeof DELAY_RELAY_SCENARIOS,
 ): Promise<void> {
-  await mockDelayRelay(page, testUser, DELAY_RELAY_SCENARIOS[scenario]);
+  await mockDelayRelay({ page, testUser, delayRelayOverrides: DELAY_RELAY_SCENARIOS[scenario] });
 }
 
 /**

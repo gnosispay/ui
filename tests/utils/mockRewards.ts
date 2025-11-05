@@ -48,7 +48,15 @@ export interface RewardsMockData extends RewardsData {}
  * });
  * ```
  */
-export async function mockRewards(page: Page, testUser: TestUser, rewardsOverrides?: RewardsMockData): Promise<void> {
+export async function mockRewards({
+  page,
+  testUser,
+  rewardsOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  rewardsOverrides?: RewardsMockData;
+}): Promise<void> {
   await page.route("**/api/v1/rewards", async (route) => {
     const request = route.request();
 
@@ -198,7 +206,7 @@ export async function mockRewardsScenario(
   testUser: TestUser,
   scenario: keyof typeof REWARDS_SCENARIOS,
 ): Promise<void> {
-  await mockRewards(page, testUser, REWARDS_SCENARIOS[scenario]);
+  await mockRewards({ page, testUser, rewardsOverrides: REWARDS_SCENARIOS[scenario] });
 }
 
 /**

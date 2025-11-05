@@ -49,11 +49,15 @@ export interface IbansAvailableMockData extends IbansAvailableData {}
  * });
  * ```
  */
-export async function mockIbansAvailable(
-  page: Page,
-  testUser: TestUser,
-  ibansAvailableOverrides?: IbansAvailableMockData,
-): Promise<void> {
+export async function mockIbansAvailable({
+  page,
+  testUser,
+  ibansAvailableOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  ibansAvailableOverrides?: IbansAvailableMockData;
+}): Promise<void> {
   await page.route("**/api/v1/ibans/available", async (route) => {
     const request = route.request();
 
@@ -118,7 +122,7 @@ export async function mockIbansAvailableScenario(
   testUser: TestUser,
   scenario: keyof typeof IBANS_AVAILABLE_SCENARIOS,
 ): Promise<void> {
-  await mockIbansAvailable(page, testUser, IBANS_AVAILABLE_SCENARIOS[scenario]);
+  await mockIbansAvailable({ page, testUser, ibansAvailableOverrides: IBANS_AVAILABLE_SCENARIOS[scenario] });
 }
 
 /**
@@ -136,7 +140,7 @@ export function determineIbanAvailability(testUser: TestUser): IbansAvailableMoc
     user.kycStatus === "approved" && user.status === "ACTIVE" && user.isPhoneValidated && user.isSourceOfFundsAnswered;
 
   return {
-    available: isEligible,
+    available: isEligible ?? false,
   };
 }
 

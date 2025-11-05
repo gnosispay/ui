@@ -48,11 +48,15 @@ export interface AccountBalancesMockData extends AccountBalancesData {}
  * });
  * ```
  */
-export async function mockAccountBalances(
-  page: Page,
-  testUser: TestUser,
-  balancesOverrides?: AccountBalancesMockData,
-): Promise<void> {
+export async function mockAccountBalances({
+  page,
+  testUser,
+  balancesOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  balancesOverrides?: AccountBalancesMockData;
+}): Promise<void> {
   await page.route("**/api/v1/account-balances", async (route) => {
     const request = route.request();
 
@@ -209,7 +213,7 @@ export async function mockAccountBalancesScenario(
   testUser: TestUser,
   scenario: keyof typeof ACCOUNT_BALANCE_SCENARIOS,
 ): Promise<void> {
-  await mockAccountBalances(page, testUser, ACCOUNT_BALANCE_SCENARIOS[scenario]);
+  await mockAccountBalances({ page, testUser, balancesOverrides: ACCOUNT_BALANCE_SCENARIOS[scenario] });
 }
 
 /**

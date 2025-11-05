@@ -128,12 +128,17 @@ export interface CardStatusData {
  * });
  * ```
  */
-export async function mockCards(
-  page: Page,
-  testUser: TestUser,
-  cardsOverrides?: CardsMockData,
-  cardStatusOverrides?: Record<string, CardStatusData>,
-): Promise<void> {
+export async function mockCards({
+  page,
+  testUser,
+  cardsOverrides,
+  cardStatusOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  cardsOverrides?: CardsMockData;
+  cardStatusOverrides?: Record<string, CardStatusData>;
+}): Promise<void> {
   await page.route("**/api/v1/cards", async (route) => {
     const request = route.request();
 
@@ -522,7 +527,7 @@ export async function mockCardsScenario(
   testUser: TestUser,
   scenario: keyof typeof CARD_SCENARIOS,
 ): Promise<void> {
-  await mockCards(page, testUser, CARD_SCENARIOS[scenario]);
+  await mockCards({ page, testUser, cardsOverrides: CARD_SCENARIOS[scenario] });
 }
 
 /**

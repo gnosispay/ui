@@ -26,7 +26,10 @@ export interface SafeConfigMockData {
  * Sets up a mock for the `/api/v1/safe/config` endpoint in Playwright tests.
  *
  * This function intercepts GET requests to the safe config endpoint and returns
- * the specified safe configuration data.
+ * the specified safe configuration data with the following priority order:
+ * 1. testUser.safeConfig (from the test user definition)
+ * 2. configOverrides (passed as parameter)
+ * 3. fallback defaults (hardcoded sensible defaults)
  *
  * @param page - The Playwright page instance
  * @param testUser - The test user whose safe config to mock
@@ -38,31 +41,39 @@ export interface SafeConfigMockData {
  * import { TEST_USER_APPROVED } from "./utils/testUsers";
  *
  * test("safe config display", async ({ page }) => {
- *   // Set up the safe config mock with default values
- *   await mockSafeConfig(page, TEST_USER_APPROVED);
+ *   // Uses testUser.safeConfig, then falls back to defaults
+ *   await mockSafeConfig({ page, testUser: TEST_USER_APPROVED });
  *
- *   // Or with custom overrides
- *   await mockSafeConfig(page, TEST_USER_APPROVED, {
- *     isDeployed: false,
- *     accountStatus: 1 // SafeNotDeployed
+ *   // Uses testUser.safeConfig, then configOverrides, then defaults
+ *   await mockSafeConfig({
+ *     page,
+ *     testUser: TEST_USER_APPROVED,
+ *     configOverrides: {
+ *       isDeployed: false,
+ *       accountStatus: 1 // SafeNotDeployed
+ *     }
  *   });
  *
  *   // Your test code here...
  * });
  * ```
  */
-export async function mockSafeConfig(
-  page: Page,
-  testUser: TestUser,
-  configOverrides?: SafeConfigMockData,
-): Promise<void> {
+export async function mockSafeConfig({
+  page,
+  testUser,
+  configOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  configOverrides?: SafeConfigMockData;
+}): Promise<void> {
   await page.route("**/api/v1/safe/config", async (route) => {
     const request = route.request();
 
     if (request.method() === "GET") {
       try {
-        // Create default safe config based on test user
-        const defaultConfig: SafeConfig = {
+        // Create fallback default config
+        const fallbackDefaults: SafeConfig = {
           hasNoApprovals: false,
           isDeployed: true,
           address: testUser.safeAddress,
@@ -77,17 +88,17 @@ export async function mockSafeConfig(
           },
         };
 
-        // Apply any overrides
+        // Priority order: testUser.safeConfig > configOverrides > fallbackDefaults
         const finalConfig: SafeConfig = {
-          ...defaultConfig,
+          ...fallbackDefaults,
+          ...testUser.safeConfig,
           ...configOverrides,
-          // If accountAllowance is provided in overrides, merge it with defaults
-          ...(configOverrides?.accountAllowance && {
-            accountAllowance: {
-              ...defaultConfig.accountAllowance,
-              ...configOverrides.accountAllowance,
-            },
-          }),
+          // Handle accountAllowance merging with proper priority
+          accountAllowance: {
+            ...fallbackDefaults.accountAllowance,
+            ...(testUser.safeConfig?.accountAllowance || {}),
+            ...(configOverrides?.accountAllowance || {}),
+          },
         };
 
         await route.fulfill({
@@ -246,5 +257,5 @@ export async function mockSafeConfigScenario(
   testUser: TestUser,
   scenario: keyof typeof SAFE_CONFIG_SCENARIOS,
 ): Promise<void> {
-  await mockSafeConfig(page, testUser, SAFE_CONFIG_SCENARIOS[scenario]);
+  await mockSafeConfig({ page, testUser, configOverrides: SAFE_CONFIG_SCENARIOS[scenario] });
 }

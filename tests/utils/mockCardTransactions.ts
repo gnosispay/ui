@@ -89,11 +89,15 @@ export enum TransactionType {
  * });
  * ```
  */
-export async function mockCardTransactions(
-  page: Page,
-  testUser: TestUser,
-  transactionsOverrides?: CardTransactionsMockData,
-): Promise<void> {
+export async function mockCardTransactions({
+  page,
+  testUser,
+  transactionsOverrides,
+}: {
+  page: Page;
+  testUser: TestUser;
+  transactionsOverrides?: CardTransactionsMockData;
+}): Promise<void> {
   // Handle both /api/v1/cards/transactions and /v1/cards/transactions patterns
   const routeHandler = async (route: Route) => {
     const request = route.request();
@@ -363,10 +367,14 @@ export const CARD_TRANSACTIONS_SCENARIOS = {
 /**
  * Helper function to mock card transactions with a predefined scenario
  */
-export async function mockCardTransactionsScenario(
-  page: Page,
-  testUser: TestUser,
-  scenario: keyof typeof CARD_TRANSACTIONS_SCENARIOS,
-): Promise<void> {
-  await mockCardTransactions(page, testUser, CARD_TRANSACTIONS_SCENARIOS[scenario]);
+export async function mockCardTransactionsScenario({
+  page,
+  testUser,
+  scenario,
+}: {
+  page: Page;
+  testUser: TestUser;
+  scenario: keyof typeof CARD_TRANSACTIONS_SCENARIOS;
+}): Promise<void> {
+  await mockCardTransactions({ page, testUser, transactionsOverrides: CARD_TRANSACTIONS_SCENARIOS[scenario] });
 }
