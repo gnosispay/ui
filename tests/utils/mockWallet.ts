@@ -3,7 +3,6 @@ import { privateKeyToAccount } from "viem/accounts";
 import { type Address, http } from "viem";
 import { gnosis } from "viem/chains";
 import type { Page } from "@playwright/test";
-import type { TestUser } from "./testUsers";
 import { USER_TEST_PRIVATE_KEY } from "./testUsers";
 
 /**

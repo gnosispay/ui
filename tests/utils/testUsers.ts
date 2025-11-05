@@ -10,7 +10,7 @@ import type { CardTransactionsMockData } from "./mockCardTransactions";
 import { createCard, CardStatus } from "./mockCards";
 import { CARD_TRANSACTIONS_SCENARIOS } from "./mockCardTransactions";
 
-export const USER_TEST_PRIVATE_KEY = "21887a39f458c94eee2645f761df490a83f0b7c4d55eae8a670199625e1343e9";
+export const USER_TEST_PRIVATE_KEY = "0x21887a39f458c94eee2645f761df490a83f0b7c4d55eae8a670199625e1343e9";
 export const USER_TEST_SIGNER_ADDRESS = "0x0D04547F7a54710C6E5C1d9f2794DE8423951cD8";
 /**
  * Complete test user configuration including all addresses and IDs

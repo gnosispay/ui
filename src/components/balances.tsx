@@ -8,7 +8,7 @@ import { useUnspendableAmount } from "@/hooks/useUnspendableAmount";
 
 export const Balances = () => {
   const { balances, safeConfig } = useUser();
-  const { unspendableFormatted, shouldShowAlert } = useUnspendableAmount();
+  const { unspendableFormatted, hasUnspendableAmount } = useUnspendableAmount();
   const currencyInfo = useMemo(() => {
     if (!safeConfig?.fiatSymbol) {
       return;
@@ -26,7 +26,6 @@ export const Balances = () => {
     () => formatCurrency(balances?.pending, currencyInfo),
     [balances?.pending, currencyInfo],
   );
-
   return (
     <div className="flex flex-col gap-2 mb-4 mx-4 lg:mx-0">
       <h1 className="font-bold text-secondary text-lg">Balance</h1>
@@ -46,7 +45,7 @@ export const Balances = () => {
           {formattedPending} pending
         </div>
       )}
-      {shouldShowAlert && (
+      {hasUnspendableAmount && (
         <div className="text-secondary flex items-center gap-1">
           <CircleMinus className="w-4 h-4" aria-hidden="true" />
           {unspendableFormatted} not spendable
