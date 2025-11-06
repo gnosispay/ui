@@ -9,9 +9,10 @@ import { TransactionDetailsModal } from "@/components/modals/transaction-details
 
 interface TransactionRowProps {
   transaction: Event;
+  index?: number;
 }
 
-export const TransactionRow = ({ transaction }: TransactionRowProps) => {
+export const TransactionRow = ({ transaction, index = 0 }: TransactionRowProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isRefund, isReversal, isPending, otherTxStatus, sign } = useTransactionStatus(transaction);
 
@@ -56,29 +57,30 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
         className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors w-full text-left p-2"
         onClick={handleClick}
         type="button"
+        data-testid={`transaction-row-${index}`}
       >
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center">
             <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
           </div>
           <div>
-            <div className="text-lg text-foreground">{merchantName}</div>
+            <div className="text-lg text-foreground" data-testid="transaction-merchant-name">{merchantName}</div>
             <div className="text-xs text-muted-foreground">
               {time}
               {isRefund && (
-                <span className="inline-flex items-center ml-1">
+                <span className="inline-flex items-center ml-1" data-testid="transaction-status-refund">
                   {"• Refund"}
                   <StatusHelpIcon type="refund" />
                 </span>
               )}
               {isReversal && (
-                <span className="inline-flex items-center ml-1">
+                <span className="inline-flex items-center ml-1" data-testid="transaction-status-reversal">
                   {"• Reversal"}
                   <StatusHelpIcon type="reversal" />
                 </span>
               )}
               {isPending && (
-                <span className="inline-flex items-center ml-1">
+                <span className="inline-flex items-center ml-1" data-testid="transaction-status-pending">
                   {"• Pending"}
                   <StatusHelpIcon type="pending" />
                 </span>
@@ -88,7 +90,7 @@ export const TransactionRow = ({ transaction }: TransactionRowProps) => {
           </div>
         </div>
         <div className="text-right">
-          <div className={`text-lg text-foreground ${isStrikethrough ? "line-through" : ""}`}>
+          <div className={`text-lg text-foreground ${isStrikethrough ? "line-through" : ""}`} data-testid="transaction-amount">
             {billAmount ? `${sign} ${billAmount}` : "-"}
           </div>
           {txAmount !== billAmount && <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>}

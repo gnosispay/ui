@@ -1,6 +1,7 @@
 import type { Page, Route } from "@playwright/test";
 import type { Event, Payment, Refund, Reversal, BasePaymentish } from "../../src/client/types.gen";
 import type { TestUser } from "./testUsers";
+import { mockCurrencies } from "./currencyUtils";
 
 /**
  * Card transactions response data structure
@@ -101,7 +102,6 @@ export async function mockCardTransactions({
   // Handle both /api/v1/cards/transactions and /v1/cards/transactions patterns
   const routeHandler = async (route: Route) => {
     const request = route.request();
-    console.log(`[mockCardTransactions] Intercepted: ${request.method()} ${request.url()}`);
 
     if (request.method() === "GET") {
       try {
@@ -202,10 +202,10 @@ export function createPayment(
       city: "Berlin",
       country: { alpha2: "DE", name: "Germany" },
     },
-    billingAmount: config.billingAmount || "1000", // 10.00 EUR in cents
-    billingCurrency: config.billingCurrency || { code: "EUR", name: "Euro" },
-    transactionAmount: config.transactionAmount || config.billingAmount || "1000",
-    transactionCurrency: config.transactionCurrency || config.billingCurrency || { code: "EUR", name: "Euro" },
+    billingAmount: config.billingAmount || "10000000000000000000", // 10.00 EUR (18 decimals)
+    billingCurrency: config.billingCurrency || mockCurrencies.EUR,
+    transactionAmount: config.transactionAmount || config.billingAmount || "10000000000000000000",
+    transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.PURCHASE,
     cardToken: config.cardToken || "default-card-token",
     transactions: config.transactions || [],
@@ -237,14 +237,14 @@ export function createRefund(
       city: "Berlin",
       country: { alpha2: "DE", name: "Germany" },
     },
-    billingAmount: config.billingAmount || "1000",
-    billingCurrency: config.billingCurrency || { code: "EUR", name: "Euro" },
-    transactionAmount: config.transactionAmount || config.billingAmount || "1000",
-    transactionCurrency: config.transactionCurrency || config.billingCurrency || { code: "EUR", name: "Euro" },
+    billingAmount: config.billingAmount || "10000000000000000000", // 10.00 EUR (18 decimals)
+    billingCurrency: config.billingCurrency || mockCurrencies.EUR,
+    transactionAmount: config.transactionAmount || config.billingAmount || "10000000000000000000",
+    transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.RETURN_OF_GOODS,
     cardToken: config.cardToken || "default-card-token",
     transactions: config.transactions || [],
-    refundAmount: config.refundAmount || config.billingAmount || "1000",
+    refundAmount: config.refundAmount || config.billingAmount || "10000000000000000000",
   };
 }
 
@@ -272,14 +272,14 @@ export function createReversal(
       city: "Berlin",
       country: { alpha2: "DE", name: "Germany" },
     },
-    billingAmount: config.billingAmount || "1000",
-    billingCurrency: config.billingCurrency || { code: "EUR", name: "Euro" },
-    transactionAmount: config.transactionAmount || config.billingAmount || "1000",
-    transactionCurrency: config.transactionCurrency || config.billingCurrency || { code: "EUR", name: "Euro" },
+    billingAmount: config.billingAmount || "10000000000000000000", // 10.00 EUR (18 decimals)
+    billingCurrency: config.billingCurrency || mockCurrencies.EUR,
+    transactionAmount: config.transactionAmount || config.billingAmount || "10000000000000000000",
+    transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.PURCHASE,
     cardToken: config.cardToken || "default-card-token",
     transactions: config.transactions || [],
-    reversalAmount: config.reversalAmount || config.billingAmount || "1000",
+    reversalAmount: config.reversalAmount || config.billingAmount || "10000000000000000000",
   };
 }
 
@@ -312,7 +312,7 @@ export const CARD_TRANSACTIONS_SCENARIOS = {
         isPending: true,
         clearedAt: null,
         merchant: { name: "Coffee Shop", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
-        billingAmount: "350", // 3.50 EUR
+        billingAmount: "3500000000000000000", // 3.50 EUR (18 decimals)
         mcc: "5814", // Fast food restaurants
       }),
     ],
@@ -327,7 +327,7 @@ export const CARD_TRANSACTIONS_SCENARIOS = {
       createPayment({
         isPending: false,
         merchant: { name: "Grocery Store", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
-        billingAmount: "2500", // 25.00 EUR
+        billingAmount: "25000000000000000000", // 25.00 EUR (18 decimals)
         mcc: "5411", // Grocery stores
       }),
     ],

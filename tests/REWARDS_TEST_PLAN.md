@@ -283,3 +283,4 @@ All test scenarios use predefined mock data from `tests/utils/mockRewards.ts`:
 Run tests with: `pnpm test tests/rewards.spec.ts`
 
 All tests should pass with proper mock wallet setup and API mocking in place.
+

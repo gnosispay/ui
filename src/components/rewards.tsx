@@ -17,7 +17,6 @@ export const Rewards = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  console.log("error", error);
   const fetchRewards = useCallback(() => {
     setIsLoading(true);
     setError(null);

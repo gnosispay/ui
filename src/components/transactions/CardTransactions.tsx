@@ -45,20 +45,24 @@ export const CardTransactions = () => {
   }
 
   return (
-    <>
+    <div data-testid="card-transactions-component">
       {Object.keys(transactionsByDate).length === 0 && (
         <div className="flex flex-col items-center justify-center py-8">
-          <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
-          <div className="text-center text-secondary">No card transactions to display</div>
+          <InboxIcon className="w-10 h-10 mb-2 text-secondary" data-testid="empty-transactions-icon" />
+          <div className="text-center text-secondary" data-testid="empty-transactions-message">
+            No card transactions to display
+          </div>
         </div>
       )}
 
       {Object.keys(transactionsByDate).map((date) => (
         <div key={date}>
-          <div className="text-xs text-secondary mb-2 p-2">{date}</div>
-          {(transactionsByDate as Record<string, Event[]>)[date].map((tx: Event) => {
+          <div className="text-xs text-secondary mb-2 p-2" data-testid="transaction-date-header">
+            {date}
+          </div>
+          {(transactionsByDate as Record<string, Event[]>)[date].map((tx: Event, index: number) => {
             const id = `${tx.createdAt}${tx.merchant?.name || ""}${tx.kind}`;
-            return <TransactionRow key={id} transaction={tx} />;
+            return <TransactionRow key={id} transaction={tx} index={index} />;
           })}
         </div>
       ))}
@@ -71,11 +75,12 @@ export const CardTransactions = () => {
             disabled={isLoadingMoreCardTransactions}
             loading={isLoadingMoreCardTransactions}
             className="w-full"
+            data-testid="load-more-button"
           >
             {loadMoreButtonText}
           </Button>
         </div>
       )}
-    </>
+    </div>
   );
 };
