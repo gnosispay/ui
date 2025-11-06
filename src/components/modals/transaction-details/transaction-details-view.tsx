@@ -126,17 +126,21 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
           <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <div className="flex items-center gap-3 flex-1">
               <div className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center">
-                <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
+                <Icon className="w-6 h-6 text-primary" aria-hidden="true" data-testid="modal-icon" />
               </div>
               <div className="flex-1">
-                <div className="text-lg text-foreground font-normal">{merchantName}</div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-lg text-foreground font-normal" data-testid="modal-merchant-name">
+                  {merchantName}
+                </div>
+                <div className="text-xs text-muted-foreground" data-testid="modal-transaction-date">
                   {format(parseISO(transaction.createdAt || ""), "MMM dd, yyyy 'at' HH:mm")}
                 </div>
               </div>
             </div>
             <div className="text-center sm:text-right">
-              <div className={`text-lg text-foreground font-normal`}>{billAmount ? `${sign} ${billAmount}` : "-"}</div>
+              <div className={`text-lg text-foreground font-normal`} data-testid="modal-transaction-amount">
+                {billAmount ? `${sign} ${billAmount}` : "-"}
+              </div>
               {txAmount !== billAmount && txAmount && (
                 <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>
               )}
@@ -154,6 +158,7 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
               className={`font-medium ${
                 isPending ? "text-warning" : isRefund || isReversal || isApproved ? "text-success" : "text-destructive"
               }`}
+              data-testid="modal-transaction-status"
             >
               {status}
             </span>
@@ -166,13 +171,17 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
         {/* Cashback Eligibility */}
         <div className="flex justify-between items-center py-3">
           <span className="text-muted-foreground">Cashback</span>
-          <CashbackEligibilityStatus transactionDetails={transaction} />
+          <div data-testid="modal-cashback-status">
+            <CashbackEligibilityStatus transactionDetails={transaction} />
+          </div>
         </div>
 
         {cardInfo && (
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">{cardInfo.virtual ? "Virtual" : "Physical"} Card</span>
-            <span className="font-medium text-foreground">••• {cardInfo.lastFourDigits}</span>
+            <span className="font-medium text-foreground" data-testid="modal-card-info">
+              ••• {cardInfo.lastFourDigits}
+            </span>
           </div>
         )}
 
@@ -188,7 +197,9 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
         {exchangeRate && (
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Exchange rate</span>
-            <span className="font-medium text-foreground">{exchangeRate}</span>
+            <span className="font-medium text-foreground" data-testid="modal-exchange-rate">
+              {exchangeRate}
+            </span>
           </div>
         )}
 
@@ -196,7 +207,9 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
         {transactionDetails?.category && (
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Category</span>
-            <span className="font-medium text-foreground">{category}</span>
+            <span className="font-medium text-foreground" data-testid="modal-category">
+              {category}
+            </span>
           </div>
         )}
 
@@ -204,7 +217,7 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
         {country && (
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Country</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" data-testid="modal-country">
               {countryFlag && <span className="text-lg">{countryFlag}</span>}
               <span className="font-medium text-foreground">{country}</span>
             </div>
@@ -215,7 +228,7 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
         {txHash && (
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">TxHash</span>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2" data-testid="modal-txhash">
               <span className="font-medium text-foreground">{shortenAddress(txHash)}</span>
               <Button
                 variant="ghost"
@@ -224,6 +237,7 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
                 onClick={() => {
                   window.open(`https://gnosisscan.io/tx/${txHash}`, "_blank");
                 }}
+                data-testid="txhash-external-link"
               >
                 <ExternalLink className="w-4 h-4" />
               </Button>
@@ -235,7 +249,12 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
       {/* Dispute Button */}
       {threadId && (
         <div className="pt-6">
-          <Button variant="outline" onClick={onStartDispute} className="w-full">
+          <Button
+            variant="outline"
+            onClick={onStartDispute}
+            className="w-full"
+            data-testid="dispute-transaction-button"
+          >
             Dispute Transaction
           </Button>
         </div>

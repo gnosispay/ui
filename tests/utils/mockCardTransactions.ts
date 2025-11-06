@@ -207,8 +207,16 @@ export function createPayment(
     transactionAmount: config.transactionAmount || config.billingAmount || "10000000000000000000",
     transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.PURCHASE,
-    cardToken: config.cardToken || "default-card-token",
-    transactions: config.transactions || [],
+    cardToken: config.cardToken || "token-approved-1",
+    transactions: config.transactions || [
+      {
+        status: "ExecSuccess",
+        to: "0xcFF260bfbc199dC82717494299b1AcADe25F549b",
+        value: "0",
+        data: "0x8a320255000000000000000000000000cb444e90d8198415266c6a2724b7900fb12fc56e0000000000000000000000006ea79daa04ca3ed7fce7141773b01d4f25ee6a190000000000000000000000004822521e6135cd2599199c83ea35179229a172ee0000000000000000000000000000000000000000000000005a9f38670f4d0000349476e3982666749979c85ce800cd2947a4b8dc9fe20a01a00a1b526072a8a30000000000000000000000000000000000000000000000000000019a16e9bfb6e71bd7ddc6faad5593dc9f954cb2413fd3593162041b0491223c51d21d5917ba33a14a9f6489390021ee2b6231a97c26d7049a44e8297402a28652fb8cf59cc61b",
+        hash: "0x22cb212fe780eab2c3faa2848bb4e90acc4b327eb42d1ee1fe134248e064390a",
+      },
+    ],
     status: config.status || PaymentStatus.APPROVED,
   };
 }
@@ -242,7 +250,7 @@ export function createRefund(
     transactionAmount: config.transactionAmount || config.billingAmount || "10000000000000000000",
     transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.RETURN_OF_GOODS,
-    cardToken: config.cardToken || "default-card-token",
+    cardToken: config.cardToken || "token-approved-1",
     transactions: config.transactions || [],
     refundAmount: config.refundAmount || config.billingAmount || "10000000000000000000",
   };
@@ -277,7 +285,7 @@ export function createReversal(
     transactionAmount: config.transactionAmount || config.billingAmount || "10000000000000000000",
     transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.PURCHASE,
-    cardToken: config.cardToken || "default-card-token",
+    cardToken: config.cardToken || "token-approved-1",
     transactions: config.transactions || [],
     reversalAmount: config.reversalAmount || config.billingAmount || "10000000000000000000",
   };
@@ -329,6 +337,7 @@ export const CARD_TRANSACTIONS_SCENARIOS = {
         merchant: { name: "Grocery Store", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
         billingAmount: "25000000000000000000", // 25.00 EUR (18 decimals)
         mcc: "5411", // Grocery stores
+        createdAt: "2024-01-15T14:30:00.000Z", // January 15, 2024 at 14:30 UTC
       }),
     ],
   },

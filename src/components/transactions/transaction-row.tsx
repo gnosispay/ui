@@ -64,7 +64,9 @@ export const TransactionRow = ({ transaction, index = 0 }: TransactionRowProps) 
             <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
           </div>
           <div>
-            <div className="text-lg text-foreground" data-testid="transaction-merchant-name">{merchantName}</div>
+            <div className="text-lg text-foreground" data-testid="transaction-merchant-name">
+              {merchantName}
+            </div>
             <div className="text-xs text-muted-foreground">
               {time}
               {isRefund && (
@@ -90,7 +92,10 @@ export const TransactionRow = ({ transaction, index = 0 }: TransactionRowProps) 
           </div>
         </div>
         <div className="text-right">
-          <div className={`text-lg text-foreground ${isStrikethrough ? "line-through" : ""}`} data-testid="transaction-amount">
+          <div
+            className={`text-lg text-foreground ${isStrikethrough ? "line-through" : ""}`}
+            data-testid="transaction-amount"
+          >
             {billAmount ? `${sign} ${billAmount}` : "-"}
           </div>
           {txAmount !== billAmount && <div className="text-xs text-muted-foreground mt-1">{`${sign} ${txAmount}`}</div>}

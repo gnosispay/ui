@@ -4,7 +4,7 @@
 
 import type { CurrencyInfo } from "../constants";
 
-export const currencyData: Record<string, Omit<CurrencyInfo, 'logo'>> = {
+export const currencyData: Record<string, Omit<CurrencyInfo, "logo">> = {
   EUR: {
     tokenSymbol: "EURe",
     address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",

@@ -131,10 +131,9 @@ test.describe("Card Transactions Component", () => {
     });
 
     test("displays mixed transaction types with multi-currency", async ({ page }) => {
-      // Create a custom mixed scenario with multi-currency transactions and mixed dates
-      const today = new Date();
-      const yesterday = new Date(today);
-      yesterday.setDate(yesterday.getDate() - 1);
+      // Create a custom mixed scenario with multi-currency transactions and specific dates
+      const today = new Date("2024-01-16T10:15:00.000Z"); // January 16, 2024 at 10:15 UTC
+      const yesterday = new Date("2024-01-15T16:45:00.000Z"); // January 15, 2024 at 16:45 UTC
 
       const mixedMultiCurrencyScenario = {
         count: 4,
@@ -208,6 +207,18 @@ test.describe("Card Transactions Component", () => {
         await expect(allTransactionRows).toHaveCount(4);
       });
 
+      await test.step("verify specific date headers", async () => {
+        // Get all date headers and verify they show the correct dates
+        const dateHeaders = cardTransactionsComponent.getByTestId("transaction-date-header");
+        await expect(dateHeaders).toHaveCount(2);
+
+        // First date header should show today's date (JAN 16, 2024)
+        await expect(dateHeaders.first()).toContainText("JAN 16, 2024");
+
+        // Second date header should show yesterday's date (JAN 15, 2024)
+        await expect(dateHeaders.nth(1)).toContainText("JAN 15, 2024");
+      });
+
       await test.step("today's transactions show correct details", async () => {
         // Get the first date group (today's transactions)
         const dateGroups = cardTransactionsComponent
@@ -247,6 +258,94 @@ test.describe("Card Transactions Component", () => {
         await expect(londonShopRow.getByTestId("transaction-status-pending")).toBeVisible();
         // Secondary amount should show original currency - this will be in a separate div
         await expect(londonShopRow).toContainText("£20.00");
+      });
+    });
+  });
+
+  test.describe("Transaction Row Interaction and Modal Opening", () => {
+    test("modal displays correct transaction data", async ({ page }) => {
+      // Use the singleCompleted scenario but with a specific date
+      await setupTest(page, "singleCompleted");
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("open modal and verify content", async () => {
+        // Wait for transaction row to be visible first
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await expect(transactionRow).toBeVisible();
+
+        // Click transaction to open modal
+        await transactionRow.click();
+
+        const modal = page.getByTestId("transaction-details-modal");
+        await expect(modal).toBeVisible();
+
+        // Verify merchant name in modal header
+        const modalMerchantName = modal.getByTestId("modal-merchant-name");
+        await expect(modalMerchantName).toContainText("Grocery Store");
+
+        // Verify the icon is carrot (for MCC 5411 - Grocery stores)
+        const modalIcon = modal.getByTestId("modal-icon");
+        await expect(modalIcon).toBeVisible();
+
+        // Verify transaction date is formatted correctly
+        const modalTransactionDate = modal.getByTestId("modal-transaction-date");
+        await expect(modalTransactionDate).toBeVisible();
+        // Date should be in format "MMM dd, yyyy 'at' HH:mm" - checking for specific date
+        await expect(modalTransactionDate).toContainText("Jan 15, 2024 at 14:30");
+
+        // Verify transaction amount
+        const modalTransactionAmount = modal.getByTestId("modal-transaction-amount");
+        await expect(modalTransactionAmount).toContainText("- €25.00");
+
+        // Verify status
+        const modalTransactionStatus = modal.getByTestId("modal-transaction-status");
+        await expect(modalTransactionStatus).toContainText("Completed");
+
+        // Verify cashback status is present
+        const modalCashbackStatus = modal.getByTestId("modal-cashback-status");
+        await expect(modalCashbackStatus).toBeVisible();
+        await expect(modalCashbackStatus).toContainText("Eligible");
+
+        // Verify country (singleCompleted has Germany)
+        const modalCountry = modal.getByTestId("modal-country");
+        await expect(modalCountry).toContainText("Germany");
+
+        // Verify dispute button is present (transaction has threadId by default)
+        const disputeButton = modal.getByTestId("dispute-transaction-button");
+        await expect(disputeButton).toBeVisible();
+        await expect(disputeButton).toContainText("Dispute Transaction");
+
+        // Verify TxHash is present
+        const modalTxHash = modal.getByTestId("modal-txhash");
+        await expect(modalTxHash).toBeVisible();
+        await expect(modalTxHash).toContainText("0x22cb");
+
+        // Verify the external link button is present
+        const modalTxHashExternalLink = modal.getByTestId("txhash-external-link");
+        await expect(modalTxHashExternalLink).toBeVisible();
+
+        // Note: The external link uses onClick with window.open(), not href attribute
+        // So we just verify the button is present and clickable
+
+        // Verify the card info (contains both type and number)
+        const modalCardInfo = modal.getByTestId("modal-card-info");
+        await expect(modalCardInfo).toBeVisible();
+        await expect(modalCardInfo).toContainText("••• 1234");
+      });
+
+      await test.step("close modal by clicking outside", async () => {
+        // Click outside modal (on the overlay)
+        const dialogOverlay = page.locator('[data-slot="dialog-overlay"]');
+        await dialogOverlay.click({ position: { x: 10, y: 10 } });
+
+        // Verify modal closes
+        const modal = page.getByTestId("transaction-details-modal");
+        await expect(modal).not.toBeVisible();
+
+        // Verify we're back to the transaction list
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await expect(transactionRow).toBeVisible();
       });
     });
   });
