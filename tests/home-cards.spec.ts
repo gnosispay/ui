@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { createCard, CardStatus, CARD_SCENARIOS } from "./utils/mockCards";
+import { CARD_SCENARIOS } from "./utils/mockCards";
 
 test.describe("Home Page - Cards Component", () => {
   test.beforeEach(async ({ page }) => {
@@ -10,50 +10,14 @@ test.describe("Home Page - Cards Component", () => {
   });
 
   test("displays virtual and physical cards with correct information and navigation", async ({ page }) => {
-    // Create a mix of virtual and physical cards with different statuses
+    // Compose a mix of cards with different statuses for comprehensive testing
     const testCards = [
-      createCard({
-        id: "card-virtual-1",
-        cardToken: "token-virtual-1",
-        lastFourDigits: "1234",
-        virtual: true,
-        statusCode: CardStatus.ACTIVE,
-      }),
-      createCard({
-        id: "card-physical-1",
-        cardToken: "token-physical-1",
-        lastFourDigits: "5678",
-        virtual: false,
-        statusCode: CardStatus.ACTIVE,
-      }),
-      createCard({
-        id: "card-physical-frozen",
-        cardToken: "token-physical-frozen",
-        lastFourDigits: "9999",
-        virtual: false,
-        statusCode: CardStatus.DECLINED, // Frozen status
-      }),
-      createCard({
-        id: "card-expired",
-        cardToken: "token-expired",
-        lastFourDigits: "7777",
-        virtual: false,
-        statusCode: CardStatus.EXPIRED,
-      }),
-      createCard({
-        id: "card-pin-blocked",
-        cardToken: "token-pin-blocked",
-        lastFourDigits: "8888",
-        virtual: false,
-        statusCode: CardStatus.PIN_BLOCKED,
-      }),
-      createCard({
-        id: "card-voided",
-        cardToken: "token-voided",
-        lastFourDigits: "0000",
-        virtual: false,
-        statusCode: CardStatus.VOID, // Voided card - should not be displayed
-      }),
+      CARD_SCENARIOS.SINGLE_VIRTUAL,
+      CARD_SCENARIOS.SINGLE_PHYSICAL,
+      CARD_SCENARIOS.SINGLE_FROZEN,
+      CARD_SCENARIOS.SINGLE_EXPIRED,
+      CARD_SCENARIOS.SINGLE_PIN_BLOCKED,
+      CARD_SCENARIOS.SINGLE_VOIDED,
     ];
 
     await setupAllMocks(page, BASE_USER, {
@@ -162,7 +126,7 @@ test.describe("Home Page - Cards Component", () => {
 
   test("displays add card button and opens modal", async ({ page }) => {
     await setupAllMocks(page, BASE_USER, {
-      cards: CARD_SCENARIOS.SINGLE_VIRTUAL,
+      cards: [CARD_SCENARIOS.SINGLE_VIRTUAL],
     });
 
     await page.goto("/");
@@ -210,7 +174,7 @@ test.describe("Home Page - Cards Component", () => {
 
   test("displays View details link to cards page", async ({ page }) => {
     await setupAllMocks(page, BASE_USER, {
-      cards: CARD_SCENARIOS.SINGLE_VIRTUAL,
+      cards: [CARD_SCENARIOS.SINGLE_VIRTUAL],
     });
 
     await page.goto("/");

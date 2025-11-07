@@ -1,5 +1,11 @@
 import type { Page } from "@playwright/test";
+import type { GetApiV1UserResponses } from "../../src/client/types.gen";
 import type { TestUser } from "./testUsers";
+
+/**
+ * User response type - derived from API types
+ */
+export type UserResponse = GetApiV1UserResponses[200];
 
 /**
  * Sets up a mock for the `/api/v1/user` endpoint in Playwright tests.

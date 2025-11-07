@@ -23,34 +23,46 @@ export interface CardTransactionsData {
 export interface CardTransactionsMockData extends CardTransactionsData {}
 
 /**
- * Transaction status enum for payments
+ * Transaction status enum for payments - derived from API types
+ * Using satisfies to ensure compile-time validation against Payment["status"]
  */
-export enum PaymentStatus {
-  APPROVED = "Approved",
-  INCORRECT_PIN = "IncorrectPin",
-  INSUFFICIENT_FUNDS = "InsufficientFunds",
-  EXCEEDS_APPROVAL_AMOUNT_LIMIT = "ExceedsApprovalAmountLimit",
-  INVALID_AMOUNT = "InvalidAmount",
-  PIN_ENTRY_TRIES_EXCEEDED = "PinEntryTriesExceeded",
-  INCORRECT_SECURITY_CODE = "IncorrectSecurityCode",
-  REVERSAL = "Reversal",
-  PARTIAL_REVERSAL = "PartialReversal",
-  OTHER = "Other",
-}
+export const PaymentStatus = {
+  APPROVED: "Approved" as const,
+  INCORRECT_PIN: "IncorrectPin" as const,
+  INSUFFICIENT_FUNDS: "InsufficientFunds" as const,
+  EXCEEDS_APPROVAL_AMOUNT_LIMIT: "ExceedsApprovalAmountLimit" as const,
+  INVALID_AMOUNT: "InvalidAmount" as const,
+  PIN_ENTRY_TRIES_EXCEEDED: "PinEntryTriesExceeded" as const,
+  INCORRECT_SECURITY_CODE: "IncorrectSecurityCode" as const,
+  REVERSAL: "Reversal" as const,
+  PARTIAL_REVERSAL: "PartialReversal" as const,
+  OTHER: "Other" as const,
+} satisfies Record<string, NonNullable<Payment["status"]>>;
 
 /**
- * Transaction type codes (DE3 field from ISO 8583)
+ * Type alias for payment status - derived from API type
  */
-export enum TransactionType {
-  PURCHASE = "00",
-  WITHDRAWAL = "01",
-  ACCOUNT_FUNDING = "10",
-  RETURN_OF_GOODS = "20",
-  PREPAID_LOAD = "28",
-  BALANCE_INQUIRY = "30",
-  PIN_CHANGE = "70",
-  PIN_UNBLOCK = "72",
-}
+export type PaymentStatusType = Payment["status"];
+
+/**
+ * Transaction type codes (DE3 field from ISO 8583) - derived from API types
+ * Using satisfies to ensure compile-time validation against BasePaymentish["transactionType"]
+ */
+export const TransactionType = {
+  PURCHASE: "00" as const,
+  WITHDRAWAL: "01" as const,
+  ACCOUNT_FUNDING: "10" as const,
+  RETURN_OF_GOODS: "20" as const,
+  PREPAID_LOAD: "28" as const,
+  BALANCE_INQUIRY: "30" as const,
+  PIN_CHANGE: "70" as const,
+  PIN_UNBLOCK: "72" as const,
+} satisfies Record<string, NonNullable<BasePaymentish["transactionType"]>>;
+
+/**
+ * Type alias for transaction type - derived from API type
+ */
+export type TransactionTypeType = BasePaymentish["transactionType"];
 
 /**
  * Sets up a mock for the `/api/v1/cards/transactions` endpoint in Playwright tests.
@@ -183,7 +195,7 @@ export async function mockCardTransactions({
  */
 export function createPayment(
   config: Partial<BasePaymentish> & {
-    status?: PaymentStatus;
+    status?: PaymentStatusType;
   },
 ): Payment {
   const now = new Date().toISOString();

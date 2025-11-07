@@ -1,20 +1,16 @@
 import type { Page } from "@playwright/test";
+import type { GetApiV1IbansAvailableResponses } from "../../src/client/types.gen";
 import type { TestUser } from "./testUsers";
 
 /**
- * IBAN availability data structure matching the API response
+ * IBAN availability response structure - derived from API types
  */
-export interface IbansAvailableData {
-  /** Indicates if the user is eligible to enable an IBAN */
-  available: boolean;
-}
+export type IbansAvailableResponse = GetApiV1IbansAvailableResponses[200];
 
 /**
- * IBAN availability response structure
+ * IBAN availability data structure - derived from API types
  */
-export interface IbansAvailableResponse {
-  data: IbansAvailableData;
-}
+export type IbansAvailableData = IbansAvailableResponse["data"];
 
 /**
  * Configuration for mocking IbansAvailable responses

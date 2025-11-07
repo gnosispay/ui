@@ -1,86 +1,73 @@
 import type { Page } from "@playwright/test";
 import type { TestUser } from "./testUsers";
+import type { GetApiV1CardsResponses, GetApiV1CardsByCardIdStatusResponses } from "../../src/client/types.gen";
 
 /**
- * Card status codes from payment processor
+ * Type alias for the card data from the API
  */
-export enum CardStatus {
+type CardFromApi = GetApiV1CardsResponses[200][number];
+
+/**
+ * Type alias for the card status response from the API
+ */
+type CardStatusFromApi = GetApiV1CardsByCardIdStatusResponses[200];
+
+/**
+ * Card status codes from payment processor - derived from API types
+ * Using satisfies to ensure compile-time validation against the API's statusCode union
+ */
+export const CardStatus = {
   /** Card is active and can be used */
-  ACTIVE = 1000,
+  ACTIVE: 1000 as const,
   /** Transaction requires issuer approval */
-  REFER_TO_ISSUER = 1001,
+  REFER_TO_ISSUER: 1001 as const,
   /** Card should be captured/retained */
-  CAPTURE = 1004,
+  CAPTURE: 1004 as const,
   /** All transactions are declined */
-  DECLINED = 1005,
+  DECLINED: 1005 as const,
   /** Card PIN is blocked due to incorrect attempts */
-  PIN_BLOCKED = 1006,
+  PIN_BLOCKED: 1006 as const,
   /** All transactions are declined (alternative code) */
-  DECLINED_ALT = 1007,
+  DECLINED_ALT: 1007 as const,
   /** Transaction requires ID verification */
-  HONOUR_WITH_ID = 1008,
+  HONOUR_WITH_ID: 1008 as const,
   /** Card is voided/cancelled */
-  VOID = 1009,
+  VOID: 1009 as const,
   /** Card is reported as lost */
-  LOST = 1041,
+  LOST: 1041 as const,
   /** Card is reported as stolen */
-  STOLEN = 1043,
+  STOLEN: 1043 as const,
   /** Card has expired */
-  EXPIRED = 1054,
+  EXPIRED: 1054 as const,
   /** Card has expired (alternative code) */
-  EXPIRED_ALT = 1154,
+  EXPIRED_ALT: 1154 as const,
   /** Card has restrictions applied */
-  RESTRICTED = 1062,
+  RESTRICTED: 1062 as const,
   /** Card is voided/cancelled (alternative code) */
-  VOID_ALT = 1199,
-}
-
-export type CardStatusCode = CardStatus;
+  VOID_ALT: 1199 as const,
+} satisfies Record<string, CardFromApi["statusCode"]>;
 
 /**
- * Card data structure matching the API response
+ * Type alias for card status code - derived from API type
  */
-export interface CardData {
-  /** Unique card identifier */
-  id: string;
-  /** Card token for secure operations */
-  cardToken: string;
-  /** Last four digits of the card number */
-  lastFourDigits: string;
-  /** When the card was activated (null if not activated) */
-  activatedAt: string | null;
-  /** Whether this is a virtual card */
-  virtual: boolean;
-  /** Card status code from payment processor */
-  statusCode: CardStatusCode;
-  /** Human-readable card status name */
-  statusName: string;
-}
+export type CardStatusCode = CardFromApi["statusCode"];
+
+/**
+ * Card data structure - uses API type directly
+ * This ensures compile-time validation against API changes
+ */
+export type CardData = CardFromApi;
 
 /**
  * Configuration for mocking Cards responses
  */
-export interface CardsMockData extends Array<CardData> {}
+export interface CardsMockData extends Array<CardFromApi> {}
 
 /**
- * Card status data structure matching the API response for individual card status
+ * Card status data structure - uses API type directly
+ * This ensures compile-time validation against API changes
  */
-export interface CardStatusData {
-  /** When the card was activated */
-  activatedAt?: string;
-  /** Card status code from payment processor */
-  statusCode: number;
-  /** Whether the card is frozen */
-  isFrozen: boolean;
-  /** Whether the card is reported as stolen */
-  isStolen: boolean;
-  /** Whether the card is reported as lost */
-  isLost: boolean;
-  /** Whether the card is blocked */
-  isBlocked: boolean;
-  /** Whether the card is voided */
-  isVoid: boolean;
-}
+export type CardStatusData = CardStatusFromApi;
 
 /**
  * Sets up mocks for both `/api/v1/cards` and `/api/v1/cards/{cardId}/status` endpoints in Playwright tests.
@@ -294,7 +281,7 @@ export function createCard(config: {
   virtual: boolean;
   statusCode?: CardStatusCode;
   activatedAt?: string | null;
-}): CardData {
+}): CardFromApi {
   const statusCode = config.statusCode || CardStatus.ACTIVE;
   const activatedAt = config.activatedAt !== undefined ? config.activatedAt : new Date().toISOString();
 
@@ -317,13 +304,74 @@ export const CARD_SCENARIOS = {
   EMPTY: [],
 
   /** Single active virtual card */
-  SINGLE_VIRTUAL: [
-    createCard({
-      id: "card-virtual-1",
-      cardToken: "token-virtual-1",
-      lastFourDigits: "1234",
-      virtual: true,
-      statusCode: CardStatus.ACTIVE,
-    }),
-  ],
+  SINGLE_VIRTUAL: createCard({
+    id: "card-virtual-1",
+    cardToken: "token-virtual-1",
+    lastFourDigits: "1234",
+    virtual: true,
+    statusCode: CardStatus.ACTIVE,
+  }),
+
+  /** Single active physical card */
+  SINGLE_PHYSICAL: createCard({
+    id: "card-physical-1",
+    cardToken: "token-physical-1",
+    lastFourDigits: "5678",
+    virtual: false,
+    statusCode: CardStatus.ACTIVE,
+  }),
+
+  /** Frozen card scenario */
+  SINGLE_FROZEN: createCard({
+    id: "card-frozen",
+    cardToken: "token-frozen",
+    lastFourDigits: "9999",
+    virtual: false,
+    statusCode: CardStatus.DECLINED,
+  }),
+
+  /** Expired card scenario */
+  SINGLE_EXPIRED: createCard({
+    id: "card-expired",
+    cardToken: "token-expired",
+    lastFourDigits: "7777",
+    virtual: false,
+    statusCode: CardStatus.EXPIRED,
+  }),
+
+  /** PIN blocked card scenario */
+  SINGLE_PIN_BLOCKED: createCard({
+    id: "card-pin-blocked",
+    cardToken: "token-pin-blocked",
+    lastFourDigits: "8888",
+    virtual: false,
+    statusCode: CardStatus.PIN_BLOCKED,
+  }),
+
+  /** Voided card scenario */
+  SINGLE_VOIDED: createCard({
+    id: "card-voided",
+    cardToken: "token-voided",
+    lastFourDigits: "0000",
+    virtual: false,
+    statusCode: CardStatus.VOID,
+  }),
+
+  /** Lost card scenario */
+  SINGLE_LOST: createCard({
+    id: "card-lost",
+    cardToken: "token-lost",
+    lastFourDigits: "1111",
+    virtual: false,
+    statusCode: CardStatus.LOST,
+  }),
+
+  /** Stolen card scenario */
+  SINGLE_STOLEN: createCard({
+    id: "card-stolen",
+    cardToken: "token-stolen",
+    lastFourDigits: "2222",
+    virtual: false,
+    statusCode: CardStatus.STOLEN,
+  }),
 };

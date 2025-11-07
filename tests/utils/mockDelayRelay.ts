@@ -1,62 +1,55 @@
 import type { Page } from "@playwright/test";
 import type { TestUser } from "./testUsers";
+import type { DelayTransaction } from "../../src/client/types.gen";
 
 /**
- * Delay transaction status enum
+ * Delay transaction status enum derived from API types
+ * Using satisfies to ensure compile-time validation against DelayTransaction["status"]
  */
-export enum DelayTransactionStatus {
+export const DelayTransactionStatus = {
   /** Transaction is being queued */
-  QUEUING = "QUEUING",
+  QUEUING: "QUEUING" as const,
   /** Transaction is waiting for execution */
-  WAITING = "WAITING",
+  WAITING: "WAITING" as const,
   /** Transaction is currently executing */
-  EXECUTING = "EXECUTING",
+  EXECUTING: "EXECUTING" as const,
   /** Transaction has been executed successfully */
-  EXECUTED = "EXECUTED",
+  EXECUTED: "EXECUTED" as const,
   /** Transaction execution failed */
-  FAILED = "FAILED",
-}
+  FAILED: "FAILED" as const,
+} satisfies Record<string, NonNullable<DelayTransaction["status"]>>;
 
 /**
- * Delay transaction operation type enum
+ * Type alias for delay transaction status - derived from API type
  */
-export enum DelayOperationType {
+export type DelayTransactionStatusType = DelayTransaction["status"];
+
+/**
+ * Delay transaction operation type enum derived from API types
+ * Using satisfies to ensure compile-time validation against DelayTransaction["operationType"]
+ */
+export const DelayOperationType = {
   /** Standard call operation */
-  CALL = "CALL",
+  CALL: "CALL" as const,
   /** Delegate call operation */
-  DELEGATECALL = "DELEGATECALL",
-}
+  DELEGATECALL: "DELEGATECALL" as const,
+} satisfies Record<string, NonNullable<DelayTransaction["operationType"]>>;
 
 /**
- * Delay transaction data structure matching the API response
+ * Type alias for delay operation type - derived from API type
  */
-export interface DelayTransactionData {
-  /** Unique identifier for the delayed transaction */
-  id?: string;
-  /** The Safe contract address associated with the transaction */
-  safeAddress?: string;
-  /** Data payload of the transaction */
-  transactionData?: string;
-  /** Identifier of the task that enqueued this transaction */
-  enqueueTaskId?: string;
-  /** Identifier of the task responsible for dispatching this transaction */
-  dispatchTaskId?: string | null;
-  /** Timestamp indicating when the transaction is ready for processing */
-  readyAt?: string | null;
-  /** Type of operation being performed */
-  operationType?: DelayOperationType;
-  /** Identifier of the user associated with the transaction */
-  userId?: string;
-  /** Current status of the transaction */
-  status?: DelayTransactionStatus;
-  /** Timestamp of when the transaction was created */
-  createdAt?: string;
-}
+export type DelayOperationTypeType = DelayTransaction["operationType"];
+
+/**
+ * Delay transaction data structure - uses DelayTransaction from API types
+ * This ensures compile-time validation against API changes
+ */
+export type DelayTransactionData = DelayTransaction;
 
 /**
  * Configuration for mocking DelayRelay responses
  */
-export interface DelayRelayMockData extends Array<DelayTransactionData> {}
+export interface DelayRelayMockData extends Array<DelayTransaction> {}
 
 /**
  * Sets up a mock for the `/api/v1/delay-relay` endpoint in Playwright tests.
@@ -135,17 +128,17 @@ export async function mockDelayRelay({
  * Helper function to create a delay transaction with consistent data
  */
 export function createDelayTransaction(config: {
-  id: string;
-  safeAddress: string;
-  userId: string;
-  status?: DelayTransactionStatus;
-  operationType?: DelayOperationType;
+  id?: string;
+  safeAddress?: string;
+  userId?: string;
+  status?: DelayTransactionStatusType;
+  operationType?: DelayOperationTypeType;
   transactionData?: string;
   readyAt?: string | null;
   enqueueTaskId?: string;
   dispatchTaskId?: string | null;
   createdAt?: string;
-}): DelayTransactionData {
+}): DelayTransaction {
   const now = new Date().toISOString();
   const readyAt =
     config.readyAt !== undefined ? config.readyAt : new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
@@ -158,127 +151,8 @@ export function createDelayTransaction(config: {
     operationType: config.operationType || DelayOperationType.CALL,
     transactionData: config.transactionData || "0x",
     readyAt,
-    enqueueTaskId: config.enqueueTaskId || `enqueue-${config.id}`,
-    dispatchTaskId: config.dispatchTaskId || null,
+    enqueueTaskId: config.enqueueTaskId || (config.id ? `enqueue-${config.id}` : undefined),
+    dispatchTaskId: config.dispatchTaskId !== undefined ? config.dispatchTaskId : null,
     createdAt: config.createdAt || now,
   };
 }
-
-/**
- * Predefined delay relay scenarios for common test cases
- */
-export const DELAY_RELAY_SCENARIOS = {
-  /** No delayed transactions */
-  EMPTY: [],
-
-  /** Single waiting transaction */
-  SINGLE_WAITING: [
-    createDelayTransaction({
-      id: "delay-tx-waiting-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.WAITING,
-      operationType: DelayOperationType.CALL,
-    }),
-  ],
-
-  /** Single executing transaction */
-  SINGLE_EXECUTING: [
-    createDelayTransaction({
-      id: "delay-tx-executing-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.EXECUTING,
-      operationType: DelayOperationType.CALL,
-    }),
-  ],
-
-  /** Multiple transactions with different statuses */
-  MIXED_STATUS: [
-    createDelayTransaction({
-      id: "delay-tx-waiting-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.WAITING,
-      operationType: DelayOperationType.CALL,
-    }),
-    createDelayTransaction({
-      id: "delay-tx-executing-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.EXECUTING,
-      operationType: DelayOperationType.DELEGATECALL,
-    }),
-    createDelayTransaction({
-      id: "delay-tx-queuing-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.QUEUING,
-      operationType: DelayOperationType.CALL,
-    }),
-  ],
-
-  /** Transaction ready for execution */
-  READY_FOR_EXECUTION: [
-    createDelayTransaction({
-      id: "delay-tx-ready-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.WAITING,
-      operationType: DelayOperationType.CALL,
-      readyAt: new Date(Date.now() - 60 * 1000).toISOString(), // Ready 1 minute ago
-    }),
-  ],
-
-  /** Transaction not yet ready */
-  NOT_YET_READY: [
-    createDelayTransaction({
-      id: "delay-tx-future-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.WAITING,
-      operationType: DelayOperationType.CALL,
-      readyAt: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Ready in 24 hours
-    }),
-  ],
-
-  /** Multiple transactions in queue */
-  QUEUE_BACKLOG: [
-    createDelayTransaction({
-      id: "delay-tx-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.WAITING,
-      operationType: DelayOperationType.CALL,
-      readyAt: new Date(Date.now() - 60 * 1000).toISOString(),
-    }),
-    createDelayTransaction({
-      id: "delay-tx-2",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.WAITING,
-      operationType: DelayOperationType.CALL,
-      readyAt: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
-    }),
-    createDelayTransaction({
-      id: "delay-tx-3",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.QUEUING,
-      operationType: DelayOperationType.DELEGATECALL,
-      readyAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    }),
-  ],
-
-  /** Transactions with dispatch tasks */
-  WITH_DISPATCH_TASKS: [
-    createDelayTransaction({
-      id: "delay-tx-dispatched-1",
-      safeAddress: "0x1234567890123456789012345678901234567890",
-      userId: "test-user-1",
-      status: DelayTransactionStatus.EXECUTING,
-      operationType: DelayOperationType.CALL,
-      dispatchTaskId: "dispatch-task-123",
-    }),
-  ],
-};

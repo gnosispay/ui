@@ -1,17 +1,11 @@
 import type { Page } from "@playwright/test";
+import type { GetApiV1AccountBalancesResponses } from "../../src/client/types.gen";
 import type { TestUser } from "./testUsers";
 
 /**
- * Account balances data structure matching the API response
+ * Account balances data structure - derived from API types
  */
-export interface AccountBalancesData {
-  /** The total balance for this account (spendable and pending) */
-  total: string;
-  /** The amount that can be spent from this account */
-  spendable: string;
-  /** The amount that is being reviewed for spending */
-  pending: string;
-}
+export type AccountBalancesData = GetApiV1AccountBalancesResponses[200];
 
 /**
  * Configuration for mocking Account Balances responses

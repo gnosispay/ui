@@ -2,8 +2,6 @@ import type { Page } from "@playwright/test";
 import type { TestUser } from "./testUsers";
 import type { IbanOrder } from "../../src/client";
 
-// Create enums that strictly follow the API types
-// If the API changes, these will cause compile errors
 export const IbanOrderKind = {
   ISSUE: "issue" as const,
   REDEEM: "redeem" as const,

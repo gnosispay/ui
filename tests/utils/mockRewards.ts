@@ -1,17 +1,11 @@
 import type { Page } from "@playwright/test";
+import type { GetApiV1RewardsResponses } from "../../src/client/types.gen";
 import type { TestUser } from "./testUsers";
 
 /**
- * Rewards data structure matching the API response
+ * Rewards data structure - derived from API types
  */
-export interface RewardsData {
-  /** Whether the user holds an OG NFT token */
-  isOg: boolean;
-  /** User's GNO token balance in their Safe account */
-  gnoBalance: number;
-  /** Base cashback rate calculated from GNO balance (0-4%) */
-  cashbackRate: number;
-}
+export type RewardsData = GetApiV1RewardsResponses[200];
 
 /**
  * Configuration for mocking Rewards responses

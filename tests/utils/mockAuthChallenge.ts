@@ -1,10 +1,15 @@
 import jwt from "jsonwebtoken";
 import type { Page } from "@playwright/test";
-import type { PostApiV1AuthChallengeData, Authorization } from "../../src/client/types.gen";
+import type {
+  PostApiV1AuthChallengeData,
+  PostApiV1AuthChallengeResponses,
+  Authorization,
+} from "../../src/client/types.gen";
 import type { TestUser } from "./testUsers";
 
 // Use generated types from API client
 type AuthChallengeRequest = PostApiV1AuthChallengeData["body"];
+type AuthChallengeResponse = PostApiV1AuthChallengeResponses[200];
 type JWTPayload = Authorization;
 
 // Mock configuration
@@ -94,7 +99,7 @@ export async function mockAuthChallenge({
         const requestBody = (await request.postDataJSON()) as AuthChallengeRequest;
         const ttlInSeconds = requestBody.ttlInSeconds || 3600;
 
-        const mockResponse = {
+        const mockResponse: AuthChallengeResponse = {
           token: generateMockJWT(ttlInSeconds, testUser, options),
         };
 

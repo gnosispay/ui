@@ -1,10 +1,24 @@
 import type { Page, Route } from "@playwright/test";
-import type { PostApiV1TransactionsByThreadIdDisputeData } from "../../src/client/types.gen";
+import type {
+  PostApiV1TransactionsByThreadIdDisputeData,
+  PostApiV1TransactionsByThreadIdDisputeResponses,
+  GetApiV1TransactionsDisputeResponses,
+} from "../../src/client/types.gen";
 
 /**
- * Type for dispute reason keys from the API
+ * Type for dispute reason keys - derived from API types
  */
 type DisputeReason = PostApiV1TransactionsByThreadIdDisputeData["body"]["disputeReason"];
+
+/**
+ * Type for dispute submission response - derived from API types
+ */
+type DisputeSubmissionResponse = PostApiV1TransactionsByThreadIdDisputeResponses[202];
+
+/**
+ * Type for dispute reasons response - derived from API types
+ */
+type DisputeReasonsResponse = GetApiV1TransactionsDisputeResponses[200];
 
 /**
  * Mock dispute reasons response - matches the API structure
@@ -40,12 +54,14 @@ export async function mockDisputeReasonsEndpoint(page: Page, reasonsOverride?: R
     const request = route.request();
 
     if (request.method() === "GET") {
+      const response: DisputeReasonsResponse = {
+        result: reasonsOverride || mockDisputeReasons,
+      };
+
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify({
-          result: reasonsOverride || mockDisputeReasons,
-        }),
+        body: JSON.stringify(response),
       });
     } else {
       await route.continue();
@@ -102,14 +118,14 @@ export async function mockDisputeSubmission(
           }),
         });
       } else {
+        const response: DisputeSubmissionResponse = {
+          message: "Dispute submitted for review",
+        };
+
         await route.fulfill({
-          status: statusCode || 201,
+          status: statusCode || 202, // API returns 202, not 201
           contentType: "application/json",
-          body: JSON.stringify({
-            result: {
-              message: "Dispute submitted for review",
-            },
-          }),
+          body: JSON.stringify(response),
         });
       }
     } else {

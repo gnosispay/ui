@@ -1,78 +1,59 @@
 import type { Page } from "@playwright/test";
 import type { TestUser } from "./testUsers";
+import type { CardOrder } from "../../src/client/types.gen";
 
 /**
- * Card order status enum
+ * Card order status enum derived from API types
+ * Using satisfies to ensure compile-time validation against CardOrder["status"]
  */
-export enum OrderStatus {
+export const OrderStatus = {
   /** Payment transaction is pending */
-  PENDING_TRANSACTION = "PENDINGTRANSACTION",
+  PENDING_TRANSACTION: "PENDINGTRANSACTION" as const,
   /** Payment transaction is complete */
-  TRANSACTION_COMPLETE = "TRANSACTIONCOMPLETE",
+  TRANSACTION_COMPLETE: "TRANSACTIONCOMPLETE" as const,
   /** Order requires user confirmation */
-  CONFIRMATION_REQUIRED = "CONFIRMATIONREQUIRED",
+  CONFIRMATION_REQUIRED: "CONFIRMATIONREQUIRED" as const,
   /** Order is ready for processing */
-  READY = "READY",
+  READY: "READY" as const,
   /** Physical card has been created */
-  CARD_CREATED = "CARDCREATED",
+  CARD_CREATED: "CARDCREATED" as const,
   /** Payment transaction failed */
-  FAILED_TRANSACTION = "FAILEDTRANSACTION",
+  FAILED_TRANSACTION: "FAILEDTRANSACTION" as const,
   /** Order was cancelled */
-  CANCELLED = "CANCELLED",
-}
+  CANCELLED: "CANCELLED" as const,
+} satisfies Record<string, CardOrder["status"]>;
 
 /**
- * Personalization source enum
+ * Type alias for order status - derived from API type
  */
-export enum PersonalizationSource {
+export type OrderStatusType = CardOrder["status"];
+
+/**
+ * Personalization source enum derived from API types
+ * Using satisfies to ensure compile-time validation against CardOrder["personalizationSource"]
+ */
+export const PersonalizationSource = {
   /** Use KYC data for personalization */
-  KYC = "KYC",
+  KYC: "KYC" as const,
   /** Use ENS data for personalization */
-  ENS = "ENS",
-}
+  ENS: "ENS" as const,
+} satisfies Record<string, CardOrder["personalizationSource"]>;
 
 /**
- * Card order data structure matching the API response
+ * Type alias for personalization source - derived from API type
  */
-export interface OrderData {
-  /** The unique identifier of the card order */
-  id: string;
-  /** The on-chain transaction hash associated with the order */
-  transactionHash?: string | null;
-  /** The name embossed on the card */
-  embossedName?: string | null;
-  /** The first line of the shipping address */
-  address1?: string | null;
-  /** The second line of the shipping address */
-  address2?: string | null;
-  /** The city of the shipping address */
-  city?: string | null;
-  /** The postal code of the shipping address */
-  postalCode?: string | null;
-  /** The state of the shipping address */
-  state?: string | null;
-  /** The country of the shipping address */
-  country?: string | null;
-  /** The user id for this card order */
-  userId: string;
-  /** Current order status */
-  status: OrderStatus;
-  /** Personalization source */
-  personalizationSource: PersonalizationSource;
-  /** The coupon code tied to this card order */
-  couponCode?: string;
-  /** Total amount in EUR */
-  totalAmountEUR?: number | null;
-  /** Total discount in EUR */
-  totalDiscountEUR: number;
-  /** When the order was created */
-  createdAt: string;
-}
+export type PersonalizationSourceType = CardOrder["personalizationSource"];
+
+/**
+ * Card order data structure - uses CardOrder from API types
+ * This ensures compile-time validation against API changes
+ */
+export type OrderData = CardOrder;
 
 /**
  * Configuration for mocking Order responses
  */
-export interface OrderMockData extends Array<OrderData> {}
+export interface OrderMockData extends Array<CardOrder> {}
 
 /**
  * Sets up a mock for the `/api/v1/order/` endpoint in Playwright tests.
@@ -154,8 +135,8 @@ export async function mockOrder({
 export function createOrder(config: {
   id: string;
   userId: string;
-  status?: OrderStatus;
-  personalizationSource?: PersonalizationSource;
+  status?: OrderStatusType;
+  personalizationSource?: PersonalizationSourceType;
   embossedName?: string;
   address1?: string;
   address2?: string;
@@ -163,230 +144,31 @@ export function createOrder(config: {
   postalCode?: string;
   state?: string;
   country?: string;
-  transactionHash?: string | null;
+  transactionHash?: string;
   couponCode?: string;
-  totalAmountEUR?: number | null;
+  totalAmountEUR?: number;
   totalDiscountEUR?: number;
   createdAt?: string;
-}): OrderData {
+  virtual?: boolean;
+}): CardOrder {
   const now = new Date().toISOString();
 
   return {
     id: config.id,
-    userId: config.userId,
     status: config.status || OrderStatus.PENDING_TRANSACTION,
     personalizationSource: config.personalizationSource || PersonalizationSource.KYC,
-    embossedName: config.embossedName || null,
-    address1: config.address1 || null,
-    address2: config.address2 || null,
-    city: config.city || null,
-    postalCode: config.postalCode || null,
-    state: config.state || null,
-    country: config.country || null,
-    transactionHash: config.transactionHash || null,
-    couponCode: config.couponCode || undefined,
-    totalAmountEUR: config.totalAmountEUR || 25.0,
-    totalDiscountEUR: config.totalDiscountEUR || 0.0,
+    embossedName: config.embossedName,
+    address1: config.address1,
+    address2: config.address2,
+    city: config.city,
+    postalCode: config.postalCode,
+    state: config.state,
+    country: config.country,
+    transactionHash: config.transactionHash,
+    couponCode: config.couponCode,
+    totalAmountEUR: config.totalAmountEUR ?? 25.0,
+    totalDiscountEUR: config.totalDiscountEUR ?? 0.0,
     createdAt: config.createdAt || now,
+    virtual: config.virtual,
   };
 }
-
-/**
- * Predefined order scenarios for common test cases
- */
-export const ORDER_SCENARIOS = {
-  /** No orders */
-  EMPTY: [],
-
-  /** Single pending order */
-  SINGLE_PENDING: [
-    createOrder({
-      id: "order-pending-1",
-      userId: "test-user-1",
-      status: OrderStatus.PENDING_TRANSACTION,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      address1: "123 Test Street",
-      city: "Test City",
-      postalCode: "12345",
-      country: "US",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-  ],
-
-  /** Single completed order */
-  SINGLE_COMPLETED: [
-    createOrder({
-      id: "order-completed-1",
-      userId: "test-user-1",
-      status: OrderStatus.CARD_CREATED,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      address1: "123 Test Street",
-      city: "Test City",
-      postalCode: "12345",
-      country: "US",
-      transactionHash: "0x1234567890abcdef1234567890abcdef12345678",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 5.0,
-    }),
-  ],
-
-  /** Order ready for processing */
-  READY_ORDER: [
-    createOrder({
-      id: "order-ready-1",
-      userId: "test-user-1",
-      status: OrderStatus.READY,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      address1: "123 Test Street",
-      city: "Test City",
-      postalCode: "12345",
-      country: "US",
-      transactionHash: "0x1234567890abcdef1234567890abcdef12345678",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-  ],
-
-  /** Failed order */
-  FAILED_ORDER: [
-    createOrder({
-      id: "order-failed-1",
-      userId: "test-user-1",
-      status: OrderStatus.FAILED_TRANSACTION,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      address1: "123 Test Street",
-      city: "Test City",
-      postalCode: "12345",
-      country: "US",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-  ],
-
-  /** Cancelled order */
-  CANCELLED_ORDER: [
-    createOrder({
-      id: "order-cancelled-1",
-      userId: "test-user-1",
-      status: OrderStatus.CANCELLED,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      address1: "123 Test Street",
-      city: "Test City",
-      postalCode: "12345",
-      country: "US",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-  ],
-
-  /** Multiple orders with different statuses */
-  MIXED_STATUS: [
-    createOrder({
-      id: "order-pending-1",
-      userId: "test-user-1",
-      status: OrderStatus.PENDING_TRANSACTION,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-    createOrder({
-      id: "order-ready-1",
-      userId: "test-user-1",
-      status: OrderStatus.READY,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      transactionHash: "0x1234567890abcdef1234567890abcdef12345678",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 5.0,
-    }),
-    createOrder({
-      id: "order-completed-1",
-      userId: "test-user-1",
-      status: OrderStatus.CARD_CREATED,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      transactionHash: "0xabcdef1234567890abcdef1234567890abcdef12",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 10.0,
-    }),
-  ],
-
-  /** Order with ENS personalization */
-  ENS_PERSONALIZATION: [
-    createOrder({
-      id: "order-ens-1",
-      userId: "test-user-1",
-      status: OrderStatus.READY,
-      personalizationSource: PersonalizationSource.ENS,
-      embossedName: "vitalik.eth",
-      address1: "123 Crypto Street",
-      city: "Ethereum City",
-      postalCode: "ETH01",
-      country: "US",
-      transactionHash: "0x1234567890abcdef1234567890abcdef12345678",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-  ],
-
-  /** Order with coupon code */
-  WITH_COUPON: [
-    createOrder({
-      id: "order-coupon-1",
-      userId: "test-user-1",
-      status: OrderStatus.READY,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      address1: "123 Test Street",
-      city: "Test City",
-      postalCode: "12345",
-      country: "US",
-      couponCode: "SAVE20",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 20.0,
-    }),
-  ],
-
-  /** Order requiring confirmation */
-  REQUIRES_CONFIRMATION: [
-    createOrder({
-      id: "order-confirm-1",
-      userId: "test-user-1",
-      status: OrderStatus.CONFIRMATION_REQUIRED,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "John Doe",
-      address1: "123 Test Street",
-      city: "Test City",
-      postalCode: "12345",
-      country: "US",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-  ],
-
-  /** International order */
-  INTERNATIONAL_ORDER: [
-    createOrder({
-      id: "order-intl-1",
-      userId: "test-user-1",
-      status: OrderStatus.READY,
-      personalizationSource: PersonalizationSource.KYC,
-      embossedName: "Hans Mueller",
-      address1: "Musterstraße 123",
-      city: "Berlin",
-      postalCode: "10115",
-      state: "Berlin",
-      country: "DE",
-      transactionHash: "0x1234567890abcdef1234567890abcdef12345678",
-      totalAmountEUR: 25.0,
-      totalDiscountEUR: 0.0,
-    }),
-  ],
-};
