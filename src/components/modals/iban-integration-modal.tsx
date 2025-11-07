@@ -22,7 +22,7 @@ export function IbanIntegrationModal({ isOpen, onOpenChange }: IbanIntegrationMo
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" data-testid="iban-integration-modal">
         <DialogHeader>
           <DialogTitle>{showSuccessState ? "IBAN Created Successfully!" : "Create Your IBAN"}</DialogTitle>
         </DialogHeader>
