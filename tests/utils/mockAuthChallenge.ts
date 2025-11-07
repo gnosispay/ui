@@ -8,9 +8,7 @@ type AuthChallengeRequest = PostApiV1AuthChallengeData["body"];
 type JWTPayload = Authorization;
 
 // Mock configuration
-const MOCK_USER_ID = "test-user-12345";
 const JWT_SECRET = "test-secret-key";
-const DEFAULT_SIGNER_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 const DEFAULT_CHAIN_ID = "100"; // Gnosis chain
 
 /**

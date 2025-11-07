@@ -248,4 +248,3 @@ export const SAFE_CONFIG_SCENARIOS = {
     },
   },
 } as const;
-
