@@ -2,7 +2,13 @@ import { test, expect, type Page } from "@playwright/test";
 import { BASE_USER } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { CARD_TRANSACTIONS_SCENARIOS, createPayment, createRefund, createReversal } from "./utils/mockCardTransactions";
+import {
+  CARD_TRANSACTIONS_SCENARIOS,
+  createPayment,
+  createRefund,
+  createReversal,
+  PaymentStatus,
+} from "./utils/mockCardTransactions";
 import { mockCurrencies } from "./utils/currencyUtils";
 
 test.describe("Card Transactions Component", () => {
@@ -136,7 +142,7 @@ test.describe("Card Transactions Component", () => {
       const yesterday = new Date("2024-01-15T16:45:00.000Z"); // January 15, 2024 at 16:45 UTC
 
       const mixedMultiCurrencyScenario = {
-        count: 4,
+        count: 5,
         next: null,
         previous: null,
         results: [
@@ -186,6 +192,18 @@ test.describe("Card Transactions Component", () => {
             transactionCurrency: mockCurrencies.GBP,
             mcc: "5411",
           }),
+          createPayment({
+            threadId: "payment-failed-yesterday-1",
+            isPending: false,
+            createdAt: yesterday.toISOString(),
+            merchant: { name: "Coffee Shop", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+            billingAmount: "4500000000000000000", // €4.50 (18 decimals)
+            billingCurrency: mockCurrencies.EUR,
+            transactionAmount: "4500000000000000000",
+            transactionCurrency: mockCurrencies.EUR,
+            status: PaymentStatus.INCORRECT_PIN, // Failed status
+            mcc: "5814",
+          }),
         ],
       };
 
@@ -201,10 +219,10 @@ test.describe("Card Transactions Component", () => {
       const cardTransactionsComponent = getCardTransactionsComponent(page);
 
       await test.step("multiple transaction rows are visible", async () => {
-        // Since transactions are grouped by date, each group has its own indexing (0, 1)
-        // We should have 4 total transaction rows across 2 date groups
+        // Since transactions are grouped by date, each group has its own indexing (0, 1, 2)
+        // We should have 5 total transaction rows across 2 date groups (2 today, 3 yesterday)
         const allTransactionRows = cardTransactionsComponent.locator('[data-testid^="transaction-row-"]');
-        await expect(allTransactionRows).toHaveCount(4);
+        await expect(allTransactionRows).toHaveCount(5);
       });
 
       await test.step("verify specific date headers", async () => {
@@ -258,12 +276,24 @@ test.describe("Card Transactions Component", () => {
         await expect(londonShopRow.getByTestId("transaction-status-pending")).toBeVisible();
         // Secondary amount should show original currency - this will be in a separate div
         await expect(londonShopRow).toContainText("£20.00");
+
+        // Yesterday's third transaction (Coffee Shop failed payment)
+        const coffeeShopRow = yesterdayGroup.getByTestId("transaction-row-2");
+        await expect(coffeeShopRow.getByTestId("transaction-merchant-name")).toContainText("Coffee Shop");
+
+        // Verify failed transaction amount has strikethrough formatting
+        const failedAmount = coffeeShopRow.getByTestId("transaction-amount");
+        await expect(failedAmount).toContainText("- €4.50");
+        await expect(failedAmount).toHaveClass(/line-through/);
+
+        // Verify failed status is displayed (should show "Incorrect pin")
+        await expect(coffeeShopRow).toContainText("Incorrect pin");
       });
     });
   });
 
   test.describe("Transaction Row Interaction and Modal Opening", () => {
-    test("modal displays correct transaction data", async ({ page }) => {
+    test("modal displays correct transaction data for a payment transaction", async ({ page }) => {
       // Use the singleCompleted scenario but with a specific date
       await setupTest(page, "singleCompleted");
 
@@ -346,6 +376,116 @@ test.describe("Card Transactions Component", () => {
         // Verify we're back to the transaction list
         const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
         await expect(transactionRow).toBeVisible();
+      });
+    });
+
+    test("modal displays correct transaction data for a refund transaction", async ({ page }) => {
+      // Use the singleRefund scenario
+      await setupTest(page, "singleRefund");
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("open modal and verify refund content", async () => {
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await expect(transactionRow).toBeVisible();
+        await transactionRow.click();
+
+        const modal = page.getByTestId("transaction-details-modal");
+        await expect(modal).toBeVisible();
+
+        // Verify merchant name
+        const modalMerchantName = modal.getByTestId("modal-merchant-name");
+        await expect(modalMerchantName).toContainText("Amazon");
+
+        // Verify refund amount is displayed (should be positive)
+        const modalTransactionAmount = modal.getByTestId("modal-transaction-amount");
+        await expect(modalTransactionAmount).toContainText("+ €19.99");
+
+        // Verify refund status (main focus of this test)
+        const modalTransactionStatus = modal.getByTestId("modal-transaction-status");
+        await expect(modalTransactionStatus).toContainText("Refund");
+
+        // Verify cashback status shows "Not eligible" for refunds
+        const modalCashbackStatus = modal.getByTestId("modal-cashback-status");
+        await expect(modalCashbackStatus).toBeVisible();
+        await expect(modalCashbackStatus).toContainText("Not eligible");
+
+        // Verify card information is displayed
+        const modalCardInfo = modal.getByTestId("modal-card-info");
+        await expect(modalCardInfo).toBeVisible();
+        await expect(modalCardInfo).toContainText("••• 1234");
+
+        // Verify date
+        const modalTransactionDate = modal.getByTestId("modal-transaction-date");
+        await expect(modalTransactionDate).toContainText("Jan 15, 2024 at 14:30");
+
+        // Verify dispute button is NOT visible for refunds
+        const disputeButton = modal.getByTestId("dispute-transaction-button");
+        await expect(disputeButton).not.toBeVisible();
+      });
+    });
+
+    test("modal displays correct transaction data for a reversal transaction", async ({ page }) => {
+      // Use the singleReversal scenario
+      await setupTest(page, "singleReversal");
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("open modal and verify reversal content", async () => {
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await expect(transactionRow).toBeVisible();
+        await transactionRow.click();
+
+        const modal = page.getByTestId("transaction-details-modal");
+        await expect(modal).toBeVisible();
+
+        // Verify merchant name
+        const modalMerchantName = modal.getByTestId("modal-merchant-name");
+        await expect(modalMerchantName).toContainText("Gas Station");
+
+        // Verify reversal status (main focus of this test)
+        const modalTransactionStatus = modal.getByTestId("modal-transaction-status");
+        await expect(modalTransactionStatus).toContainText("Reversal");
+
+        // Verify date
+        const modalTransactionDate = modal.getByTestId("modal-transaction-date");
+        await expect(modalTransactionDate).toContainText("Jan 15, 2024 at 14:30");
+
+        // Verify dispute button is NOT visible for reversals
+        const disputeButton = modal.getByTestId("dispute-transaction-button");
+        await expect(disputeButton).not.toBeVisible();
+      });
+    });
+
+    test("modal displays correct transaction data for a failed transaction", async ({ page }) => {
+      // Use the singleFailed scenario
+      await setupTest(page, "singleFailed");
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("open modal and verify failed transaction content", async () => {
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await expect(transactionRow).toBeVisible();
+        await transactionRow.click();
+
+        const modal = page.getByTestId("transaction-details-modal");
+        await expect(modal).toBeVisible();
+
+        // Verify merchant name
+        const modalMerchantName = modal.getByTestId("modal-merchant-name");
+        await expect(modalMerchantName).toContainText("Coffee Shop");
+
+        // Verify failed transaction amount is displayed
+        const modalTransactionAmount = modal.getByTestId("modal-transaction-amount");
+        await expect(modalTransactionAmount).toContainText("- €3.50");
+
+        // Verify failed status (main focus of this test)
+        const modalTransactionStatus = modal.getByTestId("modal-transaction-status");
+        await expect(modalTransactionStatus).toContainText("Incorrect pin");
+
+        // Verify date
+        const modalTransactionDate = modal.getByTestId("modal-transaction-date");
+        await expect(modalTransactionDate).toContainText("Jan 15, 2024 at 14:30");
       });
     });
   });

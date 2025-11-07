@@ -227,6 +227,7 @@ export function createPayment(
 export function createRefund(
   config: Partial<BasePaymentish> & {
     refundAmount?: string;
+    refundCurrency?: Currency;
   },
 ): Refund {
   const now = new Date().toISOString();
@@ -253,6 +254,7 @@ export function createRefund(
     cardToken: config.cardToken || "token-approved-1",
     transactions: config.transactions || [],
     refundAmount: config.refundAmount || config.billingAmount || "10000000000000000000",
+    refundCurrency: config.refundCurrency || config.billingCurrency || mockCurrencies.EUR,
   };
 }
 
@@ -338,6 +340,66 @@ export const CARD_TRANSACTIONS_SCENARIOS = {
         billingAmount: "25000000000000000000", // 25.00 EUR (18 decimals)
         mcc: "5411", // Grocery stores
         createdAt: "2024-01-15T14:30:00.000Z", // January 15, 2024 at 14:30 UTC
+      }),
+    ],
+  },
+
+  /** Single refund transaction */
+  singleRefund: {
+    count: 1,
+    next: null,
+    previous: null,
+    results: [
+      createRefund({
+        threadId: "refund-test-1",
+        merchant: { name: "Amazon", city: "Seattle", country: { alpha2: "US", name: "United States" } },
+        billingAmount: "19990000000000000000", // €19.99 refund (18 decimals)
+        billingCurrency: mockCurrencies.EUR,
+        transactionAmount: "19990000000000000000",
+        transactionCurrency: mockCurrencies.EUR,
+        refundAmount: "19990000000000000000",
+        refundCurrency: mockCurrencies.EUR, // Add refundCurrency for getAmountAndCurrency function
+        mcc: "5399",
+        cardToken: "token-approved-1", // Add card token for card info display
+        impactsCashback: false, // Refunds don't impact cashback
+        createdAt: "2024-01-15T14:30:00.000Z",
+      }),
+    ],
+  },
+
+  /** Single reversal transaction */
+  singleReversal: {
+    count: 1,
+    next: null,
+    previous: null,
+    results: [
+      createReversal({
+        threadId: "reversal-test-1",
+        merchant: { name: "Gas Station", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+        billingAmount: "5000", // 50.00 EUR reversal (matching mixed scenario format)
+        reversalAmount: "5000",
+        mcc: "5542", // Automated fuel dispensers
+        createdAt: "2024-01-15T14:30:00.000Z",
+      }),
+    ],
+  },
+
+  /** Single failed transaction */
+  singleFailed: {
+    count: 1,
+    next: null,
+    previous: null,
+    results: [
+      createPayment({
+        threadId: "failed-test-1",
+        merchant: { name: "Coffee Shop", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+        billingAmount: "3500000000000000000", // 3.50 EUR (18 decimals)
+        billingCurrency: mockCurrencies.EUR,
+        transactionAmount: "3500000000000000000",
+        transactionCurrency: mockCurrencies.EUR,
+        mcc: "5814", // Fast food restaurants
+        status: PaymentStatus.INCORRECT_PIN, // Failed status
+        createdAt: "2024-01-15T14:30:00.000Z",
       }),
     ],
   },

@@ -246,8 +246,8 @@ export const TransactionDetailsView = ({ transaction, onStartDispute }: Transact
         )}
       </div>
 
-      {/* Dispute Button */}
-      {threadId && (
+      {/* Dispute Button - Only show for payments, not refunds or reversals */}
+      {threadId && !isRefund && !isReversal && (
         <div className="pt-6">
           <Button
             variant="outline"
