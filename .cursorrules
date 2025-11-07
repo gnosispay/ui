@@ -317,7 +317,17 @@ try {
   - Group tests that share similar setup or context
   - Only separate tests when they test fundamentally different features
   - Application setup is expensive, so consolidating tests improves performance
-  
+
+#### Test Best Practices
+- **NEVER use `page.waitForTimeout()`** or `waitForTimeout()` in tests
+  - Arbitrary timeouts make tests flaky and slow
+  - Use proper Playwright waiting mechanisms instead:
+    - `waitForSelector()` - Wait for elements to appear
+    - `waitForLoadState()` - Wait for page load states
+    - `expect().toBeVisible()` - Wait for elements with assertions
+    - `waitForResponse()` - Wait for specific network responses
+    - `waitForFunction()` - Wait for custom conditions
+
 #### Examples
 ```bash
 # Run all tests with line reporter
@@ -328,6 +338,19 @@ pnpm test card-transactions.spec.ts --reporter=line
 
 # Run tests in headed mode for debugging
 pnpm test --headed --reporter=line
+```
+
+```tsx
+// ❌ DON'T - Use arbitrary timeouts
+await page.waitForTimeout(500);
+await page.waitForTimeout(1000);
+
+// ✅ DO - Use proper waiting mechanisms
+await page.waitForSelector('[data-testid="my-element"]');
+await page.waitForLoadState('networkidle');
+await expect(page.getByTestId('my-element')).toBeVisible();
+await page.waitForResponse(response => response.url().includes('/api/data'));
+await page.waitForFunction(() => document.querySelector('.loading') === null);
 ```
 
 ## Testing Considerations

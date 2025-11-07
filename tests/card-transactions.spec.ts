@@ -215,7 +215,6 @@ test.describe("Card Transactions Component", () => {
       await page.goto("/");
       // Wait for the Transactions section to be visible
       await page.waitForSelector("text=Transactions", { timeout: 10000 });
-      await page.waitForTimeout(1000);
 
       const cardTransactionsComponent = getCardTransactionsComponent(page);
 
@@ -579,9 +578,6 @@ test.describe("Card Transactions Component", () => {
       await test.step("verify dispute reasons load and display", async () => {
         const modal = page.getByTestId("transaction-details-modal");
 
-        // Wait for loading to complete and dropdown to be available
-        await page.waitForTimeout(500);
-
         // Click the select trigger to open dropdown
         const selectTrigger = modal.getByRole("combobox");
         await expect(selectTrigger).toBeVisible();
@@ -769,9 +765,6 @@ test.describe("Card Transactions Component", () => {
         const disputeButton = modal.getByTestId("dispute-transaction-button");
         await disputeButton.click();
 
-        // Wait for reasons to load
-        await page.waitForTimeout(500);
-
         // Select a dispute reason
         const selectTrigger = modal.getByRole("combobox");
         await selectTrigger.click();
@@ -780,9 +773,6 @@ test.describe("Card Transactions Component", () => {
         // Submit the dispute
         const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
         await submitButton.click();
-
-        // Wait for error to appear
-        await page.waitForTimeout(500);
 
         // Verify error message is displayed
         await expect(modal.getByText("Transaction has already been disputed")).toBeVisible();

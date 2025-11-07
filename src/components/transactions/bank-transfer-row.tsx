@@ -8,9 +8,10 @@ import { BankTransferDetailsModal } from "@/components/modals/transaction-detail
 
 interface BankTransferRowProps {
   ibanOrder: IbanOrder;
+  index?: number;
 }
 
-export const BankTransferRow = ({ ibanOrder }: BankTransferRowProps) => {
+export const BankTransferRow = ({ ibanOrder, index }: BankTransferRowProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = useCallback(() => {
@@ -50,21 +51,34 @@ export const BankTransferRow = ({ ibanOrder }: BankTransferRowProps) => {
         className="flex items-center justify-between py-3 cursor-pointer hover:bg-muted/50 rounded-lg transition-colors w-full text-left p-2"
         onClick={handleClick}
         type="button"
+        data-testid={`iban-transaction-row-${index ?? 0}`}
       >
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center">
+          <div
+            className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center"
+            data-testid="iban-transaction-icon"
+          >
             <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
           </div>
           <div className="flex flex-col">
-            <div className="text-lg">{transferTitle}</div>
-            <div className="text-xs text-secondary mt-1">
+            <div className="text-lg" data-testid="iban-transaction-title">
+              {transferTitle}
+            </div>
+            <div className="text-xs text-secondary mt-1" data-testid="iban-transaction-time">
               {transferTime}
-              {memo && <span className="mx-1"> • {memo}</span>}
+              {memo && (
+                <span className="mx-1" data-testid="iban-transaction-memo">
+                  {" "}
+                  • {memo}
+                </span>
+              )}
             </div>
           </div>
         </div>
         <div className="text-right">
-          <div className="text-lg text-primary">{formattedAmount}</div>
+          <div className="text-lg text-primary" data-testid="iban-transaction-amount">
+            {formattedAmount}
+          </div>
         </div>
       </button>
 

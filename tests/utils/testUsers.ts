@@ -7,6 +7,7 @@ import type { DelayRelayMockData } from "./mockDelayRelay";
 import type { OrderMockData } from "./mockOrder";
 import type { IbansAvailableMockData } from "./mockIbansAvailable";
 import type { CardTransactionsMockData } from "./mockCardTransactions";
+import type { IbanOrdersMockData } from "./mockIbanOrders";
 import { createCard, CardStatus } from "./mockCards";
 import { CARD_TRANSACTIONS_SCENARIOS } from "./mockCardTransactions";
 
@@ -42,6 +43,8 @@ export interface TestUser {
   ibansAvailable?: IbansAvailableMockData;
   /** Card transactions mock data */
   cardTransactions?: CardTransactionsMockData;
+  /** IBAN orders mock data */
+  ibanOrders?: IbanOrdersMockData;
 }
 
 /**
@@ -73,6 +76,7 @@ function createTestUser(config: {
   orders?: OrderMockData;
   ibansAvailable?: IbansAvailableMockData;
   cardTransactions?: CardTransactionsMockData;
+  ibanOrders?: IbanOrdersMockData;
 }): TestUser {
   const now = new Date().toISOString();
 
@@ -131,6 +135,7 @@ function createTestUser(config: {
     orders: config.orders,
     ibansAvailable: config.ibansAvailable,
     cardTransactions: config.cardTransactions,
+    ibanOrders: config.ibanOrders,
   };
 }
 
@@ -150,6 +155,9 @@ export const BASE_USER = createTestUser({
   isPhoneValidated: true,
   isSourceOfFundsAnswered: true,
   hasSignedUp: true,
+  bankingDetails: {
+    moneriumIban: "DE89370400440532013000",
+  },
   safeConfig: {
     hasNoApprovals: false,
     isDeployed: true,
@@ -185,3 +193,43 @@ export const BASE_USER = createTestUser({
   ibansAvailable: { available: true }, // Available for approved user
   cardTransactions: CARD_TRANSACTIONS_SCENARIOS.empty, // Start with empty transactions
 });
+
+/**
+ * Helper function to create a test user without IBAN
+ * Useful for testing scenarios where user is eligible but hasn't created IBAN yet
+ */
+export const createUserWithoutIban = (baseUser: TestUser = BASE_USER): TestUser => {
+  return {
+    ...baseUser,
+    user: {
+      ...baseUser.user,
+      bankingDetails: {
+        ...baseUser.user.bankingDetails,
+        moneriumIban: undefined,
+      },
+    },
+  };
+};
+
+/**
+ * Helper function to create a test user with IBAN
+ * Useful for testing scenarios where user has already created an IBAN
+ */
+export const createUserWithIban = (
+  baseUser: TestUser = BASE_USER,
+  iban: string = "DE89370400440532013000",
+  bic: string = "COBADEFFXXX",
+  status: string = "ASSIGNED",
+): TestUser => {
+  return {
+    ...baseUser,
+    user: {
+      ...baseUser.user,
+      bankingDetails: {
+        moneriumIban: iban,
+        moneriumBic: bic,
+        moneriumIbanStatus: status,
+      },
+    },
+  };
+};

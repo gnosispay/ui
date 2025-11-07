@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { BASE_USER } from "./utils/testUsers";
+import { createUserWithIban, createUserWithoutIban } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
 
@@ -10,7 +10,8 @@ test.describe("Home Page Banners", () => {
 
   test("partner and IBAN banners display, navigate, and dismiss correctly", async ({ page }) => {
     // Setup mocks with user eligible for IBAN but without IBAN set
-    await setupAllMocks(page, BASE_USER, {
+    const userWithoutIban = createUserWithoutIban();
+    await setupAllMocks(page, userWithoutIban, {
       ibansAvailable: {
         available: true,
       },
@@ -107,7 +108,8 @@ test.describe("Home Page Banners", () => {
 
   test("IBAN banner does not show when user is not eligible for IBAN", async ({ page }) => {
     // Setup mocks with user who is not eligible for IBAN (available: false)
-    await setupAllMocks(page, BASE_USER, {
+    const userWithoutIban = createUserWithoutIban();
+    await setupAllMocks(page, userWithoutIban, {
       ibansAvailable: {
         available: false,
       },
@@ -129,17 +131,7 @@ test.describe("Home Page Banners", () => {
 
   test("IBAN banner does not show when user already has an IBAN", async ({ page }) => {
     // Create a user with moneriumIban set in bankingDetails
-    const userWithIban = {
-      ...BASE_USER,
-      user: {
-        ...BASE_USER.user,
-        bankingDetails: {
-          moneriumIban: "DE89370400440532013000",
-          moneriumBic: "COBADEFFXXX",
-          moneriumIbanStatus: "ASSIGNED",
-        },
-      },
-    };
+    const userWithIban = createUserWithIban();
 
     // Setup mocks with user who has IBAN (even though eligible, banner shouldn't show)
     await setupAllMocks(page, userWithIban, {

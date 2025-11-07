@@ -10,6 +10,7 @@ import { mockDelayRelay, type DelayRelayMockData } from "./mockDelayRelay";
 import { mockOrder, type OrderMockData } from "./mockOrder";
 import { mockIbansAvailable, type IbansAvailableMockData } from "./mockIbansAvailable";
 import { mockCardTransactions, type CardTransactionsMockData } from "./mockCardTransactions";
+import { mockIbanOrders, type IbanOrdersMockData } from "./mockIbanOrders";
 
 /**
  * Configuration options for setting up all API mocks
@@ -33,6 +34,8 @@ export interface MockSetupOptions {
   ibansAvailable?: IbansAvailableMockData;
   /** Optional overrides for card transactions mock */
   cardTransactions?: CardTransactionsMockData;
+  /** Optional overrides for IBAN orders mock */
+  ibanOrders?: IbanOrdersMockData;
   /** Skip auth challenge mock (useful when setting up custom auth flow) */
   skipAuthChallenge?: boolean;
   /** Skip user mock (useful when setting up custom user data) */
@@ -53,6 +56,8 @@ export interface MockSetupOptions {
   skipIbansAvailable?: boolean;
   /** Skip card transactions mock (useful when setting up custom pagination or transaction data) */
   skipCardTransactions?: boolean;
+  /** Skip IBAN orders mock (useful when setting up custom IBAN order data) */
+  skipIbanOrders?: boolean;
 }
 
 /**
@@ -137,6 +142,9 @@ export async function setupAllMocks(page: Page, testUser: TestUser, options: Moc
   }
   if (!options.skipCardTransactions) {
     mockPromises.push(mockCardTransactions({ page, testUser, transactionsOverrides: options.cardTransactions }));
+  }
+  if (!options.skipIbanOrders) {
+    mockPromises.push(mockIbanOrders({ page, testUser, ordersOverrides: options.ibanOrders }));
   }
 
   await Promise.all(mockPromises);
