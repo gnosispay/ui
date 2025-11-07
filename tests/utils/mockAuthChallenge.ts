@@ -118,23 +118,3 @@ export async function mockAuthChallenge({
     }
   });
 }
-
-/**
- * Utility function to decode a JWT token for testing purposes
- *
- * @param token - The JWT token string to decode
- * @returns The decoded JWT payload
- */
-export function decodeJWT(token: string): JWTPayload {
-  return jwt.decode(token) as JWTPayload;
-}
-
-/**
- * Constants exported for use in tests
- */
-export const AUTH_MOCK_CONSTANTS = {
-  MOCK_USER_ID,
-  DEFAULT_SIGNER_ADDRESS,
-  DEFAULT_CHAIN_ID,
-  JWT_SECRET,
-} as const;

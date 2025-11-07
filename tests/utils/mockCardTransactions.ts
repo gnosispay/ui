@@ -450,18 +450,3 @@ export const CARD_TRANSACTIONS_SCENARIOS = {
     ],
   },
 };
-
-/**
- * Helper function to mock card transactions with a predefined scenario
- */
-export async function mockCardTransactionsScenario({
-  page,
-  testUser,
-  scenario,
-}: {
-  page: Page;
-  testUser: TestUser;
-  scenario: keyof typeof CARD_TRANSACTIONS_SCENARIOS;
-}): Promise<void> {
-  await mockCardTransactions({ page, testUser, transactionsOverrides: CARD_TRANSACTIONS_SCENARIOS[scenario] });
-}

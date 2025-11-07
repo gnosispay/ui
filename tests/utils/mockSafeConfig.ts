@@ -249,13 +249,3 @@ export const SAFE_CONFIG_SCENARIOS = {
   },
 } as const;
 
-/**
- * Helper function to mock safe config with a predefined scenario
- */
-export async function mockSafeConfigScenario(
-  page: Page,
-  testUser: TestUser,
-  scenario: keyof typeof SAFE_CONFIG_SCENARIOS,
-): Promise<void> {
-  await mockSafeConfig({ page, testUser, configOverrides: SAFE_CONFIG_SCENARIOS[scenario] });
-}

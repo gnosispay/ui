@@ -199,42 +199,8 @@ export const REWARDS_SCENARIOS = {
 } as const;
 
 /**
- * Helper function to mock rewards with a predefined scenario
- */
-export async function mockRewardsScenario(
-  page: Page,
-  testUser: TestUser,
-  scenario: keyof typeof REWARDS_SCENARIOS,
-): Promise<void> {
-  await mockRewards({ page, testUser, rewardsOverrides: REWARDS_SCENARIOS[scenario] });
-}
-
-/**
  * Helper function to calculate total cashback rate including OG bonus
  */
 export function calculateTotalCashbackRate(rewards: RewardsData): number {
   return rewards.cashbackRate + (rewards.isOg ? 1.0 : 0.0);
-}
-
-/**
- * Helper function to determine cashback rate based on GNO balance
- * This matches the business logic described in the API
- */
-export function calculateCashbackRateFromBalance(gnoBalance: number): number {
-  if (gnoBalance >= 50) return 4.0;
-  if (gnoBalance >= 25) return 3.0;
-  if (gnoBalance >= 10) return 2.0;
-  if (gnoBalance >= 2.5) return 1.0;
-  return 0.0;
-}
-
-/**
- * Helper function to create realistic rewards data based on GNO balance
- */
-export function createRewardsFromBalance(gnoBalance: number, isOg: boolean = false): RewardsData {
-  return {
-    isOg,
-    gnoBalance,
-    cashbackRate: calculateCashbackRateFromBalance(gnoBalance),
-  };
 }

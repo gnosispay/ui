@@ -5,7 +5,7 @@ import { mockUser } from "./mockUser";
 import { mockSafeConfig, type SafeConfigMockData } from "./mockSafeConfig";
 import { mockRewards, type RewardsMockData } from "./mockRewards";
 import { mockAccountBalances, type AccountBalancesMockData } from "./mockAccountBalances";
-import { mockCards, type CardsMockData, type CardStatusData } from "./mockCards";
+import { mockCards, type CardsMockData } from "./mockCards";
 import { mockDelayRelay, type DelayRelayMockData } from "./mockDelayRelay";
 import { mockOrder, type OrderMockData } from "./mockOrder";
 import { mockIbansAvailable, type IbansAvailableMockData } from "./mockIbansAvailable";
@@ -25,8 +25,6 @@ export interface MockSetupOptions {
   accountBalances?: AccountBalancesMockData;
   /** Optional overrides for cards mock */
   cards?: CardsMockData;
-  /** Optional overrides for card status mock */
-  cardStatus?: Record<string, CardStatusData>;
   /** Optional overrides for delay relay mock */
   delayRelay?: DelayRelayMockData;
   /** Optional overrides for orders mock */
@@ -126,9 +124,7 @@ export async function setupAllMocks(page: Page, testUser: TestUser, options: Moc
     mockPromises.push(mockAccountBalances({ page, testUser, balancesOverrides: options.accountBalances }));
   }
   if (!options.skipCards) {
-    mockPromises.push(
-      mockCards({ page, testUser, cardsOverrides: options.cards, cardStatusOverrides: options.cardStatus }),
-    );
+    mockPromises.push(mockCards({ page, testUser, cardsOverrides: options.cards }));
   }
   if (!options.skipDelayRelay) {
     mockPromises.push(mockDelayRelay({ page, testUser, delayRelayOverrides: options.delayRelay }));
