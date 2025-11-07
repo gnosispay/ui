@@ -17,6 +17,7 @@ import { AlertTriangle } from "lucide-react";
 import type { Address } from "viem";
 import { useSmartWallet } from "@/hooks/useSmartWallet";
 import { useDelayRelay } from "@/context/DelayRelayContext";
+import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
 
 interface SafeOwnersDeleteConfirmationProps {
   ownerAddress: string;
@@ -36,6 +37,7 @@ export const SafeOwnersDeleteConfirmation = ({
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const { fetchDelayQueue } = useDelayRelay();
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
 
   const handleDelete = useCallback(async () => {
     if (!safeConfig?.address) {
@@ -159,6 +161,13 @@ export const SafeOwnersDeleteConfirmation = ({
 
   return (
     <div className="space-y-6">
+      {!isSignerConnected && !isDataLoading && (
+        <StandardAlert
+          variant="destructive"
+          description="You must be connected with an account that is a signer of the Gnosis Pay account"
+        />
+      )}
+
       <div className="flex flex-col items-center text-center space-y-4">
         <div className="p-3 bg-destructive/10 rounded-full">
           <AlertTriangle className="w-8 h-8 text-destructive" />
@@ -200,6 +209,7 @@ export const SafeOwnersDeleteConfirmation = ({
       />
 
       {error && <StandardAlert variant="destructive" title="Error" description={error} />}
+      {signerError && <StandardAlert variant="destructive" description={signerError.message} />}
 
       <div className="flex gap-3">
         <Button variant="outline" className="flex-1" onClick={onCancel} disabled={isDeleting}>
@@ -209,7 +219,7 @@ export const SafeOwnersDeleteConfirmation = ({
           variant="destructive"
           className="flex-1"
           onClick={handleDelete}
-          disabled={isDeleting}
+          disabled={isDeleting || !isSignerConnected || !!signerError}
           loading={isDeleting}
         >
           {isDeleting ? "Removing..." : "Remove owner"}
