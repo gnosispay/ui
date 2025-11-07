@@ -1,5 +1,5 @@
 import type { Page, Route } from "@playwright/test";
-import type { Event, Payment, Refund, Reversal, BasePaymentish } from "../../src/client/types.gen";
+import type { Event, Payment, Refund, Reversal, BasePaymentish, Currency } from "../../src/client/types.gen";
 import type { TestUser } from "./testUsers";
 import { mockCurrencies } from "./currencyUtils";
 
