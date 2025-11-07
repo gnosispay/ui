@@ -264,15 +264,14 @@ export const CARD_STATUS_NAMES: Record<CardStatusCode, string> = {
  */
 export function createCardStatusFromCard(card: CardData): CardStatusData {
   // Determine boolean flags based on status code
+  const isFrozen = card.statusCode === CardStatus.DECLINED;
   const isStolen = card.statusCode === CardStatus.STOLEN;
   const isLost = card.statusCode === CardStatus.LOST;
   const isVoid = card.statusCode === CardStatus.VOID || card.statusCode === CardStatus.VOID_ALT;
   const isBlocked =
     card.statusCode === CardStatus.PIN_BLOCKED ||
-    card.statusCode === CardStatus.DECLINED ||
     card.statusCode === CardStatus.DECLINED_ALT ||
     card.statusCode === CardStatus.RESTRICTED;
-  const isFrozen = false; // Frozen is a separate action, not determined by status code
 
   return {
     activatedAt: card.activatedAt || undefined,
@@ -360,8 +359,8 @@ export const CARD_SCENARIOS = {
   /** Card with issues (blocked) */
   BLOCKED_CARD: [
     createCard({
-      id: "card-blocked-1",
-      cardToken: "token-blocked-1",
+      id: "card-pin-blocked-1",
+      cardToken: "token-pin-blocked-1",
       lastFourDigits: "9999",
       virtual: false,
       statusCode: CardStatus.PIN_BLOCKED,
@@ -411,8 +410,8 @@ export const CARD_SCENARIOS = {
       statusCode: CardStatus.ACTIVE,
     }),
     createCard({
-      id: "card-blocked-1",
-      cardToken: "token-blocked-1",
+      id: "card-pin-blocked-1",
+      cardToken: "token-pin-blocked-1",
       lastFourDigits: "2222",
       virtual: false,
       statusCode: CardStatus.PIN_BLOCKED,
@@ -590,7 +589,7 @@ export function createCardStatus(config: {
 
   return {
     statusCode,
-    isFrozen: config.isFrozen || false,
+    isFrozen: config.isFrozen || statusCode === CardStatus.DECLINED,
     isStolen: config.isStolen || statusCode === CardStatus.STOLEN,
     isLost: config.isLost || statusCode === CardStatus.LOST,
     isBlocked:

@@ -66,6 +66,13 @@ export const Cards = () => {
                   {cardInfo?.isStolen && <CardStatusOverlay status="stolen" showText={false} iconSize={20} />}
                   {cardInfo?.isLost && <CardStatusOverlay status="lost" showText={false} iconSize={20} />}
                   {cardInfo?.isVoid && <CardStatusOverlay status="void" showText={false} iconSize={20} />}
+                  {!cardInfo?.isFrozen &&
+                    !cardInfo?.isStolen &&
+                    !cardInfo?.isLost &&
+                    !cardInfo?.isVoid &&
+                    cardInfo?.statusCode !== 1000 && (
+                      <CardStatusOverlay status="other" showText={false} iconSize={20} />
+                    )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <div className="text-sm text-primary">

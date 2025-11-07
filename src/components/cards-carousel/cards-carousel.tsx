@@ -210,7 +210,7 @@ export const CardsCarousel = ({
             return (
               <div
                 key={card.id}
-                className={`flex-shrink-0 transition-opacity duration-300 ${
+                className={`shrink-0 transition-opacity duration-300 ${
                   index === currentIndex ? "opacity-100" : "opacity-40"
                 } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : index === cards.length - 1 ? "mr-[calc(50%-10rem)] sm:mr-0" : ""}`}
               >
