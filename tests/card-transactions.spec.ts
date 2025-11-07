@@ -795,4 +795,115 @@ test.describe("Card Transactions Component", () => {
       });
     });
   });
+
+  test.describe("Pagination and Load More", () => {
+    test("load more functionality with button states and pagination", async ({ page }) => {
+      // Create initial 10 transactions
+      const initialTransactions = Array.from({ length: 10 }, (_, i) => {
+        const date = new Date("2024-01-15T10:00:00.000Z");
+        date.setHours(date.getHours() - i);
+        return createPayment({
+          threadId: `initial-tx-${i}`,
+          isPending: false,
+          createdAt: date.toISOString(),
+          merchant: { name: `Initial Merchant ${i}`, city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+          billingAmount: `${(i + 1) * 1000000000000000000}`,
+          mcc: "5411",
+        });
+      });
+
+      // Create additional 10 transactions for second page
+      const additionalTransactions = Array.from({ length: 10 }, (_, i) => {
+        const date = new Date("2024-01-15T10:00:00.000Z");
+        date.setHours(date.getHours() - (10 + i));
+        return createPayment({
+          threadId: `additional-tx-${i}`,
+          isPending: false,
+          createdAt: date.toISOString(),
+          merchant: { name: `Additional Merchant ${i}`, city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+          billingAmount: `${(i + 11) * 1000000000000000000}`,
+          mcc: "5411",
+        });
+      });
+
+      // Set up mock to handle pagination - do this BEFORE setupAllMocks
+      await page.route("**/api/v1/cards/transactions*", async (route) => {
+        const url = new URL(route.request().url());
+        const offset = parseInt(url.searchParams.get("offset") || "0", 10);
+
+        if (offset === 0) {
+          // First request - return initial transactions with next page
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              count: 20,
+              next: "/api/v1/cards/transactions?limit=10&offset=10",
+              previous: null,
+              results: initialTransactions,
+            }),
+          });
+        } else {
+          // Second request - return additional transactions without next page
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              count: 20,
+              next: null,
+              previous: "/api/v1/cards/transactions?limit=10&offset=0",
+              results: additionalTransactions,
+            }),
+          });
+        }
+      });
+
+      // Set up other mocks (skip card transactions since we set up custom pagination above)
+      await setupAllMocks(page, BASE_USER, {
+        skipCardTransactions: true,
+      });
+
+      await page.goto("/");
+      await page.waitForSelector("text=Transactions", { timeout: 10000 });
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("verify load more button is visible and styled correctly", async () => {
+        const loadMoreButton = cardTransactionsComponent.getByTestId("load-more-button");
+        await expect(loadMoreButton).toBeVisible();
+        await expect(loadMoreButton).toContainText("Load More");
+        await expect(loadMoreButton).toBeEnabled();
+        await expect(loadMoreButton).toHaveClass(/w-full/); // Full width
+      });
+
+      await test.step("verify initial transactions are loaded", async () => {
+        // Check that we have initial transactions
+        await expect(cardTransactionsComponent.getByText("Initial Merchant 0")).toBeVisible();
+        await expect(cardTransactionsComponent.getByText("Initial Merchant 9")).toBeVisible();
+
+        // Additional transactions should not be visible yet
+        await expect(cardTransactionsComponent.getByText("Additional Merchant 0")).not.toBeVisible();
+      });
+
+      await test.step("click load more and verify additional transactions", async () => {
+        const loadMoreButton = cardTransactionsComponent.getByTestId("load-more-button");
+        await expect(loadMoreButton).toBeVisible();
+
+        // Click load more
+        await loadMoreButton.click();
+
+        // Wait for additional transactions to appear (loading state is too fast to reliably test)
+        await expect(cardTransactionsComponent.getByText("Additional Merchant 0")).toBeVisible();
+        await expect(cardTransactionsComponent.getByText("Additional Merchant 9")).toBeVisible();
+
+        // Initial transactions should still be visible
+        await expect(cardTransactionsComponent.getByText("Initial Merchant 0")).toBeVisible();
+      });
+
+      await test.step("verify load more button disappears when no more pages", async () => {
+        const loadMoreButton = cardTransactionsComponent.getByTestId("load-more-button");
+        await expect(loadMoreButton).not.toBeVisible();
+      });
+    });
+  });
 });

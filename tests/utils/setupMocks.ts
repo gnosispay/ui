@@ -33,6 +33,26 @@ export interface MockSetupOptions {
   ibansAvailable?: IbansAvailableMockData;
   /** Optional overrides for card transactions mock */
   cardTransactions?: CardTransactionsMockData;
+  /** Skip auth challenge mock (useful when setting up custom auth flow) */
+  skipAuthChallenge?: boolean;
+  /** Skip user mock (useful when setting up custom user data) */
+  skipUser?: boolean;
+  /** Skip safe config mock (useful when setting up custom safe configuration) */
+  skipSafeConfig?: boolean;
+  /** Skip rewards mock (useful when setting up custom rewards data) */
+  skipRewards?: boolean;
+  /** Skip account balances mock (useful when setting up custom balance data) */
+  skipAccountBalances?: boolean;
+  /** Skip cards mock (useful when setting up custom card data) */
+  skipCards?: boolean;
+  /** Skip delay relay mock (useful when setting up custom relay data) */
+  skipDelayRelay?: boolean;
+  /** Skip orders mock (useful when setting up custom order data) */
+  skipOrders?: boolean;
+  /** Skip IBAN availability mock (useful when setting up custom IBAN data) */
+  skipIbansAvailable?: boolean;
+  /** Skip card transactions mock (useful when setting up custom pagination or transaction data) */
+  skipCardTransactions?: boolean;
 }
 
 /**
@@ -86,16 +106,38 @@ export interface MockSetupOptions {
  */
 export async function setupAllMocks(page: Page, testUser: TestUser, options: MockSetupOptions = {}): Promise<void> {
   // Set up all API mocks in parallel for better performance
-  await Promise.all([
-    mockAuthChallenge({ page, testUser, options: options.authChallenge }),
-    mockUser({ page, testUser }),
-    mockSafeConfig({ page, testUser, configOverrides: options.safeConfig }),
-    mockRewards({ page, testUser, rewardsOverrides: options.rewards }),
-    mockAccountBalances({ page, testUser, balancesOverrides: options.accountBalances }),
-    mockCards({ page, testUser, cardsOverrides: options.cards }),
-    mockDelayRelay({ page, testUser, delayRelayOverrides: options.delayRelay }),
-    mockOrder({ page, testUser, orderOverrides: options.orders }),
-    mockIbansAvailable({ page, testUser, ibansAvailableOverrides: options.ibansAvailable }),
-    mockCardTransactions({ page, testUser, transactionsOverrides: options.cardTransactions }),
-  ]);
+  const mockPromises: Promise<void>[] = [];
+
+  if (!options.skipAuthChallenge) {
+    mockPromises.push(mockAuthChallenge({ page, testUser, options: options.authChallenge }));
+  }
+  if (!options.skipUser) {
+    mockPromises.push(mockUser({ page, testUser }));
+  }
+  if (!options.skipSafeConfig) {
+    mockPromises.push(mockSafeConfig({ page, testUser, configOverrides: options.safeConfig }));
+  }
+  if (!options.skipRewards) {
+    mockPromises.push(mockRewards({ page, testUser, rewardsOverrides: options.rewards }));
+  }
+  if (!options.skipAccountBalances) {
+    mockPromises.push(mockAccountBalances({ page, testUser, balancesOverrides: options.accountBalances }));
+  }
+  if (!options.skipCards) {
+    mockPromises.push(mockCards({ page, testUser, cardsOverrides: options.cards }));
+  }
+  if (!options.skipDelayRelay) {
+    mockPromises.push(mockDelayRelay({ page, testUser, delayRelayOverrides: options.delayRelay }));
+  }
+  if (!options.skipOrders) {
+    mockPromises.push(mockOrder({ page, testUser, orderOverrides: options.orders }));
+  }
+  if (!options.skipIbansAvailable) {
+    mockPromises.push(mockIbansAvailable({ page, testUser, ibansAvailableOverrides: options.ibansAvailable }));
+  }
+  if (!options.skipCardTransactions) {
+    mockPromises.push(mockCardTransactions({ page, testUser, transactionsOverrides: options.cardTransactions }));
+  }
+
+  await Promise.all(mockPromises);
 }
