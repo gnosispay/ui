@@ -252,7 +252,15 @@ export function createRefund(
     transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.RETURN_OF_GOODS,
     cardToken: config.cardToken || "token-approved-1",
-    transactions: config.transactions || [],
+    transactions: config.transactions || [
+      {
+        status: "ExecSuccess",
+        to: "0xcFF260bfbc199dC82717494299b1AcADe25F549b",
+        value: "0",
+        data: "0x8a320255000000000000000000000000cb444e90d8198415266c6a2724b7900fb12fc56e0000000000000000000000006ea79daa04ca3ed7fce7141773b01d4f25ee6a190000000000000000000000004822521e6135cd2599199c83ea35179229a172ee0000000000000000000000000000000000000000000000005a9f38670f4d0000349476e3982666749979c85ce800cd2947a4b8dc9fe20a01a00a1b526072a8a30000000000000000000000000000000000000000000000000000019a16e9bfb6e71bd7ddc6faad5593dc9f954cb2413fd3593162041b0491223c51d21d5917ba33a14a9f6489390021ee2b6231a97c26d7049a44e8297402a28652fb8cf59cc61b",
+        hash: "0x33dc323gf891fab3d4gbb3959fb5f91bdd4c438fc53e2ff2gf245359f175501b",
+      },
+    ],
     refundAmount: config.refundAmount || config.billingAmount || "10000000000000000000",
     refundCurrency: config.refundCurrency || config.billingCurrency || mockCurrencies.EUR,
   };
@@ -288,7 +296,15 @@ export function createReversal(
     transactionCurrency: config.transactionCurrency || config.billingCurrency || mockCurrencies.EUR,
     transactionType: config.transactionType || TransactionType.PURCHASE,
     cardToken: config.cardToken || "token-approved-1",
-    transactions: config.transactions || [],
+    transactions: config.transactions || [
+      {
+        status: "ExecSuccess",
+        to: "0xcFF260bfbc199dC82717494299b1AcADe25F549b",
+        value: "0",
+        data: "0x8a320255000000000000000000000000cb444e90d8198415266c6a2724b7900fb12fc56e0000000000000000000000006ea79daa04ca3ed7fce7141773b01d4f25ee6a190000000000000000000000004822521e6135cd2599199c83ea35179229a172ee0000000000000000000000000000000000000000000000005a9f38670f4d0000349476e3982666749979c85ce800cd2947a4b8dc9fe20a01a00a1b526072a8a30000000000000000000000000000000000000000000000000000019a16e9bfb6e71bd7ddc6faad5593dc9f954cb2413fd3593162041b0491223c51d21d5917ba33a14a9f6489390021ee2b6231a97c26d7049a44e8297402a28652fb8cf59cc61b",
+        hash: "0x44ed434hg902gbc4e5hcc4a6agc6ga2cee5d549gd64f3gg3hg356460g286612c",
+      },
+    ],
     reversalAmount: config.reversalAmount || config.billingAmount || "10000000000000000000",
   };
 }

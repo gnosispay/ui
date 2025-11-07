@@ -10,6 +10,7 @@ import {
   PaymentStatus,
 } from "./utils/mockCardTransactions";
 import { mockCurrencies } from "./utils/currencyUtils";
+import { mockDisputeReasonsEndpoint, mockDisputeSubmission } from "./utils/mockDispute";
 
 test.describe("Card Transactions Component", () => {
   test.beforeEach(async ({ page }) => {
@@ -422,6 +423,15 @@ test.describe("Card Transactions Component", () => {
         // Verify dispute button is NOT visible for refunds
         const disputeButton = modal.getByTestId("dispute-transaction-button");
         await expect(disputeButton).not.toBeVisible();
+
+        // Verify TxHash is present for refunds
+        const modalTxHash = modal.getByTestId("modal-txhash");
+        await expect(modalTxHash).toBeVisible();
+        await expect(modalTxHash).toContainText("0x33dc");
+
+        // Verify the external link button is present
+        const modalTxHashExternalLink = modal.getByTestId("txhash-external-link");
+        await expect(modalTxHashExternalLink).toBeVisible();
       });
     });
 
@@ -454,6 +464,15 @@ test.describe("Card Transactions Component", () => {
         // Verify dispute button is NOT visible for reversals
         const disputeButton = modal.getByTestId("dispute-transaction-button");
         await expect(disputeButton).not.toBeVisible();
+
+        // Verify TxHash is present for reversals
+        const modalTxHash = modal.getByTestId("modal-txhash");
+        await expect(modalTxHash).toBeVisible();
+        await expect(modalTxHash).toContainText("0x44ed");
+
+        // Verify the external link button is present
+        const modalTxHashExternalLink = modal.getByTestId("txhash-external-link");
+        await expect(modalTxHashExternalLink).toBeVisible();
       });
     });
 
@@ -486,6 +505,293 @@ test.describe("Card Transactions Component", () => {
         // Verify date
         const modalTransactionDate = modal.getByTestId("modal-transaction-date");
         await expect(modalTransactionDate).toContainText("Jan 15, 2024 at 14:30");
+
+        // Verify TxHash is present for failed transactions
+        const modalTxHash = modal.getByTestId("modal-txhash");
+        await expect(modalTxHash).toBeVisible();
+        await expect(modalTxHash).toContainText("0x22cb");
+
+        // Verify the external link button is present
+        const modalTxHashExternalLink = modal.getByTestId("txhash-external-link");
+        await expect(modalTxHashExternalLink).toBeVisible();
+      });
+    });
+  });
+
+  test.describe("Dispute Flow Integration", () => {
+    test("complete dispute flow with all scenarios", async ({ page }) => {
+      await mockDisputeReasonsEndpoint(page);
+      await mockDisputeSubmission(page);
+
+      // Create a transaction that is older than 24 hours
+      const oldDate = new Date();
+      oldDate.setDate(oldDate.getDate() - 2); // 2 days ago
+
+      const oldTransactionScenario = {
+        count: 1,
+        next: null,
+        previous: null,
+        results: [
+          createPayment({
+            isPending: false,
+            createdAt: oldDate.toISOString(),
+            merchant: { name: "Test Merchant", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+            billingAmount: "10000000000000000000",
+            mcc: "5411",
+          }),
+        ],
+      };
+
+      await setupAllMocks(page, BASE_USER, {
+        cardTransactions: oldTransactionScenario,
+      });
+
+      await page.goto("/");
+      await page.waitForSelector("text=Transactions", { timeout: 10000 });
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("open modal and start dispute", async () => {
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await transactionRow.click();
+
+        const modal = page.getByTestId("transaction-details-modal");
+        await expect(modal).toBeVisible();
+
+        // Click dispute button
+        const disputeButton = modal.getByTestId("dispute-transaction-button");
+        await disputeButton.click();
+
+        // Verify dispute section appears
+        await expect(modal.getByText("Dispute Transaction")).toBeVisible();
+        await expect(modal.getByText("Select the reason that best describes your issue")).toBeVisible();
+
+        // Verify back button is present
+        const backButton = modal.getByRole("button", { name: "Back" });
+        await expect(backButton).toBeVisible();
+
+        // Verify submit button is present but disabled initially
+        const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
+        await expect(submitButton).toBeVisible();
+        await expect(submitButton).toBeDisabled();
+      });
+
+      await test.step("verify dispute reasons load and display", async () => {
+        const modal = page.getByTestId("transaction-details-modal");
+
+        // Wait for loading to complete and dropdown to be available
+        await page.waitForTimeout(500);
+
+        // Click the select trigger to open dropdown
+        const selectTrigger = modal.getByRole("combobox");
+        await expect(selectTrigger).toBeVisible();
+        await selectTrigger.click();
+
+        // Verify dispute reasons are displayed
+        await expect(page.getByText("Purchase cancelled but no refund received")).toBeVisible();
+        await expect(page.getByText("Problem with the product (chargeback)")).toBeVisible();
+        await expect(page.getByText("Charged more than once")).toBeVisible();
+        await expect(page.getByText("Unrecognized transaction (report fraudulent)")).toBeVisible();
+      });
+
+      await test.step("select reason and verify submit button enabled", async () => {
+        const modal = page.getByTestId("transaction-details-modal");
+
+        // Select a dispute reason
+        await page.getByText("Charged more than once").click();
+
+        // Verify submit button is now enabled
+        const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
+        await expect(submitButton).toBeEnabled();
+      });
+
+      await test.step("test fraudulent transaction warning", async () => {
+        const modal = page.getByTestId("transaction-details-modal");
+
+        // Change to fraudulent transaction reason
+        const selectTrigger = modal.getByRole("combobox");
+        await selectTrigger.click();
+        await page.getByText("Unrecognized transaction (report fraudulent)").click();
+
+        // Verify warning is displayed
+        await expect(modal.getByText(/your card will be temporarily restricted/i)).toBeVisible();
+
+        // Submit button should still be enabled for fraudulent transactions
+        const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
+        await expect(submitButton).toBeEnabled();
+
+        // Switch back to non-fraudulent reason for next steps
+        await selectTrigger.click();
+        await page.getByText("Charged more than once").click();
+      });
+
+      await test.step("submit dispute and verify success", async () => {
+        const modal = page.getByTestId("transaction-details-modal");
+
+        // Submit the dispute
+        const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
+        await submitButton.click();
+
+        // Verify success message
+        await expect(modal.getByText("Dispute Submitted Successfully")).toBeVisible();
+        await expect(modal.getByText(/support ticket has been created/i)).toBeVisible();
+        await expect(modal.getByText(/receive updates via email/i)).toBeVisible();
+
+        // Verify success icon (checkmark) - CheckCircle2 from lucide-react
+        const successIcon = modal.locator("svg.lucide-circle-check");
+        await expect(successIcon).toBeVisible();
+
+        // Verify back button is available
+        const backButton = modal.getByRole("button", { name: "Back" });
+        await expect(backButton).toBeVisible();
+      });
+
+      await test.step("navigate back to transaction details", async () => {
+        const modal = page.getByTestId("transaction-details-modal");
+        const backButton = modal.getByRole("button", { name: "Back" });
+        await backButton.click();
+
+        // Verify we're back on details view
+        await expect(modal.getByTestId("modal-merchant-name")).toContainText("Test Merchant");
+        await expect(modal.getByTestId("dispute-transaction-button")).toBeVisible();
+      });
+    });
+
+    test("24-hour restriction prevents dispute for recent transactions", async ({ page }) => {
+      await mockDisputeReasonsEndpoint(page);
+
+      // Create a transaction less than 24 hours old (1 hour ago)
+      const recentDate = new Date();
+      recentDate.setHours(recentDate.getHours() - 1);
+
+      const recentTransactionScenario = {
+        count: 1,
+        next: null,
+        previous: null,
+        results: [
+          createPayment({
+            isPending: false,
+            createdAt: recentDate.toISOString(),
+            merchant: { name: "Recent Merchant", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+            billingAmount: "10000000000000000000",
+            mcc: "5411",
+          }),
+        ],
+      };
+
+      await setupAllMocks(page, BASE_USER, {
+        cardTransactions: recentTransactionScenario,
+      });
+
+      await page.goto("/");
+      await page.waitForSelector("text=Transactions", { timeout: 10000 });
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("verify 24-hour restriction for non-fraudulent", async () => {
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await transactionRow.click();
+
+        const modal = page.getByTestId("transaction-details-modal");
+        const disputeButton = modal.getByTestId("dispute-transaction-button");
+        await disputeButton.click();
+
+        // Select a non-fraudulent dispute reason
+        const selectTrigger = modal.getByRole("combobox");
+        await selectTrigger.click();
+        await page.getByText("Charged more than once").click();
+
+        // Verify 24-hour restriction message is displayed
+        await expect(modal.getByText(/less than 24 hours old/i)).toBeVisible();
+
+        // Submit button should be disabled
+        const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
+        await expect(submitButton).toBeDisabled();
+      });
+
+      await test.step("verify fraudulent bypasses 24-hour restriction", async () => {
+        const modal = page.getByTestId("transaction-details-modal");
+
+        // Select fraudulent transaction reason
+        const selectTrigger = modal.getByRole("combobox");
+        await selectTrigger.click();
+        await page.getByText("Unrecognized transaction (report fraudulent)").click();
+
+        // 24-hour restriction should NOT appear
+        await expect(modal.getByText(/less than 24 hours old/i)).not.toBeVisible();
+
+        // Submit button should be enabled
+        const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
+        await expect(submitButton).toBeEnabled();
+      });
+    });
+
+    test("dispute submission error handling", async ({ page }) => {
+      await mockDisputeReasonsEndpoint(page);
+      await mockDisputeSubmission(page, {
+        shouldFail: true,
+        errorMessage: "Transaction has already been disputed",
+      });
+
+      // Create an old transaction
+      const oldDate = new Date();
+      oldDate.setDate(oldDate.getDate() - 2);
+
+      const oldTransactionScenario = {
+        count: 1,
+        next: null,
+        previous: null,
+        results: [
+          createPayment({
+            isPending: false,
+            createdAt: oldDate.toISOString(),
+            merchant: { name: "Test Merchant", city: "Berlin", country: { alpha2: "DE", name: "Germany" } },
+            billingAmount: "10000000000000000000",
+            mcc: "5411",
+          }),
+        ],
+      };
+
+      await setupAllMocks(page, BASE_USER, {
+        cardTransactions: oldTransactionScenario,
+      });
+
+      await page.goto("/");
+      await page.waitForSelector("text=Transactions", { timeout: 10000 });
+
+      const cardTransactionsComponent = getCardTransactionsComponent(page);
+
+      await test.step("submit dispute and verify error", async () => {
+        const transactionRow = cardTransactionsComponent.getByTestId("transaction-row-0");
+        await transactionRow.click();
+
+        const modal = page.getByTestId("transaction-details-modal");
+        const disputeButton = modal.getByTestId("dispute-transaction-button");
+        await disputeButton.click();
+
+        // Wait for reasons to load
+        await page.waitForTimeout(500);
+
+        // Select a dispute reason
+        const selectTrigger = modal.getByRole("combobox");
+        await selectTrigger.click();
+        await page.getByText("Charged more than once").click();
+
+        // Submit the dispute
+        const submitButton = modal.getByRole("button", { name: "Submit Dispute" });
+        await submitButton.click();
+
+        // Wait for error to appear
+        await page.waitForTimeout(500);
+
+        // Verify error message is displayed
+        await expect(modal.getByText("Transaction has already been disputed")).toBeVisible();
+
+        // Submit button should be re-enabled for retry
+        await expect(submitButton).toBeEnabled();
+
+        // Should still be on dispute form (not success view)
+        await expect(modal.getByText("Dispute Transaction")).toBeVisible();
       });
     });
   });
