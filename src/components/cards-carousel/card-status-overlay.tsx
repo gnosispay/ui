@@ -1,7 +1,7 @@
 import { AlertTriangle, Snowflake, Ban } from "lucide-react";
 
 interface CardStatusOverlayProps {
-  status: "frozen" | "stolen" | "lost" | "void";
+  status: "frozen" | "stolen" | "lost" | "void" | "other";
   showText?: boolean;
   iconSize?: number;
 }
@@ -25,6 +25,10 @@ export const CardStatusOverlay = ({ status, showText = true, iconSize = 40 }: Ca
     void: {
       icon: <Ban size={iconSize} className={iconClassName} />,
       text: "VOID",
+    },
+    other: {
+      icon: <AlertTriangle size={iconSize} className={iconClassName} />,
+      text: "",
     },
   };
 

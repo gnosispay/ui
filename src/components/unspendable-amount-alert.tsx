@@ -4,10 +4,10 @@ import { useUnspendableAmount } from "@/hooks/useUnspendableAmount";
 import { useZendesk } from "react-use-zendesk";
 
 export const UnspendableAmountAlert = () => {
-  const { unspendableFormatted, shouldShowAlert } = useUnspendableAmount();
+  const { unspendableFormatted, hasUnspendableAmount } = useUnspendableAmount();
   const { open } = useZendesk();
 
-  if (!shouldShowAlert) {
+  if (!hasUnspendableAmount) {
     return null;
   }
   return (

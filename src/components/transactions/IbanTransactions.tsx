@@ -20,22 +20,26 @@ export const IbanTransactions = () => {
   }
 
   return (
-    <>
+    <div data-testid="iban-transactions-component">
       {Object.keys(transactionsByDate).length === 0 && (
         <div className="flex flex-col items-center justify-center py-8">
-          <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
-          <div className="text-center text-secondary">No IBAN transactions to display</div>
+          <InboxIcon className="w-10 h-10 mb-2 text-secondary" data-testid="empty-iban-transactions-icon" />
+          <div className="text-center text-secondary" data-testid="empty-iban-transactions-message">
+            No IBAN transactions to display
+          </div>
         </div>
       )}
 
       {Object.keys(transactionsByDate).map((date) => (
         <div key={date}>
-          <div className="text-xs text-secondary mb-2 p-2">{date}</div>
-          {(transactionsByDate as Record<string, IbanOrder[]>)[date].map((ibanOrder: IbanOrder) => {
-            return <BankTransferRow key={ibanOrder.id} ibanOrder={ibanOrder} />;
+          <div className="text-xs text-secondary mb-2 p-2" data-testid="iban-transaction-date-header">
+            {date}
+          </div>
+          {(transactionsByDate as Record<string, IbanOrder[]>)[date].map((ibanOrder: IbanOrder, index: number) => {
+            return <BankTransferRow key={ibanOrder.id} ibanOrder={ibanOrder} index={index} />;
           })}
         </div>
       ))}
-    </>
+    </div>
   );
 };

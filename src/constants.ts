@@ -1,4 +1,5 @@
 import type { GetApiV1UserTermsResponse } from "./client";
+import { currencyData } from "./constants/currencies";
 import eurLogo from "./assets/tokens/eure.png";
 import gbpLogo from "./assets/tokens/gbpe.png";
 import usdcLogo from "./assets/tokens/usdce.png";
@@ -22,27 +23,15 @@ export const REWARD_ADDRESS = "0xCdF50be9061086e2eCfE6e4a1BF9164d43568EEC";
 
 export const currencies: Record<string, CurrencyInfo> = {
   EUR: {
-    tokenSymbol: "EURe",
-    address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
-    decimals: 18,
-    symbol: "€",
-    fiatSymbol: "EUR",
+    ...currencyData.EUR,
     logo: eurLogo,
   },
   GBP: {
-    tokenSymbol: "GBPe",
-    address: "0x5Cb9073902F2035222B9749F8fB0c9BFe5527108",
-    decimals: 18,
-    symbol: "£",
-    fiatSymbol: "GBP",
+    ...currencyData.GBP,
     logo: gbpLogo,
   },
   USD: {
-    tokenSymbol: "USDCe",
-    address: "0x2a22f9c3b484c3629090FeED35F17Ff8F88f76F0",
-    decimals: 6,
-    symbol: "$",
-    fiatSymbol: "USD",
+    ...currencyData.USD,
     logo: usdcLogo,
   },
 };

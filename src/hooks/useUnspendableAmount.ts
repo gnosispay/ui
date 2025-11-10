@@ -17,13 +17,13 @@ export const useUnspendableAmount = () => {
   const unspendableData = useMemo(() => {
     const spendableBn = BigInt(balances?.spendable ?? "0");
     const totalBn = BigInt(balances?.total ?? "0");
-    const unspendableBn = totalBn - spendableBn;
+    const pendingBn = BigInt(balances?.pending ?? "0");
+    const unspendableBn = totalBn - spendableBn - pendingBn;
 
     return {
       unspendableFormatted: formatCurrency(unspendableBn.toString(), currencyInfo),
       unspendableBn,
       hasUnspendableAmount: unspendableBn > 0n,
-      shouldShowAlert: balances?.pending === "0" && unspendableBn > 0n,
     };
   }, [balances?.total, balances?.spendable, balances?.pending, currencyInfo]);
 

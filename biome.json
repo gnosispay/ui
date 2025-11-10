@@ -3,7 +3,7 @@
   "vcs": { "enabled": false, "clientKind": "git", "useIgnoreFile": false },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/components/ui/**/*.tsx", "!**/dist", "!**/src/client"]
+    "includes": ["**", "!**/components/ui/**/*.tsx", "!**/dist", "!**/src/client", "!playwright-report"]
   },
   "formatter": {
     "enabled": true,

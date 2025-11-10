@@ -37,32 +37,36 @@ export function PartnerBanner({ className }: PartnerBannerProps) {
   }
 
   return (
-    <Link to={PARTNERS_URL} className={cn(
+    <Link
+      to={PARTNERS_URL}
+      data-testid="partner-banner"
+      className={cn(
         "block relative rounded-lg overflow-hidden bg-card mb-4",
         "w-full cursor-pointer hover:bg-card/80 transition-colors",
         className
-      )}>
+      )}
+    >
+      <div
+        className="absolute top-0 right-0 bottom-0 w-1/3 bg-cover bg-no-repeat"
+        style={{
+          backgroundImage: `url(${PartnerAppsImage})`,
+        }}
+      />
 
-        <div
-          className="absolute top-0 right-0 bottom-0 w-1/3 bg-cover bg-no-repeat"
-          style={{
-            backgroundImage: `url(${PartnerAppsImage})`,
+      <div className="relative p-4 flex flex-col justify-center">
+        {/* Dismiss Button */}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            handleDismiss();
           }}
-        />
-        
-        <div className="relative p-4 flex flex-col justify-center">
-          {/* Dismiss Button */}
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              handleDismiss();
-            }}
-            className="absolute top-2 right-2 p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer z-10"
-            aria-label="Dismiss banner"
-          >
-            <X size={14} className="text-foreground" />
-          </button>
+          className="absolute top-2 right-2 p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer z-10"
+          aria-label="Dismiss banner"
+          data-testid="partner-banner-dismiss"
+        >
+          <X size={14} className="text-foreground" />
+        </button>
           
           <div className="w-3/4">
             <h3 className="font-semibold text-foreground mb-1 text-xs leading-4">

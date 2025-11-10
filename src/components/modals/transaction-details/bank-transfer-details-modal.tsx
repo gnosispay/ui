@@ -87,21 +87,28 @@ export const BankTransferDetailsModal = ({ ibanOrder, isOpen, onClose }: BankTra
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg" data-testid="bank-transfer-details-modal">
         <DialogHeader className="pb-0">
           <DialogTitle className="pb-4 mt-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               <div className="flex items-center gap-3 flex-1">
-                <div className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center">
+                <div
+                  className="w-12 h-12 rounded-full bg-icon-background flex items-center justify-center"
+                  data-testid="modal-icon"
+                >
                   <Icon className="w-6 h-6 text-primary" aria-hidden="true" />
                 </div>
                 <div className="flex-1">
-                  <div className="text-lg text-foreground font-normal">{transferTitle}</div>
-                  <div className="text-xs text-muted-foreground">{formattedDate}</div>
+                  <div className="text-lg text-foreground font-normal" data-testid="modal-transfer-title">
+                    {transferTitle}
+                  </div>
+                  <div className="text-xs text-muted-foreground" data-testid="modal-transfer-date">
+                    {formattedDate}
+                  </div>
                 </div>
               </div>
               <div className="text-center sm:text-right">
-                <div className="text-lg text-foreground font-normal">
+                <div className="text-lg text-foreground font-normal" data-testid="modal-transfer-amount">
                   {formattedAmount ? `${sign} ${formattedAmount}` : "-"}
                 </div>
               </div>
@@ -113,25 +120,32 @@ export const BankTransferDetailsModal = ({ ibanOrder, isOpen, onClose }: BankTra
           {/* Status */}
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Status</span>
-            <span className={`font-medium ${statusInfo.color}`}>{statusInfo.text}</span>
+            <span className={`font-medium ${statusInfo.color}`} data-testid="modal-transfer-status">
+              {statusInfo.text}
+            </span>
           </div>
 
           {/* Counterpart */}
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">{direction}</span>
-            <span className="font-medium text-foreground">{counterpartName}</span>
+            <span className="font-medium text-foreground" data-testid="modal-counterpart-name">
+              {counterpartName}
+            </span>
           </div>
 
           {/* IBAN */}
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">IBAN</span>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground font-mono text-sm">{iban}</span>
+              <span className="font-medium text-foreground font-mono text-sm" data-testid="modal-iban">
+                {iban}
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-8 w-8 p-0"
                 onClick={() => copyToClipboard(iban, { successMessage: "IBAN copied to clipboard" })}
+                data-testid="copy-iban-button"
               >
                 <Copy className="w-4 h-4" />
               </Button>
@@ -141,14 +155,18 @@ export const BankTransferDetailsModal = ({ ibanOrder, isOpen, onClose }: BankTra
           {/* Currency */}
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Currency</span>
-            <span className="font-medium text-foreground">{currency}</span>
+            <span className="font-medium text-foreground" data-testid="modal-currency">
+              {currency}
+            </span>
           </div>
 
           {/* Memo */}
           {memo && (
             <div className="flex justify-between items-center py-3">
               <span className="text-muted-foreground">Memo</span>
-              <span className="font-medium text-foreground">{memo}</span>
+              <span className="font-medium text-foreground" data-testid="modal-memo">
+                {memo}
+              </span>
             </div>
           )}
 
@@ -156,12 +174,15 @@ export const BankTransferDetailsModal = ({ ibanOrder, isOpen, onClose }: BankTra
           <div className="flex justify-between items-center py-3">
             <span className="text-muted-foreground">Order ID</span>
             <div className="flex items-center gap-2">
-              <span className="font-medium text-foreground font-mono text-sm">{ibanOrder.id}</span>
+              <span className="font-medium text-foreground font-mono text-sm" data-testid="modal-order-id">
+                {ibanOrder.id}
+              </span>
               <Button
                 variant="ghost"
                 size="sm"
                 className="h-8 w-8 p-0"
                 onClick={() => copyToClipboard(ibanOrder.id, { successMessage: "Order ID copied to clipboard" })}
+                data-testid="copy-order-id-button"
               >
                 <Copy className="w-4 h-4" />
               </Button>

@@ -39,7 +39,7 @@ export const TransactionDetailsModal = ({ transaction, isOpen, onClose }: Transa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-lg" data-testid="transaction-details-modal">
         {currentView === ModalView.Details && (
           <TransactionDetailsView transaction={transaction} onStartDispute={handleStartDispute} />
         )}

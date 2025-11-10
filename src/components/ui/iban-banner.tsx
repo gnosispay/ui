@@ -51,7 +51,8 @@ export function IbanBanner({ className }: IbanBannerProps) {
 
   return (
     <>
-      <div 
+      <div
+        data-testid="iban-banner"
         className={cn(
           "block relative rounded-lg overflow-hidden bg-card",
           "w-full mb-4 cursor-pointer hover:bg-card/80 transition-colors",
@@ -62,7 +63,7 @@ export function IbanBanner({ className }: IbanBannerProps) {
         <div className="absolute top-0 right-0 bottom-0 w-1/3 flex items-center justify-center">
           <img src={IbanIcon} alt="IBAN" className="w-3/4 h-3/4 object-cover" />
         </div>
-        
+
         <div className="relative p-4 flex flex-col justify-center">
           {/* Dismiss Button */}
           <button
@@ -73,6 +74,7 @@ export function IbanBanner({ className }: IbanBannerProps) {
             }}
             className="absolute top-2 right-2 p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer z-10"
             aria-label="Dismiss IBAN banner"
+            data-testid="iban-banner-dismiss"
           >
             <X size={14} className="text-foreground" />
           </button>

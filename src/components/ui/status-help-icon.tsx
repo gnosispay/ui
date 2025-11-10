@@ -37,11 +37,12 @@ export const StatusHelpIcon = ({ type }: StatusHelpIconProps) => {
           role="button"
           tabIndex={0}
           onClick={handleClick}
+          data-testid={`help-icon-${type}`}
         >
           <HelpCircle className="w-3 h-3" />
         </span>
       </PopoverTrigger>
-      <PopoverContent className="w-64 text-sm" align="start">
+      <PopoverContent className="w-64 text-sm" align="start" data-testid={`help-content-${type}`}>
         <div className="text-foreground">{getHelpText()}</div>
       </PopoverContent>
     </Popover>

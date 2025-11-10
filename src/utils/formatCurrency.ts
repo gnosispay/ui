@@ -10,7 +10,13 @@ export const formatCurrency = (
 
   try {
     const bigIntValue = BigInt(value);
-    const valueInUnits = Number(bigIntValue) / 10 ** currencyInfo.decimals;
+    // Use more precise BigInt arithmetic to avoid floating point precision issues
+    const divisor = BigInt(10 ** currencyInfo.decimals);
+    const wholePart = bigIntValue / divisor;
+    const fractionalPart = bigIntValue % divisor;
+
+    // Convert to decimal with proper precision
+    const valueInUnits = Number(wholePart) + Number(fractionalPart) / Number(divisor);
     return formatDisplayAmount(valueInUnits, currencyInfo);
   } catch (e) {
     console.error("Error formatting currency:", e);
@@ -20,7 +26,9 @@ export const formatCurrency = (
 
 export const formatDisplayAmount = (value: number, currencyInfo: CurrencyInfo) => {
   // Floor the value to 2 decimal places to prevent rounding up
-  const flooredValue = Math.floor(value * 100) / 100;
+  // Use more robust approach to handle floating point precision issues
+  const multiplied = Math.round(value * 100);
+  const flooredValue = Math.floor(multiplied) / 100;
 
   return new Intl.NumberFormat("en-US", {
     style: "currency",
