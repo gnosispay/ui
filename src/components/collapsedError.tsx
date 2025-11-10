@@ -28,7 +28,7 @@ export const CollapsedError = ({ error, title }: Props) => {
   }, [open]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col" data-testid="collapsed-error">
       <div>{title}</div>
       <Button variant="ghost" onClick={onSwitch} className="text-muted-foreground p-0 justify-start w-fit">
         Details <ChevronDown size={16} className={open ? "rotate-180" : ""} />

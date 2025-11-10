@@ -23,24 +23,24 @@ export const CardsOrderVirtual = ({ onClose, onGoBack }: CardsOrderVirtualProps)
         if (error) {
           console.error("Error ordering card: ", error);
           toast.error(<CollapsedError title="Error ordering card" error={error} />);
+          setIsLoading(false);
           return;
         }
 
         toast.success("Virtual card ordered successfully");
         refreshCards();
+        setIsLoading(false);
+        onClose();
       })
       .catch((error) => {
         console.error("Error ordering card: ", error);
         toast.error(<CollapsedError title="Error ordering card" error={error} />);
-      })
-      .finally(() => {
         setIsLoading(false);
-        onClose();
       });
   }, [refreshCards, onClose]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" data-testid="virtual-card-order-step">
       <div className="space-y-2">
         <p className="text-sm text-muted-foreground">
           The card will be available in your dashboard immediately for online purchases. You can also add it manually to
@@ -48,10 +48,10 @@ export const CardsOrderVirtual = ({ onClose, onGoBack }: CardsOrderVirtualProps)
         </p>
       </div>
       <DialogFooter className="justify-end">
-        <Button variant="outline" onClick={onGoBack}>
+        <Button variant="outline" onClick={onGoBack} data-testid="back-button">
           Back
         </Button>
-        <Button disabled={isLoading} loading={isLoading} onClick={onCardOrder}>
+        <Button disabled={isLoading} loading={isLoading} onClick={onCardOrder} data-testid="order-virtual-card-button">
           Order Virtual Card
         </Button>
       </DialogFooter>

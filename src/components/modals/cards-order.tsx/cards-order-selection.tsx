@@ -46,6 +46,7 @@ export const CardsOrderSelection = ({ onVirtualCardOrder, onClose }: CardsOrderS
               type="button"
               onClick={onClick}
               className="cursor-pointer w-full flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors text-left"
+              data-testid={`card-option-${title.toLowerCase().replace(" ", "-")}`}
             >
               <div className="flex-shrink-0">
                 <IconComponent className="h-6 w-6 text-foreground" />

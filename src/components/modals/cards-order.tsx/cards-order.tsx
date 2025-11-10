@@ -38,7 +38,7 @@ export const CardsOrderModal = ({ open, onOpenChange }: CardsOrderModalProps) =>
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg" data-testid="card-order-modal">
         <DialogHeader>
           <DialogTitle>
             {step === CardsOrderStep.Selection && "Order a card"}
