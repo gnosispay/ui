@@ -93,6 +93,7 @@ export const Cards = () => {
             className="cursor-pointer rounded-sm w-17 h-11 bg-muted flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={handleAddCard}
             aria-label="Add card"
+            data-testid="add-card-button"
           >
             <PlusIcon className="w-4 h-4" />
           </button>
