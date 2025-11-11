@@ -2,7 +2,8 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { CARD_SCENARIOS, createCard, CardStatus } from "./utils/mockCards";
+import { CARD_SCENARIOS } from "./utils/mockCards";
+import { mockVirtualCardCreation } from "./utils/mockVirtualCardCreation";
 
 test.describe("Virtual Card Order", () => {
   test.beforeEach(async ({ page }) => {
@@ -90,28 +91,10 @@ test.describe("Virtual Card Order", () => {
     });
 
     await test.step("order virtual card successfully", async () => {
-      // Mock the virtual card creation API
-      const newCard = createCard({
-        id: "card-virtual-new",
-        cardToken: "token-virtual-new",
-        lastFourDigits: "4321",
-        virtual: true,
-        statusCode: CardStatus.ACTIVE,
-      });
-
       let cardsGetCallCount = 0;
 
-      await page.route("**/api/v1/cards/virtual", async (route) => {
-        if (route.request().method() === "POST") {
-          await route.fulfill({
-            status: 200,
-            contentType: "application/json",
-            body: JSON.stringify(newCard),
-          });
-        } else {
-          await route.continue();
-        }
-      });
+      // Mock successful virtual card creation
+      await mockVirtualCardCreation(page, { isError: false });
 
       // Track GET calls to /api/v1/cards to verify refresh is called
       await page.route("**/api/v1/cards", async (route) => {
@@ -154,17 +137,10 @@ test.describe("Virtual Card Order", () => {
     });
 
     await test.step("mock API error and attempt to order card", async () => {
-      // Mock the virtual card creation API to return an error
-      await page.route("**/api/v1/cards/virtual", async (route) => {
-        if (route.request().method() === "POST") {
-          await route.fulfill({
-            status: 400,
-            contentType: "application/json",
-            body: JSON.stringify({ error: "Card limit exceeded" }),
-          });
-        } else {
-          await route.continue();
-        }
+      // Mock the virtual card creation API to return an error (422 - Unprocessable Entity)
+      await mockVirtualCardCreation(page, {
+        isError: true,
+        errorStatus: 422,
       });
 
       const orderButton = page.getByTestId("order-virtual-card-button");
