@@ -38,10 +38,16 @@ export const SafeDeploymentRoute = () => {
   }, [user, safeConfig, step]);
 
   return (
-    <div className="grid grid-cols-6 gap-4 h-full">
+    <div className="grid grid-cols-6 gap-4 h-full" data-testid="safe-deployment-page">
       {error && (
         <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
-          <StandardAlert variant="destructive" title="Error" description={error} className="mt-4" />
+          <StandardAlert
+            variant="destructive"
+            title="Error"
+            description={error}
+            className="mt-4"
+            data-testid="safe-deployment-error-alert"
+          />
         </div>
       )}
       {step === ScreenStep.AnswerSourceOfFunds && (

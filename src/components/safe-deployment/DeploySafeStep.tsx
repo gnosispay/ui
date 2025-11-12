@@ -118,22 +118,24 @@ const DeploySafeStep = ({ setError }: DeploySafeStepProps) => {
   }, [stopPolling]);
 
   return (
-    <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
+    <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0" data-testid="deploy-safe-step">
       <h2 className="text-lg font-semibold mb-4 mt-4">Configuring your Safe</h2>
       <div className="flex flex-col items-center justify-center h-full space-y-4">
         {step === DeploymentStep.Done && (
           <>
-            <CheckCircle2 className="w-16 h-16 text-success" />
-            <p className="text-center text-muted-foreground">Your Safe account has been successfully created!</p>
-            <Button className="mt-4" onClick={() => navigate("/")}>
+            <CheckCircle2 className="w-16 h-16 text-success" data-testid="safe-deployment-success-icon" />
+            <p className="text-center text-muted-foreground" data-testid="safe-deployment-success-message">
+              Your Safe account has been successfully created!
+            </p>
+            <Button className="mt-4" onClick={() => navigate("/")} data-testid="safe-deployment-visit-home-button">
               Visit Home
             </Button>
           </>
         )}
         {step !== DeploymentStep.Done && (
           <>
-            <LoaderCircle className="w-16 h-16 animate-spin text-primary" />
-            <p className="text-center text-muted-foreground">
+            <LoaderCircle className="w-16 h-16 animate-spin text-primary" data-testid="safe-deployment-loading-icon" />
+            <p className="text-center text-muted-foreground" data-testid="safe-deployment-loading-message">
               {step === DeploymentStep.Initializing
                 ? "Initializing your account..."
                 : "Creating your Safe account (this may take a few minutes)..."}

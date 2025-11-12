@@ -64,18 +64,18 @@ const SourceOfFundsStep = ({ onComplete, setError }: SourceOfFundsStepProps) => 
   );
 
   return (
-    <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
+    <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0" data-testid="source-of-funds-step">
       <h2 className="text-lg font-semibold my-4">Please answer the following questions:</h2>
-      <form onSubmit={handleSOFSubmit} className="space-y-6">
+      <form onSubmit={handleSOFSubmit} className="space-y-6" data-testid="source-of-funds-form">
         {sourceOfFunds.map((q, idx) => {
           const qId = `sof-q-${idx}`;
           return (
-            <div key={q.question} className="mb-4">
+            <div key={q.question} className="mb-4" data-testid={`source-of-funds-question-${idx}`}>
               <label htmlFor={qId} className="block mb-2 font-medium">
                 {q.question}
               </label>
               <Select value={answers[idx] || ""} onValueChange={(value) => handleSoFAnswer(idx, value)}>
-                <SelectTrigger id={qId} className="w-full">
+                <SelectTrigger id={qId} className="w-full" data-testid={`source-of-funds-select-${idx}`}>
                   <SelectValue placeholder="Select an answer" />
                 </SelectTrigger>
                 <SelectContent className="w-full">
@@ -89,7 +89,12 @@ const SourceOfFundsStep = ({ onComplete, setError }: SourceOfFundsStepProps) => 
             </div>
           );
         })}
-        <Button loading={isSubmitting} type="submit" disabled={isSourceOfFundsSubmitDisabled}>
+        <Button
+          loading={isSubmitting}
+          type="submit"
+          disabled={isSourceOfFundsSubmitDisabled}
+          data-testid="source-of-funds-submit-button"
+        >
           Submit
         </Button>
       </form>

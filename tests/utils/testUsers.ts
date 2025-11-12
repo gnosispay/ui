@@ -22,7 +22,7 @@ export interface TestUser {
   /** Signer address for wallet connections */
   signerAddress: string;
   /** Safe address for the user's Safe wallet */
-  safeAddress: string;
+  safeAddress?: string;
   /** User ID for consistent referencing */
   userId: string;
   /** Whether the user has completed sign up process */
@@ -53,10 +53,10 @@ export interface TestUser {
 function createTestUser(config: {
   userId: string;
   signerAddress: string;
-  safeAddress: string;
-  email: string;
-  firstName: string;
-  lastName: string;
+  safeAddress?: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
   phone?: string;
   address1?: string;
   city?: string;
@@ -87,19 +87,24 @@ function createTestUser(config: {
     createdAt: now,
   };
 
-  const safeAccount: SafeAccount = {
-    address: config.safeAddress,
-    chainId: "100", // Gnosis chain
-    tokenSymbol: "EURe",
-    createdAt: now,
-  };
+  // Only create safe account if safeAddress is provided
+  const safeWallets: SafeAccount[] = config.safeAddress
+    ? [
+        {
+          address: config.safeAddress,
+          chainId: "100", // Gnosis chain
+          tokenSymbol: "EURe",
+          createdAt: now,
+        },
+      ]
+    : [];
 
   const user: User = {
     id: config.userId,
-    email: config.email,
+    email: config.email || null,
     phone: config.phone || "+1234567890",
-    firstName: config.firstName,
-    lastName: config.lastName,
+    firstName: config.firstName || null,
+    lastName: config.lastName || null,
     address1: config.address1 || "123 Test Street",
     address2: null,
     city: config.city || "Test City",
@@ -108,7 +113,7 @@ function createTestUser(config: {
     country: config.country || "US",
     nationalityCountry: config.country || "US",
     signInWallets: [eoaAccount],
-    safeWallets: [safeAccount],
+    safeWallets: safeWallets,
     kycStatus: config.kycStatus || "approved",
     availableFeatures: {
       moneriumIban: true,
@@ -233,3 +238,107 @@ export const createUserWithIban = (
     },
   };
 };
+
+// ============================================================================
+// Onboarding Test Users
+// ============================================================================
+
+/**
+ * Test user who has not signed up yet
+ * Useful for testing the initial signup flow
+ */
+export const USER_NOT_SIGNED_UP = createTestUser({
+  userId: "test-user-not-signed-up",
+  signerAddress: USER_TEST_SIGNER_ADDRESS,
+  safeAddress: undefined,
+  email: undefined,
+  firstName: undefined,
+  lastName: undefined,
+  kycStatus: "notStarted",
+  isPhoneValidated: false,
+  isSourceOfFundsAnswered: false,
+  hasSignedUp: false,
+  cards: [],
+  bankingDetails: null,
+  status: "ACTIVE",
+});
+
+/**
+ * Test user who has signed up but not started KYC
+ * Useful for testing the KYC initiation flow
+ */
+export const USER_SIGNED_UP_NO_KYC = createTestUser({
+  ...USER_NOT_SIGNED_UP,
+  kycStatus: "notStarted",
+  email: "test@test.com",
+  isSourceOfFundsAnswered: false,
+  isPhoneValidated: false,
+  hasSignedUp: true,
+});
+
+/**
+ * Test user with KYC pending (documents submitted)
+ * Useful for testing the KYC waiting state
+ */
+export const USER_KYC_PENDING = createTestUser({
+  ...USER_SIGNED_UP_NO_KYC,
+  kycStatus: "pending",
+  isSourceOfFundsAnswered: false,
+  isPhoneValidated: false,
+});
+
+/**
+ * Test user with KYC processing
+ * Useful for testing the KYC processing state
+ */
+export const USER_KYC_PROCESSING = createTestUser({
+  ...USER_KYC_PENDING,
+  kycStatus: "processing",
+  isSourceOfFundsAnswered: false,
+  isPhoneValidated: false,
+});
+
+/**
+ * Test user with KYC approved but no source of funds answered
+ * Useful for testing the source of funds flow
+ */
+export const USER_KYC_APPROVED_NO_SOF = createTestUser({
+  ...USER_KYC_PROCESSING,
+  kycStatus: "approved",
+  isSourceOfFundsAnswered: false,
+  isPhoneValidated: false,
+});
+
+/**
+ * Test user with source of funds answered but phone not validated
+ * Useful for testing the phone verification flow
+ */
+export const USER_SOF_ANSWERED_NO_PHONE = createTestUser({
+  userId: USER_KYC_APPROVED_NO_SOF.userId,
+  signerAddress: USER_KYC_APPROVED_NO_SOF.signerAddress,
+  safeAddress: USER_KYC_APPROVED_NO_SOF.safeAddress,
+  email: USER_KYC_APPROVED_NO_SOF.user.email,
+  firstName: USER_KYC_APPROVED_NO_SOF.user.firstName,
+  lastName: USER_KYC_APPROVED_NO_SOF.user.lastName,
+  kycStatus: "approved",
+  isSourceOfFundsAnswered: true,
+  isPhoneValidated: false,
+  hasSignedUp: true,
+});
+
+/**
+ * Test user ready for safe deployment
+ * Useful for testing the safe deployment flow
+ */
+export const USER_READY_FOR_SAFE_DEPLOYMENT = createTestUser({
+  userId: USER_SOF_ANSWERED_NO_PHONE.userId,
+  signerAddress: USER_SOF_ANSWERED_NO_PHONE.signerAddress,
+  safeAddress: USER_SOF_ANSWERED_NO_PHONE.safeAddress,
+  email: USER_SOF_ANSWERED_NO_PHONE.user.email,
+  firstName: USER_SOF_ANSWERED_NO_PHONE.user.firstName,
+  lastName: USER_SOF_ANSWERED_NO_PHONE.user.lastName,
+  kycStatus: "approved",
+  isSourceOfFundsAnswered: true,
+  isPhoneValidated: true,
+  hasSignedUp: true,
+});

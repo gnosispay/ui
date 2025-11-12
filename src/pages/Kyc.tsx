@@ -79,15 +79,28 @@ export const KycRoute = () => {
   // - requiresAction
 
   return (
-    <div className="grid grid-cols-6 gap-4 h-full">
+    <div className="grid grid-cols-6 gap-4 h-full" data-testid="kyc-page">
       {error && (
         <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
-          <StandardAlert variant="destructive" title="Error" description={error} className="mt-4" />
+          <StandardAlert
+            variant="destructive"
+            title="Error"
+            description={error}
+            className="mt-4"
+            data-testid="kyc-error-alert"
+          />
         </div>
       )}
       {!error && (
         <div className="col-span-6">
-          {kycUrl && <iframe src={kycUrl} className="w-full h-[calc(100vh-73px)]" title="KYC Integration" />}
+          {kycUrl && (
+            <iframe
+              src={kycUrl}
+              className="w-full h-[calc(100vh-73px)]"
+              title="KYC Integration"
+              data-testid="kyc-iframe"
+            />
+          )}
         </div>
       )}
     </div>
