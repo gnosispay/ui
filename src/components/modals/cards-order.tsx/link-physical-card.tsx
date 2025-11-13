@@ -4,12 +4,12 @@ import { Label } from "@/components/ui/label";
 import { DialogFooter } from "@/components/ui/dialog";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { useCallback, useState, useMemo } from "react";
-import { client } from "@/client/client.gen";
 import { useCards } from "@/context/CardsContext";
 import { toast } from "sonner";
 import { CollapsedError } from "@/components/collapsedError";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { generateSessionKey, encryptSessionKey, generateIV, encryptSecret } from "@/utils/cryptography";
+import { getApiV1UserCardPublicKey, postApiV1CardsVerify } from "@/client";
 
 interface CardsOrderPhysicalProps {
   onClose: () => void;
@@ -37,15 +37,7 @@ export const LinkPhysicalCard = ({ onClose, onGoBack }: CardsOrderPhysicalProps)
   }, []);
 
   const getFutureCardPublicKey = useCallback(async (): Promise<string> => {
-    const response = await client.get({
-      url: "/api/v1/user/card-public-key",
-      security: [
-        {
-          scheme: "bearer",
-          type: "http",
-        },
-      ],
-    });
+    const response = await getApiV1UserCardPublicKey();
 
     if (response.error) {
       throw new Error(extractErrorMessage(response.error, "Failed to get card public key"));
@@ -55,8 +47,7 @@ export const LinkPhysicalCard = ({ onClose, onGoBack }: CardsOrderPhysicalProps)
       throw new Error("No data returned from card public key endpoint");
     }
 
-    const data = response.data as { publicKey: string };
-    return data.publicKey;
+    return response.data.publicKey;
   }, []);
 
   const handleVerify = useCallback(async () => {
@@ -83,21 +74,11 @@ export const LinkPhysicalCard = ({ onClose, onGoBack }: CardsOrderPhysicalProps)
         throw new Error("Failed to encrypt PAN");
       }
 
-      const response = await client.post({
-        url: "/api/v1/cards/verify",
-        security: [
-          {
-            scheme: "bearer",
-            type: "http",
-          },
-        ],
+      const response = await postApiV1CardsVerify({
         body: {
-          iv,
-          encryptedKey,
           encryptedPan,
-        },
-        headers: {
-          "Content-Type": "application/json",
+          encryptedKey,
+          iv,
         },
       });
 
@@ -112,8 +93,7 @@ export const LinkPhysicalCard = ({ onClose, onGoBack }: CardsOrderPhysicalProps)
         throw new Error("No data returned from verify endpoint");
       }
 
-      const data = response.data as { cardId: string };
-      const cardId = data.cardId;
+      const { cardId } = response.data;
 
       if (!cardId) {
         throw new Error("Failed to verify card");

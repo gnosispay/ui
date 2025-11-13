@@ -2,7 +2,7 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteApiV1EoaAccountsByIdData, DeleteApiV1EoaAccountsByIdErrors, DeleteApiV1EoaAccountsByIdResponses, DeleteApiV1IbansResetData, DeleteApiV1IbansResetErrors, DeleteApiV1IbansResetResponses, DeleteApiV1OwnersData, DeleteApiV1OwnersErrors, DeleteApiV1OwnersResponses, GetApiV1AccountBalancesData, GetApiV1AccountBalancesErrors, GetApiV1AccountBalancesResponses, GetApiV1AccountsDailyLimitData, GetApiV1AccountsDailyLimitErrors, GetApiV1AccountsDailyLimitResponses, GetApiV1AccountsDailyLimitTransactionDataData, GetApiV1AccountsDailyLimitTransactionDataErrors, GetApiV1AccountsDailyLimitTransactionDataResponses, GetApiV1AccountSignaturePayloadData, GetApiV1AccountSignaturePayloadErrors, GetApiV1AccountSignaturePayloadResponses, GetApiV1AccountsOnchainDailyLimitData, GetApiV1AccountsOnchainDailyLimitErrors, GetApiV1AccountsOnchainDailyLimitResponses, GetApiV1AccountsOnchainDailyLimitTransactionDataData, GetApiV1AccountsOnchainDailyLimitTransactionDataErrors, GetApiV1AccountsOnchainDailyLimitTransactionDataResponses, GetApiV1AccountsWithdrawTransactionDataData, GetApiV1AccountsWithdrawTransactionDataErrors, GetApiV1AccountsWithdrawTransactionDataResponses, GetApiV1AuthNonceData, GetApiV1AuthNonceErrors, GetApiV1AuthNonceResponses, GetApiV1CardsByCardIdStatusData, GetApiV1CardsByCardIdStatusErrors, GetApiV1CardsByCardIdStatusResponses, GetApiV1CardsData, GetApiV1CardsErrors, GetApiV1CardsResponses, GetApiV1CardsTransactionsData, GetApiV1CardsTransactionsErrors, GetApiV1CardsTransactionsResponses, GetApiV1DelayRelayData, GetApiV1DelayRelayErrors, GetApiV1DelayRelayResponses, GetApiV1EoaAccountsData, GetApiV1EoaAccountsErrors, GetApiV1EoaAccountsResponses, GetApiV1IbansAvailableData, GetApiV1IbansAvailableErrors, GetApiV1IbansAvailableResponses, GetApiV1IbansDetailsData, GetApiV1IbansDetailsErrors, GetApiV1IbansDetailsResponses, GetApiV1IbansOauthRedirectUrlData, GetApiV1IbansOauthRedirectUrlErrors, GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOrdersData, GetApiV1IbansOrdersErrors, GetApiV1IbansOrdersResponses, GetApiV1IbansSigningMessageData, GetApiV1IbansSigningMessageErrors, GetApiV1IbansSigningMessageResponses, GetApiV1KycIntegrationData, GetApiV1KycIntegrationErrors, GetApiV1KycIntegrationResponses, GetApiV1KycIntegrationSdkData, GetApiV1KycIntegrationSdkErrors, GetApiV1KycIntegrationSdkResponses, GetApiV1OrderByOrderIdData, GetApiV1OrderByOrderIdErrors, GetApiV1OrderByOrderIdResponses, GetApiV1OrderData, GetApiV1OrderErrors, GetApiV1OrderResponses, GetApiV1OwnersAddTransactionDataData, GetApiV1OwnersAddTransactionDataErrors, GetApiV1OwnersAddTransactionDataResponses, GetApiV1OwnersData, GetApiV1OwnersErrors, GetApiV1OwnersRemoveTransactionDataData, GetApiV1OwnersRemoveTransactionDataErrors, GetApiV1OwnersRemoveTransactionDataResponses, GetApiV1OwnersResponses, GetApiV1RewardsData, GetApiV1RewardsErrors, GetApiV1RewardsResponses, GetApiV1SafeConfigData, GetApiV1SafeConfigErrors, GetApiV1SafeConfigResponses, GetApiV1SafeDeployData, GetApiV1SafeDeployErrors, GetApiV1SafeDeployResponses, GetApiV1SourceOfFundsData, GetApiV1SourceOfFundsErrors, GetApiV1SourceOfFundsResponses, GetApiV1TransactionsData, GetApiV1TransactionsDisputeData, GetApiV1TransactionsDisputeErrors, GetApiV1TransactionsDisputeResponses, GetApiV1TransactionsErrors, GetApiV1TransactionsResponses, GetApiV1UserData, GetApiV1UserErrors, GetApiV1UserResponses, GetApiV1UserTermsData, GetApiV1UserTermsErrors, GetApiV1UserTermsResponses, GetApiV1WebhooksMessageByPartnerIdData, GetApiV1WebhooksMessageByPartnerIdErrors, GetApiV1WebhooksMessageByPartnerIdResponses, PatchApiV1AccountDeploySafeModulesData, PatchApiV1AccountDeploySafeModulesErrors, PatchApiV1AccountDeploySafeModulesResponses, PostApiV1AccountData, PostApiV1AccountErrors, PostApiV1AccountResponses, PostApiV1AccountsWithdrawData, PostApiV1AccountsWithdrawErrors, PostApiV1AccountsWithdrawResponses, PostApiV1AuthChallengeData, PostApiV1AuthChallengeErrors, PostApiV1AuthChallengeResponses, PostApiV1AuthSignupData, PostApiV1AuthSignupErrors, PostApiV1AuthSignupOtpData, PostApiV1AuthSignupOtpErrors, PostApiV1AuthSignupOtpResponses, PostApiV1AuthSignupResponses, PostApiV1CardsByCardIdActivateData, PostApiV1CardsByCardIdActivateErrors, PostApiV1CardsByCardIdActivateResponses, PostApiV1CardsByCardIdFreezeData, PostApiV1CardsByCardIdFreezeErrors, PostApiV1CardsByCardIdFreezeResponses, PostApiV1CardsByCardIdLostData, PostApiV1CardsByCardIdLostErrors, PostApiV1CardsByCardIdLostResponses, PostApiV1CardsByCardIdStolenData, PostApiV1CardsByCardIdStolenErrors, PostApiV1CardsByCardIdStolenResponses, PostApiV1CardsByCardIdUnfreezeData, PostApiV1CardsByCardIdUnfreezeErrors, PostApiV1CardsByCardIdUnfreezeResponses, PostApiV1CardsByCardIdVoidData, PostApiV1CardsByCardIdVoidErrors, PostApiV1CardsByCardIdVoidResponses, PostApiV1CardsVirtualData, PostApiV1CardsVirtualErrors, PostApiV1CardsVirtualResponses, PostApiV1EoaAccountsData, PostApiV1EoaAccountsErrors, PostApiV1EoaAccountsResponses, PostApiV1IbansMoneriumProfileData, PostApiV1IbansMoneriumProfileErrors, PostApiV1IbansMoneriumProfileResponses, PostApiV1IntegrationsMoneriumData, PostApiV1IntegrationsMoneriumErrors, PostApiV1IntegrationsMoneriumResponses, PostApiV1KycImportPartnerApplicantData, PostApiV1KycImportPartnerApplicantErrors, PostApiV1KycImportPartnerApplicantResponses, PostApiV1OrderByOrderIdAttachCouponData, PostApiV1OrderByOrderIdAttachCouponErrors, PostApiV1OrderByOrderIdAttachCouponResponses, PostApiV1OrderByOrderIdCancelData, PostApiV1OrderByOrderIdCancelErrors, PostApiV1OrderByOrderIdCancelResponses, PostApiV1OrderByOrderIdCreateCardData, PostApiV1OrderByOrderIdCreateCardErrors, PostApiV1OrderByOrderIdCreateCardResponses, PostApiV1OrderCreateData, PostApiV1OrderCreateErrors, PostApiV1OrderCreateResponses, PostApiV1OwnersData, PostApiV1OwnersErrors, PostApiV1OwnersResponses, PostApiV1SafeDeployData, PostApiV1SafeDeployErrors, PostApiV1SafeDeployResponses, PostApiV1SafeSetCurrencyData, PostApiV1SafeSetCurrencyErrors, PostApiV1SafeSetCurrencyResponses, PostApiV1SourceOfFundsData, PostApiV1SourceOfFundsErrors, PostApiV1SourceOfFundsResponses, PostApiV1TransactionsByThreadIdDisputeData, PostApiV1TransactionsByThreadIdDisputeErrors, PostApiV1TransactionsByThreadIdDisputeResponses, PostApiV1UserTermsData, PostApiV1UserTermsErrors, PostApiV1UserTermsResponses, PostApiV1VerificationCheckData, PostApiV1VerificationCheckErrors, PostApiV1VerificationCheckResponses, PostApiV1VerificationData, PostApiV1VerificationErrors, PostApiV1VerificationResponses, PostApiV1WebhooksSubscribeByPartnerIdData, PostApiV1WebhooksSubscribeByPartnerIdErrors, PostApiV1WebhooksSubscribeByPartnerIdResponses, PutApiV1AccountsDailyLimitData, PutApiV1AccountsDailyLimitErrors, PutApiV1AccountsDailyLimitResponses, PutApiV1AccountsOnchainDailyLimitData, PutApiV1AccountsOnchainDailyLimitErrors, PutApiV1AccountsOnchainDailyLimitResponses, PutApiV1OrderByOrderIdAttachTransactionData, PutApiV1OrderByOrderIdAttachTransactionErrors, PutApiV1OrderByOrderIdAttachTransactionResponses, PutApiV1OrderByOrderIdConfirmPaymentData, PutApiV1OrderByOrderIdConfirmPaymentErrors, PutApiV1OrderByOrderIdConfirmPaymentResponses } from './types.gen';
+import type { DeleteApiV1EoaAccountsByIdData, DeleteApiV1EoaAccountsByIdErrors, DeleteApiV1EoaAccountsByIdResponses, DeleteApiV1IbansResetData, DeleteApiV1IbansResetErrors, DeleteApiV1IbansResetResponses, DeleteApiV1OwnersData, DeleteApiV1OwnersErrors, DeleteApiV1OwnersResponses, DeleteApiV1SafeResetData, DeleteApiV1SafeResetErrors, DeleteApiV1SafeResetResponses, GetApiV1AccountBalancesData, GetApiV1AccountBalancesErrors, GetApiV1AccountBalancesResponses, GetApiV1AccountsDailyLimitData, GetApiV1AccountsDailyLimitErrors, GetApiV1AccountsDailyLimitResponses, GetApiV1AccountsDailyLimitTransactionDataData, GetApiV1AccountsDailyLimitTransactionDataErrors, GetApiV1AccountsDailyLimitTransactionDataResponses, GetApiV1AccountSignaturePayloadData, GetApiV1AccountSignaturePayloadErrors, GetApiV1AccountSignaturePayloadResponses, GetApiV1AccountsOnchainDailyLimitData, GetApiV1AccountsOnchainDailyLimitErrors, GetApiV1AccountsOnchainDailyLimitResponses, GetApiV1AccountsOnchainDailyLimitTransactionDataData, GetApiV1AccountsOnchainDailyLimitTransactionDataErrors, GetApiV1AccountsOnchainDailyLimitTransactionDataResponses, GetApiV1AccountsWithdrawTransactionDataData, GetApiV1AccountsWithdrawTransactionDataErrors, GetApiV1AccountsWithdrawTransactionDataResponses, GetApiV1AuthNonceData, GetApiV1AuthNonceErrors, GetApiV1AuthNonceResponses, GetApiV1CardsByCardIdStatusData, GetApiV1CardsByCardIdStatusErrors, GetApiV1CardsByCardIdStatusResponses, GetApiV1CardsData, GetApiV1CardsErrors, GetApiV1CardsResponses, GetApiV1CardsTransactionsData, GetApiV1CardsTransactionsErrors, GetApiV1CardsTransactionsResponses, GetApiV1CashbackData, GetApiV1CashbackErrors, GetApiV1CashbackResponses, GetApiV1DelayRelayData, GetApiV1DelayRelayErrors, GetApiV1DelayRelayResponses, GetApiV1EoaAccountsData, GetApiV1EoaAccountsErrors, GetApiV1EoaAccountsResponses, GetApiV1IbansAvailableData, GetApiV1IbansAvailableErrors, GetApiV1IbansAvailableResponses, GetApiV1IbansDetailsData, GetApiV1IbansDetailsErrors, GetApiV1IbansDetailsResponses, GetApiV1IbansOauthRedirectUrlData, GetApiV1IbansOauthRedirectUrlErrors, GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOrdersData, GetApiV1IbansOrdersErrors, GetApiV1IbansOrdersResponses, GetApiV1IbansSigningMessageData, GetApiV1IbansSigningMessageErrors, GetApiV1IbansSigningMessageResponses, GetApiV1KycIntegrationData, GetApiV1KycIntegrationErrors, GetApiV1KycIntegrationResponses, GetApiV1KycIntegrationSdkData, GetApiV1KycIntegrationSdkErrors, GetApiV1KycIntegrationSdkResponses, GetApiV1OrderByOrderIdData, GetApiV1OrderByOrderIdErrors, GetApiV1OrderByOrderIdResponses, GetApiV1OrderData, GetApiV1OrderErrors, GetApiV1OrderResponses, GetApiV1OwnersAddTransactionDataData, GetApiV1OwnersAddTransactionDataErrors, GetApiV1OwnersAddTransactionDataResponses, GetApiV1OwnersData, GetApiV1OwnersErrors, GetApiV1OwnersRemoveTransactionDataData, GetApiV1OwnersRemoveTransactionDataErrors, GetApiV1OwnersRemoveTransactionDataResponses, GetApiV1OwnersResponses, GetApiV1RewardsData, GetApiV1RewardsErrors, GetApiV1RewardsResponses, GetApiV1SafeConfigData, GetApiV1SafeConfigErrors, GetApiV1SafeConfigResponses, GetApiV1SafeDeployData, GetApiV1SafeDeployErrors, GetApiV1SafeDeployResponses, GetApiV1SourceOfFundsData, GetApiV1SourceOfFundsErrors, GetApiV1SourceOfFundsResponses, GetApiV1TransactionsData, GetApiV1TransactionsDisputeData, GetApiV1TransactionsDisputeErrors, GetApiV1TransactionsDisputeResponses, GetApiV1TransactionsErrors, GetApiV1TransactionsResponses, GetApiV1UserCardPublicKeyData, GetApiV1UserCardPublicKeyErrors, GetApiV1UserCardPublicKeyResponses, GetApiV1UserData, GetApiV1UserErrors, GetApiV1UserResponses, GetApiV1UserTermsData, GetApiV1UserTermsErrors, GetApiV1UserTermsResponses, GetApiV1WebhooksMessageByPartnerIdData, GetApiV1WebhooksMessageByPartnerIdErrors, GetApiV1WebhooksMessageByPartnerIdResponses, PatchApiV1AccountDeploySafeModulesData, PatchApiV1AccountDeploySafeModulesErrors, PatchApiV1AccountDeploySafeModulesResponses, PostApiV1AccountData, PostApiV1AccountErrors, PostApiV1AccountResponses, PostApiV1AccountsWithdrawData, PostApiV1AccountsWithdrawErrors, PostApiV1AccountsWithdrawResponses, PostApiV1AuthChallengeData, PostApiV1AuthChallengeErrors, PostApiV1AuthChallengeResponses, PostApiV1AuthSignupData, PostApiV1AuthSignupErrors, PostApiV1AuthSignupOtpData, PostApiV1AuthSignupOtpErrors, PostApiV1AuthSignupOtpResponses, PostApiV1AuthSignupResponses, PostApiV1CardsByCardIdActivateData, PostApiV1CardsByCardIdActivateErrors, PostApiV1CardsByCardIdActivateResponses, PostApiV1CardsByCardIdFreezeData, PostApiV1CardsByCardIdFreezeErrors, PostApiV1CardsByCardIdFreezeResponses, PostApiV1CardsByCardIdLostData, PostApiV1CardsByCardIdLostErrors, PostApiV1CardsByCardIdLostResponses, PostApiV1CardsByCardIdStolenData, PostApiV1CardsByCardIdStolenErrors, PostApiV1CardsByCardIdStolenResponses, PostApiV1CardsByCardIdUnfreezeData, PostApiV1CardsByCardIdUnfreezeErrors, PostApiV1CardsByCardIdUnfreezeResponses, PostApiV1CardsByCardIdVoidData, PostApiV1CardsByCardIdVoidErrors, PostApiV1CardsByCardIdVoidResponses, PostApiV1CardsVerifyData, PostApiV1CardsVerifyErrors, PostApiV1CardsVerifyResponses, PostApiV1CardsVirtualData, PostApiV1CardsVirtualErrors, PostApiV1CardsVirtualResponses, PostApiV1EoaAccountsData, PostApiV1EoaAccountsErrors, PostApiV1EoaAccountsResponses, PostApiV1IbansMoneriumProfileData, PostApiV1IbansMoneriumProfileErrors, PostApiV1IbansMoneriumProfileResponses, PostApiV1IntegrationsMoneriumData, PostApiV1IntegrationsMoneriumErrors, PostApiV1IntegrationsMoneriumResponses, PostApiV1KycImportPartnerApplicantData, PostApiV1KycImportPartnerApplicantErrors, PostApiV1KycImportPartnerApplicantResponses, PostApiV1OrderByOrderIdAttachCouponData, PostApiV1OrderByOrderIdAttachCouponErrors, PostApiV1OrderByOrderIdAttachCouponResponses, PostApiV1OrderByOrderIdCancelData, PostApiV1OrderByOrderIdCancelErrors, PostApiV1OrderByOrderIdCancelResponses, PostApiV1OrderByOrderIdCreateCardData, PostApiV1OrderByOrderIdCreateCardErrors, PostApiV1OrderByOrderIdCreateCardResponses, PostApiV1OrderCreateData, PostApiV1OrderCreateErrors, PostApiV1OrderCreateResponses, PostApiV1OwnersData, PostApiV1OwnersErrors, PostApiV1OwnersResponses, PostApiV1SafeDeployData, PostApiV1SafeDeployErrors, PostApiV1SafeDeployResponses, PostApiV1SafeSetCurrencyData, PostApiV1SafeSetCurrencyErrors, PostApiV1SafeSetCurrencyResponses, PostApiV1SourceOfFundsData, PostApiV1SourceOfFundsErrors, PostApiV1SourceOfFundsResponses, PostApiV1TransactionsByThreadIdDisputeData, PostApiV1TransactionsByThreadIdDisputeErrors, PostApiV1TransactionsByThreadIdDisputeResponses, PostApiV1UserTermsData, PostApiV1UserTermsErrors, PostApiV1UserTermsResponses, PostApiV1VerificationCheckData, PostApiV1VerificationCheckErrors, PostApiV1VerificationCheckResponses, PostApiV1VerificationData, PostApiV1VerificationErrors, PostApiV1VerificationResponses, PostApiV1WebhooksSubscribeByPartnerIdData, PostApiV1WebhooksSubscribeByPartnerIdErrors, PostApiV1WebhooksSubscribeByPartnerIdResponses, PutApiV1AccountsDailyLimitData, PutApiV1AccountsDailyLimitErrors, PutApiV1AccountsDailyLimitResponses, PutApiV1AccountsOnchainDailyLimitData, PutApiV1AccountsOnchainDailyLimitErrors, PutApiV1AccountsOnchainDailyLimitResponses, PutApiV1OrderByOrderIdAttachTransactionData, PutApiV1OrderByOrderIdAttachTransactionErrors, PutApiV1OrderByOrderIdAttachTransactionResponses, PutApiV1OrderByOrderIdConfirmPaymentData, PutApiV1OrderByOrderIdConfirmPaymentErrors, PutApiV1OrderByOrderIdConfirmPaymentResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
     /**
@@ -429,6 +429,30 @@ export const getApiV1CardsTransactions = <ThrowOnError extends boolean = false>(
 };
 
 /**
+ * Link physical card to user
+ *
+ * Verifies a card by decrypting PAN details and associating it with the authenticated user
+ *
+ * @deprecated
+ */
+export const postApiV1CardsVerify = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsVerifyData, ThrowOnError>) => {
+    return (options.client ?? client).post<PostApiV1CardsVerifyResponses, PostApiV1CardsVerifyErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/cards/verify',
+        ...options,
+        headers: {
+            'Content-Type': 'application/json',
+            ...options.headers
+        }
+    });
+};
+
+/**
  * List Delayed Transactions
  *
  * Returns an array of delayed transactions associated with the authenticated user, excluding failed transactions.
@@ -521,6 +545,42 @@ export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(option
             }
         ],
         url: '/api/v1/safe/deploy',
+        ...options
+    });
+};
+
+/**
+ * Reset Safe Account
+ *
+ * Permanently deletes the Safe account for the authenticated user. This operation is irreversible and should be used with caution.
+ *
+ * **Prerequisites for Safe Reset:**
+ * - Safe account must exist for the user
+ * - Safe account must not be in a properly configured state (AccountIntegrityStatus.Ok)
+ * - Safe account must not have transactions in the delay queue (AccountIntegrityStatus.DelayQueueNotEmpty)
+ * - User must not have any active (non-voided) cards linked to the Safe
+ * - Safe account must have zero token balance (all tokens must be withdrawn first)
+ *
+ * **Use Cases:**
+ * - Reset a Safe account that failed during deployment or setup
+ * - Clean up a Safe account that is in an inconsistent state
+ * - Remove a Safe account before creating a new one
+ *
+ * **Important Notes:**
+ * - This operation permanently deletes the Safe account record from the database
+ * - The actual Safe contract on-chain is not affected by this operation
+ * - Users will need to deploy a new Safe account after reset
+ *
+ */
+export const deleteApiV1SafeReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1SafeResetData, ThrowOnError>) => {
+    return (options?.client ?? client).delete<DeleteApiV1SafeResetResponses, DeleteApiV1SafeResetErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/safe/reset',
         ...options
     });
 };
@@ -913,6 +973,28 @@ export const getApiV1AccountsWithdrawTransactionData = <ThrowOnError extends boo
             }
         ],
         url: '/api/v1/accounts/withdraw/transaction-data',
+        ...options
+    });
+};
+
+/**
+ * Retrieve Cashback Information
+ *
+ * Returns user's OG status, GNO balance of Safe, cashback rate, and weekly spending cap.
+ * The cashback rate is based on GNO balance tiers and includes the OG NFT holder bonus if applicable.
+ *
+ * **Note:** This cashback structure is valid from November 1st, 2025.
+ *
+ */
+export const getApiV1Cashback = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CashbackData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetApiV1CashbackResponses, GetApiV1CashbackErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/cashback',
         ...options
     });
 };
@@ -1504,6 +1586,24 @@ export const getApiV1Rewards = <ThrowOnError extends boolean = false>(options?: 
             }
         ],
         url: '/api/v1/rewards',
+        ...options
+    });
+};
+
+/**
+ * Get card public key
+ *
+ * @deprecated
+ */
+export const getApiV1UserCardPublicKey = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserCardPublicKeyData, ThrowOnError>) => {
+    return (options?.client ?? client).get<GetApiV1UserCardPublicKeyResponses, GetApiV1UserCardPublicKeyErrors, ThrowOnError>({
+        security: [
+            {
+                scheme: 'bearer',
+                type: 'http'
+            }
+        ],
+        url: '/api/v1/user/card-public-key',
         ...options
     });
 };

@@ -1446,6 +1446,81 @@ export type GetApiV1CardsTransactionsResponses = {
 
 export type GetApiV1CardsTransactionsResponse = GetApiV1CardsTransactionsResponses[keyof GetApiV1CardsTransactionsResponses];
 
+export type PostApiV1CardsVerifyData = {
+    body: {
+        /**
+         * Encrypted Primary Account Number
+         */
+        encryptedPan: string;
+        /**
+         * Encrypted key used for decryption
+         */
+        encryptedKey: string;
+        /**
+         * Initialization vector for decryption
+         */
+        iv: string;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/cards/verify';
+};
+
+export type PostApiV1CardsVerifyErrors = {
+    /**
+     * Bad request - validation error or missing user data
+     */
+    400: {
+        /**
+         * Error message
+         */
+        error?: string;
+        /**
+         * Detailed validation errors (optional)
+         */
+        details?: {
+            [key: string]: unknown;
+        } | null;
+    };
+    /**
+     * Unauthorized
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Card not found
+     */
+    404: {
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type PostApiV1CardsVerifyError = PostApiV1CardsVerifyErrors[keyof PostApiV1CardsVerifyErrors];
+
+export type PostApiV1CardsVerifyResponses = {
+    /**
+     * Successfully verified and associated the card
+     */
+    200: {
+        /**
+         * The unique identifier of the verified card
+         */
+        cardId: string;
+    };
+};
+
+export type PostApiV1CardsVerifyResponse = PostApiV1CardsVerifyResponses[keyof PostApiV1CardsVerifyResponses];
+
 export type GetApiV1DelayRelayData = {
     body?: never;
     path?: never;
@@ -1689,6 +1764,65 @@ export type PostApiV1SafeDeployResponses = {
 };
 
 export type PostApiV1SafeDeployResponse = PostApiV1SafeDeployResponses[keyof PostApiV1SafeDeployResponses];
+
+export type DeleteApiV1SafeResetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/safe/reset';
+};
+
+export type DeleteApiV1SafeResetErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Safe account not found for the authenticated user
+     */
+    404: {
+        /**
+         * Error message indicating no Safe account exists
+         */
+        message?: string;
+    };
+    /**
+     * Safe account cannot be reset due to validation constraints
+     */
+    422: {
+        /**
+         * Error message explaining why the Safe cannot be reset
+         */
+        message?: string;
+    };
+    /**
+     * Internal server error occurred during the reset operation
+     */
+    500: {
+        /**
+         * Generic error message for internal server errors
+         */
+        message?: string;
+    };
+};
+
+export type DeleteApiV1SafeResetError = DeleteApiV1SafeResetErrors[keyof DeleteApiV1SafeResetErrors];
+
+export type DeleteApiV1SafeResetResponses = {
+    /**
+     * Successfully reset the Safe account
+     */
+    200: {
+        /**
+         * Success message confirming the Safe account was reset
+         */
+        message?: string;
+    };
+};
+
+export type DeleteApiV1SafeResetResponse = DeleteApiV1SafeResetResponses[keyof DeleteApiV1SafeResetResponses];
 
 export type PostApiV1SafeSetCurrencyData = {
     body?: never;
@@ -2731,6 +2865,56 @@ export type GetApiV1AccountsWithdrawTransactionDataResponses = {
 };
 
 export type GetApiV1AccountsWithdrawTransactionDataResponse = GetApiV1AccountsWithdrawTransactionDataResponses[keyof GetApiV1AccountsWithdrawTransactionDataResponses];
+
+export type GetApiV1CashbackData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cashback';
+};
+
+export type GetApiV1CashbackErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal server error
+     */
+    500: {
+        error?: string;
+    };
+};
+
+export type GetApiV1CashbackError = GetApiV1CashbackErrors[keyof GetApiV1CashbackErrors];
+
+export type GetApiV1CashbackResponses = {
+    /**
+     * Successfully retrieved cashback information
+     */
+    200: {
+        /**
+         * Indicates if the user holds an OG NFT token. If true, the user receives higher cashback rates.
+         */
+        isOg: boolean;
+        /**
+         * User's GNO token balance in their Safe account (as string to preserve precision)
+         */
+        gnoBalance: string;
+        /**
+         * Cashback rate percentage (0-5%). Includes OG NFT bonus if applicable.
+         */
+        cashbackRate: number;
+        /**
+         * Maximum weekly spending amount eligible for cashback in USD
+         */
+        weeklyCapUsd: number;
+    };
+};
+
+export type GetApiV1CashbackResponse = GetApiV1CashbackResponses[keyof GetApiV1CashbackResponses];
 
 export type GetApiV1EoaAccountsData = {
     body?: never;
@@ -4283,6 +4467,59 @@ export type GetApiV1RewardsResponses = {
 };
 
 export type GetApiV1RewardsResponse = GetApiV1RewardsResponses[keyof GetApiV1RewardsResponses];
+
+export type GetApiV1UserCardPublicKeyData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/user/card-public-key';
+};
+
+export type GetApiV1UserCardPublicKeyErrors = {
+    /**
+     * Bad request - user has no country set
+     */
+    400: {
+        error?: string;
+    };
+    /**
+     * Unauthorized
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * User not found
+     */
+    404: {
+        error?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: {
+        /**
+         * Details about the server error.
+         */
+        message?: string;
+    };
+};
+
+export type GetApiV1UserCardPublicKeyError = GetApiV1UserCardPublicKeyErrors[keyof GetApiV1UserCardPublicKeyErrors];
+
+export type GetApiV1UserCardPublicKeyResponses = {
+    /**
+     * Successfully retrieved the card public key
+     */
+    200: {
+        /**
+         * The public key for the card based on the user's country
+         */
+        publicKey: string;
+    };
+};
+
+export type GetApiV1UserCardPublicKeyResponse = GetApiV1UserCardPublicKeyResponses[keyof GetApiV1UserCardPublicKeyResponses];
 
 export type GetApiV1UserTermsData = {
     body?: never;
