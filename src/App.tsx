@@ -47,7 +47,7 @@ export const menuRoutes = [
   },
 ];
 
-const publicRoutes = [
+const otherRoutes = [
   {
     path: "/register",
     element: <SignUpRoute />,
@@ -81,16 +81,23 @@ const publicRoutes = [
     element: <Navigate to="/" replace />,
   },
   {
+    path: "/dashboard",
+    element: <Navigate to="/" replace />,
+  },
+];
+
+const publicRoutes = [
+  {
+    path: "/activate",
+    element: <ExternalRedirect url={PARTNERS_URL} />,
+  },
+  {
     path: "/activation/choose-partner",
     element: <ExternalRedirect url={PARTNERS_URL} />,
   },
   {
     path: "/partners",
     element: <ExternalRedirect url={PARTNERS_URL} />,
-  },
-  {
-    path: "/dashboard",
-    element: <Navigate to="/" replace />,
   },
 ];
 
@@ -116,6 +123,11 @@ function App() {
       <HeaderNavBar />
       <Routes>
         <Route element={<ProtectedLayout checkForSignup={false} />}>
+          {otherRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+        <Route>
           {publicRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
@@ -126,7 +138,7 @@ function App() {
           ))}
         </Route>
         {/* Catch-all route for 404 pages */}
-        <Route element={<ProtectedLayout checkForSignup={false} />}>
+        <Route>
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
