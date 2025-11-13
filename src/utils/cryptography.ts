@@ -15,28 +15,14 @@ const ab2str = (ab: ArrayBuffer) => {
 
 // Import a raw base64 encoded AES key
 const importKey = async (rawKey: string): Promise<CryptoKey> => {
-  return await window.crypto.subtle.importKey(
-    "raw",
-    str2ab(atob(rawKey)),
-    "AES-GCM",
-    false,
-    ["encrypt", "decrypt"],
-  );
+  return await window.crypto.subtle.importKey("raw", str2ab(atob(rawKey)), "AES-GCM", false, ["encrypt", "decrypt"]);
 };
 
 // Encrypt & decrypt utils for secrets (PAN, PIN, ...)
-export const encryptSecret = async (
-  msg: string,
-  rawKey: string,
-  iv: string,
-): Promise<string> => {
+export const encryptSecret = async (msg: string, rawKey: string, iv: string): Promise<string> => {
   const data = new TextEncoder().encode(msg);
   const key = await importKey(rawKey);
-  const secret = await window.crypto.subtle.encrypt(
-    { name: "AES-GCM", iv: str2ab(atob(iv)) },
-    key,
-    data,
-  );
+  const secret = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: str2ab(atob(iv)) }, key, data);
   return btoa(ab2str(secret));
 };
 
@@ -47,10 +33,7 @@ export const generateSessionKey = (): string => {
   return btoa(String.fromCharCode.apply(null, Array.from(array)));
 };
 
-export const encryptSessionKey = async (
-  sessionKey: string,
-  publicKey: string,
-): Promise<string> => {
+export const encryptSessionKey = async (sessionKey: string, publicKey: string): Promise<string> => {
   const publicKeyData = str2ab(atob(publicKey));
 
   const cryptoKey = await window.crypto.subtle.importKey(
@@ -62,19 +45,11 @@ export const encryptSessionKey = async (
   );
   const textEncoder = new TextEncoder();
   const sessionKeyBytes = textEncoder.encode(sessionKey);
-  const encryptedKey = await window.crypto.subtle.encrypt(
-    { name: "RSA-OAEP" },
-    cryptoKey,
-    sessionKeyBytes,
-  );
+  const encryptedKey = await window.crypto.subtle.encrypt({ name: "RSA-OAEP" }, cryptoKey, sessionKeyBytes);
   return btoa(ab2str(encryptedKey));
 };
 
 // IV generation
-const CHARACTER_LIST =
-  "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+const CHARACTER_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 export const generateIV = (): string =>
-  Array.from({ length: 16 }, () =>
-    CHARACTER_LIST.charAt(Math.floor(Math.random() * CHARACTER_LIST.length)),
-  ).join("");
-
+  Array.from({ length: 16 }, () => CHARACTER_LIST.charAt(Math.floor(Math.random() * CHARACTER_LIST.length))).join("");
