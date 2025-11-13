@@ -14,7 +14,7 @@ import { fromUnixTime } from "date-fns";
 import { GNOSIS_PAY_SETTLEMENT_ADDRESS } from "@/constants";
 import { Erc20TokenEventDirection } from "@/types/transaction";
 import type { Erc20TokenEvent } from "@/types/transaction";
-import { ERC20_ABI } from "./ERC20Abi";
+import { ERC20_ABI } from "./abis/ERC20Abi";
 
 // Gnosis Chain average block time is approximately 5 seconds
 const GNOSIS_AVERAGE_BLOCK_TIME = 5;
