@@ -3,7 +3,7 @@ import { Label } from "@/components/ui/label";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { Switch } from "@/components/ui/switch";
 import { Coins } from "lucide-react";
-import { useState, useCallback, useMemo } from "react";
+import { useState, useCallback, useMemo, useEffect } from "react";
 import { isAddress, encodeFunctionData, type Address } from "viem";
 import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./modals/send-funds/token-amount-input";
@@ -13,13 +13,14 @@ import { useAccount, useSignTypedData } from "wagmi";
 import { useUser } from "@/context/UserContext";
 import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
 import { populateExecuteEnqueue, predictAddresses } from "@gnosispay/account-kit";
-import { sendTransaction, readContract, waitForTransactionReceipt } from "wagmi/actions";
+import { sendTransaction, readContract, waitForTransactionReceipt, getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { gnosis } from "wagmi/chains";
 import { storeTransaction } from "@/utils/localTransactionStorage";
 import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
+import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
 
 interface WithdrawFundsFormProps {
   onSuccess?: () => void;
@@ -29,6 +30,7 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
   const { address: connectedAddress } = useAccount();
   const { safeConfig } = useUser();
   const { signTypedDataAsync } = useSignTypedData();
+  const { isSignerConnected, signerError, isDataLoading: isSignerVerificationLoading } = useSafeSignerVerification();
   const [toAddress, setToAddress] = useState("");
   const [addressError, setAddressError] = useState("");
   const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
@@ -36,6 +38,8 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
   const [amountError, setAmountError] = useState("");
   const [isCustomToken, setIsCustomToken] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [nativeBalance, setNativeBalance] = useState<bigint>(0n);
+  const [isBalanceLoading, setIsBalanceLoading] = useState(false);
 
   const handleAddressChange = useCallback((value: string) => {
     setAddressError("");
@@ -54,6 +58,62 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
     setAmountError("");
   }, []);
 
+  // Fetch native balance for gas payments
+  useEffect(() => {
+    if (!connectedAddress) {
+      setNativeBalance(0n);
+      return;
+    }
+
+    setIsBalanceLoading(true);
+    getBalance(wagmiAdapter.wagmiConfig, {
+      address: connectedAddress as Address,
+    })
+      .then((balance) => {
+        setNativeBalance(balance.value);
+      })
+      .catch((error) => {
+        console.error("Error fetching native balance:", error);
+        setNativeBalance(0n);
+      })
+      .finally(() => {
+        setIsBalanceLoading(false);
+      });
+  }, [connectedAddress]);
+
+  const hasSufficientGasBalance = useMemo(() => {
+    return nativeBalance > 0n;
+  }, [nativeBalance]);
+
+  const validationError = useMemo(() => {
+    if (!connectedAddress) {
+      return null;
+    }
+
+    if (isSignerVerificationLoading || isBalanceLoading) {
+      return null; // Still loading, don't show error yet
+    }
+
+    if (!isSignerConnected) {
+      return signerError
+        ? `You are not an owner of this Safe. ${signerError.message}`
+        : "You are not an owner of this Safe. Please connect an owner account.";
+    }
+
+    if (!hasSufficientGasBalance) {
+      return "Your connected account has insufficient xDAI balance to pay for gas. Please ensure you have xDAI in your wallet.";
+    }
+
+    return null;
+  }, [
+    connectedAddress,
+    isSignerConnected,
+    signerError,
+    isSignerVerificationLoading,
+    hasSufficientGasBalance,
+    isBalanceLoading,
+  ]);
+
   const isFormValid = useMemo(() => {
     return !!(
       toAddress &&
@@ -63,9 +123,23 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       !amountError &&
       !addressError &&
       connectedAddress &&
-      safeConfig?.address
+      safeConfig?.address &&
+      isSignerConnected &&
+      hasSufficientGasBalance &&
+      !validationError
     );
-  }, [toAddress, addressError, amount, selectedToken, amountError, connectedAddress, safeConfig?.address]);
+  }, [
+    toAddress,
+    addressError,
+    amount,
+    selectedToken,
+    amountError,
+    connectedAddress,
+    safeConfig?.address,
+    isSignerConnected,
+    hasSufficientGasBalance,
+    validationError,
+  ]);
 
   const handleWithdraw = useCallback(async () => {
     if (!isFormValid || !selectedToken || !connectedAddress || !safeConfig?.address) {
@@ -195,6 +269,8 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       {!connectedAddress && (
         <StandardAlert variant="destructive" description="You must connect your wallet to withdraw funds" />
       )}
+
+      {connectedAddress && validationError && <StandardAlert variant="destructive" description={validationError} />}
 
       <StandardAlert
         variant="warning"
