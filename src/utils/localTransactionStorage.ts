@@ -13,6 +13,7 @@ export interface StoredTransaction {
   recipient?: string;
   timestamp: number;
   txHash?: string;
+  nonce: number;
 }
 
 const STORAGE_KEY = "gnosispay_pending_transactions";
@@ -38,10 +39,7 @@ export function storeTransaction(safeAddress: string, transaction: StoredTransac
   try {
     const transactions = getStoredTransactions(safeAddress);
     transactions.push(transaction);
-    localStorage.setItem(
-      `${STORAGE_KEY}_${safeAddress.toLowerCase()}`,
-      JSON.stringify(transactions)
-    );
+    localStorage.setItem(`${STORAGE_KEY}_${safeAddress.toLowerCase()}`, JSON.stringify(transactions));
   } catch (error) {
     console.error("Error storing transaction:", error);
   }
@@ -54,10 +52,7 @@ export function removeTransaction(safeAddress: string, timestamp: number): void 
   try {
     const transactions = getStoredTransactions(safeAddress);
     const filtered = transactions.filter((tx) => tx.timestamp !== timestamp);
-    localStorage.setItem(
-      `${STORAGE_KEY}_${safeAddress.toLowerCase()}`,
-      JSON.stringify(filtered)
-    );
+    localStorage.setItem(`${STORAGE_KEY}_${safeAddress.toLowerCase()}`, JSON.stringify(filtered));
   } catch (error) {
     console.error("Error removing transaction:", error);
   }
@@ -81,4 +76,3 @@ export function getNextTransaction(safeAddress: string): StoredTransaction | nul
   const transactions = getStoredTransactions(safeAddress);
   return transactions.length > 0 ? transactions[0] : null;
 }
-

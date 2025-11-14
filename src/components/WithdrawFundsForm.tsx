@@ -12,13 +12,14 @@ import { AddressInput } from "./modals/send-funds/address-input";
 import { useAccount, useSignTypedData } from "wagmi";
 import { useUser } from "@/context/UserContext";
 import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
-import { populateExecuteEnqueue } from "@gnosispay/account-kit";
-import { sendTransaction } from "wagmi/actions";
+import { populateExecuteEnqueue, predictAddresses } from "@gnosispay/account-kit";
+import { sendTransaction, readContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { gnosis } from "wagmi/chains";
 import { storeTransaction } from "@/utils/localTransactionStorage";
+import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
 
 interface WithdrawFundsFormProps {
   onSuccess?: () => void;
@@ -111,14 +112,37 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       );
 
       // Send the transaction
-      const txHash = await sendTransaction(wagmiAdapter.wagmiConfig, {
+      const sendTxHash = await sendTransaction(wagmiAdapter.wagmiConfig, {
         to: txRequest.to as Address,
         data: txRequest.data as `0x${string}`,
         value: BigInt(txRequest.value),
       });
 
-      console.log("txHash", txHash);
-      console.log("txRequest", txRequest);
+      // Wait for transaction confirmation
+      await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, {
+        hash: sendTxHash,
+      });
+
+      // Get the delay module address
+      const { delay: delayModAddress } = predictAddresses(safeConfig.address);
+
+      // Get the updated queueNonce to determine the nonce of the transaction we just queued
+      const queueNonce = (await readContract(wagmiAdapter.wagmiConfig, {
+        address: delayModAddress as Address,
+        abi: DELAY_MOD_ABI,
+        functionName: "queueNonce",
+      })) as bigint;
+
+      // The transaction we just queued has nonce = queueNonce - 1
+      const txNonce = queueNonce - 1n;
+
+      // Get the transaction hash from the delay module
+      const delayTxHash = (await readContract(wagmiAdapter.wagmiConfig, {
+        address: delayModAddress as Address,
+        abi: DELAY_MOD_ABI,
+        functionName: "getTxHash",
+        args: [txNonce],
+      })) as `0x${string}`;
 
       // Store transaction details locally for later execution
       storeTransaction(safeConfig.address, {
@@ -130,13 +154,13 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
         amount: amount.toString(),
         recipient: toAddress,
         timestamp: Date.now(),
-        txHash,
+        txHash: delayTxHash,
+        nonce: Number(txNonce),
       });
 
       toast.success(
         "Withdrawal transaction queued successfully! It will be ready to execute after the cooldown period.",
       );
-      console.info("Transaction hash:", txHash);
 
       // Reset form
       setToAddress("");

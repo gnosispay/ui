@@ -42,6 +42,18 @@ export const DELAY_MOD_ABI = [
     type: "function",
   },
   {
+    inputs: [
+      { internalType: "address", name: "to", type: "address" },
+      { internalType: "uint256", name: "value", type: "uint256" },
+      { internalType: "bytes", name: "data", type: "bytes" },
+      { internalType: "enum Enum.Operation", name: "operation", type: "uint8" },
+    ],
+    name: "executeNextTx",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     name: "enableModule",
     type: "function",
     inputs: [{ name: "module", type: "address" }],
@@ -53,5 +65,24 @@ export const DELAY_MOD_ABI = [
       { name: "prevModule", type: "address" },
       { name: "module", type: "address" },
     ],
+  },
+  {
+    name: "getTxHash",
+    inputs: [{ internalType: "uint256", name: "_nonce", type: "uint256" }],
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "to", type: "address" },
+      { internalType: "uint256", name: "value", type: "uint256" },
+      { internalType: "bytes", name: "data", type: "bytes" },
+      { internalType: "enum Enum.Operation", name: "operation", type: "uint8" },
+    ],
+    name: "getTransactionHash",
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    stateMutability: "pure",
+    type: "function",
   },
 ] as const;

@@ -6,20 +6,26 @@ import type { Address } from "viem";
 import { predictAddresses } from "@gnosispay/account-kit";
 import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
 
+export interface PendingTransaction {
+  nonce: bigint;
+  hash: string | null;
+  expirationTimestamp: bigint;
+  creationTimestamp: bigint;
+  isExpired: boolean;
+  isCooledDown: boolean;
+}
+
 export interface DelayModuleQueueInfo {
   hasPendingTransactions: boolean;
   txNonce: bigint;
   queueNonce: bigint;
-  pendingCount: number;
   cooldown: bigint;
   expiration: bigint;
-  txCreatedAt: bigint | null;
-  hasExpiredTransactions: boolean;
 }
 
 export interface UseDelayModuleQueueResult {
   queueInfo: DelayModuleQueueInfo | null;
-  isLoading: boolean;
+  queue: PendingTransaction[];
   isError: boolean;
   refetch: () => void;
 }
@@ -27,21 +33,17 @@ export interface UseDelayModuleQueueResult {
 export const useDelayModuleQueue = (): UseDelayModuleQueueResult => {
   const { safeConfig } = useUser();
   const [queueInfo, setQueueInfo] = useState<DelayModuleQueueInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [queue, setQueue] = useState<PendingTransaction[]>([]);
   const [isError, setIsError] = useState(false);
-  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const fetchQueueInfo = useCallback(
     async (isPolling = false) => {
       if (!safeConfig?.address) {
         setQueueInfo(null);
+        setQueue([]);
         return;
       }
 
-      // Only show loading state on initial load, not during polling
-      if (!isPolling) {
-        setIsLoading(true);
-      }
       setIsError(false);
 
       try {
@@ -73,43 +75,93 @@ export const useDelayModuleQueue = (): UseDelayModuleQueueResult => {
         ]);
 
         const hasPendingTransactions = txNonce !== queueNonce;
-        const pendingCount = Number(queueNonce - txNonce);
 
-        // Fetch the creation timestamp of the next transaction to execute (if any)
-        let txCreatedAt: bigint | null = null;
-        let hasExpiredTransactions = false;
+        // Build queue of all pending transactions
+        const pendingQueue: PendingTransaction[] = [];
+        const currentTimeSeconds = BigInt(Math.floor(Date.now() / 1000));
 
-        if (hasPendingTransactions) {
-          try {
-            txCreatedAt = (await readContract(wagmiAdapter.wagmiConfig, {
-              address: delayModAddress as Address,
-              abi: DELAY_MOD_ABI,
-              functionName: "getTxCreatedAt",
-              args: [txNonce],
-            })) as bigint;
+        if (hasPendingTransactions && queueNonce > txNonce) {
+          // Fetch creation timestamps and hashes for all pending transactions (from txNonce to queueNonce - 1)
+          const txDataPromises: Promise<{ nonce: bigint; createdAt: bigint | null; hash: string | null }>[] = [];
+          const nonces: bigint[] = [];
 
-            // Check if the transaction has expired
-            // Transaction is expired if: current time > (txCreatedAt + expiration)
-            if (txCreatedAt && expiration > 0n) {
-              const currentTimeSeconds = BigInt(Math.floor(Date.now() / 1000));
-              const expirationTime = txCreatedAt + expiration;
-              hasExpiredTransactions = currentTimeSeconds > expirationTime;
+          // Convert to numbers for loop iteration
+          const txNonceNum = Number(txNonce);
+          const queueNonceNum = Number(queueNonce);
+
+          for (let i = txNonceNum; i < queueNonceNum; i++) {
+            const nonce = BigInt(i);
+            nonces.push(nonce);
+
+            // Fetch both createdAt and hash in parallel for each nonce
+            txDataPromises.push(
+              Promise.all([
+                readContract(wagmiAdapter.wagmiConfig, {
+                  address: delayModAddress as Address,
+                  abi: DELAY_MOD_ABI,
+                  functionName: "getTxCreatedAt",
+                  args: [nonce],
+                })
+                  .then((result) => result as bigint)
+                  .catch((error) => {
+                    console.error(`Error fetching txCreatedAt for nonce ${nonce}:`, error);
+                    return null;
+                  }),
+                readContract(wagmiAdapter.wagmiConfig, {
+                  address: delayModAddress as Address,
+                  abi: DELAY_MOD_ABI,
+                  functionName: "getTxHash",
+                  args: [nonce],
+                })
+                  .then((result) => {
+                    // Convert bytes32 to hex string (0x prefixed)
+                    const hash = result as `0x${string}`;
+                    return hash;
+                  })
+                  .catch((error) => {
+                    console.error(`Error fetching txHash for nonce ${nonce}:`, error);
+                    return null;
+                  }),
+              ]).then(([createdAt, hash]) => ({
+                nonce,
+                createdAt,
+                hash,
+              })),
+            );
+          }
+
+          const txDataArray = await Promise.all(txDataPromises);
+
+          // Build queue items with all required information
+          for (let i = 0; i < txDataArray.length; i++) {
+            const { nonce, createdAt: creationTimestamp, hash } = txDataArray[i];
+
+            if (creationTimestamp !== null) {
+              const expirationTimestamp = creationTimestamp + expiration;
+              const cooldownTimestamp = creationTimestamp + cooldown;
+              const isExpired = expiration > 0n && currentTimeSeconds > expirationTimestamp;
+              const isCooledDown = currentTimeSeconds > cooldownTimestamp;
+
+              pendingQueue.push({
+                nonce,
+                hash,
+                expirationTimestamp,
+                creationTimestamp,
+                isExpired,
+                isCooledDown,
+              });
             }
-          } catch (error) {
-            console.error("Error fetching txCreatedAt:", error);
-            // Continue without timestamp - will fall back to localStorage
           }
         }
+
+        setQueue(pendingQueue);
 
         setQueueInfo({
           hasPendingTransactions,
           txNonce,
           queueNonce,
-          pendingCount,
           cooldown,
           expiration,
-          txCreatedAt,
-          hasExpiredTransactions,
         });
       } catch (error) {
         console.error("Error fetching delay module queue info:", error);
@@ -117,17 +169,11 @@ export const useDelayModuleQueue = (): UseDelayModuleQueueResult => {
         if (!isPolling) {
           setIsError(true);
           setQueueInfo(null);
-        }
-      } finally {
-        if (!isPolling) {
-          setIsLoading(false);
-        }
-        if (isInitialLoad) {
-          setIsInitialLoad(false);
+          setQueue([]);
         }
       }
     },
-    [safeConfig?.address, isInitialLoad],
+    [safeConfig?.address],
   );
 
   useEffect(() => {
@@ -148,7 +194,7 @@ export const useDelayModuleQueue = (): UseDelayModuleQueueResult => {
 
   return {
     queueInfo,
-    isLoading,
+    queue,
     isError,
     refetch,
   };

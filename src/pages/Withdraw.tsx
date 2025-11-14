@@ -1,6 +1,6 @@
 import { OnchainBalance } from "@/components/OnchainBalance";
 import { WithdrawFundsForm } from "@/components/WithdrawFundsForm";
-import { DelayModuleQueue } from "@/components/DelayModuleQueue";
+import { DelayModuleQueue } from "@/components/DelayModuleQueue/DelayModuleQueue";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useDelayModuleQueue } from "@/hooks/useDelayModuleQueue";
 import { useCallback } from "react";
@@ -8,11 +8,6 @@ import { useCallback } from "react";
 export const WithdrawRoute = () => {
   const { refetch: refetchBalance } = useTokenBalance();
   const { refetch: refetchQueue } = useDelayModuleQueue();
-
-  const handleWithdrawSuccess = useCallback(() => {
-    refetchBalance();
-    refetchQueue();
-  }, [refetchBalance, refetchQueue]);
 
   const handleTransactionExecuted = useCallback(() => {
     refetchBalance();
@@ -27,7 +22,7 @@ export const WithdrawRoute = () => {
 
           <DelayModuleQueue onTransactionExecuted={handleTransactionExecuted} />
           <OnchainBalance />
-          <WithdrawFundsForm onSuccess={handleWithdrawSuccess} />
+          <WithdrawFundsForm onSuccess={handleTransactionExecuted} />
         </div>
       </div>
     </div>
