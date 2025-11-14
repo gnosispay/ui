@@ -9,7 +9,7 @@ import { Button } from "../ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { getTxInfo } from "@/utils/delayUtils";
 import { OperationType } from "@gnosispay/account-kit";
-import { formatDisplayAmount, formatTokenAmount } from "@/utils/formatCurrency";
+import { formatTokenAmount } from "@/utils/formatCurrency";
 import { formatCountdown } from "@/utils/timeUtils";
 import { useDelayModuleQueue } from "@/context/DelayModuleQueueContext";
 import { formatUnits, type Address } from "viem";
