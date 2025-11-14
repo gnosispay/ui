@@ -3,38 +3,25 @@ import { format } from "date-fns";
 import { shortenAddress } from "@/utils/shortenAddress";
 import { getStoredTransactions, type StoredTransaction, removeTransaction } from "@/utils/localTransactionStorage";
 import { useUser } from "@/context/UserContext";
-import type { PendingTransaction } from "@/hooks/useDelayModuleQueue";
+import type { PendingTransaction } from "@/context/DelayModuleQueueContext";
 import { CheckCircle2, Clock, AlertTriangle, Copy } from "lucide-react";
 import { Button } from "../ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { getTxInfo } from "@/utils/delayUtils";
-import { OperationType, predictAddresses } from "@gnosispay/account-kit";
-import { formatTokenAmount } from "@/utils/formatCurrency";
-import { writeContract, waitForTransactionReceipt } from "wagmi/actions";
-import { wagmiAdapter } from "@/wagmi";
-import type { Address } from "viem";
-import { toast } from "sonner";
-import { extractErrorMessage } from "@/utils/errorHelpers";
-import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
+import { OperationType } from "@gnosispay/account-kit";
+import { formatDisplayAmount, formatTokenAmount } from "@/utils/formatCurrency";
 import { formatCountdown } from "@/utils/timeUtils";
+import { useDelayModuleQueue } from "@/context/DelayModuleQueueContext";
+import { formatUnits, type Address } from "viem";
 
 interface PendingTransactionItemProps {
   transaction: PendingTransaction;
-  hasExpiredTx: boolean;
-  onExecuteSuccess?: () => void;
-  cooldown: bigint;
-  refetchQueue: () => void;
 }
 
-export const PendingTransactionItem = ({
-  transaction,
-  hasExpiredTx,
-  onExecuteSuccess,
-  cooldown,
-  refetchQueue,
-}: PendingTransactionItemProps) => {
+export const PendingTransactionItem = ({ transaction }: PendingTransactionItemProps) => {
   const { safeConfig } = useUser();
   const { copyToClipboard } = useCopyToClipboard();
+  const { queueInfo, hasExpiredTransaction, refetch, executeTransaction } = useDelayModuleQueue();
   const [isExecuting, setIsExecuting] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
@@ -93,7 +80,7 @@ export const PendingTransactionItem = ({
 
     // Fallback to token symbol if available
     if (storedTransaction.tokenSymbol && amount && recipient) {
-      return `Sending ${amount} ${storedTransaction.tokenSymbol} to ${shortenAddress(recipient)}`;
+      return `Sending ${formatUnits(BigInt(amount), storedTransaction.tokenDecimals ?? 0)} ${storedTransaction.tokenSymbol} to ${shortenAddress(recipient)}`;
     }
 
     return null;
@@ -101,17 +88,17 @@ export const PendingTransactionItem = ({
 
   // Calculate and update countdown timer
   useEffect(() => {
-    if (!transaction.isCooledDown && !transaction.isExpired && cooldown) {
+    if (!transaction.isCooledDown && !transaction.isExpired && queueInfo?.cooldown) {
       const updateCountdown = () => {
         const creationTimestampMs = Number(transaction.creationTimestamp) * 1000;
-        const cooldownMs = Number(cooldown) * 1000;
+        const cooldownMs = Number(queueInfo.cooldown) * 1000;
         const cooldownEndMs = creationTimestampMs + cooldownMs;
         const remainingMs = cooldownEndMs - Date.now();
 
         if (remainingMs <= 0) {
           setTimeRemaining(0);
           // Refetch to update the transaction status
-          refetchQueue();
+          refetch();
         } else {
           setTimeRemaining(remainingMs);
         }
@@ -127,7 +114,7 @@ export const PendingTransactionItem = ({
     } else {
       setTimeRemaining(0);
     }
-  }, [transaction.isCooledDown, transaction.isExpired, transaction.creationTimestamp, cooldown, refetchQueue]);
+  }, [transaction.isCooledDown, transaction.isExpired, transaction.creationTimestamp, queueInfo?.cooldown, refetch]);
 
   const handleExecute = useCallback(async () => {
     if (!safeConfig?.address || !transaction.isCooledDown || !storedTransaction) {
@@ -137,43 +124,20 @@ export const PendingTransactionItem = ({
     setIsExecuting(true);
 
     try {
-      // Get the delay module address
-      const { delay: delayModAddress } = predictAddresses(safeConfig.address);
+      await executeTransaction(
+        storedTransaction.to as Address,
+        BigInt(storedTransaction.value),
+        storedTransaction.data as `0x${string}`,
+      );
 
-      // Call executeNextTx on the delay module with transaction parameters
-      const txHash = await writeContract(wagmiAdapter.wagmiConfig, {
-        address: delayModAddress as Address,
-        abi: DELAY_MOD_ABI,
-        functionName: "executeNextTx",
-        args: [
-          storedTransaction.to as Address,
-          BigInt(storedTransaction.value),
-          storedTransaction.data as `0x${string}`,
-          OperationType.Call, // 0 for CALL operation
-        ],
-      });
-
-      // Wait for transaction confirmation
-      await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, {
-        hash: txHash,
-      });
-
-      toast.success("Transaction executed successfully!");
-      console.info("Execute transaction hash:", txHash);
-
-      // Remove from local storage
+      // Remove from local storage after successful execution
       removeTransaction(safeConfig.address, storedTransaction.timestamp);
-
-      // Refresh queue
-      refetchQueue();
-      onExecuteSuccess?.();
-    } catch (error) {
-      console.error("Error executing transaction:", error);
-      toast.error(extractErrorMessage(error, "Error executing transaction"));
+    } catch {
+      // Error is already handled in the context
     } finally {
       setIsExecuting(false);
     }
-  }, [safeConfig?.address, transaction.isCooledDown, storedTransaction, refetchQueue, onExecuteSuccess]);
+  }, [safeConfig?.address, transaction.isCooledDown, storedTransaction, executeTransaction]);
 
   return (
     <div className="flex flex-col gap-3 p-4 rounded-lg border border-border bg-card">
@@ -228,7 +192,7 @@ export const PendingTransactionItem = ({
           </div>
         </div>
         {/* Execute button - we can only execute if there is no expired transaction */}
-        {!hasExpiredTx && transaction.isCooledDown && !transaction.isExpired && storedTransaction && (
+        {!hasExpiredTransaction && transaction.isCooledDown && !transaction.isExpired && storedTransaction && (
           <Button
             variant="default"
             size="sm"

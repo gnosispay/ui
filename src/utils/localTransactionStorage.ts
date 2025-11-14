@@ -11,12 +11,13 @@ export interface StoredTransaction {
   tokenSymbol?: string;
   amount?: string;
   recipient?: string;
+  tokenDecimals?: number;
   timestamp: number;
   txHash?: string;
   nonce: number;
 }
 
-const STORAGE_KEY = "gnosispay_pending_transactions";
+const STORAGE_KEY = "gp-ui.pending-transactions";
 
 /**
  * Get all stored transactions for a safe address

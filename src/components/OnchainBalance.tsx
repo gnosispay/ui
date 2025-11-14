@@ -20,25 +20,26 @@ export const OnchainBalance = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg" data-testid="onchain-balance-component">
-      <h2 className="font-bold text-secondary text-lg">Token Balances</h2>
-
+    <div className="flex flex-col gap-4 " data-testid="onchain-balance-component">
       {isLoading ? (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-2">
           {[1, 2, 3, 4].map((i) => (
-            <div key={`skeleton-${i}`} className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <Skeleton className="w-8 h-8 rounded-full" />
-                <Skeleton className="w-20 h-5" />
+            <div
+              key={`skeleton-${i}`}
+              className="flex flex-col lg:items-center lg:justify-center p-2 border border-border rounded-lg"
+            >
+              <div className="flex items-center gap-2 lg:flex-col lg:gap-1">
+                <Skeleton className="w-6 h-6 rounded-full" />
+                <Skeleton className="w-20 h-4 lg:w-16" />
               </div>
-              <Skeleton className="w-24 h-5" />
+              <Skeleton className="w-24 h-4 lg:mt-1 lg:w-20" />
             </div>
           ))}
         </div>
       ) : tokensWithNonZeroBalance.length === 0 ? (
         <div className="text-center text-secondary py-4">No tokens available</div>
       ) : (
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-4 md:grid-cols-2 gap-2">
           {allTokens.map(([symbol, token]) => {
             const formattedBalance = formatUnits(token.balance, token.decimals || 18);
             const displayBalance = Number.parseFloat(formattedBalance).toFixed(4);
@@ -51,20 +52,16 @@ export const OnchainBalance = () => {
             return (
               <div
                 key={symbol}
-                className="flex items-center justify-between p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                className="bg-card flex items-center justify-between lg:flex-col lg:items-center lg:justify-center p-2 rounded-lg"
                 data-testid={`token-balance-${symbol}`}
               >
-                <div className="flex items-center gap-3">
-                  {token.logo && <img src={token.logo} alt={`${symbol} logo`} className="w-8 h-8 rounded-full" />}
-                  <div className="flex flex-col">
-                    <span className="font-medium text-foreground">{symbol}</span>
-                    {token.tokenSymbol && token.tokenSymbol !== symbol && (
-                      <span className="text-xs text-muted-foreground">{token.tokenSymbol}</span>
-                    )}
-                  </div>
+                <div className="flex items-center gap-2 min-w-0 flex-1 lg:flex-col lg:flex-1 lg:min-w-0 lg:gap-1">
+                  {token.logo && (
+                    <img src={token.logo} alt={`${symbol} logo`} className="w-6 h-6 rounded-full shrink-0" />
+                  )}
                 </div>
-                <div className="text-right">
-                  <div className="font-medium text-foreground">{displayBalance}</div>
+                <div className="text-right shrink-0 ml-2 lg:ml-0 lg:text-center lg:mt-1">
+                  <div className="font-medium text-foreground text-sm">{displayBalance}</div>
                   <div className="text-xs text-muted-foreground">{symbol}</div>
                 </div>
               </div>

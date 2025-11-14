@@ -1,65 +1,21 @@
 import { StandardAlert } from "@/components/ui/standard-alert";
-import { useDelayModuleQueue } from "@/hooks/useDelayModuleQueue";
+import { useDelayModuleQueue } from "@/context/DelayModuleQueueContext";
 import { PendingTransactionItem } from "./PendingTransactionItem";
-import { useCallback, useMemo, useState } from "react";
 import { Button } from "../ui/button";
-import { useUser } from "@/context/UserContext";
-import { predictAddresses } from "@gnosispay/account-kit";
-import { writeContract, waitForTransactionReceipt } from "wagmi/actions";
-import { wagmiAdapter } from "@/wagmi";
-import type { Address } from "viem";
-import { toast } from "sonner";
-import { extractErrorMessage } from "@/utils/errorHelpers";
-import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
+import { useState, useCallback } from "react";
 
-interface DelayModuleQueueProps {
-  onTransactionExecuted?: () => void;
-}
-
-export const DelayModuleQueue = ({ onTransactionExecuted }: DelayModuleQueueProps = {}) => {
-  const { queue, queueInfo, isError, refetch } = useDelayModuleQueue();
-  const { safeConfig } = useUser();
+export const DelayModuleQueue = () => {
+  const { queue, isError, hasExpiredTransaction, skipExpired } = useDelayModuleQueue();
   const [isSkippingExpired, setIsSkippingExpired] = useState(false);
 
-  const hasExpiredTransaction = useMemo(() => {
-    return queue?.some((transaction) => transaction.isExpired);
-  }, [queue]);
-
   const handleSkipExpired = useCallback(async () => {
-    if (!safeConfig?.address || !hasExpiredTransaction) {
-      return;
-    }
-
     setIsSkippingExpired(true);
-
     try {
-      // Get the delay module address
-      const { delay: delayModAddress } = predictAddresses(safeConfig.address);
-
-      // Call skipExpired on the delay module
-      const txHash = await writeContract(wagmiAdapter.wagmiConfig, {
-        address: delayModAddress as Address,
-        abi: DELAY_MOD_ABI,
-        functionName: "skipExpired",
-      });
-
-      // Wait for transaction confirmation
-      await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, {
-        hash: txHash,
-      });
-
-      toast.success("Expired transactions skipped successfully!");
-      console.info("Skip expired transaction hash:", txHash);
-
-      // Refresh queue
-      refetch();
-    } catch (error) {
-      console.error("Error skipping expired transactions:", error);
-      toast.error(extractErrorMessage(error, "Error skipping expired transactions"));
+      await skipExpired();
     } finally {
       setIsSkippingExpired(false);
     }
-  }, [safeConfig?.address, hasExpiredTransaction, refetch]);
+  }, [skipExpired]);
 
   if (isError) {
     return <StandardAlert variant="destructive" description="Failed to fetch delay module queue information." />;
@@ -75,14 +31,7 @@ export const DelayModuleQueue = ({ onTransactionExecuted }: DelayModuleQueueProp
 
       <div className="space-y-3">
         {queue.map((transaction) => (
-          <PendingTransactionItem
-            key={transaction.nonce.toString()}
-            transaction={transaction}
-            hasExpiredTx={hasExpiredTransaction}
-            onExecuteSuccess={onTransactionExecuted}
-            cooldown={queueInfo?.cooldown ?? 0n}
-            refetchQueue={refetch}
-          />
+          <PendingTransactionItem key={transaction.nonce.toString()} transaction={transaction} />
         ))}
         {hasExpiredTransaction && (
           <Button

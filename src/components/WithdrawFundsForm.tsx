@@ -152,6 +152,7 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
         tokenAddress: selectedToken.address,
         tokenSymbol: selectedToken.symbol || selectedToken.tokenSymbol,
         amount: amount.toString(),
+        tokenDecimals: selectedToken.decimals,
         recipient: toAddress,
         timestamp: Date.now(),
         txHash: delayTxHash,
