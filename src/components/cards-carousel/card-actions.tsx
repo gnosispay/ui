@@ -46,7 +46,7 @@ export const CardActions = ({
     return cardInfoMap[card.cardToken];
   }, [card.cardToken, cardInfoMap]);
   const canReport =
-    !!card.activatedAt && !cardInfo?.isFrozen && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid;
+    !!card.activatedAt && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid && !cardInfo?.isBlocked;
 
   const onShowCardDetails = (cardToken?: string) => {
     if (!cardToken) {
