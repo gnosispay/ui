@@ -17,6 +17,7 @@ import { AppLoader } from "./components/AppLoader";
 import { useAppInitialization } from "./hooks/useAppInitialization";
 import { useAppKitTheme } from "./hooks/useAppKitTheme";
 import { PARTNERS_URL } from "./constants";
+import { WithdrawRoute } from "./pages/Withdraw";
 
 const ExternalRedirect = ({ url }: { url: string }) => {
   useEffect(() => {
@@ -67,6 +68,10 @@ const otherRoutes = [
   {
     path: "/card-order/:orderId",
     element: <ExistingCardOrder />,
+  },
+  {
+    path: "/withdraw",
+    element: <WithdrawRoute />,
   },
   {
     path: "/signup",

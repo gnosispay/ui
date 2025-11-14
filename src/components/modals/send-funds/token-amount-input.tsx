@@ -15,7 +15,7 @@ interface TokenAmountInputProps {
 }
 
 export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: TokenAmountInputProps) => {
-  const { currenciesWithBalance: tokens } = useTokenBalance();
+  const { currenciesWithBalance: tokens, isLoading: isLoadingBalances } = useTokenBalance();
   const [displayAmount, setDisplayAmount] = useState<string>("");
   const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
   const { safeConfig } = useUser();
@@ -57,16 +57,16 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
       setSelectedToken(newToken);
       onTokenChange(newToken);
       setDisplayAmount("");
-      setError(""); // Clear error when token changes
+      setError("");
     },
     [tokens, onTokenChange, setError],
   );
 
   useEffect(() => {
-    if (!selectedToken && safeConfig?.fiatSymbol && tokens[safeConfig.fiatSymbol]) {
+    if (!selectedToken && !isLoadingBalances && safeConfig?.fiatSymbol && tokens[safeConfig.fiatSymbol]) {
       handleTokenSelect(safeConfig.fiatSymbol);
     }
-  }, [selectedToken, tokens, handleTokenSelect, safeConfig?.fiatSymbol]);
+  }, [selectedToken, tokens, handleTokenSelect, safeConfig?.fiatSymbol, isLoadingBalances]);
 
   const handleAmountChange = (newAmount: string) => {
     setDisplayAmount(newAmount);

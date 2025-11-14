@@ -5,13 +5,13 @@ import { shortenAddress } from "./shortenAddress";
 import { formatCurrency } from "./formatCurrency";
 import type { Address } from "viem";
 import { decodeFunctionData } from "viem";
-import { DELAY_ABI } from "./abis/delayAbi";
+import { DELAY_MOD_ABI } from "./abis/delayAbi";
 import { DAILY_LIMIT_ABI } from "./abis/dailyLimitAbi";
 
 const decodeDelayTransaction = (data: Address) => {
   try {
     return decodeFunctionData({
-      abi: DELAY_ABI,
+      abi: DELAY_MOD_ABI,
       data,
     });
   } catch (error) {

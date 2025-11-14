@@ -23,7 +23,7 @@ const tokens = { ...moneriumTokens, ...supportedTokens };
 export const useTokenBalance = (): UseTokenBalanceResult => {
   const { safeConfig } = useUser();
   const [currenciesWithBalance, setCurrenciesWithBalance] = useState<TokenWithBalance>({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 
   const fetchBalances = useCallback(async () => {
