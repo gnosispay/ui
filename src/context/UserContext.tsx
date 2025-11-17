@@ -25,6 +25,7 @@ export type IUserContext = {
   showInitializingLoader: boolean;
   isKycApproved: boolean;
   isSafeConfigured: boolean;
+  isDeactivated: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -41,6 +42,8 @@ const UserContextProvider = ({ children }: UserContextProps) => {
     () => isAuthenticated && isUserSignedUp && isKycApproved && isSafeConfigured,
     [isAuthenticated, isUserSignedUp, isKycApproved, isSafeConfigured],
   );
+
+  const isDeactivated = useMemo(() => user?.status === "DEACTIVATED", [user]);
 
   const showInitializingLoader = useMemo(() => {
     // If user is not signed up, we don't need to show loader (will show signup screen)
@@ -171,6 +174,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         showInitializingLoader,
         isKycApproved,
         isSafeConfigured,
+        isDeactivated,
       }}
     >
       {children}

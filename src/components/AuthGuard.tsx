@@ -27,7 +27,7 @@ interface AuthScreenProps {
     disabled?: boolean;
     loading?: boolean;
   };
-  type: "connection" | "login" | "signup";
+  type: "connection" | "login" | "signup" | "deactivated";
 }
 
 const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthScreenProps) => {
@@ -62,7 +62,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
 
 export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
-  const { isOnboarded } = useUser();
+  const { isOnboarded, isDeactivated } = useUser();
   const { open } = useAppKit();
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
@@ -79,6 +79,10 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
 
   const handleNavigateToRegister = useCallback(() => {
     navigate("/register");
+  }, [navigate]);
+
+  const handleWithdrawFunds = useCallback(() => {
+    navigate("/withdraw");
   }, [navigate]);
 
   const signupScreenConfig = useMemo(
@@ -109,6 +113,16 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
     };
   }, [renewToken, isAuthenticating]);
 
+  const deactivatedScreenConfig = useMemo((): AuthScreenProps => {
+    return {
+      title: "Account deactivated",
+      description: "Your account has been deactivated.",
+      buttonText: "Withdraw funds",
+      buttonProps: { onClick: handleWithdrawFunds, disabled: false, loading: false },
+      type: "deactivated",
+    };
+  }, [handleWithdrawFunds]);
+
   const connectionScreenConfig = useMemo((): AuthScreenProps => {
     const buttonText = isConnecting ? "Connecting..." : "Connect wallet";
 
@@ -126,6 +140,10 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   // this is purely related to the wallet
   if (!isConnected) {
     return <AuthScreen {...connectionScreenConfig} />;
+  }
+
+  if (isDeactivated) {
+    return <AuthScreen {...deactivatedScreenConfig} />;
   }
 
   // the wallet is connected but the JWT is not set or expired

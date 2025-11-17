@@ -10,7 +10,7 @@ import { wagmiAdapter } from "@/wagmi";
 import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { useUser } from "@/context/UserContext";
 import { Coins } from "lucide-react";
-import { ERC20_ABI } from "@/utils/ERC20Abi";
+import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
 
 interface CustomTokenAmountInputProps {
   onTokenChange: (token: TokenInfoWithBalance) => void;
