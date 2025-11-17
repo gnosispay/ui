@@ -12,7 +12,8 @@ import { AddressInput } from "./modals/send-funds/address-input";
 import { useAccount, useSignTypedData } from "wagmi";
 import { useUser } from "@/context/UserContext";
 import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
-import { populateExecuteEnqueue, predictAddresses } from "@gnosispay/account-kit";
+import { populateExecuteEnqueue } from "@gnosispay/account-kit";
+import { predictDelayModAddress } from "@/utils/predictAddresses";
 import { sendTransaction, readContract, waitForTransactionReceipt, getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import { toast } from "sonner";
@@ -198,9 +199,8 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       });
 
       // Get the delay module address
-      const { delay: delayModAddress } = predictAddresses(safeConfig.address);
+      const delayModAddress = predictDelayModAddress(safeConfig.address);
 
-      // Get the updated queueNonce to determine the nonce of the transaction we just queued
       const queueNonce = (await readContract(wagmiAdapter.wagmiConfig, {
         address: delayModAddress as Address,
         abi: DELAY_MOD_ABI,

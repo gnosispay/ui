@@ -1,5 +1,12 @@
 export const DELAY_MOD_ABI = [
   {
+    inputs: [{ internalType: "bytes", name: "initializeParams", type: "bytes" }],
+    name: "setUp",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
     inputs: [],
     name: "txNonce",
     outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
