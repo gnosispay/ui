@@ -1,12 +1,15 @@
-import { useTokenBalance } from "@/hooks/useTokenBalance";
+import type { TokenWithBalance } from "@/hooks/useTokenBalance";
 import { Skeleton } from "./ui/skeleton";
 import { StandardAlert } from "./ui/standard-alert";
 import { formatUnits } from "viem";
 import { useMemo } from "react";
 
-export const OnchainBalance = () => {
-  const { currenciesWithBalance, isLoading, isError } = useTokenBalance();
-
+interface OnchainBalanceProps {
+  currenciesWithBalance: TokenWithBalance;
+  isLoading: boolean;
+  isError: boolean;
+}
+export const OnchainBalance = ({ currenciesWithBalance, isLoading, isError }: OnchainBalanceProps) => {
   const tokensWithNonZeroBalance = useMemo(() => {
     return Object.entries(currenciesWithBalance).filter(([, token]) => token.balance > 0n);
   }, [currenciesWithBalance]);
