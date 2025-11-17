@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import { useState, useCallback } from "react";
 
 export const DelayModuleQueue = () => {
-  const { queue, isError, hasExpiredTransaction, skipExpired } = useDelayModuleQueue();
+  const { queue, isError, hasExpiredTransaction, skipExpired, isLoading } = useDelayModuleQueue();
   const [isSkippingExpired, setIsSkippingExpired] = useState(false);
 
   const handleSkipExpired = useCallback(async () => {
@@ -21,7 +21,7 @@ export const DelayModuleQueue = () => {
     return <StandardAlert variant="destructive" description="Failed to fetch delay module queue information." />;
   }
 
-  if (!queue || queue.length === 0) {
+  if (!queue || queue.length === 0 || isLoading) {
     return null;
   }
 

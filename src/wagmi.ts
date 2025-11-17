@@ -45,15 +45,15 @@ export const appKit = createAppKit({
   },
   enableNetworkSwitch: false,
   themeMode: "light",
-  themeVariables: {
-    "--apkt-font-family": '"DM Sans", system-ui, Avenir, Helvetica, Arial, sans-serif',
-    "--apkt-accent": "var(--color-brand)",
-    "--apkt-color-mix": "var(--color-brand)",
-    "--apkt-color-mix-strength": 20,
-    "--apkt-font-size-master": "16px",
-    "--apkt-border-radius-master": "var(--radius)", // Uses your design system's border radius
-    "--apkt-z-index": 1000,
-  } as Record<string, string | number>,
+  // themeVariables: {
+  //   "--apkt-font-family": '"DM Sans", system-ui, Avenir, Helvetica, Arial, sans-serif',
+  //   "--apkt-accent": "var(--color-brand)",
+  //   "--apkt-color-mix": "var(--color-brand)",
+  //   "--apkt-color-mix-strength": 20,
+  //   "--apkt-font-size-master": "16px",
+  //   "--apkt-border-radius-master": "var(--radius)",
+  //   "--apkt-z-index": 1000,
+  // },
   // Force Gnosis chain for WalletConnect
   enableWalletConnect: true,
   enableInjected: true,
