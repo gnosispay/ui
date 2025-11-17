@@ -63,7 +63,9 @@ export const DelayModuleQueueContextProvider = ({
     let delayModAddress: string | undefined;
 
     try {
+      console.log("safeConfig.address", safeConfig.address);
       delayModAddress = predictAddresses(safeConfig.address).delay;
+      console.log("delayModAddress", delayModAddress);
     } catch (error) {
       console.error("Error getting delay module address:", error);
       return undefined;
