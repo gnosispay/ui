@@ -60,7 +60,16 @@ export const DelayModuleQueueContextProvider = ({
   const delayModAddress = useMemo(() => {
     if (!safeConfig?.address) return undefined;
 
-    return predictAddresses(safeConfig.address).delay;
+    let delayModAddress: string | undefined;
+
+    try {
+      delayModAddress = predictAddresses(safeConfig.address).delay;
+    } catch (error) {
+      console.error("Error getting delay module address:", error);
+      return undefined;
+    }
+
+    return delayModAddress as Address;
   }, [safeConfig]);
 
   const fetchQueueInfo = useCallback(async () => {
@@ -77,22 +86,22 @@ export const DelayModuleQueueContextProvider = ({
       // Fetch txNonce, queueNonce, cooldown, and expiration in parallel
       const [txNonce, queueNonce, cooldown, expiration] = await Promise.all([
         readContract(wagmiAdapter.wagmiConfig, {
-          address: delayModAddress as Address,
+          address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "txNonce",
         }) as Promise<bigint>,
         readContract(wagmiAdapter.wagmiConfig, {
-          address: delayModAddress as Address,
+          address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "queueNonce",
         }) as Promise<bigint>,
         readContract(wagmiAdapter.wagmiConfig, {
-          address: delayModAddress as Address,
+          address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "txCooldown",
         }) as Promise<bigint>,
         readContract(wagmiAdapter.wagmiConfig, {
-          address: delayModAddress as Address,
+          address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "txExpiration",
         }) as Promise<bigint>,
@@ -121,7 +130,7 @@ export const DelayModuleQueueContextProvider = ({
           txDataPromises.push(
             Promise.all([
               readContract(wagmiAdapter.wagmiConfig, {
-                address: delayModAddress as Address,
+                address: delayModAddress,
                 abi: DELAY_MOD_ABI,
                 functionName: "getTxCreatedAt",
                 args: [nonce],
@@ -132,7 +141,7 @@ export const DelayModuleQueueContextProvider = ({
                   return null;
                 }),
               readContract(wagmiAdapter.wagmiConfig, {
-                address: delayModAddress as Address,
+                address: delayModAddress,
                 abi: DELAY_MOD_ABI,
                 functionName: "getTxHash",
                 args: [nonce],
@@ -218,7 +227,7 @@ export const DelayModuleQueueContextProvider = ({
     try {
       // Call skipExpired on the delay module
       const txHash = await writeContract(wagmiAdapter.wagmiConfig, {
-        address: delayModAddress as Address,
+        address: delayModAddress,
         abi: DELAY_MOD_ABI,
         functionName: "skipExpired",
       });
@@ -250,7 +259,7 @@ export const DelayModuleQueueContextProvider = ({
       try {
         // Call executeNextTx on the delay module with transaction parameters
         const txHash = await writeContract(wagmiAdapter.wagmiConfig, {
-          address: delayModAddress as Address,
+          address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "executeNextTx",
           args: [to, value, data, OperationType.Call],
