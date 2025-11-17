@@ -4,7 +4,8 @@ import { useUser } from "@/context/UserContext";
 import { readContract, writeContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import type { Address } from "viem";
-import { predictAddresses, OperationType } from "@gnosispay/account-kit";
+import { OperationType } from "@gnosispay/account-kit";
+import { predictDelayModAddress } from "@/utils/predictAddresses";
 import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -34,7 +35,6 @@ interface DelayModuleQueueContextValue {
   refetch: () => void;
   skipExpired: () => Promise<void>;
   executeTransaction: (to: Address, value: bigint, data: `0x${string}`) => Promise<void>;
-  isLoading: boolean;
 }
 
 const DelayModuleQueueContext = createContext<DelayModuleQueueContextValue | undefined>(undefined);
@@ -52,7 +52,6 @@ export const DelayModuleQueueContextProvider = ({
   const [queueInfo, setQueueInfo] = useState<DelayModuleQueueInfo | null>(null);
   const [queue, setQueue] = useState<PendingTransaction[]>([]);
   const [isError, setIsError] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const hasExpiredTransaction = useMemo(() => {
     return queue?.some((transaction) => transaction.isExpired);
   }, [queue]);
@@ -63,9 +62,7 @@ export const DelayModuleQueueContextProvider = ({
     let delayModAddress: string | undefined;
 
     try {
-      console.log("safeConfig.address", safeConfig.address);
-      delayModAddress = predictAddresses(safeConfig.address).delay;
-      console.log("delayModAddress", delayModAddress);
+      delayModAddress = predictDelayModAddress(safeConfig.address);
     } catch (error) {
       console.error("Error getting delay module address:", error);
       return undefined;
@@ -82,7 +79,6 @@ export const DelayModuleQueueContextProvider = ({
     }
 
     setIsError(false);
-    setIsLoading(true);
 
     try {
       // Fetch txNonce, queueNonce, cooldown, and expiration in parallel
@@ -200,8 +196,6 @@ export const DelayModuleQueueContextProvider = ({
       });
     } catch (error) {
       console.error("Error fetching delay module queue info:", error);
-    } finally {
-      setIsLoading(false);
     }
   }, [delayModAddress]);
 
@@ -295,7 +289,6 @@ export const DelayModuleQueueContextProvider = ({
     refetch,
     skipExpired,
     executeTransaction,
-    isLoading,
   };
 
   return <DelayModuleQueueContext.Provider value={value}>{children}</DelayModuleQueueContext.Provider>;
