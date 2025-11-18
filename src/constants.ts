@@ -81,7 +81,7 @@ export const userTerms: Record<UserTermsTypeFromApi, { title: string; version: s
   "general-tos": {
     title: "Gnosis Pay Terms of Service",
     version: "TOS_GENERAL_VERSION_1",
-    url: "https://help.gnosispay.com/hc/en-us/articles/39723036951444-Gnosis-Pay-WebApp-Terms-of-Service",
+    url: "https://help.gnosispay.com/hc/en-us/articles/43350967419412-Gnosis-Pay-Terms-of-Service",
   },
   "card-monavate-tos": {
     title: "Cardholder Terms of Service",
