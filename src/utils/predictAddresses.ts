@@ -25,7 +25,7 @@ function encodeAddress(address: string): string {
  */
 function encodeUint256(value: number | bigint): string {
   const hex = typeof value === "bigint" ? value.toString(16) : value.toString(16);
-  return "0x" + hex.padStart(64, "0");
+  return `0x${hex.padStart(64, "0")}`;
 }
 
 /**
