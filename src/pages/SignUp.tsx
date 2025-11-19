@@ -1,5 +1,11 @@
 import { useEffect, useState, useCallback, Fragment } from "react";
-import { postApiV1AuthSignup, getApiV1UserTerms, postApiV1UserTerms } from "@/client";
+import {
+  postApiV1AuthSignup,
+  getApiV1UserTerms,
+  postApiV1UserTerms,
+  type GetApiV1TermsResponse,
+  getApiV1Terms,
+} from "@/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -8,8 +14,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelpers";
-import { userTerms, type UserTermsTypeFromApi } from "@/constants";
 import { PARTNER_ID } from "@/constants";
+import { toast } from "sonner";
 
 export const SignUpRoute = () => {
   const { updateJwt, updateClient } = useAuth();
@@ -18,7 +24,24 @@ export const SignUpRoute = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isAcceptedTos, setIsAcceptedTos] = useState(false);
+  const [terms, setTerms] = useState<GetApiV1TermsResponse["terms"]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getApiV1Terms()
+      .then(({ data, error }) => {
+        if (error) {
+          toast.error("Error getting terms of service");
+          console.error("Error getting terms", error);
+          return;
+        }
+        setTerms(data?.terms || []);
+      })
+      .catch((error) => {
+        toast.error("Error getting terms of service");
+        console.error("Error getting terms", error);
+      });
+  }, []);
 
   useEffect(() => {
     // if the user is authenticated and signed up, we should go to kyc
@@ -143,10 +166,10 @@ export const SignUpRoute = () => {
             />
             <label htmlFor="accept-tos" className="text-sm leading-normal">
               I have read and agree to the{" "}
-              {Object.entries(userTerms).map(([type, { url }], idx, arr) => (
+              {terms?.map(({ type, url, name }, idx, arr) => (
                 <Fragment key={type}>
                   <a href={url} target="_blank" rel="noopener noreferrer" className="underline">
-                    {userTerms[type as UserTermsTypeFromApi].title}
+                    {name}
                   </a>
                   {idx < arr.length - 1 ? ", " : ""}
                 </Fragment>

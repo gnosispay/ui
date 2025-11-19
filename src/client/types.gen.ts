@@ -4468,6 +4468,56 @@ export type GetApiV1RewardsResponses = {
 
 export type GetApiV1RewardsResponse = GetApiV1RewardsResponses[keyof GetApiV1RewardsResponses];
 
+export type GetApiV1TermsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/terms';
+};
+
+export type GetApiV1TermsErrors = {
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type GetApiV1TermsError = GetApiV1TermsErrors[keyof GetApiV1TermsErrors];
+
+export type GetApiV1TermsResponses = {
+    /**
+     * Successfully retrieved terms
+     */
+    200: {
+        terms?: Array<{
+            /**
+             * Type of terms and conditions
+             */
+            type?: 'general-tos' | 'card-monavate-tos' | 'cashback-tos' | 'privacy-policy';
+            /**
+             * Current version of these terms
+             */
+            currentVersion?: string;
+            /**
+             * URL to view these terms
+             */
+            url?: string;
+            /**
+             * Human-readable name of these terms
+             */
+            name?: string;
+        }>;
+    };
+};
+
+export type GetApiV1TermsResponse = GetApiV1TermsResponses[keyof GetApiV1TermsResponses];
+
 export type GetApiV1UserCardPublicKeyData = {
     body?: never;
     path?: never;
@@ -4767,3 +4817,50 @@ export type PostApiV1WebhooksSubscribeByPartnerIdResponses = {
 };
 
 export type PostApiV1WebhooksSubscribeByPartnerIdResponse = PostApiV1WebhooksSubscribeByPartnerIdResponses[keyof PostApiV1WebhooksSubscribeByPartnerIdResponses];
+
+export type GetApiV1WebhooksSubscriptionByPartnerIdData = {
+    body?: never;
+    path: {
+        /**
+         * Partner ID to check subscription for
+         */
+        partnerId: string;
+    };
+    query?: never;
+    url: '/api/v1/webhooks/subscription/{partnerId}';
+};
+
+export type GetApiV1WebhooksSubscriptionByPartnerIdErrors = {
+    /**
+     * Authentication required
+     */
+    401: unknown;
+    /**
+     * Partner not found
+     */
+    404: unknown;
+    /**
+     * Internal Server Error
+     */
+    500: _Error;
+};
+
+export type GetApiV1WebhooksSubscriptionByPartnerIdError = GetApiV1WebhooksSubscriptionByPartnerIdErrors[keyof GetApiV1WebhooksSubscriptionByPartnerIdErrors];
+
+export type GetApiV1WebhooksSubscriptionByPartnerIdResponses = {
+    /**
+     * Subscription status retrieved successfully
+     */
+    200: {
+        /**
+         * Whether the authenticated user is subscribed to the partner's webhooks
+         */
+        subscribed?: boolean;
+        /**
+         * ID of the subscription if it exists
+         */
+        subscriptionId?: string | null;
+    };
+};
+
+export type GetApiV1WebhooksSubscriptionByPartnerIdResponse = GetApiV1WebhooksSubscriptionByPartnerIdResponses[keyof GetApiV1WebhooksSubscriptionByPartnerIdResponses];
