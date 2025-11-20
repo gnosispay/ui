@@ -53,3 +53,5 @@ export const encryptSessionKey = async (sessionKey: string, publicKey: string): 
 const CHARACTER_LIST = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 export const generateIV = (): string =>
   Array.from({ length: 16 }, () => CHARACTER_LIST.charAt(Math.floor(Math.random() * CHARACTER_LIST.length))).join("");
+
+
