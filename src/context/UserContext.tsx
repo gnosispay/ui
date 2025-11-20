@@ -21,10 +21,10 @@ export type IUserContext = {
   isUserSignedUp?: boolean;
   refreshUser: () => void;
   refreshSafeConfig: () => void;
-  isOnboarded: boolean;
+  isOnboarded?: boolean;
   showInitializingLoader: boolean;
-  isKycApproved: boolean;
-  isSafeConfigured: boolean;
+  isKycApproved?: boolean;
+  isSafeConfigured?: boolean;
   isDeactivated: boolean;
 };
 
@@ -39,15 +39,17 @@ const UserContextProvider = ({ children }: UserContextProps) => {
 
   const isKycApproved = useMemo(() => {
     if (!isAuthenticated || !isUserSignedUp || !user) {
-      return false;
+      return undefined;
     }
+
     return user.kycStatus === "approved";
   }, [isAuthenticated, isUserSignedUp, user]);
 
   const isSafeConfigured = useMemo(() => {
     if (!safeConfig) {
-      return false;
+      return undefined;
     }
+
     return (
       safeConfig.accountStatus === AccountIntegrityStatus.Ok ||
       safeConfig.accountStatus === AccountIntegrityStatus.DelayQueueNotEmpty
@@ -72,13 +74,18 @@ const UserContextProvider = ({ children }: UserContextProps) => {
       return true;
     }
 
-    // For KYC approved users, wait for safe config
-    if (user.kycStatus === "approved" && safeConfig === undefined) {
+    // Wait for kyc approval data
+    if (isKycApproved === undefined) {
+      return true;
+    }
+
+    // if kyc is approved, wait for safe config
+    if (isKycApproved === true && safeConfig === undefined) {
       return true;
     }
 
     return false;
-  }, [isUserSignedUp, user, safeConfig]);
+  }, [isUserSignedUp, user, safeConfig, isKycApproved]);
 
   const refreshSafeConfig = useCallback(() => {
     getApiV1SafeConfig()

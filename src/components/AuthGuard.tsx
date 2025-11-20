@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAppKit } from "@reown/appkit/react";
 import { useTheme } from "@/context/ThemeContext";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
@@ -26,10 +26,16 @@ interface AuthScreenProps {
     disabled?: boolean;
     loading?: boolean;
   };
-  type: "connection" | "login" | "signup" | "deactivated";
+  showHelpLinkDebugButton?: boolean;
 }
 
-const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthScreenProps) => {
+const AuthScreen = ({
+  title,
+  description,
+  buttonText,
+  buttonProps,
+  showHelpLinkDebugButton = false,
+}: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
@@ -45,15 +51,19 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
         >
           {buttonText}
         </Button>
-        <a
-          className="text-xs text-muted-foreground text-center underline"
-          href={TROUBLE_LOGGING_IN_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Trouble logging in? Get help
-        </a>
-        {type === "signup" && <DebugButton />}
+        {showHelpLinkDebugButton && (
+          <>
+            <a
+              className="text-xs text-muted-foreground text-center underline"
+              href={TROUBLE_LOGGING_IN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trouble logging in? Get help
+            </a>
+            <DebugButton />
+          </>
+        )}
       </div>
     </div>
   );
@@ -61,7 +71,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
 
 export const AuthGuard = ({ children }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
-  const { isOnboarded, isDeactivated } = useUser();
+  const { isDeactivated, isUserSignedUp, isKycApproved, isSafeConfigured, isOnboarded } = useUser();
   const { open } = useAppKit();
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
@@ -76,27 +86,6 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
     }
   }, [open]);
 
-  const handleNavigateToRegister = useCallback(() => {
-    navigate("/register");
-  }, [navigate]);
-
-  const handleWithdrawFunds = useCallback(() => {
-    navigate("/withdraw");
-  }, [navigate]);
-
-  const signupScreenConfig = useMemo(
-    (): AuthScreenProps => ({
-      title: "Welcome to Gnosis Pay",
-      description: "You need to complete the signup process to use the app.",
-      buttonText: "Complete Signup",
-      buttonProps: {
-        onClick: handleNavigateToRegister,
-      },
-      type: "signup",
-    }),
-    [handleNavigateToRegister],
-  );
-
   const loginScreenConfig = useMemo((): AuthScreenProps => {
     const buttonText = isAuthenticating ? "Signing message..." : "Sign message";
     return {
@@ -108,7 +97,6 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
         disabled: isAuthenticating,
         loading: isAuthenticating,
       },
-      type: "login",
     };
   }, [renewToken, isAuthenticating]);
 
@@ -117,10 +105,10 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
       title: "Account deactivated",
       description: "Your account has been deactivated.",
       buttonText: "Withdraw funds",
-      buttonProps: { onClick: handleWithdrawFunds, disabled: false, loading: false },
-      type: "deactivated",
+      buttonProps: { onClick: () => navigate("/withdraw"), disabled: false, loading: false },
+      showHelpLinkDebugButton: true,
     };
-  }, [handleWithdrawFunds]);
+  }, [navigate]);
 
   const connectionScreenConfig = useMemo((): AuthScreenProps => {
     const buttonText = isConnecting ? "Connecting..." : "Connect wallet";
@@ -130,9 +118,42 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
       description: "Please connect your wallet to continue.",
       buttonText,
       buttonProps: { onClick: handleConnect, disabled: isConnecting, loading: isConnecting },
-      type: "connection",
     };
   }, [handleConnect, isConnecting]);
+
+  const signupScreenConfig = useMemo((): AuthScreenProps => {
+    return {
+      title: "Welcome to Gnosis Pay",
+      description: "You need to complete the signup process to use the app.",
+      buttonText: "Complete Signup",
+      buttonProps: {
+        onClick: () => navigate("/register"),
+      },
+      showHelpLinkDebugButton: true,
+    };
+  }, [navigate]);
+
+  const kycScreenConfig = useMemo((): AuthScreenProps => {
+    return {
+      title: "Identity Verification",
+      description: "We need to verify your identity to comply with regulations.",
+      buttonText: "Complete KYC Verification",
+      buttonProps: {
+        onClick: () => navigate("/kyc"),
+      },
+    };
+  }, [navigate]);
+
+  const safeDeploymentScreenConfig = useMemo((): AuthScreenProps => {
+    return {
+      title: "Safe Setup",
+      description: "We need to deploy your Safe to secure your funds.",
+      buttonText: "Setup Safe",
+      buttonProps: {
+        onClick: () => navigate("/safe-deployment"),
+      },
+    };
+  }, [navigate]);
 
   // this is purely related to the wallet
   if (!isConnected) {
@@ -148,8 +169,20 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
     return <AuthScreen {...loginScreenConfig} />;
   }
 
+  if (isUserSignedUp === false) {
+    return <AuthScreen {...signupScreenConfig} />;
+  }
+
+  if (isKycApproved === false) {
+    return <AuthScreen {...kycScreenConfig} />;
+  }
+
+  if (isSafeConfigured === false) {
+    return <AuthScreen {...safeDeploymentScreenConfig} />;
+  }
+
   // the wallet is connected and the JWT is set but the user needs to sign up
-  if (!isOnboarded) {
+  if (isOnboarded === false) {
     return <AuthScreen {...signupScreenConfig} />;
   }
 

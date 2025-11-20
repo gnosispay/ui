@@ -118,7 +118,6 @@ function App() {
   useZendeskUserId();
   useAppKitTheme();
   const { isInitializing } = useAppInitialization();
-  console.log("isInitializing", isInitializing);
 
   if (isInitializing) {
     return <AppLoader />;
