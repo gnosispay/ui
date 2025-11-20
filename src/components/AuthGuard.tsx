@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAppKit } from "@reown/appkit/react";
 import { useTheme } from "@/context/ThemeContext";
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
@@ -15,7 +15,6 @@ import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
 
 interface AuthGuardProps {
   children: ReactNode;
-  checkForSignup?: boolean;
 }
 
 interface AuthScreenProps {
@@ -60,7 +59,7 @@ const AuthScreen = ({ title, description, buttonText, buttonProps, type }: AuthS
   );
 };
 
-export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
+export const AuthGuard = ({ children }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
   const { isOnboarded, isDeactivated } = useUser();
   const { open } = useAppKit();
@@ -135,8 +134,6 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
     };
   }, [handleConnect, isConnecting]);
 
-  const needsSignup = checkForSignup && !isOnboarded;
-
   // this is purely related to the wallet
   if (!isConnected) {
     return <AuthScreen {...connectionScreenConfig} />;
@@ -152,7 +149,7 @@ export const AuthGuard = ({ children, checkForSignup }: AuthGuardProps) => {
   }
 
   // the wallet is connected and the JWT is set but the user needs to sign up
-  if (needsSignup) {
+  if (!isOnboarded) {
     return <AuthScreen {...signupScreenConfig} />;
   }
 

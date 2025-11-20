@@ -36,8 +36,24 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   const [safeConfig, setSafeConfig] = useState<IUserContext["safeConfig"]>(undefined);
   const [balances, setBalance] = useState<IUserContext["balances"]>(undefined);
   const isUserSignedUp = useMemo(() => jwtContainsUserId, [jwtContainsUserId]);
-  const [isKycApproved, setIsKycApproved] = useState(false);
-  const [isSafeConfigured, setIsSafeConfigured] = useState(false);
+
+  const isKycApproved = useMemo(() => {
+    if (!isAuthenticated || !isUserSignedUp || !user) {
+      return false;
+    }
+    return user.kycStatus === "approved";
+  }, [isAuthenticated, isUserSignedUp, user]);
+
+  const isSafeConfigured = useMemo(() => {
+    if (!safeConfig) {
+      return false;
+    }
+    return (
+      safeConfig.accountStatus === AccountIntegrityStatus.Ok ||
+      safeConfig.accountStatus === AccountIntegrityStatus.DelayQueueNotEmpty
+    );
+  }, [safeConfig]);
+
   const isOnboarded = useMemo(
     () => isAuthenticated && isUserSignedUp && isKycApproved && isSafeConfigured,
     [isAuthenticated, isUserSignedUp, isKycApproved, isSafeConfigured],
@@ -63,20 +79,6 @@ const UserContextProvider = ({ children }: UserContextProps) => {
 
     return false;
   }, [isUserSignedUp, user, safeConfig]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !isUserSignedUp || !user) return;
-    setIsKycApproved(user.kycStatus === "approved");
-  }, [isAuthenticated, isUserSignedUp, user]);
-
-  useEffect(() => {
-    if (
-      safeConfig?.accountStatus === AccountIntegrityStatus.Ok ||
-      safeConfig?.accountStatus === AccountIntegrityStatus.DelayQueueNotEmpty
-    ) {
-      setIsSafeConfigured(true);
-    }
-  }, [safeConfig]);
 
   const refreshSafeConfig = useCallback(() => {
     getApiV1SafeConfig()
