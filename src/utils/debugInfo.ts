@@ -5,8 +5,8 @@ import type { SafeConfig, User } from "@/client";
 export interface DebugInfo {
   isAuthenticated: boolean;
   isUserSignedUp: boolean;
-  isKycApproved: boolean;
-  isSafeConfigured: boolean;
+  isKycApproved?: boolean;
+  isSafeConfigured?: boolean;
   safeConfig: SafeConfig | undefined;
   user: User | undefined;
 }

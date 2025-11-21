@@ -106,9 +106,9 @@ const publicRoutes = [
   },
 ];
 
-function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
+function ProtectedLayout() {
   return (
-    <AuthGuard checkForSignup={checkForSignup}>
+    <AuthGuard>
       <Outlet />
     </AuthGuard>
   );
@@ -127,7 +127,7 @@ function App() {
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />
       <Routes>
-        <Route element={<ProtectedLayout checkForSignup={false} />}>
+        <Route element={<ProtectedLayout />}>
           {otherRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
@@ -137,7 +137,7 @@ function App() {
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
-        <Route element={<ProtectedLayout checkForSignup={true} />}>
+        <Route element={<ProtectedLayout />}>
           {menuRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
