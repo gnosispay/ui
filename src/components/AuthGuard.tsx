@@ -15,6 +15,7 @@ import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
 
 interface AuthGuardProps {
   children: ReactNode;
+  isOnboardingRoute?: boolean;
 }
 
 interface AuthScreenProps {
@@ -69,7 +70,7 @@ const AuthScreen = ({
   );
 };
 
-export const AuthGuard = ({ children }: AuthGuardProps) => {
+export const AuthGuard = ({ children, isOnboardingRoute = false }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
   const { isDeactivated, isUserSignedUp, isKycApproved, isSafeConfigured, isOnboarded } = useUser();
   const { open } = useAppKit();
@@ -169,20 +170,20 @@ export const AuthGuard = ({ children }: AuthGuardProps) => {
     return <AuthScreen {...loginScreenConfig} />;
   }
 
-  if (isUserSignedUp === false) {
+  if (isUserSignedUp === false && !isOnboardingRoute) {
     return <AuthScreen {...signupScreenConfig} />;
   }
 
-  if (isKycApproved === false) {
+  if (isKycApproved === false && !isOnboardingRoute) {
     return <AuthScreen {...kycScreenConfig} />;
   }
 
-  if (isSafeConfigured === false) {
+  if (isSafeConfigured === false && !isOnboardingRoute) {
     return <AuthScreen {...safeDeploymentScreenConfig} />;
   }
 
   // the wallet is connected and the JWT is set but the user needs to sign up
-  if (isOnboarded === false) {
+  if (isOnboarded === false && !isOnboardingRoute) {
     return <AuthScreen {...signupScreenConfig} />;
   }
 

@@ -48,7 +48,7 @@ export const menuRoutes = [
   },
 ];
 
-const otherRoutes = [
+export const onboardingRoutes = [
   {
     path: "/register",
     element: <SignUpRoute />,
@@ -61,6 +61,9 @@ const otherRoutes = [
     path: "/safe-deployment",
     element: <SafeDeploymentRoute />,
   },
+];
+
+const otherRoutes = [
   {
     path: "/card-order/new",
     element: <NewCardOrder />,
@@ -106,9 +109,9 @@ const publicRoutes = [
   },
 ];
 
-function ProtectedLayout() {
+function ProtectedLayout({ isOnboardingRoute = false }: { isOnboardingRoute?: boolean }) {
   return (
-    <AuthGuard>
+    <AuthGuard isOnboardingRoute={isOnboardingRoute}>
       <Outlet />
     </AuthGuard>
   );
@@ -129,6 +132,11 @@ function App() {
       <Routes>
         <Route element={<ProtectedLayout />}>
           {otherRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+        <Route element={<ProtectedLayout isOnboardingRoute={true} />}>
+          {onboardingRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
