@@ -8,13 +8,14 @@ import {
   MoreHorizontal,
   MailCheck,
   EyeOff,
+  BanIcon,
 } from "lucide-react";
 import { IconButton } from "../ui/icon-button";
 import type { Card } from "@/client";
 import { useGpSdk } from "@/hooks/useGpSdk";
 import { toast } from "sonner";
 import { Dialog } from "../ui/dialog";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useCards } from "@/context/CardsContext";
 import { ReportCardModal } from "../modals/report-card";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu";
@@ -33,11 +34,20 @@ export const CardActions = ({
   onToggleVoidedCardsVisibility: () => void;
 }) => {
   const { showCardDetails, showPin, isLoading } = useGpSdk();
-  const { freezeCard, unfreezeCard, markCardAsStolen, markCardAsLost, cardInfoMap, activateCard, isHideVoidedCards } =
-    useCards();
+  const {
+    freezeCard,
+    unfreezeCard,
+    markCardAsStolen,
+    markCardAsLost,
+    cardInfoMap,
+    activateCard,
+    isHideVoidedCards,
+    voidVirtualCard,
+  } = useCards();
   const [isCardDetailsModalOpen, setIsCardDetailsModalOpen] = useState(false);
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isActivationDialogOpen, setIsActivationDialogOpen] = useState(false);
+  const [isVoidVirtualCardDialogOpen, setIsVoidVirtualCardDialogOpen] = useState(false);
   const cardInfo = useMemo(() => {
     if (!card.cardToken || !cardInfoMap) {
       return undefined;
@@ -48,40 +58,51 @@ export const CardActions = ({
   const canReport =
     !!card.activatedAt && !cardInfo?.isStolen && !cardInfo?.isLost && !cardInfo?.isVoid && !cardInfo?.isBlocked;
 
-  const onShowCardDetails = (cardToken?: string) => {
-    if (!cardToken) {
-      toast.error("No card token");
-      return;
-    }
+  const onShowCardDetails = useCallback(
+    (cardToken?: string) => {
+      if (!cardToken) {
+        toast.error("No card token");
+        return;
+      }
 
-    try {
-      showCardDetails(cardToken, PSE_IFRAME_ID);
-      setIsCardDetailsModalOpen(true);
-    } catch (error) {
-      console.error(error);
-      toast.error("Error showing card details");
-    }
-  };
+      try {
+        showCardDetails(cardToken, PSE_IFRAME_ID);
+        setIsCardDetailsModalOpen(true);
+      } catch (error) {
+        console.error(error);
+        toast.error("Error showing card details");
+      }
+    },
+    [showCardDetails],
+  );
 
-  const onShowPin = (cardToken?: string) => {
-    if (!cardToken) {
-      toast.error("No card token");
-      return;
-    }
+  const onShowPin = useCallback(
+    (cardToken?: string) => {
+      if (!cardToken) {
+        toast.error("No card token");
+        return;
+      }
 
-    try {
-      showPin(cardToken, PSE_IFRAME_ID);
-      setIsCardDetailsModalOpen(true);
-    } catch (error) {
-      console.error(error);
-      toast.error("Error showing PIN");
-    }
-  };
+      try {
+        showPin(cardToken, PSE_IFRAME_ID);
+        setIsCardDetailsModalOpen(true);
+      } catch (error) {
+        console.error(error);
+        toast.error("Error showing PIN");
+      }
+    },
+    [showPin],
+  );
 
-  const onConfirmActivation = () => {
+  const onConfirmActivation = useCallback(() => {
     activateCard(card.id);
     setIsActivationDialogOpen(false);
-  };
+  }, [activateCard, card.id]);
+
+  const onVoidVirtualCard = useCallback(() => {
+    voidVirtualCard(card.id);
+    setIsVoidVirtualCardDialogOpen(false);
+  }, [voidVirtualCard, card.id]);
 
   return (
     <>
@@ -134,6 +155,18 @@ export const CardActions = ({
             </span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
+            {card.virtual && (
+              <DropdownMenuItem onClick={() => setIsVoidVirtualCardDialogOpen(true)}>
+                <BanIcon size={22} /> Void card
+              </DropdownMenuItem>
+            )}
+
+            {canReport && (
+              <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
+                <AlertOctagon size={22} /> Report
+              </DropdownMenuItem>
+            )}
+
             <DropdownMenuItem
               onClick={(e) => {
                 e.preventDefault();
@@ -151,12 +184,6 @@ export const CardActions = ({
                 onClick={(e) => e.stopPropagation()}
               />
             </DropdownMenuItem>
-
-            {canReport && (
-              <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
-                <AlertOctagon size={22} /> Report
-              </DropdownMenuItem>
-            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
@@ -191,6 +218,15 @@ export const CardActions = ({
         message="Only activate your card if you have physically received it."
         confirmText="Activate Card"
         onConfirm={onConfirmActivation}
+      />
+      <ConfirmationDialog
+        open={isVoidVirtualCardDialogOpen}
+        onOpenChange={setIsVoidVirtualCardDialogOpen}
+        title="Void Card"
+        iconColor="text-warning"
+        message="Are you sure you want to void this card? This action cannot be undone."
+        confirmText="Void Card"
+        onConfirm={onVoidVirtualCard}
       />
     </>
   );
