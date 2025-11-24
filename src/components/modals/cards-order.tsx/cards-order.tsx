@@ -2,11 +2,12 @@ import { useState, useCallback } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CardsOrderSelection } from "./cards-order-selection";
 import { CardsOrderVirtual } from "./cards-order-virtual";
-import { useNavigate } from "react-router-dom";
+import { LinkPhysicalCard } from "./link-physical-card";
 
 export enum CardsOrderStep {
   Selection = "selection",
   Virtual = "virtual",
+  LinkPhysical = "link-physical",
 }
 
 interface CardsOrderModalProps {
@@ -16,15 +17,14 @@ interface CardsOrderModalProps {
 
 export const CardsOrderModal = ({ open, onOpenChange }: CardsOrderModalProps) => {
   const [step, setStep] = useState<CardsOrderStep>(CardsOrderStep.Selection);
-  const navigate = useNavigate();
 
   const handleVirtualCardOrder = useCallback(() => {
     setStep(CardsOrderStep.Virtual);
   }, []);
 
-  const handlePhysicalCardOrder = useCallback(() => {
-    navigate("/card-order/new");
-  }, [navigate]);
+  const handlePhysicalCardLink = useCallback(() => {
+    setStep(CardsOrderStep.LinkPhysical);
+  }, []);
 
   const handleClose = useCallback(
     (open: boolean) => {
@@ -43,6 +43,7 @@ export const CardsOrderModal = ({ open, onOpenChange }: CardsOrderModalProps) =>
           <DialogTitle>
             {step === CardsOrderStep.Selection && "Order a card"}
             {step === CardsOrderStep.Virtual && "Virtual card order"}
+            {step === CardsOrderStep.LinkPhysical && "Link a physical card"}
           </DialogTitle>
         </DialogHeader>
 
@@ -50,13 +51,17 @@ export const CardsOrderModal = ({ open, onOpenChange }: CardsOrderModalProps) =>
           {step === CardsOrderStep.Selection && (
             <CardsOrderSelection
               onVirtualCardOrder={handleVirtualCardOrder}
-              onPhysicalCardOrder={handlePhysicalCardOrder}
+              onPhysicalCardLink={handlePhysicalCardLink}
               onClose={() => handleClose(false)}
             />
           )}
 
           {step === CardsOrderStep.Virtual && (
             <CardsOrderVirtual onClose={() => handleClose(false)} onGoBack={() => setStep(CardsOrderStep.Selection)} />
+          )}
+
+          {step === CardsOrderStep.LinkPhysical && (
+            <LinkPhysicalCard onClose={() => handleClose(false)} onGoBack={() => setStep(CardsOrderStep.Selection)} />
           )}
         </div>
       </DialogContent>

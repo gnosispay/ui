@@ -1,4 +1,65 @@
-export const DELAY_ABI = [
+export const DELAY_MOD_ABI = [
+  {
+    inputs: [{ internalType: "bytes", name: "initializeParams", type: "bytes" }],
+    name: "setUp",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "txNonce",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "queueNonce",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "txCooldown",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "txExpiration",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "_nonce", type: "uint256" }],
+    name: "getTxCreatedAt",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "skipExpired",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "to", type: "address" },
+      { internalType: "uint256", name: "value", type: "uint256" },
+      { internalType: "bytes", name: "data", type: "bytes" },
+      { internalType: "enum Enum.Operation", name: "operation", type: "uint8" },
+    ],
+    name: "executeNextTx",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
   {
     name: "enableModule",
     type: "function",
@@ -11,5 +72,24 @@ export const DELAY_ABI = [
       { name: "prevModule", type: "address" },
       { name: "module", type: "address" },
     ],
+  },
+  {
+    name: "getTxHash",
+    inputs: [{ internalType: "uint256", name: "_nonce", type: "uint256" }],
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "to", type: "address" },
+      { internalType: "uint256", name: "value", type: "uint256" },
+      { internalType: "bytes", name: "data", type: "bytes" },
+      { internalType: "enum Enum.Operation", name: "operation", type: "uint8" },
+    ],
+    name: "getTransactionHash",
+    outputs: [{ internalType: "bytes32", name: "", type: "bytes32" }],
+    stateMutability: "pure",
+    type: "function",
   },
 ] as const;

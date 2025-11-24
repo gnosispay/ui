@@ -21,10 +21,11 @@ export type IUserContext = {
   isUserSignedUp?: boolean;
   refreshUser: () => void;
   refreshSafeConfig: () => void;
-  isOnboarded: boolean;
+  isOnboarded?: boolean;
   showInitializingLoader: boolean;
-  isKycApproved: boolean;
-  isSafeConfigured: boolean;
+  isKycApproved?: boolean;
+  isSafeConfigured?: boolean;
+  isDeactivated: boolean;
 };
 
 const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -35,12 +36,32 @@ const UserContextProvider = ({ children }: UserContextProps) => {
   const [safeConfig, setSafeConfig] = useState<IUserContext["safeConfig"]>(undefined);
   const [balances, setBalance] = useState<IUserContext["balances"]>(undefined);
   const isUserSignedUp = useMemo(() => jwtContainsUserId, [jwtContainsUserId]);
-  const [isKycApproved, setIsKycApproved] = useState(false);
-  const [isSafeConfigured, setIsSafeConfigured] = useState(false);
+
+  const isKycApproved = useMemo(() => {
+    if (!isAuthenticated || !isUserSignedUp || !user) {
+      return undefined;
+    }
+
+    return user.kycStatus === "approved";
+  }, [isAuthenticated, isUserSignedUp, user]);
+
+  const isSafeConfigured = useMemo(() => {
+    if (!safeConfig) {
+      return undefined;
+    }
+
+    return (
+      safeConfig.accountStatus === AccountIntegrityStatus.Ok ||
+      safeConfig.accountStatus === AccountIntegrityStatus.DelayQueueNotEmpty
+    );
+  }, [safeConfig]);
+
   const isOnboarded = useMemo(
     () => isAuthenticated && isUserSignedUp && isKycApproved && isSafeConfigured,
     [isAuthenticated, isUserSignedUp, isKycApproved, isSafeConfigured],
   );
+
+  const isDeactivated = useMemo(() => user?.status === "DEACTIVATED", [user]);
 
   const showInitializingLoader = useMemo(() => {
     // If user is not signed up, we don't need to show loader (will show signup screen)
@@ -53,27 +74,18 @@ const UserContextProvider = ({ children }: UserContextProps) => {
       return true;
     }
 
-    // For KYC approved users, wait for safe config
-    if (user.kycStatus === "approved" && safeConfig === undefined) {
+    // Wait for kyc approval data
+    if (isKycApproved === undefined) {
+      return true;
+    }
+
+    // if kyc is approved, wait for safe config
+    if (isKycApproved === true && safeConfig === undefined) {
       return true;
     }
 
     return false;
-  }, [isUserSignedUp, user, safeConfig]);
-
-  useEffect(() => {
-    if (!isAuthenticated || !isUserSignedUp || !user) return;
-    setIsKycApproved(user.kycStatus === "approved");
-  }, [isAuthenticated, isUserSignedUp, user]);
-
-  useEffect(() => {
-    if (
-      safeConfig?.accountStatus === AccountIntegrityStatus.Ok ||
-      safeConfig?.accountStatus === AccountIntegrityStatus.DelayQueueNotEmpty
-    ) {
-      setIsSafeConfigured(true);
-    }
-  }, [safeConfig]);
+  }, [isUserSignedUp, user, safeConfig, isKycApproved]);
 
   const refreshSafeConfig = useCallback(() => {
     getApiV1SafeConfig()
@@ -171,6 +183,7 @@ const UserContextProvider = ({ children }: UserContextProps) => {
         showInitializingLoader,
         isKycApproved,
         isSafeConfigured,
+        isDeactivated,
       }}
     >
       {children}

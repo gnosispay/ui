@@ -17,6 +17,7 @@ import { AppLoader } from "./components/AppLoader";
 import { useAppInitialization } from "./hooks/useAppInitialization";
 import { useAppKitTheme } from "./hooks/useAppKitTheme";
 import { PARTNERS_URL } from "./constants";
+import { WithdrawRoute } from "./pages/Withdraw";
 
 const ExternalRedirect = ({ url }: { url: string }) => {
   useEffect(() => {
@@ -47,7 +48,7 @@ export const menuRoutes = [
   },
 ];
 
-const publicRoutes = [
+export const onboardingRoutes = [
   {
     path: "/register",
     element: <SignUpRoute />,
@@ -60,6 +61,9 @@ const publicRoutes = [
     path: "/safe-deployment",
     element: <SafeDeploymentRoute />,
   },
+];
+
+const otherRoutes = [
   {
     path: "/card-order/new",
     element: <NewCardOrder />,
@@ -67,6 +71,10 @@ const publicRoutes = [
   {
     path: "/card-order/:orderId",
     element: <ExistingCardOrder />,
+  },
+  {
+    path: "/withdraw",
+    element: <WithdrawRoute />,
   },
   {
     path: "/signup",
@@ -81,6 +89,17 @@ const publicRoutes = [
     element: <Navigate to="/" replace />,
   },
   {
+    path: "/dashboard",
+    element: <Navigate to="/" replace />,
+  },
+];
+
+const publicRoutes = [
+  {
+    path: "/activate",
+    element: <ExternalRedirect url={PARTNERS_URL} />,
+  },
+  {
     path: "/activation/choose-partner",
     element: <ExternalRedirect url={PARTNERS_URL} />,
   },
@@ -88,15 +107,11 @@ const publicRoutes = [
     path: "/partners",
     element: <ExternalRedirect url={PARTNERS_URL} />,
   },
-  {
-    path: "/dashboard",
-    element: <Navigate to="/" replace />,
-  },
 ];
 
-function ProtectedLayout({ checkForSignup }: { checkForSignup?: boolean }) {
+function ProtectedLayout({ isOnboardingRoute = false }: { isOnboardingRoute?: boolean }) {
   return (
-    <AuthGuard checkForSignup={checkForSignup}>
+    <AuthGuard isOnboardingRoute={isOnboardingRoute}>
       <Outlet />
     </AuthGuard>
   );
@@ -115,18 +130,28 @@ function App() {
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />
       <Routes>
-        <Route element={<ProtectedLayout checkForSignup={false} />}>
+        <Route element={<ProtectedLayout />}>
+          {otherRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+        <Route element={<ProtectedLayout isOnboardingRoute={true} />}>
+          {onboardingRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+        </Route>
+        <Route>
           {publicRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
-        <Route element={<ProtectedLayout checkForSignup={true} />}>
+        <Route element={<ProtectedLayout />}>
           {menuRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
         {/* Catch-all route for 404 pages */}
-        <Route element={<ProtectedLayout checkForSignup={false} />}>
+        <Route>
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

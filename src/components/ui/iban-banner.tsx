@@ -31,7 +31,7 @@ export function IbanBanner({ className }: IbanBannerProps) {
     const dismissalData = getBannerDismissalData('iban');
     const shouldShow = shouldShowBanner(dismissalData);
     setIsVisible(shouldShow);
-  }, [hasIbanSet]);
+  }, [hasIbanSet, isEligibleForIban]);
 
   const handleDismiss = useCallback(() => {
     const currentData = getBannerDismissalData('iban');
