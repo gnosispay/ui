@@ -54,9 +54,9 @@ function createTestUser(config: {
   userId: string;
   signerAddress: string;
   safeAddress?: string;
-  email?: string;
-  firstName?: string;
-  lastName?: string;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   phone?: string;
   address1?: string;
   city?: string;
@@ -307,6 +307,10 @@ export const USER_KYC_APPROVED_NO_SOF = createTestUser({
   kycStatus: "approved",
   isSourceOfFundsAnswered: false,
   isPhoneValidated: false,
+  safeConfig: {
+    isDeployed: false,
+    accountStatus: 1, // SafeNotDeployed
+  },
 });
 
 /**

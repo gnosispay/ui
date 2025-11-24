@@ -45,12 +45,17 @@ const SourceOfFundsStep = ({ onComplete, setError }: SourceOfFundsStepProps) => 
       setError("");
       setIsSubmitting(true);
       try {
-        await postApiV1SourceOfFunds({
+        const { error } = await postApiV1SourceOfFunds({
           body: sourceOfFunds.map((q, idx) => ({
             question: q.question,
             answer: answers[idx],
           })),
         });
+        if (error) {
+          const errorMessage = extractErrorMessage(error, "Failed to submit answers");
+          setError(errorMessage);
+          return;
+        }
         onComplete();
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : "Failed to submit answers";

@@ -5,6 +5,7 @@ import SourceOfFundsStep from "@/components/safe-deployment/SourceOfFundsStep";
 import PhoneVerificationStep from "@/components/safe-deployment/PhoneVerificationStep";
 import DeploySafeStep from "@/components/safe-deployment/DeploySafeStep";
 import { useNavigate } from "react-router-dom";
+import { AccountIntegrityStatus } from "@gnosispay/account-kit";
 
 enum ScreenStep {
   AnswerSourceOfFunds = "answer-source-of-funds",
@@ -13,17 +14,23 @@ enum ScreenStep {
 }
 export const SafeDeploymentRoute = () => {
   const [step, setStep] = useState<ScreenStep>(ScreenStep.AnswerSourceOfFunds);
-  const { user, safeConfig, refreshUser: refetchUser } = useUser();
+  const { user, safeConfig, refreshUser: refetchUser, isUserSignedUp } = useUser();
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    // If user is not signed up, redirect to register
+    if (isUserSignedUp === false) {
+      navigate("/register");
+      return;
+    }
+
     if (!user) return;
 
     if (user.kycStatus !== "approved") {
       navigate("/kyc");
     }
-  }, [user, navigate]);
+  }, [user, navigate, isUserSignedUp]);
 
   useEffect(() => {
     if (!user || !safeConfig) return;
@@ -36,6 +43,21 @@ export const SafeDeploymentRoute = () => {
       setStep(ScreenStep.DeploySafe);
     }
   }, [user, safeConfig, step]);
+
+  useEffect(() => {
+    if (!safeConfig) return;
+
+    if (
+      safeConfig?.accountStatus !== AccountIntegrityStatus.Ok &&
+      safeConfig?.accountStatus !== AccountIntegrityStatus.DelayQueueNotEmpty &&
+      safeConfig?.accountStatus !== AccountIntegrityStatus.SafeNotDeployed
+    ) {
+      setError(
+        `Your Safe is not properly configured. Safe status is ${safeConfig?.accountStatus}. Please contact support.`,
+      );
+      return;
+    }
+  }, [safeConfig]);
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full" data-testid="safe-deployment-page">
@@ -50,7 +72,7 @@ export const SafeDeploymentRoute = () => {
           />
         </div>
       )}
-      {step === ScreenStep.AnswerSourceOfFunds && (
+      {!error && step === ScreenStep.AnswerSourceOfFunds && (
         <SourceOfFundsStep
           onComplete={() => {
             refetchUser();
@@ -59,7 +81,7 @@ export const SafeDeploymentRoute = () => {
           setError={setError}
         />
       )}
-      {step === ScreenStep.VerifyPhoneNumber && (
+      {!error && step === ScreenStep.VerifyPhoneNumber && (
         <PhoneVerificationStep
           onComplete={() => {
             refetchUser();
@@ -69,7 +91,7 @@ export const SafeDeploymentRoute = () => {
           title="Mobile phone verification"
         />
       )}
-      {step === ScreenStep.DeploySafe && <DeploySafeStep setError={setError} />}
+      {!error && step === ScreenStep.DeploySafe && <DeploySafeStep setError={setError} />}
     </div>
   );
 };

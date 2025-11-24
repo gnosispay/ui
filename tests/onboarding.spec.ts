@@ -17,7 +17,6 @@ import {
   USER_READY_FOR_SAFE_DEPLOYMENT,
   BASE_USER,
 } from "./utils/testUsers";
-import type { User } from "../src/client/types.gen";
 
 test.describe("Onboarding Flow - Happy Path", () => {
   test("Complete onboarding flow from signup to safe deployment", async ({ page }) => {
@@ -32,18 +31,7 @@ test.describe("Onboarding Flow - Happy Path", () => {
     await mockAuthChallenge({ page, testUser: USER_NOT_SIGNED_UP });
 
     // Mock user endpoint to return not signed up user initially
-    let currentUser: User = USER_NOT_SIGNED_UP.user;
-    await page.route("**/api/v1/user", async (route) => {
-      if (route.request().method() === "GET") {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(currentUser),
-        });
-      } else {
-        await route.continue();
-      }
-    });
+    await mockUser({ page, testUser: USER_NOT_SIGNED_UP });
 
     // Generate a valid JWT token for the signed-up user
     const signedUpToken = jwt.sign(
@@ -72,19 +60,6 @@ test.describe("Onboarding Flow - Happy Path", () => {
     await mockKycIntegration(page, {
       kycUrl: "https://mock-sumsub.example.com/kyc-flow",
     });
-
-    // // Mock IBANs available endpoint
-    // await page.route("**/api/v1/ibans/available", async (route) => {
-    //   if (route.request().method() === "GET") {
-    //     await route.fulfill({
-    //       status: 200,
-    //       contentType: "application/json",
-    //       body: JSON.stringify({ available: false }),
-    //     });
-    //   } else {
-    //     await route.continue();
-    //   }
-    // });
 
     // Set up request tracking for user terms acceptance
     const termsRequests: Array<{ terms: string; version: string }> = [];
@@ -164,8 +139,11 @@ test.describe("Onboarding Flow - Happy Path", () => {
     // Verify submit button is now enabled (email filled and TOS accepted)
     await expect(page.getByTestId("signup-submit-button")).toBeEnabled();
 
-    // Update current user to signed up state after signup
-    currentUser = USER_SIGNED_UP_NO_KYC.user;
+    // Update user mock to signed up state (before clicking submit so refetchUser sees it)
+    await mockUser({
+      page,
+      testUser: USER_SIGNED_UP_NO_KYC,
+    });
 
     // Click submit
     await page.getByTestId("signup-submit-button").click();
@@ -205,15 +183,13 @@ test.describe("Onboarding Flow - Happy Path", () => {
     // ========================================================================
 
     // Mock source of funds endpoints (set up before status change)
-    await mockSourceOfFunds(page, {
-      getResponse: DEFAULT_SOURCE_OF_FUNDS_QUESTIONS,
-    });
+    await mockSourceOfFunds(page);
 
     // Simulate KYC completion by updating user status to approved
-    currentUser = {
-      ...USER_KYC_APPROVED_NO_SOF.user,
-      email: "test@example.com",
-    };
+    await mockUser({
+      page,
+      testUser: USER_KYC_APPROVED_NO_SOF.user,
+    });
 
     // In a real scenario, the KYC page would poll and detect the approved status,
     // then automatically navigate. For testing, we'll navigate manually.
@@ -240,11 +216,11 @@ test.describe("Onboarding Flow - Happy Path", () => {
     await page.getByTestId("source-of-funds-select-1").click();
     await page.getByRole("option", { name: "€50,000 - €100,000" }).click();
 
-    // Update current user to have source of funds answered (before submission so refetchUser sees it)
-    currentUser = {
-      ...USER_SOF_ANSWERED_NO_PHONE.user,
-      email: "test@example.com",
-    };
+    // Update user mock to have source of funds answered (before submission so refetchUser sees it)
+    await mockUser({
+      page,
+      testUser: USER_SOF_ANSWERED_NO_PHONE.user,
+    });
 
     // Submit source of funds
     await page.getByTestId("source-of-funds-submit-button").click();
@@ -283,11 +259,11 @@ test.describe("Onboarding Flow - Happy Path", () => {
       await page.getByTestId(`otp-input-digit-${i}`).fill((i + 1).toString());
     }
 
-    // Update current user to have phone validated
-    currentUser = {
-      ...USER_READY_FOR_SAFE_DEPLOYMENT.user,
-      email: "test@example.com",
-    };
+    // Update user mock to have phone validated
+    await mockUser({
+      page,
+      testUser: USER_READY_FOR_SAFE_DEPLOYMENT.user,
+    });
 
     // Click verify
     await page.getByTestId("otp-verify-button").click();
@@ -308,11 +284,11 @@ test.describe("Onboarding Flow - Happy Path", () => {
     await expect(page.getByTestId("safe-deployment-loading-icon")).toBeVisible();
     await expect(page.getByTestId("safe-deployment-loading-message")).toBeVisible();
 
-    // Update current user to fully onboarded
-    currentUser = {
-      ...BASE_USER.user,
-      email: "test@example.com",
-    };
+    // Update user mock to fully onboarded state
+    await mockUser({
+      page,
+      testUser: BASE_USER,
+    });
 
     // Update safe config to deployed
     await mockSafeConfig({
@@ -458,11 +434,11 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
     // Submit source of funds
     await page.getByTestId("source-of-funds-submit-button").click();
 
-    // Wait for network to settle after submission
-    await page.waitForLoadState("networkidle");
-
-    // Verify error alert is shown
+    // Wait for error alert to be displayed
     await expect(page.getByTestId("safe-deployment-error-alert")).toBeVisible({ timeout: 10000 });
+
+    // Verify the error message contains information about the failure
+    await expect(page.getByTestId("safe-deployment-error-alert")).toContainText("Internal server error");
   });
 
   test("Phone verification error - invalid phone number", async ({ page }) => {
@@ -612,6 +588,7 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
 
     // Mock safe deployment with POST error
     await mockSafeDeployment(page, {
+      deploymentStatus: "not_deployed", // GET returns this, triggering POST
       postIsError: true,
       postErrorStatus: 422,
       postErrorResponse: {
@@ -622,14 +599,21 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
     // Navigate to safe deployment page
     await page.goto("/safe-deployment");
 
-    // Wait for deploy safe step to load
-    await expect(page.getByTestId("deploy-safe-step")).toBeVisible();
+    // Wait for safe-deployment page to load
+    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
 
-    // Wait for the deployment to fail
-    await page.waitForLoadState("networkidle");
+    // The component will:
+    // 1. Load and transition to DeploySafe step (user has completed SoF and phone)
+    // 2. Make GET request to check deployment status, get "not_deployed"
+    // 3. Transition to Deploying and make POST request
+    // 4. POST fails with error, which sets error state and hides steps
 
-    // Verify error alert is shown
-    await expect(page.getByTestId("safe-deployment-error-alert")).toBeVisible({ timeout: 10000 });
+    // Wait for the POST request to complete (it may happen quickly)
+    // Then wait for error alert to be displayed
+    await expect(page.getByTestId("safe-deployment-error-alert")).toBeVisible({ timeout: 15000 });
+
+    // Verify the error message contains information about the failure
+    await expect(page.getByTestId("safe-deployment-error-alert")).toContainText("Safe account already exists");
   });
 
   test("Safe deployment error - deployment status failed", async ({ page }) => {
@@ -664,16 +648,291 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
     // Navigate to safe deployment page
     await page.goto("/safe-deployment");
 
-    // Wait for deploy safe step to load
-    await expect(page.getByTestId("deploy-safe-step")).toBeVisible();
-
-    // Wait for the deployment to fail
-    await page.waitForLoadState("networkidle");
+    // Wait for safe-deployment page to load
+    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
 
     // Verify error alert is shown
     await expect(page.getByTestId("safe-deployment-error-alert")).toBeVisible({ timeout: 10000 });
     await expect(page.getByTestId("safe-deployment-error-alert")).toContainText(
       "An error occurred while deploying your Safe",
     );
+  });
+
+  test("Safe deployment error - invalid account status", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_KYC_APPROVED_NO_SOF });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_KYC_APPROVED_NO_SOF });
+
+    // Mock safe config with invalid account status (2)
+    await mockSafeConfig({
+      page,
+      testUser: USER_KYC_APPROVED_NO_SOF,
+      configOverrides: {
+        isDeployed: false,
+        accountStatus: 2, // Invalid/unexpected status
+      },
+    });
+
+    // Mock source of funds endpoints
+    await mockSourceOfFunds(page);
+
+    // Navigate to safe deployment page
+    await page.goto("/safe-deployment");
+
+    // Wait for safe-deployment page to load
+    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
+
+    // Verify error alert is shown with the expected account status
+    await expect(page.getByTestId("safe-deployment-error-alert")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("safe-deployment-error-alert")).toContainText(
+      "Your Safe is not properly configured. Safe status is 2. Please contact support.",
+    );
+
+    // Verify that no step components are displayed when error is shown
+    // These components are conditionally rendered only when !error, so they should not exist in the DOM
+    await expect(page.getByTestId("source-of-funds-step")).toHaveCount(0);
+    await expect(page.getByTestId("phone-verification-step")).toHaveCount(0);
+    await expect(page.getByTestId("deploy-safe-step")).toHaveCount(0);
+  });
+});
+
+test.describe("Onboarding Flow - Redirect Behavior", () => {
+  test("User not signed up - redirects from /safe-deployment to /register", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge for user not signed up
+    await mockAuthChallenge({ page, testUser: USER_NOT_SIGNED_UP });
+
+    // Mock user endpoint to return not signed up user
+    await mockUser({ page, testUser: USER_NOT_SIGNED_UP });
+
+    // Mock KYC integration endpoint (needed for KYC page redirect)
+    await mockKycIntegration(page, {
+      kycUrl: "https://mock-sumsub.example.com/kyc-flow",
+    });
+
+    // Navigate to safe-deployment page
+    await page.goto("/safe-deployment");
+
+    // Wait for redirect to register page
+    // Note: May redirect through /kyc first, then to /register
+    await expect(page).toHaveURL("/register", { timeout: 10000 });
+
+    // Verify signup page is visible
+    await expect(page.getByTestId("signup-page")).toBeVisible();
+  });
+
+  test("User not signed up - stays on /register", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge for user not signed up
+    await mockAuthChallenge({ page, testUser: USER_NOT_SIGNED_UP });
+
+    // Mock user endpoint to return not signed up user
+    await mockUser({ page, testUser: USER_NOT_SIGNED_UP });
+
+    // Navigate to register page
+    await page.goto("/register");
+
+    // Wait for signup page to load
+    await expect(page.getByTestId("signup-page")).toBeVisible();
+
+    // Verify we're still on /register (no redirect)
+    await expect(page).toHaveURL("/register");
+  });
+
+  test("User signed up with no KYC - redirects from /register to /kyc", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_SIGNED_UP_NO_KYC });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_SIGNED_UP_NO_KYC });
+
+    // Mock KYC integration endpoint
+    await mockKycIntegration(page, {
+      kycUrl: "https://mock-sumsub.example.com/kyc-flow",
+    });
+
+    // Navigate to register page
+    await page.goto("/register");
+
+    // Wait for redirect to KYC page
+    await expect(page).toHaveURL("/kyc", { timeout: 10000 });
+
+    // Verify KYC page is visible
+    await expect(page.getByTestId("kyc-page")).toBeVisible();
+  });
+
+  test("User signed up with no KYC - redirects from /safe-deployment to /kyc", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_SIGNED_UP_NO_KYC });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_SIGNED_UP_NO_KYC });
+
+    // Mock KYC integration endpoint
+    await mockKycIntegration(page, {
+      kycUrl: "https://mock-sumsub.example.com/kyc-flow",
+    });
+
+    // Navigate to safe-deployment page
+    await page.goto("/safe-deployment");
+
+    // Wait for redirect to KYC page
+    await expect(page).toHaveURL("/kyc", { timeout: 10000 });
+
+    // Verify KYC page is visible
+    await expect(page.getByTestId("kyc-page")).toBeVisible();
+  });
+
+  test("User with KYC approved but no SoF - redirects from /register to /safe-deployment", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_KYC_APPROVED_NO_SOF });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_KYC_APPROVED_NO_SOF });
+
+    // Mock safe config
+    await mockSafeConfig({
+      page,
+      testUser: USER_KYC_APPROVED_NO_SOF,
+      configOverrides: {
+        isDeployed: false,
+        accountStatus: 1, // SafeNotDeployed
+      },
+    });
+
+    // Mock source of funds endpoints
+    await mockSourceOfFunds(page);
+
+    // Navigate to register page
+    await page.goto("/register");
+
+    // Wait for redirect to safe-deployment page
+    // Note: May redirect through /kyc first, but redirect happens quickly
+    await expect(page).toHaveURL("/safe-deployment", { timeout: 10000 });
+
+    // Verify safe-deployment page is visible
+    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
+  });
+
+  test("User with KYC approved but no SoF - redirects from /kyc to /safe-deployment", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_KYC_APPROVED_NO_SOF });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_KYC_APPROVED_NO_SOF });
+
+    // Mock safe config
+    await mockSafeConfig({
+      page,
+      testUser: USER_KYC_APPROVED_NO_SOF,
+      configOverrides: {
+        isDeployed: false,
+        accountStatus: 1, // SafeNotDeployed
+      },
+    });
+
+    // Mock source of funds endpoints
+    await mockSourceOfFunds(page);
+
+    // Navigate to KYC page
+    await page.goto("/kyc");
+
+    // Wait for redirect to safe-deployment page (since KYC is approved)
+    await expect(page).toHaveURL("/safe-deployment", { timeout: 10000 });
+
+    // Verify safe-deployment page is visible
+    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
+  });
+
+  test("User with KYC approved but not safe deployed - redirects from /register to /safe-deployment", async ({
+    page,
+  }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_READY_FOR_SAFE_DEPLOYMENT });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_READY_FOR_SAFE_DEPLOYMENT });
+
+    // Mock safe config with not deployed
+    await mockSafeConfig({
+      page,
+      testUser: USER_READY_FOR_SAFE_DEPLOYMENT,
+      configOverrides: {
+        isDeployed: false,
+        accountStatus: 1, // SafeNotDeployed
+      },
+    });
+
+    // Mock source of funds and phone verification (already completed)
+    await mockSourceOfFunds(page);
+    await mockPhoneVerification(page);
+
+    // Navigate to register page
+    await page.goto("/register");
+
+    // Wait for redirect to safe-deployment page
+    // Note: May redirect through /kyc first, but redirect happens quickly
+    await expect(page).toHaveURL("/safe-deployment", { timeout: 10000 });
+
+    // Verify safe-deployment page is visible
+    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
+  });
+
+  test("User with KYC approved but not safe deployed - redirects from /kyc to /safe-deployment", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_READY_FOR_SAFE_DEPLOYMENT });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_READY_FOR_SAFE_DEPLOYMENT });
+
+    // Mock safe config with not deployed
+    await mockSafeConfig({
+      page,
+      testUser: USER_READY_FOR_SAFE_DEPLOYMENT,
+      configOverrides: {
+        isDeployed: false,
+        accountStatus: 1, // SafeNotDeployed
+      },
+    });
+
+    // Mock source of funds and phone verification (already completed)
+    await mockSourceOfFunds(page);
+    await mockPhoneVerification(page);
+
+    // Navigate to KYC page
+    await page.goto("/kyc");
+
+    // Wait for redirect to safe-deployment page (since KYC is approved)
+    await expect(page).toHaveURL("/safe-deployment", { timeout: 10000 });
+
+    // Verify safe-deployment page is visible
+    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
   });
 });
