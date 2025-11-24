@@ -92,4 +92,3 @@ export async function mockKycIntegration(page: Page, options: KycIntegrationMock
     }
   });
 }
-

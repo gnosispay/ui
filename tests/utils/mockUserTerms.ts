@@ -52,13 +52,7 @@ export interface UserTermsMockOptions {
  * ```
  */
 export async function mockUserTerms(page: Page, options: UserTermsMockOptions = {}): Promise<void> {
-  const {
-    getIsError = false,
-    postIsError = false,
-    getResponse,
-    postResponse,
-    postErrorResponse,
-  } = options;
+  const { getIsError = false, postIsError = false, getResponse, postResponse, postErrorResponse } = options;
 
   // Default GET response - all terms already accepted
   const defaultGetResponse: GetApiV1UserTermsResponse = {
@@ -139,4 +133,3 @@ export async function mockUserTerms(page: Page, options: UserTermsMockOptions = 
     }
   });
 }
-

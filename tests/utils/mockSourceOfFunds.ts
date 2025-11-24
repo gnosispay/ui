@@ -36,14 +36,7 @@ export interface SourceOfFundsMockOptions {
 export const DEFAULT_SOURCE_OF_FUNDS_QUESTIONS: KycQuestion[] = [
   {
     question: "What is your primary source of funds?",
-    answers: [
-      "Employment income",
-      "Business income",
-      "Investment income",
-      "Savings",
-      "Inheritance",
-      "Other",
-    ],
+    answers: ["Employment income", "Business income", "Investment income", "Savings", "Inheritance", "Other"],
   },
   {
     question: "What is your estimated annual income?",
@@ -150,4 +143,3 @@ export async function mockSourceOfFunds(page: Page, options: SourceOfFundsMockOp
     }
   });
 }
-

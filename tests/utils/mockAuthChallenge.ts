@@ -40,7 +40,7 @@ function generateMockJWT(
   options: MockAuthChallengeOptions = {},
 ): string {
   const now = Math.floor(Date.now() / 1000);
-  
+
   // Only include userId if the user has signed up
   // This matches the real API behavior where userId is only present after signup
   const payload: JWTPayload = {

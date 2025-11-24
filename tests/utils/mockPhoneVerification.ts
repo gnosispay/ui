@@ -152,4 +152,3 @@ export async function mockPhoneVerification(page: Page, options: PhoneVerificati
     }
   });
 }
-
