@@ -409,7 +409,7 @@ export type IbanOrder = {
 export type KycStatus = 'notStarted' | 'documentsRequested' | 'pending' | 'processing' | 'approved' | 'resubmissionRequested' | 'rejected' | 'requiresAction';
 
 export type SafeAccount = {
-    address: string;
+    address?: string;
     chainId?: string;
     tokenSymbol?: string;
     createdAt: string;

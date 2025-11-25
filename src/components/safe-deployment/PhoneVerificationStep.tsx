@@ -86,52 +86,66 @@ const PhoneVerificationStep = ({ onComplete, setError, onCancel, title }: PhoneV
   };
 
   return (
-    <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
+    <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0" data-testid="phone-verification-step">
       {step === PhoneStep.TypePhone && (
         <>
           <h2 className="text-lg font-semibold mb-4 mt-4">{title}</h2>
           <p className="text-muted-foreground mb-4">
             A one time code will be sent to your phone. Please enter your phone number to continue.
           </p>
-          <form className="space-y-4 mt-4 w-xs" onSubmit={handlePhoneContinue}>
-            <PhoneInput value={phone} onChange={setPhone} disabled={isSubmitting} />
+          <form className="space-y-4 mt-4 w-xs" onSubmit={handlePhoneContinue} data-testid="phone-input-form">
+            <PhoneInput value={phone} onChange={setPhone} disabled={isSubmitting} data-testid="phone-number-input" />
             {onCancel && (
               <Button className="mr-4" type="button" variant="outline" onClick={onCancel}>
                 Cancel
               </Button>
             )}
-            <Button type="submit" disabled={!phone || isSubmitting}>
+            <Button type="submit" disabled={!phone || isSubmitting} data-testid="phone-continue-button">
               Continue
             </Button>
           </form>
         </>
       )}
       {step === PhoneStep.VerifyPhoneNumber && (
-        <form className="space-y-4 mt-4" onSubmit={handlePhoneSubmit}>
+        <form className="space-y-4 mt-4" onSubmit={handlePhoneSubmit} data-testid="phone-confirm-form">
           <p className="text-muted-foreground mb-4">This number will be used to send you a one time code:</p>
-          <div className="mb-4 font-mono text-lg">{phone}</div>
+          <div className="mb-4 font-mono text-lg" data-testid="phone-number-display">
+            {phone}
+          </div>
           <div className="flex gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={() => setStep(PhoneStep.TypePhone)}
               disabled={isSubmitting}
+              data-testid="phone-edit-button"
             >
               Edit
             </Button>
-            <Button type="submit" loading={isSubmitting} disabled={isSubmitting}>
+            <Button type="submit" loading={isSubmitting} disabled={isSubmitting} data-testid="phone-send-code-button">
               Send code
             </Button>
           </div>
         </form>
       )}
       {step === PhoneStep.OtpVerification && (
-        <form className="space-y-4 mt-4" onSubmit={handleOtpSubmit}>
+        <form className="space-y-4 mt-4" onSubmit={handleOtpSubmit} data-testid="otp-verification-form">
           <label htmlFor="otp" className="block mb-4 font-medium mt-4">
             Enter the 6-digit code sent to your phone
           </label>
-          <OtpInput value={otp} onChange={setOtp} isLoading={isOtpLoading} disabled={isOtpLoading} />
-          <Button type="submit" loading={isOtpLoading} disabled={isOtpLoading || otp.length !== 6}>
+          <OtpInput
+            value={otp}
+            onChange={setOtp}
+            isLoading={isOtpLoading}
+            disabled={isOtpLoading}
+            data-testid="otp-input"
+          />
+          <Button
+            type="submit"
+            loading={isOtpLoading}
+            disabled={isOtpLoading || otp.length !== 6}
+            data-testid="otp-verify-button"
+          >
             Verify
           </Button>
           <Button
@@ -139,6 +153,7 @@ const PhoneVerificationStep = ({ onComplete, setError, onCancel, title }: PhoneV
             variant="link"
             onClick={handleResendCode}
             disabled={isSubmitting || isOtpLoading || resendTimer > 0}
+            data-testid="otp-resend-button"
           >
             {resendTimer > 0 ? `Resend code (${resendTimer}s)` : "Resend code"}
           </Button>

@@ -137,9 +137,9 @@ export const SignUpRoute = () => {
   );
 
   return (
-    <div className="grid grid-cols-6 gap-4 h-full mt-4">
+    <div className="grid grid-cols-6 gap-4 h-full mt-4" data-testid="signup-page">
       <div className="col-span-6 lg:col-start-2 lg:col-span-4 mx-4 lg:mx-0">
-        <form className="space-y-4 mt-8" onSubmit={handleSignup}>
+        <form className="space-y-4 mt-8" onSubmit={handleSignup} data-testid="signup-form">
           <Label htmlFor="register-email">Type your email</Label>
           <div className="mt-4">
             <Input
@@ -152,6 +152,7 @@ export const SignUpRoute = () => {
               required
               autoComplete="email"
               disabled={isLoading}
+              data-testid="signup-email-input"
             />
           </div>
           <div className="flex items-start gap-2 mt-2">
@@ -163,6 +164,7 @@ export const SignUpRoute = () => {
               disabled={isLoading}
               required
               className="mt-0.5"
+              data-testid="signup-tos-checkbox"
             />
             <label htmlFor="accept-tos" className="text-sm leading-normal">
               I have read and agree to the{" "}
@@ -177,10 +179,17 @@ export const SignUpRoute = () => {
             </label>
           </div>
 
-          <Button type="submit" loading={isLoading} disabled={isLoading || !email || !isAcceptedTos}>
+          <Button
+            type="submit"
+            loading={isLoading}
+            disabled={isLoading || !email || !isAcceptedTos}
+            data-testid="signup-submit-button"
+          >
             Next
           </Button>
-          {error && <StandardAlert variant="destructive" title="Error" description={error} />}
+          {error && (
+            <StandardAlert variant="destructive" title="Error" description={error} data-testid="signup-error-alert" />
+          )}
         </form>
       </div>
     </div>

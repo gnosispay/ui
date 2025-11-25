@@ -7,9 +7,10 @@ interface Props {
   onChange: (value: string) => void;
   isLoading?: boolean;
   disabled?: boolean;
+  "data-testid"?: string;
 }
 
-export const OtpInput = ({ value, onChange, isLoading, disabled }: Props) => {
+export const OtpInput = ({ value, onChange, isLoading, disabled, "data-testid": dataTestId }: Props) => {
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const length = 6;
   const baseId = useId();
@@ -62,7 +63,7 @@ export const OtpInput = ({ value, onChange, isLoading, disabled }: Props) => {
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2" data-testid={dataTestId}>
       {Array.from({ length }).map((_, idx) => (
         <Input
           key={`${baseId}-otp-input-${idx + 1}`}
@@ -80,6 +81,7 @@ export const OtpInput = ({ value, onChange, isLoading, disabled }: Props) => {
           }}
           disabled={isLoading || disabled}
           aria-label={`Digit ${idx + 1}`}
+          data-testid={dataTestId ? `${dataTestId}-digit-${idx}` : undefined}
         />
       ))}
     </div>
