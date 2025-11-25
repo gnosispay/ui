@@ -8,6 +8,7 @@ import {
   postApiV1CardsByCardIdLost,
   postApiV1CardsByCardIdStolen,
   postApiV1CardsByCardIdUnfreeze,
+  postApiV1CardsByCardIdVoid,
 } from "@/client";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useState, useMemo } from "react";
 import { toast } from "sonner";
@@ -33,6 +34,7 @@ export type ICardContext = {
   markCardAsStolen: (cardId: string) => void;
   markCardAsLost: (cardId: string) => void;
   activateCard: (cardId: string) => void;
+  voidVirtualCard: (cardId: string) => void;
 };
 
 const CardsContext = createContext<ICardContext | undefined>(undefined);
@@ -106,6 +108,31 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
       })
       .catch(console.error);
   }, [setCardsInfo]);
+
+  const voidVirtualCard = useCallback(
+    async (cardId: string) => {
+      postApiV1CardsByCardIdVoid({
+        path: {
+          cardId,
+        },
+      })
+        .then(({ error }) => {
+          if (error) {
+            console.error("Error voiding virtual card: ", error);
+            toast.error(<CollapsedError title="Error voiding virtual card" error={error} />);
+            return;
+          }
+
+          toast.success("Virtual card voided successfully");
+          refreshCards();
+        })
+        .catch((error) => {
+          console.error("Error voiding virtual card: ", error);
+          toast.error(<CollapsedError title="Error voiding virtual card" error={error} />);
+        });
+    },
+    [refreshCards],
+  );
 
   const freezeCard = useCallback(
     async (cardId: string) => {
@@ -247,6 +274,7 @@ const CardsContextProvider = ({ children }: CardContextProps) => {
         markCardAsLost,
         markCardAsStolen,
         activateCard,
+        voidVirtualCard,
       }}
     >
       {children}
