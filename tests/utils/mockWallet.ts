@@ -58,26 +58,3 @@ export async function setupMockWallet(page: Page, options: MockWalletOptions = {
     transports: { [chain.id]: http() },
   });
 }
-
-/**
- * Sets up a mock wallet using a specific private key.
- * Useful when you need to use a hardcoded private key for testing.
- *
- * @param page - The Playwright page instance
- * @param privateKey - The private key to use for the wallet (defaults to USER_TEST_PRIVATE_KEY)
- * @param options - Optional configuration overrides
- */
-export async function setupMockWalletWithPrivateKey(
-  page: Page,
-  privateKey: string = USER_TEST_PRIVATE_KEY,
-  options: Pick<MockWalletOptions, "chain"> = {},
-): Promise<void> {
-  const chain = options.chain || gnosis;
-
-  await installMockWallet({
-    page,
-    account: privateKeyToAccount(privateKey as Address),
-    defaultChain: chain,
-    transports: { [chain.id]: http() },
-  });
-}
