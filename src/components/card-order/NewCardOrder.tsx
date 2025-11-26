@@ -168,6 +168,7 @@ export const NewCardOrder = () => {
                     <Label htmlFor="address1">Address Line 1 *</Label>
                     <Input
                       id="address1"
+                      data-testid="shipping-address-address1"
                       placeholder="Street address"
                       value={shippingAddress.address1}
                       onChange={(e) => updateShippingField("address1", e.target.value)}
@@ -188,6 +189,7 @@ export const NewCardOrder = () => {
                     <Label htmlFor="address2">Address Line 2</Label>
                     <Input
                       id="address2"
+                      data-testid="shipping-address-address2"
                       placeholder="Apartment, suite, etc. (optional)"
                       value={shippingAddress.address2}
                       onChange={(e) => updateShippingField("address2", e.target.value)}
@@ -209,6 +211,7 @@ export const NewCardOrder = () => {
                       <Label htmlFor="city">City *</Label>
                       <Input
                         id="city"
+                        data-testid="shipping-address-city"
                         placeholder="City"
                         value={shippingAddress.city}
                         onChange={(e) => updateShippingField("city", e.target.value)}
@@ -227,6 +230,7 @@ export const NewCardOrder = () => {
                       <Label htmlFor="postalCode">Postal Code *</Label>
                       <Input
                         id="postalCode"
+                        data-testid="shipping-address-postal-code"
                         placeholder="Postal code"
                         value={shippingAddress.postalCode}
                         onChange={(e) => updateShippingField("postalCode", e.target.value)}
@@ -250,7 +254,7 @@ export const NewCardOrder = () => {
                       value={shippingAddress.country}
                       onValueChange={(value) => updateShippingField("country", value)}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger data-testid="shipping-address-country">
                         <SelectValue placeholder="Select country" />
                       </SelectTrigger>
                       <SelectContent>
