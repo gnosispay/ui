@@ -24,6 +24,8 @@ export interface MockAuthChallengeOptions {
   chainId?: string;
   /** Custom JWT secret for signing. Defaults to "test-secret-key" */
   jwtSecret?: string;
+  /** Delay in milliseconds before responding. Useful for testing loading states. Defaults to 0 */
+  delay?: number;
 }
 
 /**
@@ -43,14 +45,14 @@ function generateMockJWT(
 
   // Only include userId if the user has signed up
   // This matches the real API behavior where userId is only present after signup
-  const payload: JWTPayload = {
+  const payload = {
     ...(testUser.hasSignedUp && { userId: testUser.userId }),
     signerAddress: testUser.signerAddress,
     chainId: options.chainId || DEFAULT_CHAIN_ID,
     iat: now,
     exp: now + ttlInSeconds,
     hasSignedUp: testUser.hasSignedUp,
-  };
+  } as JWTPayload;
 
   return jwt.sign(payload, options.jwtSecret || JWT_SECRET);
 }
@@ -79,9 +81,16 @@ function generateMockJWT(
  *
  * // With additional custom options
  * test("custom chain authentication", async ({ page }) => {
- *   await mockAuthChallenge(page, TEST_USER_APPROVED, {
+ *   await mockAuthChallenge({ page, testUser: TEST_USER_APPROVED, options: {
  *     chainId: "1", // Ethereum mainnet
- *   });
+ *   }});
+ * });
+ *
+ * // With delay to test loading states
+ * test("authentication loading state", async ({ page }) => {
+ *   await mockAuthChallenge({ page, testUser: TEST_USER_APPROVED, options: {
+ *     delay: 200, // Delay response by 200ms to test loading state
+ *   }});
  * });
  * ```
  */
@@ -105,6 +114,11 @@ export async function mockAuthChallenge({
         const mockResponse: AuthChallengeResponse = {
           token: generateMockJWT(ttlInSeconds, testUser, options),
         };
+
+        // Apply delay if specified (useful for testing loading states)
+        if (options.delay && options.delay > 0) {
+          await new Promise((resolve) => setTimeout(resolve, options.delay));
+        }
 
         await route.fulfill({
           status: 200,

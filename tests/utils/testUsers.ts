@@ -346,3 +346,19 @@ export const USER_READY_FOR_SAFE_DEPLOYMENT = createTestUser({
   isPhoneValidated: true,
   hasSignedUp: true,
 });
+
+/**
+ * Test user with deactivated account
+ * Useful for testing the deactivated account flow
+ */
+export const USER_DEACTIVATED = createTestUser({
+  ...BASE_USER,
+  email: BASE_USER.user.email,
+  firstName: BASE_USER.user.firstName,
+  lastName: BASE_USER.user.lastName,
+  kycStatus: BASE_USER.user.kycStatus,
+  isPhoneValidated: BASE_USER.user.isPhoneValidated,
+  isSourceOfFundsAnswered: BASE_USER.user.isSourceOfFundsAnswered,
+  bankingDetails: BASE_USER.user.bankingDetails,
+  status: "DEACTIVATED",
+});
