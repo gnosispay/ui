@@ -8,6 +8,8 @@ import type {
   PutApiV1OrderByOrderIdConfirmPaymentError,
   PostApiV1OrderByOrderIdCreateCardResponse,
   PostApiV1OrderByOrderIdCreateCardError,
+  PostApiV1OrderByOrderIdCancelResponse,
+  PostApiV1OrderByOrderIdCancelError,
   GetApiV1OrderByOrderIdResponse,
   CardOrder,
 } from "../../src/client/types.gen";
@@ -34,6 +36,8 @@ export interface PhysicalCardOrderMockOptions {
   confirmPaymentError?: boolean;
   /** Whether card creation should fail */
   createCardError?: boolean;
+  /** Whether cancel order should fail */
+  cancelOrderError?: boolean;
   /** Custom error response for order creation */
   createOrderErrorResponse?: PostApiV1OrderCreateError;
   /** Custom error response for coupon attachment */
@@ -42,6 +46,8 @@ export interface PhysicalCardOrderMockOptions {
   confirmPaymentErrorResponse?: PutApiV1OrderByOrderIdConfirmPaymentError;
   /** Custom error response for card creation */
   createCardErrorResponse?: PostApiV1OrderByOrderIdCreateCardError;
+  /** Custom error response for cancel order */
+  cancelOrderErrorResponse?: PostApiV1OrderByOrderIdCancelError;
   /** Custom order data to return */
   orderData?: Partial<CardOrder>;
 }
@@ -78,10 +84,12 @@ export async function mockPhysicalCardOrder(page: Page, options: PhysicalCardOrd
     attachCouponError = false,
     confirmPaymentError = false,
     createCardError = false,
+    cancelOrderError = false,
     createOrderErrorResponse,
     attachCouponErrorResponse,
     confirmPaymentErrorResponse,
     createCardErrorResponse,
+    cancelOrderErrorResponse,
     orderData = {},
   } = options;
 
@@ -227,6 +235,9 @@ export async function mockPhysicalCardOrder(page: Page, options: PhysicalCardOrd
           body: JSON.stringify(errorResponse),
         });
       } else {
+        // Update order status after creation confirmation
+        currentOrderStatus = OrderStatus.CARD_CREATED;
+
         const response: PostApiV1OrderByOrderIdCreateCardResponse = {
           success: true,
           cardToken: cardToken,
@@ -327,6 +338,39 @@ export async function mockPhysicalCardOrder(page: Page, options: PhysicalCardOrd
         contentType: "application/json",
         body: JSON.stringify([order]),
       });
+    } else {
+      await route.continue();
+    }
+  });
+
+  // Mock POST /api/v1/order/{orderId}/cancel - Cancel order
+  await page.route(`**/api/v1/order/${orderId}/cancel`, async (route) => {
+    if (route.request().method() === "POST") {
+      if (cancelOrderError) {
+        const errorResponse: PostApiV1OrderByOrderIdCancelError = cancelOrderErrorResponse || {
+          message: "Failed to cancel order",
+        };
+        await route.fulfill({
+          status: 400,
+          contentType: "application/json",
+          body: JSON.stringify(errorResponse),
+        });
+      } else {
+        // Update order status to cancelled
+        // The order will still be in the list but with CANCELLED status,
+        // which will be filtered out by pendingPhysicalOrders since CANCELLED
+        // is not in the list of pending statuses
+        currentOrderStatus = "CANCELLED" as CardOrder["status"];
+
+        const response: PostApiV1OrderByOrderIdCancelResponse = {
+          ok: true,
+        };
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(response),
+        });
+      }
     } else {
       await route.continue();
     }

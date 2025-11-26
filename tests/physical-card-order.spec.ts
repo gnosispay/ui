@@ -189,4 +189,169 @@ test.describe("Physical Card Order", () => {
       await expect(page).toHaveURL("/cards", { timeout: 10000 });
     });
   });
+
+  test("pending order display and cancellation flow", async ({ page }) => {
+    const orderId = "order-pending-test";
+    const cardToken = "card-token-pending-test";
+
+    await setupAllMocks(page, BASE_USER, {
+      orders: [], // Start with no orders
+    });
+
+    // Set up mocks for physical card order endpoints
+    await mockPhysicalCardOrder(page, {
+      orderId,
+      cardToken,
+      initialStatus: OrderStatus.PENDING_TRANSACTION,
+    });
+
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    await test.step("create pending order", async () => {
+      const addCardButton = page.getByTestId("add-card-button");
+      await expect(addCardButton).toBeVisible();
+      await addCardButton.click();
+
+      // Verify modal opens
+      const modal = page.getByTestId("card-order-modal");
+      await expect(modal).toBeVisible();
+      await expect(modal.getByRole("heading", { name: "Order a card" })).toBeVisible();
+
+      // Select physical card option
+      const physicalCardOption = page.getByTestId("card-option-physical-card");
+      await expect(physicalCardOption).toBeVisible();
+      await physicalCardOption.click();
+
+      // Verify navigation to card order form
+      await expect(page).toHaveURL("/card-order/new");
+      await page.waitForLoadState("networkidle");
+
+      // Fill shipping address form
+      await expect(page.getByText("Order Physical Card")).toBeVisible();
+      await expect(page.getByTestId("shipping-address-address1")).toBeVisible();
+
+      const continueButton = page.getByRole("button", { name: "Continue" });
+
+      // Fill address fields
+      await page.getByTestId("shipping-address-address1").fill("123 Main Street");
+      await page.getByTestId("shipping-address-address2").fill("Apt 4B");
+      await page.getByTestId("shipping-address-city").fill("New York");
+      await page.getByTestId("shipping-address-postal-code").fill("10001");
+
+      // Select country
+      await page.getByTestId("shipping-address-country").click();
+      await expect(page.getByRole("listbox")).toBeVisible();
+      await page.getByRole("option", { name: "United States" }).click();
+
+      // Submit order
+      await expect(continueButton).toBeEnabled();
+      await continueButton.click();
+
+      // Wait for navigation to order confirmation page
+      await expect(page).toHaveURL(`/card-order/${orderId}`, { timeout: 10000 });
+      await page.waitForLoadState("networkidle");
+    });
+
+    await test.step("verify pending order displayed on home page", async () => {
+      // Navigate back to home via menu
+      const homeMenuLink = page.getByRole("link", { name: "Home" });
+      await expect(homeMenuLink).toBeVisible();
+      await homeMenuLink.click();
+      await page.waitForLoadState("networkidle");
+
+      // Verify pending order is displayed
+      const pendingOrderCard = page.getByTestId("pending-card-order");
+      await expect(pendingOrderCard).toBeVisible({ timeout: 10000 });
+
+      // Verify status is displayed
+      const status = pendingOrderCard.getByTestId("pending-order-status");
+      await expect(status).toBeVisible();
+      await expect(status).toContainText("Pending Confirmation");
+
+      // Verify buttons are present
+      await expect(pendingOrderCard.getByTestId("pending-order-resume-button")).toBeVisible();
+      await expect(pendingOrderCard.getByTestId("pending-order-cancel-button")).toBeVisible();
+    });
+
+    await test.step("verify pending order displayed on cards page", async () => {
+      // Navigate to cards page
+      const cardMenuLink = page.getByRole("link", { name: "Cards" });
+      await expect(cardMenuLink).toBeVisible();
+      await cardMenuLink.click();
+      await page.waitForLoadState("networkidle");
+
+      // Verify pending order is displayed on cards page too
+      const pendingOrderCard = page.getByTestId("pending-card-order");
+      await expect(pendingOrderCard).toBeVisible({ timeout: 10000 });
+
+      // Verify status is displayed
+      const status = pendingOrderCard.getByTestId("pending-order-status");
+      await expect(status).toBeVisible();
+      await expect(status).toContainText("Pending Confirmation");
+    });
+
+    await test.step("navigate to order detail page via resume button", async () => {
+      const pendingOrderCard = page.getByTestId("pending-card-order");
+      const resumeButton = pendingOrderCard.getByTestId("pending-order-resume-button");
+
+      await expect(resumeButton).toBeVisible();
+      await resumeButton.click();
+
+      // Verify navigation to order detail page
+      await expect(page).toHaveURL(`/card-order/${orderId}`, { timeout: 10000 });
+      await page.waitForLoadState("networkidle");
+
+      // Verify order details are displayed
+      await expect(page.getByRole("heading", { name: "Confirm Order Details" })).toBeVisible({ timeout: 10000 });
+
+      // Verify shipping address is displayed
+      await expect(page.getByText("123 Main Street")).toBeVisible();
+      await expect(page.getByText("Apt 4B")).toBeVisible();
+      await expect(page.getByText("10001")).toBeVisible();
+      await expect(page.getByText("New York")).toBeVisible();
+      await expect(page.getByText("United States")).toBeVisible();
+    });
+
+    await test.step("cancel order from home page", async () => {
+      // Navigate back to home via menu
+      const homeMenuLink = page.getByRole("link", { name: "Home" });
+      await expect(homeMenuLink).toBeVisible();
+      await homeMenuLink.click();
+      await page.waitForLoadState("networkidle");
+
+      // Verify pending order is still displayed
+      const pendingOrderCard = page.getByTestId("pending-card-order");
+      await expect(pendingOrderCard).toBeVisible({ timeout: 10000 });
+
+      // Click cancel button
+      const cancelButton = pendingOrderCard.getByTestId("pending-order-cancel-button");
+      await expect(cancelButton).toBeVisible();
+      await cancelButton.click();
+
+      // Verify confirmation dialog appears
+      const confirmationDialog = page.getByRole("dialog");
+      await expect(confirmationDialog).toBeVisible({ timeout: 5000 });
+      await expect(confirmationDialog.getByRole("heading", { name: "Cancel Card Order" })).toBeVisible();
+      await expect(
+        confirmationDialog.getByText(
+          "Are you sure you want to cancel this card order? This action cannot be undone and any payments made will not be refunded.",
+        ),
+      ).toBeVisible();
+
+      // Confirm cancellation
+      const confirmButton = confirmationDialog.getByRole("button", { name: "Cancel Order" });
+      await expect(confirmButton).toBeVisible();
+      await confirmButton.click();
+
+      // Wait for cancellation to complete
+      await page.waitForLoadState("networkidle");
+
+      // Verify confirmation dialog is no longer displayed
+      await expect(confirmationDialog).toBeHidden({ timeout: 10000 });
+
+      // Verify pending order is no longer displayed
+      await expect(pendingOrderCard).not.toBeVisible({ timeout: 10000 });
+    });
+  });
 });
