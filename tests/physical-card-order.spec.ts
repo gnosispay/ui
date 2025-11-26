@@ -3,6 +3,8 @@ import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
 import { mockPhysicalCardOrder } from "./utils/mockPhysicalCardOrder";
 import { OrderStatus } from "./utils/mockOrder";
+import { mockPseEphemeralToken } from "./utils/mockPseEphemeralToken";
+import { mockPseIframe } from "./utils/mockPseIframe";
 import { test, expect } from "@playwright/test";
 
 test.describe("Physical Card Order", () => {
@@ -134,6 +136,17 @@ test.describe("Physical Card Order", () => {
     });
 
     await test.step("complete order successfully", async () => {
+      // Set up mocks for PSE endpoints before clicking the button
+      await mockPseEphemeralToken(page, {
+        ephemeralToken: "mocked-token",
+      });
+
+      const buttonText = "Complete PIN Setup";
+      await mockPseIframe(page, {
+        actionType: "DoneSettingPin",
+        buttonText,
+      });
+
       // Wait for the button to be ready (not loading)
       // The button might be disabled while coupon is being applied
       const createCardButton = page.getByRole("button", { name: "Create Card & Set PIN" });
@@ -152,6 +165,28 @@ test.describe("Physical Card Order", () => {
       // Verify we're on the PIN setup step (SetPinStep component)
       // The SetPinStep should show the heading
       await expect(page.getByRole("heading", { name: "Set Your Card PIN" })).toBeVisible({ timeout: 15000 });
+
+      // Wait for the iframe container to be visible
+      const iframeId = `pse-setpin-new-card-${cardToken}`;
+      await expect(page.locator(`#${iframeId}`)).toBeVisible({ timeout: 10000 });
+
+      // Wait for the iframe to load and verify its content
+      // The PSE SDK creates an iframe inside the container div
+      const iframe = page.frameLocator(`#${iframeId} iframe`);
+
+      // Verify the mocked HTML content appears in the iframe
+      await expect(iframe.getByText("PIN Setup Interface")).toBeVisible({ timeout: 10000 });
+      await expect(iframe.getByText("Please enter your card PIN")).toBeVisible({ timeout: 10000 });
+
+      // Click the button in the iframe to trigger DoneSettingPin action
+      // This should send a postMessage to the parent, triggering onActionSuccess
+      const completeButton = iframe.getByRole("button", { name: buttonText });
+      await expect(completeButton).toBeVisible({ timeout: 10000 });
+      await completeButton.click();
+
+      // Verify that the action was triggered and navigation occurred
+      // SetPinStep should navigate to /cards when DoneSettingPin action is received
+      await expect(page).toHaveURL("/cards", { timeout: 10000 });
     });
   });
 });
