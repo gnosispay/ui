@@ -265,17 +265,18 @@ test.describe("Onboarding Flow - Happy Path", () => {
       testUser: USER_READY_FOR_SAFE_DEPLOYMENT.user,
     });
 
-    // Click verify
-    await page.getByTestId("otp-verify-button").click();
-
     // ========================================================================
     // STEP 5: Safe Deployment
     // ========================================================================
 
     // Mock safe deployment endpoints with progression simulation
+    // Set this up BEFORE clicking verify so the route is ready when DeploySafeStep mounts
     await mockSafeDeployment(page, {
       simulateProgression: true,
     });
+
+    // Click verify (this will navigate to DeploySafe step)
+    await page.getByTestId("otp-verify-button").click();
 
     // Wait for deploy safe step to load
     await expect(page.getByTestId("deploy-safe-step")).toBeVisible();
@@ -300,8 +301,9 @@ test.describe("Onboarding Flow - Happy Path", () => {
       },
     });
 
-    // Wait for success state (polling should complete)
-    await expect(page.getByTestId("safe-deployment-success-icon")).toBeVisible({ timeout: 15000 });
+    // Wait for success state (polling should complete - mock needs 2 GET calls after POST)
+    // Component polls every 5 seconds, so allow enough time for progression: not_deployed -> processing -> ok
+    await expect(page.getByTestId("safe-deployment-success-icon")).toBeVisible({ timeout: 20000 });
     await expect(page.getByTestId("safe-deployment-success-message")).toContainText(
       "Your Safe account has been successfully created!",
     );
