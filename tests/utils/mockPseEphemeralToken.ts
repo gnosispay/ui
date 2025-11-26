@@ -36,10 +36,7 @@ export interface PseEphemeralTokenMockOptions {
  * });
  * ```
  */
-export async function mockPseEphemeralToken(
-  page: Page,
-  options: PseEphemeralTokenMockOptions = {},
-): Promise<void> {
+export async function mockPseEphemeralToken(page: Page, options: PseEphemeralTokenMockOptions = {}): Promise<void> {
   const {
     ephemeralToken = "mocked-token",
     expiresInMs = 3600000, // 1 hour default
@@ -82,4 +79,3 @@ export async function mockPseEphemeralToken(
     }
   });
 }
-

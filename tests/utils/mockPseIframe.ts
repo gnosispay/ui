@@ -15,40 +15,6 @@ export interface PseIframeMockOptions {
 }
 
 /**
- * Default HTML content for the PSE PIN setup iframe
- */
-const DEFAULT_PIN_SETUP_HTML = `
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>PSE PIN Setup</title>
-  </head>
-  <body>
-    <div id="pse-pin-setup">
-      <h1>PIN Setup Interface</h1>
-      <p>Please enter your card PIN</p>
-      <button id="complete-pin-setup">Complete PIN Setup</button>
-    </div>
-    <script>
-      // Handle button click to send success message to parent
-      document.getElementById("complete-pin-setup").addEventListener("click", function() {
-        // Send DoneSettingPin message to parent window
-        // This will trigger onActionSuccess callback in the SDK
-        if (window.parent) {
-          window.parent.postMessage(
-            {
-              type: "DoneSettingPin"
-            },
-            "*" // In test, we'll accept any origin
-          );
-        }
-      });
-    </script>
-  </body>
-</html>
-`;
-
-/**
  * Generates HTML content for the PSE iframe with customizable action type and button text
  */
 function generateIframeHtml(actionType: string, buttonText: string): string {
@@ -115,8 +81,7 @@ export async function mockPseIframe(page: Page, options: PseIframeMockOptions = 
   } = options;
 
   // Use custom HTML content if provided, otherwise generate default
-  const finalHtmlContent =
-    htmlContent || generateIframeHtml(actionType, buttonText);
+  const finalHtmlContent = htmlContent || generateIframeHtml(actionType, buttonText);
 
   await page.route(`${iframeHost}/**`, async (route) => {
     if (route.request().method() === "GET") {
@@ -130,4 +95,3 @@ export async function mockPseIframe(page: Page, options: PseIframeMockOptions = 
     }
   });
 }
-
