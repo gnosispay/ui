@@ -5,7 +5,6 @@ import SourceOfFundsStep from "@/components/safe-deployment/SourceOfFundsStep";
 import PhoneVerificationStep from "@/components/safe-deployment/PhoneVerificationStep";
 import DeploySafeStep from "@/components/safe-deployment/DeploySafeStep";
 import { useNavigate } from "react-router-dom";
-import { AccountIntegrityStatus } from "@gnosispay/account-kit";
 
 enum ScreenStep {
   AnswerSourceOfFunds = "answer-source-of-funds",
@@ -44,21 +43,6 @@ export const SafeDeploymentRoute = () => {
     }
   }, [user, safeConfig, step]);
 
-  useEffect(() => {
-    if (!safeConfig) return;
-
-    if (
-      safeConfig?.accountStatus !== AccountIntegrityStatus.Ok &&
-      safeConfig?.accountStatus !== AccountIntegrityStatus.DelayQueueNotEmpty &&
-      safeConfig?.accountStatus !== AccountIntegrityStatus.SafeNotDeployed
-    ) {
-      setError(
-        `Your Safe is not properly configured. Safe status is ${safeConfig?.accountStatus}. Please contact support.`,
-      );
-      return;
-    }
-  }, [safeConfig]);
-
   return (
     <div className="grid grid-cols-6 gap-4 h-full" data-testid="safe-deployment-page">
       {error && (
@@ -72,7 +56,7 @@ export const SafeDeploymentRoute = () => {
           />
         </div>
       )}
-      {!error && step === ScreenStep.AnswerSourceOfFunds && (
+      {step === ScreenStep.AnswerSourceOfFunds && (
         <SourceOfFundsStep
           onComplete={() => {
             refetchUser();
@@ -81,7 +65,7 @@ export const SafeDeploymentRoute = () => {
           setError={setError}
         />
       )}
-      {!error && step === ScreenStep.VerifyPhoneNumber && (
+      {step === ScreenStep.VerifyPhoneNumber && (
         <PhoneVerificationStep
           onComplete={() => {
             refetchUser();
@@ -91,7 +75,7 @@ export const SafeDeploymentRoute = () => {
           title="Mobile phone verification"
         />
       )}
-      {!error && step === ScreenStep.DeploySafe && <DeploySafeStep setError={setError} />}
+      {step === ScreenStep.DeploySafe && <DeploySafeStep setError={setError} />}
     </div>
   );
 };
