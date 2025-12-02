@@ -43,4 +43,3 @@ export const getTokenBalance = async (
 
   return balance as bigint;
 };
-
