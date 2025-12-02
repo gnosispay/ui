@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import type { Address } from "viem";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import { getApiV1Owners } from "@/client";
 import { useUser } from "@/context/UserContext";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -12,7 +12,7 @@ interface UseSafeSignerVerificationResult {
 }
 
 export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => {
-  const { address: connectedAddress } = useAccount();
+  const { address: connectedAddress } = useConnection();
   const { safeConfig } = useUser();
 
   const [safeSigners, setSafeSigners] = useState<Address[] | null>(null);

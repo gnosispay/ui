@@ -8,7 +8,7 @@ import { jwtDecode } from "jwt-decode";
 import { type ReactNode, createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { SiweMessage } from "siwe";
 import { toast } from "sonner";
-import { useSignMessage, useAccount, useConnections } from "wagmi";
+import { useSignMessage, useConnection, useConnections } from "wagmi";
 import { getAddress } from "viem";
 
 export const LOCALSTORAGE_JWT_KEY = "gp-ui.jwt";
@@ -36,7 +36,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isLocaStorageLoading, setIsLocaStorageLoading] = useState(true);
   const [contextKey, setContextKey] = useState(0);
-  const { address, chainId } = useAccount();
+  const { address, chainId } = useConnection();
   const { signMessageAsync } = useSignMessage();
   const connections = useConnections();
   const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);

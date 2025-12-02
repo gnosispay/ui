@@ -9,7 +9,7 @@ import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./modals/send-funds/token-amount-input";
 import { CustomTokenAmountInput } from "./modals/send-funds/custom-token-amount-input";
 import { AddressInput } from "./modals/send-funds/address-input";
-import { useAccount, useSignTypedData } from "wagmi";
+import { useConnection, useSignTypedData } from "wagmi";
 import { useUser } from "@/context/UserContext";
 import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
 import { populateExecuteEnqueue } from "@gnosispay/account-kit";
@@ -28,7 +28,7 @@ interface WithdrawFundsFormProps {
 }
 
 export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) => {
-  const { address: connectedAddress } = useAccount();
+  const { address: connectedAddress } = useConnection();
   const { safeConfig } = useUser();
   const { signTypedDataAsync } = useSignTypedData();
   const { isSignerConnected, signerError, isDataLoading: isSignerVerificationLoading } = useSafeSignerVerification();

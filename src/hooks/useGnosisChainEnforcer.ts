@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAccount, useSwitchChain } from "wagmi";
+import { useConnection, useSwitchChain } from "wagmi";
 import { gnosis } from "wagmi/chains";
 
 /**
@@ -7,7 +7,7 @@ import { gnosis } from "wagmi/chains";
  * Automatically switches to Gnosis chain if connected to a different network
  */
 export const useGnosisChainEnforcer = () => {
-  const { chainId, isConnected } = useAccount();
+  const { chainId, isConnected } = useConnection();
   const { switchChain } = useSwitchChain();
 
   useEffect(() => {

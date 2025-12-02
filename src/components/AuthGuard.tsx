@@ -10,7 +10,7 @@ import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { DebugButton } from "./DebugButton";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
 
 interface AuthGuardProps {
@@ -75,7 +75,7 @@ export const AuthGuard = ({ children, isOnboardingRoute = false }: AuthGuardProp
   const { isDeactivated, isUserSignedUp, isKycApproved, isSafeConfigured, isOnboarded } = useUser();
   const { open } = useAppKit();
   const navigate = useNavigate();
-  const { isConnected, isConnecting } = useAccount();
+  const { isConnected, isConnecting } = useConnection();
 
   useGnosisChainEnforcer();
 
