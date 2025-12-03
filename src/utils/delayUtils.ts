@@ -40,7 +40,6 @@ export const deserializeTransaction = (transactionData: string) => {
 
 export const getTxInfo = (account: string, transactionData: TransactionRequest) => {
   let txType: DelayedTransactionType;
-  console.log("transactionData", transactionData);
   try {
     txType = profileDelayedTransaction(account, transactionData);
   } catch (error) {
@@ -105,11 +104,6 @@ export const getTxTitle = ({ account, transactionDataString, currencyInfo }: TxT
 
   const transactionData = deserializeTransaction(transactionDataString);
   const { txType, token, receiver, ownerAddress, dailyLimit } = getTxInfo(account, transactionData);
-  console.log("txType", txType);
-  console.log("token", token);
-  console.log("receiver", receiver);
-  console.log("ownerAddress", ownerAddress);
-  console.log("dailyLimit", dailyLimit);
 
   switch (txType) {
     case DelayedTransactionType.ERC20Transfer:
