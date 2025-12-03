@@ -9,6 +9,22 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
+      // Shim for @safe-global/safe-singleton-factory which uses dynamic require()
+      // that doesn't work with Vite bundling
+      "@safe-global/safe-singleton-factory": path.resolve(
+        __dirname,
+        "./src/shims/safe-singleton-factory.ts"
+      ),
+    },
+  },
+  optimizeDeps: {
+    // Force Vite to pre-bundle these packages with their JSON assets
+    include: ["@gnosispay/account-kit", "@safe-global/safe-deployments"],
+  },
+  build: {
+    commonjsOptions: {
+      // Include JSON files when transforming CJS to ESM
+      include: [/node_modules/],
     },
   },
   server: {
