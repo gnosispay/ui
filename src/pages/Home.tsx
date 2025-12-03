@@ -7,29 +7,16 @@ import { PendingCardOrder } from "@/components/pending-card-order";
 import { Rewards } from "@/components/rewards";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { PartnerBanner } from "@/components/ui/partner-banner";
 import { IbanBanner } from "@/components/ui/iban-banner";
 import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
-import { predictAddresses } from "@gnosispay/account-kit";
-import { useUser } from "@/context/UserContext";
 
 export const Home = () => {
   const [sendFundsModalOpen, setSendFundsModalOpen] = useState(false);
   const [addFundsModalOpen, setAddFundsModalOpen] = useState(false);
-  const { safeConfig } = useUser();
-
-  useEffect(() => {
-    if (!safeConfig?.address) return;
-    try {
-      console.log("predictAddresses", predictAddresses(safeConfig.address).delay);
-      console.log("should be 0xf790dfD01a0Df68e82fE72614b03247042e99936");
-    } catch (error) {
-      console.error("Error predicting addresses:", error);
-    }
-  }, [safeConfig]);
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
