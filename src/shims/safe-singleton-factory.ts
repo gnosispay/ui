@@ -24,10 +24,7 @@ const SINGLETON_FACTORY_INFO: SingletonFactoryInfo = {
   address: "0x914d7Fec6aaC8cd542e72Bca78B30650d45643d7",
 };
 
-export const getSingletonFactoryInfo = (
-  _chainId: number
-): SingletonFactoryInfo => {
+export const getSingletonFactoryInfo = (_chainId: number): SingletonFactoryInfo => {
   // The singleton factory is deployed at the same address on all chains
   return SINGLETON_FACTORY_INFO;
 };
-

@@ -11,10 +11,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
       // Shim for @safe-global/safe-singleton-factory which uses dynamic require()
       // that doesn't work with Vite bundling
-      "@safe-global/safe-singleton-factory": path.resolve(
-        __dirname,
-        "./src/shims/safe-singleton-factory.ts"
-      ),
+      // see https://github.com/gnosispay/ui/pull/189
+      "@safe-global/safe-singleton-factory": path.resolve(__dirname, "./src/shims/safe-singleton-factory.ts"),
     },
   },
   optimizeDeps: {
