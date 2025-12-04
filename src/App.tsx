@@ -18,6 +18,7 @@ import { useAppInitialization } from "./hooks/useAppInitialization";
 import { useAppKitTheme } from "./hooks/useAppKitTheme";
 import { PARTNERS_URL } from "./constants";
 import { WithdrawRoute } from "./pages/Withdraw";
+import { ResetRoute } from "./pages/Reset";
 
 const ExternalRedirect = ({ url }: { url: string }) => {
   useEffect(() => {
@@ -73,10 +74,6 @@ const otherRoutes = [
     element: <ExistingCardOrder />,
   },
   {
-    path: "/withdraw",
-    element: <WithdrawRoute />,
-  },
-  {
     path: "/signup",
     element: <Navigate to="/" replace />,
   },
@@ -109,9 +106,17 @@ const publicRoutes = [
   },
 ];
 
-function ProtectedLayout({ isOnboardingRoute = false }: { isOnboardingRoute?: boolean }) {
+function ProtectedLayout({
+  isOnboardingRoute = false,
+  isWithdrawRoute = false,
+  isResetRoute = false,
+}: {
+  isOnboardingRoute?: boolean;
+  isWithdrawRoute?: boolean;
+  isResetRoute?: boolean;
+}) {
   return (
-    <AuthGuard isOnboardingRoute={isOnboardingRoute}>
+    <AuthGuard isOnboardingRoute={isOnboardingRoute} isWithdrawRoute={isWithdrawRoute} isResetRoute={isResetRoute}>
       <Outlet />
     </AuthGuard>
   );
@@ -139,6 +144,12 @@ function App() {
           {onboardingRoutes.map((route) => (
             <Route key={route.path} path={route.path} element={route.element} />
           ))}
+        </Route>
+        <Route element={<ProtectedLayout isWithdrawRoute={true} />}>
+          <Route path="/withdraw" element={<WithdrawRoute />} />
+        </Route>
+        <Route element={<ProtectedLayout isResetRoute={true} />}>
+          <Route path="/reset" element={<ResetRoute />} />
         </Route>
         <Route>
           {publicRoutes.map((route) => (
