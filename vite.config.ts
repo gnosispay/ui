@@ -16,8 +16,8 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    // Force Vite to pre-bundle these packages with their JSON assets
-    include: ["@gnosispay/account-kit", "@safe-global/safe-deployments"],
+    // Force Vite to pre-bundle this package
+    include: ["@gnosispay/account-kit"],
   },
   build: {
     commonjsOptions: {
