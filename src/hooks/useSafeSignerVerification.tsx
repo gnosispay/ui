@@ -24,11 +24,11 @@ export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => 
     setIsDataLoading(true);
 
     try {
-      const { data: apiResponse, error: apiError } = await getApiV1Owners();
+      const { data: apiResponse, error: ownerError } = await getApiV1Owners();
 
-      if (apiError) {
-        console.error("---> API error:", apiError);
-        const message = extractErrorMessage(apiError, "Failed to fetch safe owners");
+      if (ownerError) {
+        console.error("Failed to fetch safe owners:", ownerError);
+        const message = extractErrorMessage(ownerError, "Failed to fetch safe owners");
         setSignerError(new Error(message));
         return;
       }
@@ -63,7 +63,10 @@ export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => 
     if (!safeConfig?.address) return false;
     if (isDataLoading) return false;
 
-    return safeSigners.includes(connectedAddress as Address);
+    const lowerCaseConnectedAddress = connectedAddress.toLowerCase();
+    const lowerCaseSafeSigners = safeSigners.map((signer) => signer.toLowerCase());
+
+    return lowerCaseSafeSigners.includes(lowerCaseConnectedAddress);
   }, [safeSigners, connectedAddress, isDataLoading, safeConfig?.address]);
 
   return {
