@@ -16,6 +16,8 @@ import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
 interface AuthGuardProps {
   children: ReactNode;
   isOnboardingRoute?: boolean;
+  isWithdrawRoute?: boolean;
+  isResetRoute?: boolean;
 }
 
 interface AuthScreenProps {
@@ -70,7 +72,12 @@ const AuthScreen = ({
   );
 };
 
-export const AuthGuard = ({ children, isOnboardingRoute = false }: AuthGuardProps) => {
+export const AuthGuard = ({
+  children,
+  isOnboardingRoute = false,
+  isWithdrawRoute = false,
+  isResetRoute = false,
+}: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
   const { isDeactivated, isUserSignedUp, isKycApproved, isSafeConfigured, isOnboarded } = useUser();
   const { open } = useAppKit();
@@ -161,13 +168,25 @@ export const AuthGuard = ({ children, isOnboardingRoute = false }: AuthGuardProp
     return <AuthScreen {...connectionScreenConfig} />;
   }
 
-  if (isDeactivated) {
-    return <AuthScreen {...deactivatedScreenConfig} />;
-  }
-
   // the wallet is connected but the JWT is not set or expired
   if (!isAuthenticated) {
     return <AuthScreen {...loginScreenConfig} />;
+  }
+
+  // the withdraw route should be accessible to all users,
+  // even if their KYC is declined or anything
+  if (isWithdrawRoute) {
+    return <>{children}</>;
+  }
+
+  // the reset route should be accessible to all users,
+  // even if their KYC is declined or anything
+  if (isResetRoute) {
+    return <>{children}</>;
+  }
+
+  if (isDeactivated === true && !isWithdrawRoute) {
+    return <AuthScreen {...deactivatedScreenConfig} />;
   }
 
   if (isUserSignedUp === false && !isOnboardingRoute) {
