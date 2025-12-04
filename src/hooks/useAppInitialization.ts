@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useAccount, useConnections } from "wagmi";
+import { useConnection, useConnections } from "wagmi";
 import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 
 export const useAppInitialization = () => {
   const [isInitializing, setIsInitializing] = useState(true);
-  const { isConnected, isConnecting } = useAccount();
+  const { isConnected, isConnecting } = useConnection();
   const connections = useConnections();
   const { isAuthenticated, showInitializingLoader: authShowsLoader } = useAuth();
   const { showInitializingLoader: userShowsLoader } = useUser();

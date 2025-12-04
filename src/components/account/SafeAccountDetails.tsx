@@ -48,7 +48,7 @@ export const SafeAccountDetails = ({ addressLabel = "Wallet address" }: SafeAcco
             {safeConfig?.address || "N/A"}
           </div>
           {safeConfig?.address && (
-            <Button variant="outline" size="sm" onClick={handleCopyAddress} className="p-2 flex-shrink-0">
+            <Button variant="outline" size="sm" onClick={handleCopyAddress} className="p-2 shrink-0">
               <Copy className="h-4 w-4" />
             </Button>
           )}

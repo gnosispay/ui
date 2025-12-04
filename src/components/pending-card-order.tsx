@@ -45,7 +45,7 @@ export const PendingCardOrder = () => {
   return (
     <div className="bg-card border border-border rounded-lg p-4 mb-6" data-testid="pending-card-order">
       <div className="flex items-start gap-3">
-        <div className="flex-shrink-0 mt-1">
+        <div className="shrink-0 mt-1">
           <Package className="w-5 h-5 text-warning" />
         </div>
         <div className="flex-1 min-w-0">
