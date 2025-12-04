@@ -56,9 +56,3 @@ export async function mockUser({ page, testUser }: { page: Page; testUser: TestU
     }
   });
 }
-
-// Re-export test user for convenience
-export {
-  BASE_USER as BASED_USER,
-  type TestUser,
-} from "./testUsers";

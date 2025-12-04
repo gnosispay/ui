@@ -4,8 +4,7 @@ import { useUser } from "@/context/UserContext";
 import { readContract, writeContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import type { Address } from "viem";
-import { OperationType } from "@gnosispay/account-kit";
-import { predictDelayModAddress } from "@/utils/predictAddresses";
+import { OperationType, predictAddresses } from "@gnosispay/account-kit";
 import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -62,7 +61,7 @@ export const DelayModuleQueueContextProvider = ({
     let delayModAddress: string | undefined;
 
     try {
-      delayModAddress = predictDelayModAddress(safeConfig.address);
+      delayModAddress = predictAddresses(safeConfig.address).delay;
     } catch (error) {
       console.error("Error getting delay module address:", error);
       return undefined;

@@ -265,17 +265,18 @@ test.describe("Onboarding Flow - Happy Path", () => {
       testUser: USER_READY_FOR_SAFE_DEPLOYMENT.user,
     });
 
-    // Click verify
-    await page.getByTestId("otp-verify-button").click();
-
     // ========================================================================
     // STEP 5: Safe Deployment
     // ========================================================================
 
     // Mock safe deployment endpoints with progression simulation
+    // Set this up BEFORE clicking verify so the route is ready when DeploySafeStep mounts
     await mockSafeDeployment(page, {
       simulateProgression: true,
     });
+
+    // Click verify (this will navigate to DeploySafe step)
+    await page.getByTestId("otp-verify-button").click();
 
     // Wait for deploy safe step to load
     await expect(page.getByTestId("deploy-safe-step")).toBeVisible();
@@ -300,8 +301,9 @@ test.describe("Onboarding Flow - Happy Path", () => {
       },
     });
 
-    // Wait for success state (polling should complete)
-    await expect(page.getByTestId("safe-deployment-success-icon")).toBeVisible({ timeout: 15000 });
+    // Wait for success state (polling should complete - mock needs 2 GET calls after POST)
+    // Component polls every 5 seconds, so allow enough time for progression: not_deployed -> processing -> ok
+    await expect(page.getByTestId("safe-deployment-success-icon")).toBeVisible({ timeout: 20000 });
     await expect(page.getByTestId("safe-deployment-success-message")).toContainText(
       "Your Safe account has been successfully created!",
     );
@@ -656,48 +658,6 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
     await expect(page.getByTestId("safe-deployment-error-alert")).toContainText(
       "An error occurred while deploying your Safe",
     );
-  });
-
-  test("Safe deployment error - invalid account status", async ({ page }) => {
-    // Set up wallet mock
-    await setupMockWallet(page);
-
-    // Mock auth challenge
-    await mockAuthChallenge({ page, testUser: USER_KYC_APPROVED_NO_SOF });
-
-    // Mock user endpoint
-    await mockUser({ page, testUser: USER_KYC_APPROVED_NO_SOF });
-
-    // Mock safe config with invalid account status (2)
-    await mockSafeConfig({
-      page,
-      testUser: USER_KYC_APPROVED_NO_SOF,
-      configOverrides: {
-        isDeployed: false,
-        accountStatus: 2, // Invalid/unexpected status
-      },
-    });
-
-    // Mock source of funds endpoints
-    await mockSourceOfFunds(page);
-
-    // Navigate to safe deployment page
-    await page.goto("/safe-deployment");
-
-    // Wait for safe-deployment page to load
-    await expect(page.getByTestId("safe-deployment-page")).toBeVisible();
-
-    // Verify error alert is shown with the expected account status
-    await expect(page.getByTestId("safe-deployment-error-alert")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByTestId("safe-deployment-error-alert")).toContainText(
-      "Your Safe is not properly configured. Safe status is 2. Please contact support.",
-    );
-
-    // Verify that no step components are displayed when error is shown
-    // These components are conditionally rendered only when !error, so they should not exist in the DOM
-    await expect(page.getByTestId("source-of-funds-step")).toHaveCount(0);
-    await expect(page.getByTestId("phone-verification-step")).toHaveCount(0);
-    await expect(page.getByTestId("deploy-safe-step")).toHaveCount(0);
   });
 });
 

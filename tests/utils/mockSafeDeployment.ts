@@ -113,9 +113,11 @@ export async function mockSafeDeployment(page: Page, options: SafeDeploymentMock
 
   const finalGetErrorResponse = getErrorResponse || defaultGetErrorResponse;
 
-  // Mock POST /safe/deploy endpoint
+  // Mock POST /safe/deploy endpoint - use a more specific pattern to ensure it matches
   await page.route("**/api/v1/safe/deploy", async (route) => {
-    if (route.request().method() === "POST") {
+    const request = route.request();
+
+    if (request.method() === "POST") {
       if (postIsError) {
         await route.fulfill({
           status: postErrorStatus,
