@@ -362,3 +362,14 @@ export const USER_DEACTIVATED = createTestUser({
   bankingDetails: BASE_USER.user.bankingDetails,
   status: "DEACTIVATED",
 });
+
+/**
+ * Test user with KYC rejected
+ * Useful for testing KYC rejection flows and special route access
+ */
+export const USER_KYC_REJECTED = createTestUser({
+  ...USER_SIGNED_UP_NO_KYC,
+  kycStatus: "rejected",
+  isSourceOfFundsAnswered: false,
+  isPhoneValidated: false,
+});
