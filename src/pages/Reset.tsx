@@ -68,6 +68,9 @@ export const ResetRoute = () => {
                   .
                 </p>
                 <p className="text-sm text-muted-foreground">
+                  Transfer any remaining funds out of your Safe account before proceeding.
+                </p>
+                <p className="text-sm text-muted-foreground">
                   Please make sure you are certain about this action before proceeding.
                 </p>
               </div>
