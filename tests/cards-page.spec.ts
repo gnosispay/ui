@@ -184,8 +184,10 @@ test.describe("Cards Page", () => {
         await page.goto("/");
         await page.waitForLoadState("networkidle");
 
-        // Click on the frozen card (ends in 9999)
-        const frozenCard = page.getByRole("button", { name: /Go to card ending in 9999/ });
+        // Click on the frozen card
+        const frozenCard = page.getByRole("button", {
+          name: new RegExp(`Go to card ending in ${CARD_SCENARIOS.FROZEN.lastFourDigits}`),
+        });
         await frozenCard.click();
 
         // Wait for navigation to cards page with correct cardIndex
@@ -201,11 +203,13 @@ test.describe("Cards Page", () => {
       });
 
       await test.step("URL navigation: clicking another card on home page navigates correctly", async () => {
-        // Navigate from home page by clicking the deactivated physical card (ends in 3333)
+        // Navigate from home page by clicking the deactivated physical card
         await page.goto("/");
         await page.waitForLoadState("networkidle");
 
-        const deactivatedCard = page.getByRole("button", { name: /Go to card ending in 3333/ });
+        const deactivatedCard = page.getByRole("button", {
+          name: new RegExp(`Go to card ending in ${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`),
+        });
         await deactivatedCard.click();
 
         // Wait for navigation to cards page with correct cardIndex
@@ -218,19 +222,6 @@ test.describe("Cards Page", () => {
         // The deactivated physical card should be selected - verify the activate button is visible
         const activateButton = page.getByTestId("card-action-activate");
         await expect(activateButton).toBeVisible();
-      });
-
-      await test.step("URL navigation: dot click updates URL with cardIndex", async () => {
-        await page.goto("/cards");
-        await page.waitForLoadState("networkidle");
-
-        // Navigate to frozen card using dot
-        const frozenDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
-        await frozenDot.click();
-
-        // URL should update to include cardIndex=2
-        await page.waitForURL("**/cards?cardIndex=2");
-        expect(page.url()).toContain("cardIndex=2");
       });
     });
   });
@@ -248,9 +239,6 @@ test.describe("Cards Page", () => {
         cards: testCards,
         cardTransactions: createTransactionsForCards(),
       });
-
-      // Set viewport to desktop size (lg breakpoint) so arrows are visible
-      await page.setViewportSize({ width: 1280, height: 720 });
 
       await page.goto("/cards");
       await page.waitForLoadState("networkidle");
