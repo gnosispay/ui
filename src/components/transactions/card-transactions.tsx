@@ -52,11 +52,11 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg mb-4">
+    <div className="flex flex-col gap-4 bg-card p-4 rounded-lg mb-4" data-testid="card-transactions-component">
       {(!transactions || Object.keys(transactions).length === 0) && (
         <div className="flex flex-col items-center justify-center">
-          <InboxIcon className="w-10 h-10 mb-2 text-secondary" />
-          <div className="text-center text-secondary">
+          <InboxIcon className="w-10 h-10 mb-2 text-secondary" data-testid="empty-transactions-icon" />
+          <div className="text-center text-secondary" data-testid="empty-transactions-message">
             No transactions for this card in the past {transactionCount} transactions
           </div>
         </div>
@@ -81,6 +81,7 @@ export const CardTransactions = ({ cardToken }: CardTransactionsProps) => {
             disabled={isLoadingMoreCardTransactions}
             loading={isLoadingMoreCardTransactions}
             className="w-full"
+            data-testid="load-more-button"
           >
             {loadMoreButtonText}
           </Button>

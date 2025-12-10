@@ -113,6 +113,7 @@ export const CardActions = ({
             label="Activate"
             onClick={() => setIsActivationDialogOpen(true)}
             size="lg"
+            data-testid="card-action-activate"
           />
         )}
         <IconButton
@@ -121,6 +122,7 @@ export const CardActions = ({
           onClick={() => onShowCardDetails(card.cardToken)}
           size="lg"
           variant="default"
+          data-testid="card-action-show-details"
         />
         <IconButton
           icon={<Eye size={22} />}
@@ -129,6 +131,7 @@ export const CardActions = ({
           size="lg"
           variant="default"
           disabled={card.virtual}
+          data-testid="card-action-see-pin"
         />
         {cardInfo?.isFrozen ? (
           <IconButton
@@ -137,6 +140,7 @@ export const CardActions = ({
             onClick={() => unfreezeCard(card.id)}
             size="lg"
             variant="default"
+            data-testid="card-action-unfreeze"
           />
         ) : (
           <IconButton
@@ -145,24 +149,34 @@ export const CardActions = ({
             onClick={() => freezeCard(card.id)}
             size="lg"
             variant="default"
+            data-testid="card-action-freeze"
           />
         )}
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <span>
-              <IconButton icon={<MoreHorizontal size={22} />} label="More" size="lg" variant="default" />
+              <IconButton
+                icon={<MoreHorizontal size={22} />}
+                label="More"
+                size="lg"
+                variant="default"
+                data-testid="card-action-more"
+              />
             </span>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             {card.virtual && (
-              <DropdownMenuItem onClick={() => setIsVoidVirtualCardDialogOpen(true)}>
+              <DropdownMenuItem
+                onClick={() => setIsVoidVirtualCardDialogOpen(true)}
+                data-testid="card-action-void-card"
+              >
                 <BanIcon size={22} /> Void card
               </DropdownMenuItem>
             )}
 
             {canReport && (
-              <DropdownMenuItem onClick={() => setIsReportModalOpen(true)}>
+              <DropdownMenuItem onClick={() => setIsReportModalOpen(true)} data-testid="card-action-report">
                 <AlertOctagon size={22} /> Report
               </DropdownMenuItem>
             )}
@@ -173,6 +187,7 @@ export const CardActions = ({
                 onToggleVoidedCardsVisibility();
               }}
               className="flex items-center justify-between"
+              data-testid="card-action-hide-voided-cards"
             >
               <div className="flex items-center gap-2">
                 <EyeOff size={22} />
