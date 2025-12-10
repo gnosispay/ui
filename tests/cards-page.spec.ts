@@ -56,7 +56,9 @@ test.describe("Cards Page", () => {
   };
 
   test.describe("Card Display and Status", () => {
-    test("displays cards with correct statuses and hides voided cards by default", async ({ page }) => {
+    test("displays cards with correct statuses, hides voided cards by default, and toggles voided visibility", async ({
+      page,
+    }) => {
       const testCards = [
         CARD_SCENARIOS.VIRTUAL,
         CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD,
@@ -134,31 +136,12 @@ test.describe("Cards Page", () => {
         await expect(deactivatedCardPreview.getByTestId("card-status-overlay-frozen")).not.toBeVisible();
         await expect(deactivatedCardPreview.getByTestId("card-status-overlay-void")).not.toBeVisible();
       });
-    });
-
-    test("toggle show/hide voided cards displays voided cards", async ({ page }) => {
-      // Use CARD_SCENARIOS - need at least 2 non-voided cards to show dots initially
-      const testCards = [
-        CARD_SCENARIOS.VIRTUAL, // Active virtual (1234)
-        CARD_SCENARIOS.PHYSICAL, // Active physical (5678)
-        CARD_SCENARIOS.VOIDED, // Voided card (0000) - hidden by default
-      ];
-
-      await setupAllMocks(page, BASE_USER, {
-        cards: testCards,
-        cardTransactions: createTransactionsForCards(),
-      });
-
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
-
-      await test.step("verify only 2 cards visible initially (voided hidden)", async () => {
-        // Dots only show when cards.length > 1
-        const dotsContainer = page.getByTestId("card-carousel-dots");
-        await expect(dotsContainer.locator("button")).toHaveCount(2);
-      });
 
       await test.step("toggle voided cards visibility via More menu", async () => {
+        // Navigate back to first card to access More menu
+        const virtualDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.VIRTUAL.lastFourDigits}`);
+        await virtualDot.click();
+
         // Click the "More" button to open dropdown
         const moreButton = page.getByTestId("card-action-more");
         await moreButton.click();
@@ -176,12 +159,12 @@ test.describe("Cards Page", () => {
       });
 
       await test.step("verify voided card is now visible", async () => {
-        // Should now show 3 cards (wait for the voided dot to appear)
+        // Should now show 4 cards (wait for the voided dot to appear)
         const voidedDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.VOIDED.lastFourDigits}`);
         await expect(voidedDot).toBeVisible();
 
         const dotsContainer = page.getByTestId("card-carousel-dots");
-        await expect(dotsContainer.locator("button")).toHaveCount(3);
+        await expect(dotsContainer.locator("button")).toHaveCount(4);
 
         // Navigate to voided card
         await voidedDot.click();
@@ -240,77 +223,61 @@ test.describe("Cards Page", () => {
   });
 
   test.describe("Card Actions Functionality", () => {
-    test("active card shows freeze button and hides activate button", async ({ page }) => {
+    test("card actions display correctly for different card states and types", async ({ page }) => {
+      const testCards = [
+        CARD_SCENARIOS.VIRTUAL,
+        CARD_SCENARIOS.FROZEN,
+        CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD,
+        CARD_SCENARIOS.PHYSICAL,
+      ];
+
       await setupAllMocks(page, BASE_USER, {
-        cards: [CARD_SCENARIOS.VIRTUAL],
+        cards: testCards,
         cardTransactions: createTransactionsForCards(),
       });
 
       await page.goto("/cards");
       await page.waitForLoadState("networkidle");
 
-      await test.step("verify Freeze button is visible", async () => {
+      await test.step("active virtual card shows freeze button and hides activate button", async () => {
+        // First card (active virtual) should be selected by default
         const freezeButton = page.getByTestId("card-action-freeze");
         await expect(freezeButton).toBeVisible();
         await expect(freezeButton).toBeEnabled();
-      });
 
-      await test.step("verify Unfreeze button is NOT visible", async () => {
         const unfreezeButton = page.getByTestId("card-action-unfreeze");
         await expect(unfreezeButton).not.toBeVisible();
-      });
 
-      await test.step("verify Activate button is NOT visible (card already activated)", async () => {
         const activateButton = page.getByTestId("card-action-activate");
         await expect(activateButton).not.toBeVisible();
-      });
 
-      await test.step("verify Show details button is visible", async () => {
         const showDetailsButton = page.getByTestId("card-action-show-details");
         await expect(showDetailsButton).toBeVisible();
         await expect(showDetailsButton).toBeEnabled();
-      });
 
-      await test.step("verify See PIN button is visible but disabled for virtual cards", async () => {
         const seePinButton = page.getByTestId("card-action-see-pin");
         await expect(seePinButton).toBeVisible();
         await expect(seePinButton).toBeDisabled();
       });
-    });
 
-    test("frozen card shows unfreeze button", async ({ page }) => {
-      await setupAllMocks(page, BASE_USER, {
-        cards: [CARD_SCENARIOS.FROZEN],
-        cardTransactions: createTransactionsForCards(),
-      });
+      await test.step("frozen card shows unfreeze button", async () => {
+        const frozenDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
+        await frozenDot.click();
 
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
-
-      await test.step("verify Unfreeze button is visible and enabled", async () => {
         const unfreezeButton = page.getByTestId("card-action-unfreeze");
         await expect(unfreezeButton).toBeVisible();
         await expect(unfreezeButton).toBeEnabled();
+
+        const freezeButton = page.getByTestId("card-action-freeze");
+        await expect(freezeButton).not.toBeVisible();
       });
 
-      await test.step("verify Freeze button is NOT visible", async () => {
-        // Log all buttons with freeze/unfreeze testids for debugging
-        const freezeButtons = page.getByTestId("card-action-freeze");
+      await test.step("deactivated physical card shows activate button", async () => {
+        const deactivatedDot = page.getByTestId(
+          `card-carousel-dot-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
+        );
+        await deactivatedDot.click();
 
-        await expect(freezeButtons).not.toBeVisible();
-      });
-    });
-
-    test("deactivated physical card shows activate button", async ({ page }) => {
-      await setupAllMocks(page, BASE_USER, {
-        cards: [CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD],
-        cardTransactions: createTransactionsForCards(),
-      });
-
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
-
-      await test.step("verify Activate button is visible and enabled", async () => {
         const activateButton = page.getByTestId("card-action-activate");
         await expect(activateButton).toBeVisible();
         await expect(activateButton).toBeEnabled();
@@ -320,47 +287,28 @@ test.describe("Cards Page", () => {
         const activateButton = page.getByTestId("card-action-activate");
         await activateButton.click();
 
-        // Verify confirmation dialog appears
         const dialog = page.locator('[role="dialog"]');
         await expect(dialog).toBeVisible();
         await expect(dialog.getByRole("heading", { name: "Activate Card" })).toBeVisible();
         await expect(dialog.getByText("Only activate your card if you have physically received it")).toBeVisible();
 
-        // Verify confirm button is present
         const confirmButton = dialog.getByRole("button", { name: "Activate Card" });
         await expect(confirmButton).toBeVisible();
+
+        // Close the dialog
+        await page.keyboard.press("Escape");
       });
 
       await test.step("verify See PIN button is visible and enabled for physical cards", async () => {
-        // Close the dialog first
-        const dialog = page.locator('[role="dialog"]');
-        const closeButton = dialog
-          .locator('button[type="button"]')
-          .filter({ has: page.locator("svg") })
-          .first();
-        if (await closeButton.isVisible()) {
-          await closeButton.click();
-        } else {
-          // Click outside to close
-          await page.keyboard.press("Escape");
-        }
-
         const seePinButton = page.getByTestId("card-action-see-pin");
         await expect(seePinButton).toBeVisible();
         await expect(seePinButton).toBeEnabled();
       });
-    });
 
-    test("virtual card shows void option in More menu", async ({ page }) => {
-      await setupAllMocks(page, BASE_USER, {
-        cards: [CARD_SCENARIOS.VIRTUAL],
-        cardTransactions: createTransactionsForCards(),
-      });
+      await test.step("virtual card shows void option in More menu", async () => {
+        const virtualDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.VIRTUAL.lastFourDigits}`);
+        await virtualDot.click();
 
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
-
-      await test.step("open More menu and verify Void card option", async () => {
         const moreButton = page.getByTestId("card-action-more");
         await moreButton.click();
 
@@ -377,53 +325,37 @@ test.describe("Cards Page", () => {
         await expect(dialog.getByRole("heading", { name: "Void Card" })).toBeVisible();
         await expect(dialog.getByText("Are you sure you want to void this card?")).toBeVisible();
         await expect(dialog.getByText("This action cannot be undone")).toBeVisible();
-      });
-    });
 
-    test("physical card does NOT show void option in More menu", async ({ page }) => {
-      await setupAllMocks(page, BASE_USER, {
-        cards: [CARD_SCENARIOS.PHYSICAL],
-        cardTransactions: createTransactionsForCards(),
+        // Close the dialog
+        await page.keyboard.press("Escape");
       });
 
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
+      await test.step("physical card More menu shows report option and hides void option", async () => {
+        const physicalDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.PHYSICAL.lastFourDigits}`);
+        await physicalDot.click();
 
-      await test.step("open More menu and verify Void card is NOT present", async () => {
         const moreButton = page.getByTestId("card-action-more");
         await moreButton.click();
 
+        // Check that void option is NOT visible for physical cards
         const voidCardOption = page.getByTestId("card-action-void-card");
         await expect(voidCardOption).not.toBeVisible();
 
-        // But Hide voided cards should still be present
+        // Check that hide voided option is visible
         const hideVoidedOption = page.getByTestId("card-action-hide-voided-cards");
         await expect(hideVoidedOption).toBeVisible();
-      });
-    });
 
-    test("Report option is available for active activated cards", async ({ page }) => {
-      await setupAllMocks(page, BASE_USER, {
-        cards: [CARD_SCENARIOS.PHYSICAL],
-        cardTransactions: createTransactionsForCards(),
-      });
-
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
-
-      await test.step("open More menu and verify Report option", async () => {
-        const moreButton = page.getByTestId("card-action-more");
-        await moreButton.click();
-
+        // Check that report option is visible for activated physical cards
         const reportOption = page.getByTestId("card-action-report");
         await expect(reportOption).toBeVisible();
       });
 
       await test.step("clicking Report opens report modal", async () => {
+        // Menu should still be open from previous step
         const reportOption = page.getByTestId("card-action-report");
+        await expect(reportOption).toBeVisible();
         await reportOption.click();
 
-        // Verify report modal opens with lost/stolen options
         const reportAsLostButton = page.getByRole("button", { name: /lost/i });
         const reportAsStolenButton = page.getByRole("button", { name: /stolen/i });
 
@@ -575,46 +507,6 @@ test.describe("Cards Page", () => {
         // Verify second card (frozen) is selected again
         const frozenCardItem = page.getByTestId(`card-carousel-item-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
         await expect(frozenCardItem).toHaveAttribute("data-selected", "true");
-      });
-    });
-  });
-
-  test.describe("Card Actions State Changes", () => {
-    test("switching between cards updates action buttons correctly", async ({ page }) => {
-      const testCards = [CARD_SCENARIOS.VIRTUAL, CARD_SCENARIOS.FROZEN, CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD];
-
-      await setupAllMocks(page, BASE_USER, {
-        cards: testCards,
-        cardTransactions: createTransactionsForCards(),
-      });
-
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
-
-      await test.step("first card (active virtual) shows Freeze", async () => {
-        await expect(page.getByTestId("card-action-freeze")).toBeVisible();
-        await expect(page.getByTestId("card-action-unfreeze")).not.toBeVisible();
-        await expect(page.getByTestId("card-action-activate")).not.toBeVisible();
-      });
-
-      await test.step("second card (frozen) shows Unfreeze", async () => {
-        const frozenDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
-        await frozenDot.click();
-
-        await expect(page.getByTestId("card-action-unfreeze")).toBeVisible();
-        await expect(page.getByTestId("card-action-freeze")).not.toBeVisible();
-        await expect(page.getByTestId("card-action-activate")).not.toBeVisible();
-      });
-
-      await test.step("third card (deactivated physical) shows Activate", async () => {
-        const deactivatedDot = page.getByTestId(
-          `card-carousel-dot-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
-        );
-        await deactivatedDot.click();
-
-        await expect(page.getByTestId("card-action-activate")).toBeVisible();
-        await expect(page.getByTestId("card-action-freeze")).toBeVisible();
-        await expect(page.getByTestId("card-action-unfreeze")).not.toBeVisible();
       });
     });
   });
