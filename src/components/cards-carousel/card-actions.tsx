@@ -217,13 +217,12 @@ export const CardActions = ({
         </PSEDialogContent>
       </Dialog>
 
-      {isReportModalOpen && (
-        <ReportCardModal
-          onClose={() => setIsReportModalOpen(false)}
-          onReportAsLost={() => markCardAsLost(card.id)}
-          onReportAsStolen={() => markCardAsStolen(card.id)}
-        />
-      )}
+      <ReportCardModal
+        open={isReportModalOpen}
+        onOpenChange={setIsReportModalOpen}
+        onReportAsLost={() => markCardAsLost(card.id)}
+        onReportAsStolen={() => markCardAsStolen(card.id)}
+      />
 
       <ConfirmationDialog
         open={isActivationDialogOpen}

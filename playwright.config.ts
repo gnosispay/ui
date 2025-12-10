@@ -66,7 +66,7 @@ export default defineConfig({
   webServer: {
     command: "pnpm dev",
     url: "http://localhost:5173",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 120 * 1000, // 2 minutes timeout for server startup
     env: {
       VITE_PSE_RELAY_SERVER_URL: "http://localhost:8083/token",

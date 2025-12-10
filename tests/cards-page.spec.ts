@@ -178,52 +178,65 @@ test.describe("Cards Page", () => {
         await expect(voidedCardPreview.getByTestId("card-status-overlay-void")).toBeVisible();
         await expect(voidedCardPreview.getByTestId("card-last4")).toHaveText(CARD_SCENARIOS.VOIDED.lastFourDigits);
       });
-    });
-  });
 
-  test.describe("Card Transactions Filtering", () => {
-    test("displays only transactions for the currently selected card", async ({ page }) => {
-      const testCards = [CARD_SCENARIOS.VIRTUAL, CARD_SCENARIOS.FROZEN];
+      await test.step("URL navigation: clicking card on home page navigates with cardIndex", async () => {
+        // Visit home page
+        await page.goto("/");
+        await page.waitForLoadState("networkidle");
 
-      await setupAllMocks(page, BASE_USER, {
-        cards: testCards,
-        cardTransactions: createTransactionsForCards(),
+        // Click on the frozen card (ends in 9999)
+        const frozenCard = page.getByRole("button", { name: /Go to card ending in 9999/ });
+        await frozenCard.click();
+
+        // Wait for navigation to cards page with correct cardIndex
+        await page.waitForURL("**/cards?cardIndex=2");
+        expect(page.url()).toContain("/cards?cardIndex=2");
+
+        // Wait for page to load
+        await page.waitForLoadState("networkidle");
+
+        // The frozen card should be selected - verify the Unfreeze button is visible
+        const unfreezeButton = page.getByTestId("card-action-unfreeze");
+        await expect(unfreezeButton).toBeVisible();
       });
 
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
+      await test.step("URL navigation: clicking another card on home page navigates correctly", async () => {
+        // Navigate from home page by clicking the deactivated physical card (ends in 3333)
+        await page.goto("/");
+        await page.waitForLoadState("networkidle");
 
-      await test.step("verify first card shows its transactions", async () => {
-        // First card (active virtual) should be selected by default
-        const transactionsComponent = page.getByTestId("card-transactions-component");
-        await expect(transactionsComponent).toBeVisible();
+        const deactivatedCard = page.getByRole("button", { name: /Go to card ending in 3333/ });
+        await deactivatedCard.click();
 
-        // Should show Virtual Card Merchant transaction
-        await expect(transactionsComponent.getByText("Virtual Card Merchant")).toBeVisible();
+        // Wait for navigation to cards page with correct cardIndex
+        await page.waitForURL("**/cards?cardIndex=1");
+        expect(page.url()).toContain("/cards?cardIndex=1");
 
-        // Should NOT show other card transactions
-        await expect(transactionsComponent.getByText("Frozen Card Merchant")).not.toBeVisible();
+        // Wait for page to load
+        await page.waitForLoadState("networkidle");
+
+        // The deactivated physical card should be selected - verify the activate button is visible
+        const activateButton = page.getByTestId("card-action-activate");
+        await expect(activateButton).toBeVisible();
       });
 
-      await test.step("navigate to second card and verify its transactions", async () => {
-        // Click the dot for the frozen card
+      await test.step("URL navigation: dot click updates URL with cardIndex", async () => {
+        await page.goto("/cards");
+        await page.waitForLoadState("networkidle");
+
+        // Navigate to frozen card using dot
         const frozenDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
         await frozenDot.click();
 
-        // Wait for transactions to update
-        const transactionsComponent = page.getByTestId("card-transactions-component");
-
-        // Should show Frozen Card Merchant transaction
-        await expect(transactionsComponent.getByText("Frozen Card Merchant")).toBeVisible();
-
-        // Should NOT show first card transactions
-        await expect(transactionsComponent.getByText("Virtual Card Merchant")).not.toBeVisible();
+        // URL should update to include cardIndex=2
+        await page.waitForURL("**/cards?cardIndex=2");
+        expect(page.url()).toContain("cardIndex=2");
       });
     });
   });
 
-  test.describe("Card Actions Functionality", () => {
-    test("card actions display correctly for different card states and types", async ({ page }) => {
+  test.describe("Card Transactions, Actions, and Navigation", () => {
+    test("transactions filter correctly, actions display correctly, and arrow navigation works", async ({ page }) => {
       const testCards = [
         CARD_SCENARIOS.VIRTUAL,
         CARD_SCENARIOS.FROZEN,
@@ -236,11 +249,21 @@ test.describe("Cards Page", () => {
         cardTransactions: createTransactionsForCards(),
       });
 
+      // Set viewport to desktop size (lg breakpoint) so arrows are visible
+      await page.setViewportSize({ width: 1280, height: 720 });
+
       await page.goto("/cards");
       await page.waitForLoadState("networkidle");
 
-      await test.step("active virtual card shows freeze button and hides activate button", async () => {
+      await test.step("first card (virtual) shows correct transactions and actions", async () => {
         // First card (active virtual) should be selected by default
+        // Verify transactions
+        const transactionsComponent = page.getByTestId("card-transactions-component");
+        await expect(transactionsComponent).toBeVisible();
+        await expect(transactionsComponent.getByText("Virtual Card Merchant")).toBeVisible();
+        await expect(transactionsComponent.getByText("Frozen Card Merchant")).not.toBeVisible();
+
+        // Verify actions
         const freezeButton = page.getByTestId("card-action-freeze");
         await expect(freezeButton).toBeVisible();
         await expect(freezeButton).toBeEnabled();
@@ -260,10 +283,16 @@ test.describe("Cards Page", () => {
         await expect(seePinButton).toBeDisabled();
       });
 
-      await test.step("frozen card shows unfreeze button", async () => {
+      await test.step("second card (frozen) shows correct transactions and actions", async () => {
         const frozenDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
         await frozenDot.click();
 
+        // Verify transactions
+        const transactionsComponent = page.getByTestId("card-transactions-component");
+        await expect(transactionsComponent.getByText("Frozen Card Merchant")).toBeVisible();
+        await expect(transactionsComponent.getByText("Virtual Card Merchant")).not.toBeVisible();
+
+        // Verify actions
         const unfreezeButton = page.getByTestId("card-action-unfreeze");
         await expect(unfreezeButton).toBeVisible();
         await expect(unfreezeButton).toBeEnabled();
@@ -361,152 +390,72 @@ test.describe("Cards Page", () => {
 
         await expect(reportAsLostButton).toBeVisible();
         await expect(reportAsStolenButton).toBeVisible();
+
+        // Close the report modal
+        await page.keyboard.press("Escape");
+        // Wait for modal and overlay to fully close
+        await expect(reportAsLostButton).not.toBeVisible();
+        const dialog = page.locator('[role="dialog"]');
+        await expect(dialog).not.toBeVisible();
+        // Wait for dialog overlay to disappear
+        const overlay = page.locator('[data-slot="dialog-overlay"]');
+        await expect(overlay).not.toBeVisible();
       });
-    });
-  });
 
-  test.describe("URL Navigation and Card Selection", () => {
-    test("cardIndex URL parameter selects correct card", async ({ page }) => {
-      const testCards = [CARD_SCENARIOS.VIRTUAL, CARD_SCENARIOS.FROZEN, CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD];
+      await test.step("arrow navigation works on desktop", async () => {
+        // Ensure any modals/dialogs are closed
+        const dialog = page.locator('[role="dialog"]');
+        if (await dialog.isVisible().catch(() => false)) {
+          await page.keyboard.press("Escape");
+          await expect(dialog).not.toBeVisible();
+        }
 
-      await setupAllMocks(page, BASE_USER, {
-        cards: testCards,
-        cardTransactions: createTransactionsForCards(),
-      });
-
-      await test.step("navigate to cards with cardIndex=1", async () => {
-        // Visit home page first
-        await page.goto("/");
+        // Wait for page to be ready
         await page.waitForLoadState("networkidle");
 
-        // Click on the frozen card (second card, ends in 9999)
-        const frozenCard = page.getByRole("button", { name: /Go to card ending in 9999/ });
-        await frozenCard.click();
+        // Navigate back to first card for arrow navigation test
+        const virtualDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.VIRTUAL.lastFourDigits}`);
+        await expect(virtualDot).toBeVisible();
+        await virtualDot.click({ force: true });
 
-        // Wait for navigation to cards page with correct cardIndex
-        await page.waitForURL("**/cards?cardIndex=1");
-        expect(page.url()).toContain("/cards?cardIndex=1");
+        // Find the carousel container (the group div that triggers hover)
+        const carouselContainer = page.locator(".relative.group").first();
 
-        // Wait for page to load
-        await page.waitForLoadState("networkidle");
-
-        // The second card (frozen) should be selected
-        // Verify the Unfreeze button is visible (frozen card shows Unfreeze, not Freeze)
-        const unfreezeButton = page.getByTestId("card-action-unfreeze");
-        await expect(unfreezeButton).toBeVisible();
-      });
-
-      await test.step("navigate to cards with cardIndex=2", async () => {
-        // Navigate from home page by clicking the deactivated physical card (third card, ends in 3333)
-        await page.goto("/");
-        await page.waitForLoadState("networkidle");
-
-        const deactivatedCard = page.getByRole("button", { name: /Go to card ending in 3333/ });
-        await deactivatedCard.click();
-
-        // Wait for navigation to cards page with correct cardIndex
-        await page.waitForURL("**/cards?cardIndex=2");
-        expect(page.url()).toContain("/cards?cardIndex=2");
-
-        // Wait for page to load
-        await page.waitForLoadState("networkidle");
-
-        // The third card (deactivated physical) should be selected
-        // Verify the activate button is visible
-        const activateButton = page.getByTestId("card-action-activate");
-        await expect(activateButton).toBeVisible();
-      });
-
-      await test.step("navigate to first card has no cardIndex param", async () => {
-        await page.goto("/cards");
-        await page.waitForLoadState("networkidle");
-
-        // Navigate to frozen card (second card)
-        const frozenDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
-        await frozenDot.click();
-
-        // URL should update to include cardIndex=1
-        await page.waitForURL("**/cards?cardIndex=1");
-        expect(page.url()).toContain("cardIndex=1");
-      });
-    });
-
-    test("arrow navigation works on desktop", async ({ page }) => {
-      const testCards = [CARD_SCENARIOS.VIRTUAL, CARD_SCENARIOS.FROZEN, CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD];
-
-      await setupAllMocks(page, BASE_USER, {
-        cards: testCards,
-        cardTransactions: createTransactionsForCards(),
-      });
-
-      // Set viewport to desktop size (lg breakpoint) so arrows are visible
-      await page.setViewportSize({ width: 1280, height: 720 });
-
-      await page.goto("/cards");
-      await page.waitForLoadState("networkidle");
-
-      // Find the carousel container (the group div that triggers hover)
-      const carouselContainer = page.locator(".relative.group").first();
-
-      await test.step("hover over carousel to reveal arrows", async () => {
+        // Hover over carousel to reveal arrows
         await carouselContainer.hover();
-
-        // Wait for arrows to become visible (they have opacity transition)
         const nextArrow = page.getByTestId("card-carousel-arrow-next");
         await expect(nextArrow).toBeVisible();
-      });
 
-      await test.step("click next arrow to navigate to second card", async () => {
-        const nextArrow = page.getByTestId("card-carousel-arrow-next");
+        // Click next arrow to navigate to second card
         await nextArrow.click();
-
-        // Verify URL updates to cardIndex=1
         await page.waitForURL("**/cards?cardIndex=1");
         expect(page.url()).toContain("cardIndex=1");
 
-        // Verify second card (frozen) is now selected
         const frozenCardItem = page.getByTestId(`card-carousel-item-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
         await expect(frozenCardItem).toHaveAttribute("data-selected", "true");
-
-        // Verify Unfreeze button is visible
         await expect(page.getByTestId("card-action-unfreeze")).toBeVisible();
-      });
 
-      await test.step("click next arrow again to navigate to third card", async () => {
-        // Hover again to keep arrows visible
+        // Click next arrow again to navigate to third card
         await carouselContainer.hover();
-
-        const nextArrow = page.getByTestId("card-carousel-arrow-next");
         await nextArrow.click();
-
-        // Verify URL updates to cardIndex=2
         await page.waitForURL("**/cards?cardIndex=2");
         expect(page.url()).toContain("cardIndex=2");
 
-        // Verify third card (deactivated physical) is now selected
         const deactivatedCardItem = page.getByTestId(
           `card-carousel-item-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
         );
         await expect(deactivatedCardItem).toHaveAttribute("data-selected", "true");
-
-        // Verify Activate button is visible
         await expect(page.getByTestId("card-action-activate")).toBeVisible();
-      });
 
-      await test.step("click previous arrow to go back", async () => {
-        // Hover again to keep arrows visible
+        // Click previous arrow to go back
         await carouselContainer.hover();
-
         const prevArrow = page.getByTestId("card-carousel-arrow-prev");
         await prevArrow.click();
-
-        // Verify URL updates back to cardIndex=1
         await page.waitForURL("**/cards?cardIndex=1");
         expect(page.url()).toContain("cardIndex=1");
 
-        // Verify second card (frozen) is selected again
-        const frozenCardItem = page.getByTestId(`card-carousel-item-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
-        await expect(frozenCardItem).toHaveAttribute("data-selected", "true");
+        const frozenCardItemAgain = page.getByTestId(`card-carousel-item-${CARD_SCENARIOS.FROZEN.lastFourDigits}`);
+        await expect(frozenCardItemAgain).toHaveAttribute("data-selected", "true");
       });
     });
   });
