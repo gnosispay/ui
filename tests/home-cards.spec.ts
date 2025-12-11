@@ -12,12 +12,12 @@ test.describe("Home Page - Cards Component", () => {
   test("displays virtual and physical cards with correct information and navigation", async ({ page }) => {
     // Compose a mix of cards with different statuses for comprehensive testing
     const testCards = [
-      CARD_SCENARIOS.SINGLE_VIRTUAL,
-      CARD_SCENARIOS.SINGLE_PHYSICAL,
-      CARD_SCENARIOS.SINGLE_FROZEN,
-      CARD_SCENARIOS.SINGLE_EXPIRED,
-      CARD_SCENARIOS.SINGLE_PIN_BLOCKED,
-      CARD_SCENARIOS.SINGLE_VOIDED,
+      CARD_SCENARIOS.VIRTUAL,
+      CARD_SCENARIOS.PHYSICAL,
+      CARD_SCENARIOS.FROZEN,
+      CARD_SCENARIOS.EXPIRED,
+      CARD_SCENARIOS.PIN_BLOCKED,
+      CARD_SCENARIOS.VOIDED,
     ];
 
     await setupAllMocks(page, BASE_USER, {
@@ -126,7 +126,7 @@ test.describe("Home Page - Cards Component", () => {
 
   test("displays add card button and opens modal", async ({ page }) => {
     await setupAllMocks(page, BASE_USER, {
-      cards: [CARD_SCENARIOS.SINGLE_VIRTUAL],
+      cards: [CARD_SCENARIOS.VIRTUAL],
     });
 
     await page.goto("/");
@@ -174,7 +174,7 @@ test.describe("Home Page - Cards Component", () => {
 
   test("displays View details link to cards page", async ({ page }) => {
     await setupAllMocks(page, BASE_USER, {
-      cards: [CARD_SCENARIOS.SINGLE_VIRTUAL],
+      cards: [CARD_SCENARIOS.VIRTUAL],
     });
 
     await page.goto("/");

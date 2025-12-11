@@ -304,7 +304,7 @@ export const CARD_SCENARIOS = {
   EMPTY: [],
 
   /** Single active virtual card */
-  SINGLE_VIRTUAL: createCard({
+  VIRTUAL: createCard({
     id: "card-virtual-1",
     cardToken: "token-virtual-1",
     lastFourDigits: "1234",
@@ -313,7 +313,7 @@ export const CARD_SCENARIOS = {
   }),
 
   /** Single active physical card */
-  SINGLE_PHYSICAL: createCard({
+  PHYSICAL: createCard({
     id: "card-physical-1",
     cardToken: "token-physical-1",
     lastFourDigits: "5678",
@@ -321,8 +321,18 @@ export const CARD_SCENARIOS = {
     statusCode: CardStatus.ACTIVE,
   }),
 
+  /** Not activated yet - needs physical activation */
+  INACTIVE_PHYSICAL_CARD: createCard({
+    id: "card-inactive-physical",
+    cardToken: "token-inactive-physical",
+    lastFourDigits: "3333",
+    virtual: false,
+    statusCode: CardStatus.ACTIVE,
+    activatedAt: null,
+  }),
+
   /** Frozen card scenario */
-  SINGLE_FROZEN: createCard({
+  FROZEN: createCard({
     id: "card-frozen",
     cardToken: "token-frozen",
     lastFourDigits: "9999",
@@ -331,7 +341,7 @@ export const CARD_SCENARIOS = {
   }),
 
   /** Expired card scenario */
-  SINGLE_EXPIRED: createCard({
+  EXPIRED: createCard({
     id: "card-expired",
     cardToken: "token-expired",
     lastFourDigits: "7777",
@@ -340,7 +350,7 @@ export const CARD_SCENARIOS = {
   }),
 
   /** PIN blocked card scenario */
-  SINGLE_PIN_BLOCKED: createCard({
+  PIN_BLOCKED: createCard({
     id: "card-pin-blocked",
     cardToken: "token-pin-blocked",
     lastFourDigits: "8888",
@@ -349,7 +359,7 @@ export const CARD_SCENARIOS = {
   }),
 
   /** Voided card scenario */
-  SINGLE_VOIDED: createCard({
+  VOIDED: createCard({
     id: "card-voided",
     cardToken: "token-voided",
     lastFourDigits: "0000",
@@ -358,7 +368,7 @@ export const CARD_SCENARIOS = {
   }),
 
   /** Lost card scenario */
-  SINGLE_LOST: createCard({
+  LOST: createCard({
     id: "card-lost",
     cardToken: "token-lost",
     lastFourDigits: "1111",
@@ -367,7 +377,7 @@ export const CARD_SCENARIOS = {
   }),
 
   /** Stolen card scenario */
-  SINGLE_STOLEN: createCard({
+  STOLEN: createCard({
     id: "card-stolen",
     cardToken: "token-stolen",
     lastFourDigits: "2222",

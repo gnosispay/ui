@@ -12,7 +12,7 @@ test.describe("Virtual Card Order", () => {
 
   test("complete virtual card order flow from home page", async ({ page }) => {
     await setupAllMocks(page, BASE_USER, {
-      cards: [CARD_SCENARIOS.SINGLE_VIRTUAL],
+      cards: [CARD_SCENARIOS.VIRTUAL],
     });
 
     await page.goto("/");
@@ -124,7 +124,7 @@ test.describe("Virtual Card Order", () => {
 
   test("display error when virtual card creation fails", async ({ page }) => {
     await setupAllMocks(page, BASE_USER, {
-      cards: [CARD_SCENARIOS.SINGLE_VIRTUAL],
+      cards: [CARD_SCENARIOS.VIRTUAL],
     });
 
     await page.goto("/");
