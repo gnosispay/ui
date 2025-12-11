@@ -61,7 +61,7 @@ test.describe("Cards Page", () => {
     }) => {
       const testCards = [
         CARD_SCENARIOS.VIRTUAL,
-        CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD,
+        CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD,
         CARD_SCENARIOS.FROZEN,
         CARD_SCENARIOS.VOIDED,
       ];
@@ -113,22 +113,22 @@ test.describe("Cards Page", () => {
       await test.step("navigate to deactivated physical card", async () => {
         // Click the dot for the deactivated physical card
         const deactivatedDot = page.getByTestId(
-          `card-carousel-dot-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
+          `card-carousel-dot-${CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD.lastFourDigits}`,
         );
         await deactivatedDot.click();
 
         // Verify the deactivated card is now selected
         const deactivatedCardItem = page.getByTestId(
-          `card-carousel-item-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
+          `card-carousel-item-${CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD.lastFourDigits}`,
         );
         await expect(deactivatedCardItem).toHaveAttribute("data-selected", "true");
 
         // Verify card details
         const deactivatedCardPreview = page.getByTestId(
-          `card-preview-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
+          `card-preview-${CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD.lastFourDigits}`,
         );
         await expect(deactivatedCardPreview.getByTestId("card-last4")).toHaveText(
-          CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits,
+          CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD.lastFourDigits,
         );
         await expect(deactivatedCardPreview.getByTestId("card-type")).toHaveText("Physical");
 
@@ -208,7 +208,7 @@ test.describe("Cards Page", () => {
         await page.waitForLoadState("networkidle");
 
         const deactivatedCard = page.getByRole("button", {
-          name: new RegExp(`Go to card ending in ${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`),
+          name: new RegExp(`Go to card ending in ${CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD.lastFourDigits}`),
         });
         await deactivatedCard.click();
 
@@ -231,7 +231,7 @@ test.describe("Cards Page", () => {
       const testCards = [
         CARD_SCENARIOS.VIRTUAL,
         CARD_SCENARIOS.FROZEN,
-        CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD,
+        CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD,
         CARD_SCENARIOS.PHYSICAL,
       ];
 
@@ -268,7 +268,30 @@ test.describe("Cards Page", () => {
 
         const seePinButton = page.getByTestId("card-action-see-pin");
         await expect(seePinButton).toBeVisible();
+        // virtual cards have no PIN
         await expect(seePinButton).toBeDisabled();
+      });
+
+      await test.step("virtual card shows void option in More menu", async () => {
+        const moreButton = page.getByTestId("card-action-more");
+        await moreButton.click();
+
+        const voidCardOption = page.getByTestId("card-action-void-card");
+        await expect(voidCardOption).toBeVisible();
+      });
+
+      await test.step("clicking Void card opens confirmation dialog", async () => {
+        const voidCardOption = page.getByTestId("card-action-void-card");
+        await voidCardOption.click();
+
+        const dialog = page.locator('[role="dialog"]');
+        await expect(dialog).toBeVisible();
+        await expect(dialog.getByRole("heading", { name: "Void Card" })).toBeVisible();
+        await expect(dialog.getByText("Are you sure you want to void this card?")).toBeVisible();
+        await expect(dialog.getByText("This action cannot be undone")).toBeVisible();
+
+        // Close the dialog
+        await page.keyboard.press("Escape");
       });
 
       await test.step("second card (frozen) shows correct transactions and actions", async () => {
@@ -287,17 +310,36 @@ test.describe("Cards Page", () => {
 
         const freezeButton = page.getByTestId("card-action-freeze");
         await expect(freezeButton).not.toBeVisible();
+
+        const activateButton = page.getByTestId("card-action-activate");
+        await expect(activateButton).not.toBeVisible();
+
+        const showDetailsButton = page.getByTestId("card-action-show-details");
+        await expect(showDetailsButton).toBeVisible();
+        await expect(showDetailsButton).toBeEnabled();
+
+        const seePinButton = page.getByTestId("card-action-see-pin");
+        await expect(seePinButton).toBeVisible();
+        await expect(seePinButton).toBeEnabled();
       });
 
       await test.step("deactivated physical card shows activate button", async () => {
         const deactivatedDot = page.getByTestId(
-          `card-carousel-dot-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
+          `card-carousel-dot-${CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD.lastFourDigits}`,
         );
         await deactivatedDot.click();
 
         const activateButton = page.getByTestId("card-action-activate");
         await expect(activateButton).toBeVisible();
         await expect(activateButton).toBeEnabled();
+
+        const showDetailsButton = page.getByTestId("card-action-show-details");
+        await expect(showDetailsButton).toBeVisible();
+        await expect(showDetailsButton).toBeEnabled();
+
+        const seePinButton = page.getByTestId("card-action-see-pin");
+        await expect(seePinButton).toBeVisible();
+        await expect(seePinButton).toBeEnabled();
       });
 
       await test.step("clicking Activate opens confirmation dialog", async () => {
@@ -311,37 +353,6 @@ test.describe("Cards Page", () => {
 
         const confirmButton = dialog.getByRole("button", { name: "Activate Card" });
         await expect(confirmButton).toBeVisible();
-
-        // Close the dialog
-        await page.keyboard.press("Escape");
-      });
-
-      await test.step("verify See PIN button is visible and enabled for physical cards", async () => {
-        const seePinButton = page.getByTestId("card-action-see-pin");
-        await expect(seePinButton).toBeVisible();
-        await expect(seePinButton).toBeEnabled();
-      });
-
-      await test.step("virtual card shows void option in More menu", async () => {
-        const virtualDot = page.getByTestId(`card-carousel-dot-${CARD_SCENARIOS.VIRTUAL.lastFourDigits}`);
-        await virtualDot.click();
-
-        const moreButton = page.getByTestId("card-action-more");
-        await moreButton.click();
-
-        const voidCardOption = page.getByTestId("card-action-void-card");
-        await expect(voidCardOption).toBeVisible();
-      });
-
-      await test.step("clicking Void card opens confirmation dialog", async () => {
-        const voidCardOption = page.getByTestId("card-action-void-card");
-        await voidCardOption.click();
-
-        const dialog = page.locator('[role="dialog"]');
-        await expect(dialog).toBeVisible();
-        await expect(dialog.getByRole("heading", { name: "Void Card" })).toBeVisible();
-        await expect(dialog.getByText("Are you sure you want to void this card?")).toBeVisible();
-        await expect(dialog.getByText("This action cannot be undone")).toBeVisible();
 
         // Close the dialog
         await page.keyboard.press("Escape");
@@ -430,7 +441,7 @@ test.describe("Cards Page", () => {
         expect(page.url()).toContain("cardIndex=2");
 
         const deactivatedCardItem = page.getByTestId(
-          `card-carousel-item-${CARD_SCENARIOS.DEACTIVATED_PHYSICAL_CARD.lastFourDigits}`,
+          `card-carousel-item-${CARD_SCENARIOS.INACTIVE_PHYSICAL_CARD.lastFourDigits}`,
         );
         await expect(deactivatedCardItem).toHaveAttribute("data-selected", "true");
         await expect(page.getByTestId("card-action-activate")).toBeVisible();

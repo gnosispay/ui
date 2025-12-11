@@ -321,6 +321,16 @@ export const CARD_SCENARIOS = {
     statusCode: CardStatus.ACTIVE,
   }),
 
+  /** Not activated yet - needs physical activation */
+  INACTIVE_PHYSICAL_CARD: createCard({
+    id: "card-inactive-physical",
+    cardToken: "token-inactive-physical",
+    lastFourDigits: "3333",
+    virtual: false,
+    statusCode: CardStatus.ACTIVE,
+    activatedAt: null,
+  }),
+
   /** Frozen card scenario */
   FROZEN: createCard({
     id: "card-frozen",
@@ -373,14 +383,5 @@ export const CARD_SCENARIOS = {
     lastFourDigits: "2222",
     virtual: false,
     statusCode: CardStatus.STOLEN,
-  }),
-
-  DEACTIVATED_PHYSICAL_CARD: createCard({
-    id: "card-deactivated-physical",
-    cardToken: "token-deactivated-physical",
-    lastFourDigits: "3333",
-    virtual: false,
-    statusCode: CardStatus.ACTIVE,
-    activatedAt: null, // Not activated yet - needs physical activation
   }),
 };
