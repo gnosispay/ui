@@ -157,6 +157,7 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
           disabled={isLoading || !safeConfig?.address}
           loading={isLoading}
           className="flex-1"
+          data-testid="send-funds-confirm-button"
         >
           {isLoading ? "Executing..." : "Confirm and execute"}
         </Button>

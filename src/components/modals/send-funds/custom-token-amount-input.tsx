@@ -214,6 +214,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
           value={contractAddress}
           onChange={(e) => handleAddressChange(e.target.value)}
           className={addressError ? "border-destructive" : ""}
+          data-testid="custom-token-address-input"
         />
         {addressError && (
           <StandardAlert variant="destructive" description={addressError} customIcon={<Coins className="h-4 w-4" />} />
@@ -235,7 +236,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
       {tokenInfo && !isLoadingToken && (
         <>
           {/* Token Details */}
-          <div className="space-y-1 p-3 rounded-lg border border-brand">
+          <div className="space-y-1 p-3 rounded-lg border border-brand" data-testid="custom-token-info">
             <div className="flex items-center gap-2">
               <div className="w-6 h-6 rounded-full bg-primary/20 flex items-center justify-center">
                 <Coins className="h-3 w-3 text-primary" />
@@ -259,6 +260,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
                 type="number"
                 value={displayAmount}
                 onChange={(e) => handleAmountChange(e.target.value)}
+                data-testid="custom-token-amount-input"
               />
               <div className="absolute right-3 top-2 flex flex-col items-end gap-1">
                 <div className="flex items-center gap-2">
@@ -275,6 +277,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
                     size="sm"
                     className="h-auto p-0 text-xs font-semibold text-foreground hover:bg-transparent"
                     onClick={handleMaxClick}
+                    data-testid="custom-token-max-button"
                   >
                     Max
                   </Button>

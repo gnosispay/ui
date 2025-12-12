@@ -31,7 +31,9 @@ export const Home = () => {
           <div className="mx-4 lg:mx-0 lg:col-span-2 lg:row-start-1">
             <Balances />
             <div className="mb-12 mt-4 flex gap-4 mx-4 lg:mx-0">
-              <Button onClick={() => setSendFundsModalOpen(true)}>Send funds</Button>
+              <Button onClick={() => setSendFundsModalOpen(true)} data-testid="send-funds-button">
+                Send funds
+              </Button>
               <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
             </div>
           </div>

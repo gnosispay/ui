@@ -26,6 +26,7 @@ export const AddressInput = ({ toAddress, onChange, error, connectedAddress }: A
           onChange={(e) => onChange(e.target.value)}
           placeholder="0x..."
           spellCheck={false}
+          data-testid="send-funds-address-input"
         />
         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">gno:</span>
       </div>
