@@ -37,7 +37,7 @@ const WSTETH_NAME_PARTIAL = "Wrapped liquid staked Ether";
 
 const anvilAvailable = isAnvilAvailable();
 
-test.describe("Send Funds Modal", () => {
+test.describe("Send Funds Modal with Anvil", () => {
   test.beforeEach(async ({ page }) => {
     await startAnvil();
     // Point the mock wallet to Anvil if available
@@ -385,6 +385,14 @@ test.describe("Send Funds Modal", () => {
       // The custom token info should not be visible
       const tokenInfo = page.getByTestId("custom-token-info");
       await expect(tokenInfo).not.toBeVisible();
+    });
+  });
+});
+
+test.describe("Send Funds Modal without Anvil", () => {
+  test.beforeEach(async ({ page }) => {
+    await setupMockWallet(page, {
+      rpcUrl: undefined,
     });
   });
 
