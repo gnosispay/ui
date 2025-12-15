@@ -2,17 +2,31 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
+import { ANVIL_RPC_URL, isAnvilAvailable, setupTestBalances, startAnvil, stopAnvil } from "./utils/anvil";
+import type { Address } from "viem";
 
 /**
  * Send Funds Modal Test Specification
  * Tests the custom token functionality and error handling for insufficient funds
  *
- * Uses real blockchain data from Gnosis Chain for wstETH token to test:
+ * Uses Anvil to fork Gnosis Chain with controlled token balances when available.
+ * Falls back to real blockchain data (0 balances) if Anvil is not installed.
+ *
+ * Tests:
  * - Default token selection from safeConfig
  * - Currency switching functionality
  * - Custom token input and token info display
  * - Insufficient funds error for both standard and custom tokens
+ * - Valid transaction flow when user has sufficient funds (Anvil only)
  * - Form validation behavior
+ *
+ * PREREQUISITES:
+ * Install Foundry to get Anvil: https://book.getfoundry.sh/getting-started/installation
+ *   curl -L https://foundry.paradigm.xyz | bash
+ *   foundryup
+ *
+ * Anvil is started automatically via globalSetup (see tests/global-setup.ts)
+ * The dev server connects to Anvil via VITE_GNOSIS_RPC_URL env var
  */
 
 // wstETH token on Gnosis Chain - real contract
@@ -21,12 +35,28 @@ const WSTETH_SYMBOL = "wstETH";
 // The full name from the contract includes "from Mainnet" suffix
 const WSTETH_NAME_PARTIAL = "Wrapped liquid staked Ether";
 
+const anvilAvailable = isAnvilAvailable();
+
 test.describe("Send Funds Modal", () => {
   test.beforeEach(async ({ page }) => {
-    await setupMockWallet(page);
+    await startAnvil();
+    // Point the mock wallet to Anvil if available
+    await setupMockWallet(page, {
+      rpcUrl: anvilAvailable ? ANVIL_RPC_URL : undefined,
+    });
+  });
+
+  test.afterEach(async () => {
+    await stopAnvil();
   });
 
   test("custom token functionality and insufficient funds error", async ({ page }) => {
+    await setupTestBalances(BASE_USER.safeAddress as Address, {
+      EURe: "1000",
+      wstETH: "2.5",
+      xDAI: "100",
+    });
+
     // Set up all mocks with the base user
     await setupAllMocks(page, BASE_USER);
 
@@ -45,10 +75,27 @@ test.describe("Send Funds Modal", () => {
       await expect(modal.getByRole("heading", { name: "Send funds" })).toBeVisible();
 
       // Verify the warning alert about Gnosis Chain address is displayed
-      await expect(page.getByRole("alert")).toContainText("Gnosis Chain address");
+      await expect(page.getByRole("alert").filter({ hasText: "Gnosis Chain address" })).toBeVisible();
     });
 
-    await test.step("enter recipient address", async () => {
+    await test.step("verify invalid address shows error", async () => {
+      const addressInput = page.getByTestId("send-funds-address-input");
+
+      // Enter an invalid address
+      await addressInput.fill("invalid-address");
+
+      // Wait for the error to appear
+      const errorAlert = page.getByRole("alert").filter({ hasText: "Invalid address" });
+      await expect(errorAlert).toBeVisible();
+
+      // Restore valid address
+      await addressInput.fill("0x1234567890123456789012345678901234567890");
+
+      // Error should disappear
+      await expect(errorAlert).not.toBeVisible();
+    });
+
+    await test.step("enter a valid recipient address", async () => {
       // Enter a valid test address
       const addressInput = page.getByTestId("send-funds-address-input");
       await expect(addressInput).toBeVisible();
@@ -59,6 +106,9 @@ test.describe("Send Funds Modal", () => {
 
       // Verify the address was entered correctly
       await expect(addressInput).toHaveValue(testRecipientAddress);
+
+      const errorAlert = page.getByRole("alert").filter({ hasText: "Invalid address" });
+      await expect(errorAlert).not.toBeVisible();
     });
 
     await test.step("verify default token is EUR from safeConfig", async () => {
@@ -71,12 +121,48 @@ test.describe("Send Funds Modal", () => {
       await expect(selectedTokenSymbol).toHaveText("EURe");
     });
 
-    await test.step("test insufficient funds error for standard token", async () => {
-      // The test safe address has 0 EUR balance on the blockchain
-      // Enter an amount to trigger insufficient balance error
+    await test.step("test valid EUR amount)", async () => {
       const amountInput = page.getByTestId("standard-token-amount-input");
       await expect(amountInput).toBeVisible();
+
+      //token amount should be 1000
+      const tokenBalance = page.getByTestId("token-balance");
+      await expect(tokenBalance).toBeVisible();
+      await expect(tokenBalance).toHaveText("1000");
+
       await amountInput.fill("100"); // Try to send 100 EUR
+
+      const errorAlert = page.getByRole("alert").filter({ hasText: "Insufficient balance" });
+      await expect(errorAlert).not.toBeVisible();
+      const nextButton = page.getByTestId("send-funds-next-button");
+      await expect(nextButton).toBeEnabled();
+
+      // Clear for next test
+      await amountInput.fill("");
+    });
+
+    await test.step("test amount available and max button", async () => {
+      const amountInput = page.getByTestId("standard-token-amount-input");
+
+      const maxButton = page.getByTestId("standard-token-max-button");
+      await expect(maxButton).toBeVisible();
+
+      await maxButton.click();
+      await expect(amountInput).toHaveValue("1000");
+
+      const errorAlert = page.getByRole("alert").filter({ hasText: "Insufficient balance" });
+      await expect(errorAlert).not.toBeVisible();
+      const nextButton = page.getByTestId("send-funds-next-button");
+      await expect(nextButton).toBeEnabled();
+
+      await amountInput.fill("");
+    });
+
+    await test.step("test insufficient funds error for standard token", async () => {
+      const amountInput = page.getByTestId("standard-token-amount-input");
+      await expect(amountInput).toBeVisible();
+
+      await amountInput.fill("2000"); // Try to send 2000 EUR (we only have 1000)
 
       // Wait for the error to appear
       const errorAlert = page.getByRole("alert").filter({ hasText: "Insufficient balance" });
@@ -85,9 +171,6 @@ test.describe("Send Funds Modal", () => {
       // Verify the next button is disabled
       const nextButton = page.getByTestId("send-funds-next-button");
       await expect(nextButton).toBeDisabled();
-
-      // Clear the amount for next steps
-      await amountInput.fill("");
     });
 
     await test.step("verify can switch currency from EUR to GBP", async () => {
@@ -103,12 +186,19 @@ test.describe("Send Funds Modal", () => {
       // Verify the selected token changed to GBP
       const selectedTokenSymbol = page.getByTestId("selected-token-symbol");
       await expect(selectedTokenSymbol).toHaveText("GBPe");
+
+      // make sure the input is empty
+      const amountInput = page.getByTestId("standard-token-amount-input");
+      await expect(amountInput).toHaveValue("");
     });
 
     await test.step("test insufficient funds error for GBP token", async () => {
-      // The test safe address also has 0 GBP balance
+      const tokenBalance = page.getByTestId("token-balance");
+      await expect(tokenBalance).toBeVisible();
+      await expect(tokenBalance).toHaveText("0");
+
       const amountInput = page.getByTestId("standard-token-amount-input");
-      await amountInput.fill("50"); // Try to send 50 GBP
+      await amountInput.fill("1000"); // Try to send 1000 GBP (we only have 0)
 
       // Wait for the error to appear
       const errorAlert = page.getByRole("alert").filter({ hasText: "Insufficient balance" });
@@ -135,23 +225,6 @@ test.describe("Send Funds Modal", () => {
       // Verify the selected token changed back to EUR
       const selectedTokenSymbol = page.getByTestId("selected-token-symbol");
       await expect(selectedTokenSymbol).toHaveText("EURe");
-    });
-
-    await test.step("verify invalid address shows error", async () => {
-      const addressInput = page.getByTestId("send-funds-address-input");
-
-      // Enter an invalid address
-      await addressInput.fill("invalid-address");
-
-      // Wait for the error to appear
-      const errorAlert = page.getByRole("alert").filter({ hasText: "Invalid address" });
-      await expect(errorAlert).toBeVisible();
-
-      // Restore valid address
-      await addressInput.fill("0x1234567890123456789012345678901234567890");
-
-      // Error should disappear
-      await expect(errorAlert).not.toBeVisible();
     });
 
     await test.step("enable custom token mode", async () => {
@@ -192,8 +265,27 @@ test.describe("Send Funds Modal", () => {
       // Verify token symbol is displayed
       await expect(tokenInfo).toContainText(WSTETH_SYMBOL);
 
-      // Verify token name contains expected text (actual name includes "from Mainnet")
+      // Verify token name contains expected text
       await expect(tokenInfo).toContainText(WSTETH_NAME_PARTIAL);
+
+      // make sure the amount balance is correct and the max button is visible
+      const tokenBalance = page.getByTestId("token-balance");
+      await expect(tokenBalance).toBeVisible();
+      await expect(tokenBalance).toHaveText("2.5");
+
+      const maxButton = page.getByTestId("custom-token-max-button");
+      await expect(maxButton).toBeVisible();
+
+      // click the max button and verify the amount balance is correct
+      await maxButton.click();
+      const customTokenAmountInput = page.getByTestId("custom-token-amount-input");
+      await expect(customTokenAmountInput).toHaveValue("2.5");
+      const nextButton = page.getByTestId("send-funds-next-button");
+      await expect(nextButton).toBeEnabled();
+
+      // clear the amount input
+      await customTokenAmountInput.fill("");
+      await expect(nextButton).toBeDisabled();
     });
 
     await test.step("verify amount input is available after token loads", async () => {
@@ -205,11 +297,22 @@ test.describe("Send Funds Modal", () => {
       await expect(page.getByText("Amount")).toBeVisible();
     });
 
-    await test.step("test insufficient funds error with positive amount", async () => {
-      // Since the test Safe address has 0 wstETH balance,
-      // any positive amount should trigger the insufficient balance error
+    await test.step("test valid wstETH amount when balance available", async () => {
       const amountInput = page.getByTestId("custom-token-amount-input");
-      await amountInput.fill("0.001"); // Try to send 0.001 wstETH when balance is 0
+
+      await amountInput.fill("1"); // Try to send 1 wstETH
+
+      const errorAlert = page.getByRole("alert").filter({ hasText: "Insufficient balance" });
+      await expect(errorAlert).not.toBeVisible();
+      const nextButton = page.getByTestId("send-funds-next-button");
+      await expect(nextButton).toBeEnabled();
+      await amountInput.fill("");
+    });
+
+    await test.step("test insufficient funds error with positive amount", async () => {
+      const amountInput = page.getByTestId("custom-token-amount-input");
+
+      await amountInput.fill("5"); // Try to send 5 wstETH (we only have 2.5)
 
       // Wait for the error to appear
       const errorAlert = page.getByRole("alert").filter({ hasText: "Insufficient balance" });
@@ -275,13 +378,50 @@ test.describe("Send Funds Modal", () => {
       const customTokenInput = page.getByTestId("custom-token-address-input");
       await expect(customTokenInput).not.toBeVisible();
 
-      // The standard amount input (id="amount") should be visible
-      const standardAmountInput = page.locator("#amount");
+      // The standard amount input should be visible
+      const standardAmountInput = page.getByTestId("standard-token-amount-input");
       await expect(standardAmountInput).toBeVisible({ timeout: 5000 });
 
       // The custom token info should not be visible
       const tokenInfo = page.getByTestId("custom-token-info");
       await expect(tokenInfo).not.toBeVisible();
+    });
+  });
+
+  test("shows error when connected account is not a Safe owner", async ({ page }) => {
+    // Set up all mocks but mock owners with a different address (not the connected wallet)
+    // This simulates the case where the connected wallet is not an owner
+    await setupAllMocks(page, BASE_USER, {
+      owners: {
+        owners: ["0x1111111111111111111111111111111111111111"], // Different address, not the connected wallet
+      },
+    });
+
+    // Navigate to home page
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    await test.step("open send funds modal", async () => {
+      const sendFundsButton = page.getByTestId("send-funds-button");
+      await expect(sendFundsButton).toBeVisible();
+      await sendFundsButton.click();
+
+      // Wait for modal to open
+      const modal = page.locator('[role="dialog"]');
+      await expect(modal).toBeVisible();
+      await expect(modal.getByRole("heading", { name: "Send funds" })).toBeVisible();
+    });
+
+    await test.step("verify error message appears for non-owner account", async () => {
+      // Verify the error message is displayed
+      const errorAlert = page
+        .getByRole("alert")
+        .filter({ hasText: "You must be connected with an account that is a signer of the Gnosis Pay account" });
+      await expect(errorAlert).toBeVisible();
+
+      // Verify the Next button is disabled
+      const nextButton = page.getByTestId("send-funds-next-button");
+      await expect(nextButton).toBeDisabled();
     });
   });
 });

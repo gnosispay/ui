@@ -271,7 +271,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
                 </div>
 
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <span>{formatUnits(tokenInfo.balance, tokenInfo.decimals)}</span>
+                  <span data-testid="token-balance">{formatUnits(tokenInfo.balance, tokenInfo.decimals)}</span>
                   <Button
                     variant="ghost"
                     size="sm"

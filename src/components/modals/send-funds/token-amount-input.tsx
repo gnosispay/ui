@@ -126,7 +126,7 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
           </Select>
 
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>{formatUnits(selectedToken.balance, selectedToken.decimals)}</span>
+            <span data-testid="token-balance">{formatUnits(selectedToken.balance, selectedToken.decimals)}</span>
             <Button
               variant="ghost"
               size="sm"

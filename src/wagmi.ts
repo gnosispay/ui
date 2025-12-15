@@ -6,6 +6,9 @@ import { safe, injected } from "wagmi/connectors";
 
 const projectId = "02e652f4cb3974c4c3a822aa56ec09f6";
 
+// Allow RPC URL to be configured via environment variable (useful for testing with Anvil)
+const rpcUrl = import.meta.env.VITE_GNOSIS_RPC_URL || undefined;
+
 export const wagmiAdapter = new WagmiAdapter({
   networks: [gnosis],
   projectId,
@@ -18,7 +21,7 @@ export const wagmiAdapter = new WagmiAdapter({
     }),
   ],
   transports: {
-    [gnosis.id]: http(),
+    [gnosis.id]: http(rpcUrl),
   },
   ssr: false,
 });

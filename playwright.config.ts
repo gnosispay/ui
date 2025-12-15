@@ -66,7 +66,7 @@ export default defineConfig({
   webServer: {
     command: "pnpm dev",
     url: "http://localhost:5173",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true, // Reuse existing dev server if running
     timeout: 120 * 1000, // 2 minutes timeout for server startup
     env: {
       VITE_PSE_RELAY_SERVER_URL: "http://localhost:8083/token",
@@ -74,6 +74,8 @@ export default defineConfig({
       VITE_GNOSIS_PAY_API_BASE_URL: "https://api.gnosispay.com/",
       VITE_PSE_APP_ID: "gp_a1b2c3d4e5f678901234567890123456",
       VITE_ZENDESK_KEY: "d73cdc9f-1ac0-4780-8c0a-f4ea7c09ebc5",
+      // Point to Anvil for tests that use blockchain forking
+      VITE_GNOSIS_RPC_URL: "http://127.0.0.1:8545",
     },
   },
 });
