@@ -276,6 +276,11 @@ export const USER_SIGNED_UP_NO_KYC = createTestUser({
   hasSignedUp: true,
 });
 
+export const USER_SIGNED_UP_NO_KYC_REQUIRES_ACTION = createTestUser({
+  ...USER_SIGNED_UP_NO_KYC,
+  kycStatus: "requiresAction",
+});
+
 /**
  * Test user with KYC pending (documents submitted)
  * Useful for testing the KYC waiting state

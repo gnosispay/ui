@@ -16,6 +16,7 @@ import {
   USER_SOF_ANSWERED_NO_PHONE,
   USER_READY_FOR_SAFE_DEPLOYMENT,
   BASE_USER,
+  USER_SIGNED_UP_NO_KYC_REQUIRES_ACTION,
 } from "./utils/testUsers";
 
 test.describe("Onboarding Flow - Happy Path", () => {
@@ -357,6 +358,41 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
     // Verify error alert is shown
     await expect(page.getByTestId("signup-error-alert")).toBeVisible();
     await expect(page.getByTestId("signup-error-alert")).toContainText("already associated with a Gnosis Pay account");
+  });
+
+  test("KYC error - requires action", async ({ page }) => {
+    // Set up wallet mock
+    await setupMockWallet(page);
+
+    // Mock auth challenge
+    await mockAuthChallenge({ page, testUser: USER_SIGNED_UP_NO_KYC });
+
+    // Mock user endpoint
+    await mockUser({ page, testUser: USER_SIGNED_UP_NO_KYC_REQUIRES_ACTION });
+
+    // Mock KYC integration endpoint with error
+    await mockKycIntegration(page);
+
+    // Navigate to KYC page
+    await page.goto("/kyc");
+
+    // Wait for KYC page to load
+    await expect(page.getByTestId("kyc-page")).toBeVisible();
+
+    // Verify error alert is shown
+    await expect(page.getByTestId("kyc-error-alert")).toBeVisible();
+    await expect(page.getByTestId("kyc-error-alert")).toContainText(
+      "Your KYC application has encountered an issue. Please contact the support using the chat widget",
+    );
+
+    // Verify contact support button is shown
+    await expect(page.getByTestId("kyc-contact-support-button")).toBeVisible();
+
+    // Click contact support button
+    await page.getByTestId("kyc-contact-support-button").click();
+
+    // Verify Zendesk chat iframe is opened
+    await expect(page.getByTitle("Button to launch messaging window, conversation in progress")).toBeVisible();
   });
 
   test("KYC error - failed to load integration", async ({ page }) => {
