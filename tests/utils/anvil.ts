@@ -8,10 +8,10 @@ import {
   createTestClient,
   createWalletClient,
   http,
-  parseEther,
   type Address,
   type Hex,
   pad,
+  parseUnits,
 } from "viem";
 import { gnosis } from "viem/chains";
 import { privateKeyToAccount } from "viem/accounts";
@@ -129,7 +129,6 @@ export async function startAnvil(
   // Check if Anvil is already running on this port
   if (await isAnvilRunning(port)) {
     console.log(`✅ Anvil already running on port ${port}, reusing existing instance`);
-    // Create a "dummy" instance that won't try to start/stop
     // We'll just use the existing Anvil
     return;
   }
@@ -199,21 +198,6 @@ export function createAnvilWalletClient(privateKey: Hex) {
 }
 
 /**
- * Sets the native token (xDAI) balance for an address
- *
- * @param address - The address to set balance for
- * @param balance - The balance in ether (e.g., "100" for 100 xDAI)
- */
-export async function setNativeBalance(address: Address, balance: string): Promise<void> {
-  const client = createAnvilClient();
-
-  await client.setBalance({
-    address,
-    value: parseEther(balance),
-  });
-}
-
-/**
  * Sets ERC20 balance by impersonating a whale address and transferring tokens
  * This is more reliable than storage manipulation for complex token contracts
  *
@@ -232,12 +216,10 @@ async function setErc20BalanceViaTransfer(
   // Check if token address is zero address (native token)
   const isNativeToken = tokenAddress.toLowerCase() === "0x0000000000000000000000000000000000000000";
 
-  // Try to find a whale address on the fork that has tokens
-  // Common addresses that might have tokens on Gnosis chain
-
   const [symbol, token] = Object.entries(GNOSIS_TOKENS).find(([_, token]) => token.address === tokenAddress) ?? [];
 
   const whale = token?.whale;
+
   if (!whale) {
     throw new Error(`No whale found for token ${symbol}`);
   }
@@ -283,10 +265,9 @@ async function setErc20BalanceViaTransfer(
 
     if (isNativeToken) {
       // For native token, use standard transfer
-      await walletClient.sendTransaction({
-        to: holderAddress,
+      await client.setBalance({
+        address: holderAddress,
         value: balance,
-        account: whale,
       });
     } else {
       // Transfer ERC20 tokens using wallet client
@@ -380,10 +361,9 @@ export const GNOSIS_TOKENS = {
     decimals: 18,
     whale: "0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f",
   },
-  XDAI: {
+  xDAI: {
     address: "0x0000000000000000000000000000000000000000" as Address,
     decimals: 18,
-    balanceSlot: 0,
     whale: "0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d",
   },
 } as const;
@@ -405,24 +385,15 @@ export const GNOSIS_TOKENS = {
  */
 export async function setupTestBalances(
   accountAddress: Address,
-  balances: Partial<Record<keyof typeof GNOSIS_TOKENS | "xDAI", string>>,
+  balances: Partial<Record<keyof typeof GNOSIS_TOKENS, string>>,
 ): Promise<void> {
   const promises: Promise<void>[] = [];
 
-  // Handle native token (xDAI)
-  if (balances.xDAI) {
-    promises.push(setNativeBalance(accountAddress, balances.xDAI));
-  }
-
   // Handle ERC20 tokens
   for (const [symbol, amount] of Object.entries(balances)) {
-    if (symbol === "xDAI") continue;
-
-    const tokenInfo = GNOSIS_TOKENS[symbol as keyof typeof GNOSIS_TOKENS];
+    const tokenInfo = GNOSIS_TOKENS[symbol];
     if (tokenInfo) {
-      const balanceWei = BigInt(Math.floor(parseFloat(amount) * 10 ** tokenInfo.decimals));
-      // Use auto-detection for all tokens to find the correct storage slot
-      // This handles upgradeable proxies and different storage layouts
+      const balanceWei = parseUnits(amount, tokenInfo.decimals);
       promises.push(setErc20BalanceViaTransfer(tokenInfo.address, accountAddress, balanceWei));
     }
   }

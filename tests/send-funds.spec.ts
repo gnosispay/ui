@@ -2,38 +2,21 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { ANVIL_RPC_URL, isAnvilAvailable, setupTestBalances, startAnvil, stopAnvil } from "./utils/anvil";
+import {
+  ANVIL_RPC_URL,
+  GNOSIS_TOKENS,
+  isAnvilAvailable,
+  setupTestBalances,
+  startAnvil,
+  stopAnvil,
+} from "./utils/anvil";
 import type { Address } from "viem";
 
-/**
- * Send Funds Modal Test Specification
- * Tests the custom token functionality and error handling for insufficient funds
- *
- * Uses Anvil to fork Gnosis Chain with controlled token balances when available.
- * Falls back to real blockchain data (0 balances) if Anvil is not installed.
- *
- * Tests:
- * - Default token selection from safeConfig
- * - Currency switching functionality
- * - Custom token input and token info display
- * - Insufficient funds error for both standard and custom tokens
- * - Valid transaction flow when user has sufficient funds (Anvil only)
- * - Form validation behavior
- *
- * PREREQUISITES:
- * Install Foundry to get Anvil: https://book.getfoundry.sh/getting-started/installation
- *   curl -L https://foundry.paradigm.xyz | bash
- *   foundryup
- *
- * Anvil is started automatically via globalSetup (see tests/global-setup.ts)
- * The dev server connects to Anvil via VITE_GNOSIS_RPC_URL env var
- */
-
-// wstETH token on Gnosis Chain - real contract
-const WSTETH_ADDRESS = "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6";
-const WSTETH_SYMBOL = "wstETH";
-// The full name from the contract includes "from Mainnet" suffix
-const WSTETH_NAME_PARTIAL = "Wrapped liquid staked Ether";
+const wstETHInfo = {
+  address: GNOSIS_TOKENS.wstETH.address,
+  symbol: "wstETH",
+  name: "Wrapped liquid staked Ether",
+};
 
 const anvilAvailable = isAnvilAvailable();
 
@@ -256,17 +239,17 @@ test.describe("Send Funds Modal with Anvil", () => {
     await test.step("enter wstETH token address and verify token info loads", async () => {
       // Enter the wstETH token address
       const customTokenInput = page.getByTestId("custom-token-address-input");
-      await customTokenInput.fill(WSTETH_ADDRESS);
+      await customTokenInput.fill(wstETHInfo.address);
 
       // Wait for token info to load from blockchain
       const tokenInfo = page.getByTestId("custom-token-info");
       await expect(tokenInfo).toBeVisible({ timeout: 15000 });
 
       // Verify token symbol is displayed
-      await expect(tokenInfo).toContainText(WSTETH_SYMBOL);
+      await expect(tokenInfo).toContainText(wstETHInfo.symbol);
 
       // Verify token name contains expected text
-      await expect(tokenInfo).toContainText(WSTETH_NAME_PARTIAL);
+      await expect(tokenInfo).toContainText(wstETHInfo.name);
 
       // make sure the amount balance is correct and the max button is visible
       const tokenBalance = page.getByTestId("token-balance");
