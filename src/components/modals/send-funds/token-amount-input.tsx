@@ -96,14 +96,20 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
           type="number"
           value={displayAmount}
           onChange={(e) => handleAmountChange(e.target.value)}
+          data-testid="standard-token-amount-input"
         />
         <div className="absolute right-3 top-2 flex flex-col items-end gap-1">
           <Select value={selectedToken.address} onValueChange={handleTokenSelect}>
-            <SelectTrigger className="w-auto border-0 bg-transparent p-0 h-auto shadow-none">
+            <SelectTrigger
+              className="w-auto border-0 bg-transparent p-0 h-auto shadow-none"
+              data-testid="token-selector"
+            >
               <SelectValue>
                 <div className="flex items-center gap-2">
                   {selectedToken?.logo && <img src={selectedToken.logo} className="h-5 w-5 rounded-full" alt="Token" />}
-                  <span className="font-medium">{selectedToken?.tokenSymbol}</span>
+                  <span className="font-medium" data-testid="selected-token-symbol">
+                    {selectedToken?.tokenSymbol}
+                  </span>
                 </div>
               </SelectValue>
             </SelectTrigger>
@@ -120,12 +126,13 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
           </Select>
 
           <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <span>{formatUnits(selectedToken.balance, selectedToken.decimals)}</span>
+            <span data-testid="token-balance">{formatUnits(selectedToken.balance, selectedToken.decimals)}</span>
             <Button
               variant="ghost"
               size="sm"
               className="h-auto p-0 text-xs font-semibold text-foreground hover:bg-transparent"
               onClick={handleMaxClick}
+              data-testid="standard-token-max-button"
             >
               Max
             </Button>

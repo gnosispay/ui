@@ -103,7 +103,12 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
             <Label htmlFor="custom-token-switch" className="text-sm text-muted-foreground">
               Custom token
             </Label>
-            <Switch id="custom-token-switch" checked={isCustomToken} onCheckedChange={handleCustomTokenChange} />
+            <Switch
+              id="custom-token-switch"
+              checked={isCustomToken}
+              onCheckedChange={handleCustomTokenChange}
+              data-testid="custom-token-switch"
+            />
           </div>
         </div>
 
@@ -122,7 +127,12 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
         )}
       </div>
 
-      <Button onClick={handleNext} disabled={!isFormValid || isQueueNotEmpty || !isSignerConnected} className="w-full">
+      <Button
+        onClick={handleNext}
+        disabled={!isFormValid || isQueueNotEmpty || !isSignerConnected}
+        className="w-full"
+        data-testid="send-funds-next-button"
+      >
         Next
       </Button>
     </div>

@@ -130,14 +130,22 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
           <Label className="text-muted-foreground text-sm">You're sending</Label>
           <div className="flex items-center gap-2 mt-1">
             {selectedToken.logo && <img src={selectedToken.logo} className="h-6 w-6 rounded-full" alt="Token" />}
-            <div className="text-xl font-semibold">{formatUnits(amount, selectedToken.decimals ?? 18)}</div>
-            <div className="text-lg text-muted-foreground">{selectedToken.symbol}</div>
+            <div className="text-xl font-semibold" data-testid="confirm-amount">
+              {formatUnits(amount, selectedToken.decimals ?? 18)}
+            </div>
+            <div className="text-lg text-muted-foreground" data-testid="confirm-token-symbol">
+              {selectedToken.symbol}
+            </div>
           </div>
         </div>
 
         <div className="bg-muted/50 p-4 rounded-lg">
-          <Label className="text-muted-foreground text-sm">To</Label>
-          <div className="mt-1 font-mono text-sm break-all">{toAddress}</div>
+          <Label className="text-muted-foreground text-sm" data-testid="confirm-to-label">
+            To
+          </Label>
+          <div className="mt-1 font-mono text-sm break-all" data-testid="confirm-to-address">
+            {toAddress}
+          </div>
         </div>
       </div>
 
@@ -157,6 +165,7 @@ export const SendFundsConfirm = ({ selectedToken, amount, toAddress, onBack, onS
           disabled={isLoading || !safeConfig?.address}
           loading={isLoading}
           className="flex-1"
+          data-testid="send-funds-confirm-button"
         >
           {isLoading ? "Executing..." : "Confirm and execute"}
         </Button>
