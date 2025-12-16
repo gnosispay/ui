@@ -120,8 +120,49 @@ test.describe("Send Funds Modal with Anvil", () => {
       const nextButton = page.getByTestId("send-funds-next-button");
       await expect(nextButton).toBeEnabled();
 
-      // Clear for next test
-      await amountInput.fill("");
+      // Click Next to go to confirmation screen
+      await nextButton.click();
+
+      // Verify confirmation screen displays correct EURe data
+      await test.step("verify confirmation screen displays EURe data", async () => {
+        // Wait for confirmation screen to appear
+        const confirmButton = page.getByTestId("send-funds-confirm-button");
+        await expect(confirmButton).toBeVisible();
+
+        // Verify "You're sending" section shows 100 EURe
+        const sendingLabel = page.getByText("You're sending");
+        await expect(sendingLabel).toBeVisible();
+
+        // Verify the amount (100) is displayed
+        const amountDisplay = page.getByTestId("confirm-amount");
+        await expect(amountDisplay).toBeVisible();
+        await expect(amountDisplay).toHaveText("100");
+
+        // Verify token symbol (€) is displayed
+        const tokenSymbol = page.getByTestId("confirm-token-symbol");
+        await expect(tokenSymbol).toBeVisible();
+        await expect(tokenSymbol).toHaveText("€");
+
+        // Verify recipient address is displayed
+        const recipientLabel = page.getByTestId("confirm-to-label");
+        await expect(recipientLabel).toBeVisible();
+        const recipientAddress = page.getByTestId("confirm-to-address");
+        await expect(recipientAddress).toBeVisible();
+        await expect(recipientAddress).toHaveText("0x1234567890123456789012345678901234567890");
+      });
+
+      // Click Back to return to form
+      const backButton = page.getByRole("button", { name: "Back" });
+      await expect(backButton).toBeVisible();
+      await backButton.click();
+
+      // Verify we're back on the form and amount input has the value reset
+      await expect(amountInput).toBeVisible();
+      await expect(amountInput).toHaveValue("");
+
+      const addressInput = page.getByTestId("send-funds-address-input");
+      const testRecipientAddress = "0x1234567890123456789012345678901234567890";
+      await addressInput.fill(testRecipientAddress);
     });
 
     await test.step("test amount available and max button", async () => {
@@ -264,35 +305,58 @@ test.describe("Send Funds Modal with Anvil", () => {
       const customTokenAmountInput = page.getByTestId("custom-token-amount-input");
       await expect(customTokenAmountInput).toHaveValue("2.5");
       const nextButton = page.getByTestId("send-funds-next-button");
-      await expect(nextButton).toBeEnabled();
-
-      // clear the amount input
-      await customTokenAmountInput.fill("");
-      await expect(nextButton).toBeDisabled();
-    });
-
-    await test.step("verify amount input is available after token loads", async () => {
-      // The amount input should now be visible
-      const amountInput = page.getByTestId("custom-token-amount-input");
-      await expect(amountInput).toBeVisible();
-
-      // Amount label should be visible
-      await expect(page.getByText("Amount")).toBeVisible();
-    });
-
-    await test.step("test valid wstETH amount when balance available", async () => {
-      const amountInput = page.getByTestId("custom-token-amount-input");
-
-      await amountInput.fill("1"); // Try to send 1 wstETH
 
       const errorAlert = page.getByRole("alert").filter({ hasText: "Insufficient balance" });
       await expect(errorAlert).not.toBeVisible();
-      const nextButton = page.getByTestId("send-funds-next-button");
+
       await expect(nextButton).toBeEnabled();
-      await amountInput.fill("");
+
+      // Click Next to go to confirmation screen
+      await nextButton.click();
+
+      // Verify confirmation screen displays correct wstETH data
+      await test.step("verify confirmation screen displays wstETH data", async () => {
+        // Wait for confirmation screen to appear
+        const confirmButton = page.getByTestId("send-funds-confirm-button");
+        await expect(confirmButton).toBeVisible();
+
+        // Verify "You're sending" section shows 2.5 wstETH
+        const sendingLabel = page.getByText("You're sending");
+        await expect(sendingLabel).toBeVisible();
+
+        // Verify the amount (2.5) is displayed
+        const amountDisplay = page.locator("text=/^2\\.5$/");
+        await expect(amountDisplay).toBeVisible();
+
+        // Verify token symbol (wstETH) is displayed
+        const tokenSymbol = page.getByText("wstETH");
+        await expect(tokenSymbol).toBeVisible();
+      });
+
+      // Click Back to return to form
+      const backButton = page.getByRole("button", { name: "Back" });
+      await expect(backButton).toBeVisible();
+      await backButton.click();
+
+      // Verify we're back on the form and amount input has the value reset
+      await expect(customTokenAmountInput).not.toBeVisible();
     });
 
     await test.step("test insufficient funds error with positive amount", async () => {
+      // Enable custom token mode
+      const customTokenSwitch = page.getByTestId("custom-token-switch");
+      await expect(customTokenSwitch).toBeVisible();
+      await customTokenSwitch.click();
+
+      // Enter wstETH token address
+      const customTokenInput = page.getByTestId("custom-token-address-input");
+      await expect(customTokenInput).toBeVisible();
+      await customTokenInput.fill(wstETHInfo.address);
+
+      // Wait for token info to load
+      await expect(page.getByTestId("custom-token-info")).toBeVisible({ timeout: 15000 });
+
+      // Now we can test the amount input
       const amountInput = page.getByTestId("custom-token-amount-input");
 
       await amountInput.fill("5"); // Try to send 5 wstETH (we only have 2.5)
