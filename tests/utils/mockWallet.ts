@@ -1,6 +1,6 @@
 import { installMockWallet } from "@johanneskares/wallet-mock";
 import { privateKeyToAccount } from "viem/accounts";
-import { type Address, http } from "viem";
+import { type Address, http, type Chain } from "viem";
 import { gnosis } from "viem/chains";
 import type { Page } from "@playwright/test";
 import { USER_TEST_PRIVATE_KEY } from "./testUsers";
@@ -10,9 +10,11 @@ import { USER_TEST_PRIVATE_KEY } from "./testUsers";
  */
 export interface MockWalletOptions {
   /** Custom chain to use instead of Gnosis chain */
-  chain?: typeof gnosis;
+  chain?: Chain;
   /** Custom private key to use instead of the test user's key */
   privateKey?: string;
+  /** Custom RPC URL (e.g., for Anvil fork) */
+  rpcUrl?: string;
 }
 
 /**
@@ -50,11 +52,12 @@ export interface MockWalletOptions {
 export async function setupMockWallet(page: Page, options: MockWalletOptions = {}): Promise<void> {
   const chain = options.chain || gnosis;
   const privateKey = options.privateKey || USER_TEST_PRIVATE_KEY;
+  const rpcUrl = options.rpcUrl;
 
   await installMockWallet({
     page,
     account: privateKeyToAccount(privateKey as Address),
     defaultChain: chain,
-    transports: { [chain.id]: http() },
+    transports: { [chain.id]: http(rpcUrl) },
   });
 }

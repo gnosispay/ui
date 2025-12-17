@@ -196,6 +196,7 @@ export const CardsCarousel = ({
             onClick={prevCard}
             className="hidden lg:block absolute left-2 top-1/2 -translate-y-1/2 text-primary z-10 bg-background opacity-80 rounded-full p-1 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
             aria-label="Previous card"
+            data-testid="card-carousel-arrow-prev"
           >
             <ChevronLeft strokeWidth={1} size={24} />
           </button>
@@ -210,6 +211,8 @@ export const CardsCarousel = ({
             return (
               <div
                 key={card.id}
+                data-testid={`card-carousel-item-${card.lastFourDigits}`}
+                data-selected={index === currentIndex}
                 className={`shrink-0 transition-opacity duration-300 ${
                   index === currentIndex ? "opacity-100" : "opacity-40"
                 } ${index === 0 ? "ml-[calc(50%-10rem)] sm:ml-0" : index === cards.length - 1 ? "mr-[calc(50%-10rem)] sm:mr-0" : ""}`}
@@ -230,6 +233,7 @@ export const CardsCarousel = ({
             onClick={nextCard}
             className="hidden lg:block absolute right-2 top-1/2 -translate-y-1/2 z-10 text-primary bg-background opacity-80 rounded-full p-1 shadow-md lg:opacity-0 lg:group-hover:opacity-100 transition-opacity cursor-pointer"
             aria-label="Next card"
+            data-testid="card-carousel-arrow-next"
           >
             <ChevronRight strokeWidth={1} size={24} />
           </button>
@@ -238,7 +242,7 @@ export const CardsCarousel = ({
 
       {/* Dots indicator */}
       {cards.length > 1 && (
-        <div className="flex justify-center items-center px-4 sm:px-0 mt-2">
+        <div className="flex justify-center items-center px-4 sm:px-0 mt-2" data-testid="card-carousel-dots">
           <div className="flex gap-2">
             {cards.map((card, index) => (
               <button
@@ -247,6 +251,7 @@ export const CardsCarousel = ({
                 onClick={() => goToCard(index)}
                 className={`w-3 h-3 rounded-full transition-colors cursor-pointer border ${index === currentIndex ? "border-primary" : "bg-border"}`}
                 aria-label={`Go to card ${index + 1}`}
+                data-testid={`card-carousel-dot-${card.lastFourDigits}`}
               />
             ))}
           </div>

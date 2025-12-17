@@ -35,7 +35,10 @@ export const CardStatusOverlay = ({ status, showText = true, iconSize = 40 }: Ca
   const config = statusConfig[status];
 
   return (
-    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-1">
+    <div
+      className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center z-1"
+      data-testid={`card-status-overlay-${status}`}
+    >
       {config.icon}
       {showText && <span className="text-white text-sm font-semibold tracking-widest">{config.text}</span>}
     </div>

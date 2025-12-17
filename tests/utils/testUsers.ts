@@ -276,6 +276,11 @@ export const USER_SIGNED_UP_NO_KYC = createTestUser({
   hasSignedUp: true,
 });
 
+export const USER_SIGNED_UP_NO_KYC_REQUIRES_ACTION = createTestUser({
+  ...USER_SIGNED_UP_NO_KYC,
+  kycStatus: "requiresAction",
+});
+
 /**
  * Test user with KYC pending (documents submitted)
  * Useful for testing the KYC waiting state
@@ -361,4 +366,15 @@ export const USER_DEACTIVATED = createTestUser({
   isSourceOfFundsAnswered: BASE_USER.user.isSourceOfFundsAnswered,
   bankingDetails: BASE_USER.user.bankingDetails,
   status: "DEACTIVATED",
+});
+
+/**
+ * Test user with KYC rejected
+ * Useful for testing KYC rejection flows and special route access
+ */
+export const USER_KYC_REJECTED = createTestUser({
+  ...USER_SIGNED_UP_NO_KYC,
+  kycStatus: "rejected",
+  isSourceOfFundsAnswered: false,
+  isPhoneValidated: false,
 });

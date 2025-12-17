@@ -51,6 +51,7 @@ const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       )}>
         <Comp
           ref={ref}
+          aria-label={label}
           className={cn(
             iconButtonVariants({ 
               variant, 

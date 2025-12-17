@@ -11,6 +11,7 @@ import { mockOrder, type OrderMockData } from "./mockOrder";
 import { mockIbansAvailable, type IbansAvailableMockData } from "./mockIbansAvailable";
 import { mockCardTransactions, type CardTransactionsMockData } from "./mockCardTransactions";
 import { mockIbanOrders, type IbanOrdersMockData } from "./mockIbanOrders";
+import { mockOwners, type OwnersMockData } from "./mockOwners";
 
 /**
  * Configuration options for setting up all API mocks
@@ -36,6 +37,8 @@ export interface MockSetupOptions {
   cardTransactions?: CardTransactionsMockData;
   /** Optional overrides for IBAN orders mock */
   ibanOrders?: IbanOrdersMockData;
+  /** Optional overrides for owners mock */
+  owners?: OwnersMockData;
   /** Skip auth challenge mock (useful when setting up custom auth flow) */
   skipAuthChallenge?: boolean;
   /** Skip user mock (useful when setting up custom user data) */
@@ -58,6 +61,8 @@ export interface MockSetupOptions {
   skipCardTransactions?: boolean;
   /** Skip IBAN orders mock (useful when setting up custom IBAN order data) */
   skipIbanOrders?: boolean;
+  /** Skip owners mock (useful when setting up custom owners data) */
+  skipOwners?: boolean;
 }
 
 /**
@@ -145,6 +150,9 @@ export async function setupAllMocks(page: Page, testUser: TestUser, options: Moc
   }
   if (!options.skipIbanOrders) {
     mockPromises.push(mockIbanOrders({ page, testUser, ordersOverrides: options.ibanOrders }));
+  }
+  if (!options.skipOwners) {
+    mockPromises.push(mockOwners({ page, testUser, ownersOverrides: options.owners }));
   }
 
   await Promise.all(mockPromises);

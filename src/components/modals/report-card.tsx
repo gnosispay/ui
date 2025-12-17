@@ -4,24 +4,16 @@ import { Dialog, DialogContent, DialogFooter, DialogTitle } from "../ui/dialog";
 import { ConfirmationDialog } from "./confirmation-dialog";
 
 interface ReportCardModalProps {
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
   onReportAsLost: () => void | Promise<void>;
   onReportAsStolen: () => void | Promise<void>;
 }
 
-export const ReportCardModal = ({ onClose, onReportAsLost, onReportAsStolen }: ReportCardModalProps) => {
+export const ReportCardModal = ({ open, onOpenChange, onReportAsLost, onReportAsStolen }: ReportCardModalProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showLostConfirmation, setShowLostConfirmation] = useState(false);
   const [showStolenConfirmation, setShowStolenConfirmation] = useState(false);
-
-  const onOpenChange = useCallback(
-    (open: boolean) => {
-      if (!open) {
-        onClose();
-      }
-    },
-    [onClose],
-  );
 
   const handleReportAsLost = useCallback(async () => {
     setIsLoading(true);
@@ -41,11 +33,26 @@ export const ReportCardModal = ({ onClose, onReportAsLost, onReportAsStolen }: R
     onOpenChange(false);
   }, [onOpenChange]);
 
+  // Reset confirmation states when the modal is closed
+  const handleOpenChange = useCallback(
+    (newOpen: boolean) => {
+      if (!newOpen) {
+        setShowLostConfirmation(false);
+        setShowStolenConfirmation(false);
+      }
+      onOpenChange(newOpen);
+    },
+    [onOpenChange],
+  );
+
   if (showLostConfirmation) {
     return (
       <ConfirmationDialog
-        open={true}
-        onOpenChange={() => setShowLostConfirmation(false)}
+        open={open}
+        onOpenChange={(newOpen) => {
+          if (!newOpen) setShowLostConfirmation(false);
+          onOpenChange(newOpen);
+        }}
         title="Report Card as Lost"
         iconColor="text-destructive"
         message="Please note that this is a non-reversible action. Once a card is reported as lost, it cannot be undone."
@@ -59,8 +66,11 @@ export const ReportCardModal = ({ onClose, onReportAsLost, onReportAsStolen }: R
   if (showStolenConfirmation) {
     return (
       <ConfirmationDialog
-        open={true}
-        onOpenChange={() => setShowStolenConfirmation(false)}
+        open={open}
+        onOpenChange={(newOpen) => {
+          if (!newOpen) setShowStolenConfirmation(false);
+          onOpenChange(newOpen);
+        }}
         title="Report Card as Stolen"
         iconColor="text-destructive"
         message="Please note that this is a non-reversible action. Once a card is reported as stolen, it cannot be undone."
@@ -72,7 +82,7 @@ export const ReportCardModal = ({ onClose, onReportAsLost, onReportAsStolen }: R
   }
 
   return (
-    <Dialog open={true} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent aria-describedby={undefined}>
         <DialogTitle>Report Card</DialogTitle>
         <div className="grid flex-1 gap-4">
