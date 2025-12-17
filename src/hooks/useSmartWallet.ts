@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { useAccount, usePublicClient } from "wagmi";
+import { useConnection, usePublicClient } from "wagmi";
 import type { Address } from "viem";
 
 interface UseSmartWalletReturn {
@@ -11,7 +11,7 @@ interface UseSmartWalletReturn {
 export const useSmartWallet = (): UseSmartWalletReturn => {
   const [isSmartWallet, setIsSmartWallet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { address } = useAccount();
+  const { address } = useConnection();
   const publicClient = usePublicClient();
 
   const checkSmartWallet = useCallback(() => {

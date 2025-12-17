@@ -1,9 +1,9 @@
-import { getBalance } from "wagmi/actions";
 import { currencies as moneriumTokens, supportedTokens, type TokenInfo } from "@/constants";
 import { useState, useEffect, useCallback } from "react";
 import { wagmiAdapter } from "@/wagmi";
 import { useUser } from "@/context/UserContext";
 import type { Address } from "viem";
+import { getTokenBalance } from "@/utils/tokenBalanceUtils";
 
 export interface TokenInfoWithBalance extends TokenInfo {
   balance: bigint;
@@ -46,22 +46,19 @@ export const useTokenBalance = (): UseTokenBalanceResult => {
     try {
       const balancePromises = Object.values(tokens).map(async (token) => {
         if (!token.address) {
-          return Promise.resolve({ value: 0n });
+          return 0n;
         }
 
-        return getBalance(wagmiAdapter.wagmiConfig, {
-          address: safeConfig.address as Address,
-          token: token.address !== supportedTokens.XDAI.address ? (token.address as Address) : undefined,
-        });
+        return getTokenBalance(wagmiAdapter.wagmiConfig, safeConfig.address as Address, token.address);
       });
 
       const balanceResults = await Promise.all(balancePromises);
       const newCurrencies: TokenWithBalance = {};
 
-      for (const [index, result] of balanceResults.entries()) {
+      for (const [index, balance] of balanceResults.entries()) {
         newCurrencies[Object.keys(tokens)[index]] = {
           ...tokens[Object.keys(tokens)[index]],
-          balance: result.value,
+          balance,
         };
       }
 
