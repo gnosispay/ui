@@ -4,14 +4,18 @@ import { useUser } from "@/context/UserContext";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+import { Button } from "@/components/ui/button";
+import { useZendesk } from "react-use-zendesk";
 
 const kycStatusesRequiringContact: KycStatus[] = ["rejected", "requiresAction"];
 
 export const KycRoute = () => {
   const { user, refreshUser, isUserSignedUp } = useUser();
   const [error, setError] = useState("");
+  const [withContactSupport, setWithContactSupport] = useState(false);
   const [kycUrl, setKycUrl] = useState("");
   const navigate = useNavigate();
+  const { open } = useZendesk();
 
   useEffect(() => {
     if (!user?.kycStatus) return;
@@ -19,9 +23,8 @@ export const KycRoute = () => {
     // an issue happened during the KYC process, sumsub rejected the application
     // or an action is required, they need to contact your support
     if (kycStatusesRequiringContact.includes(user.kycStatus)) {
-      setError(
-        "Your KYC application has encountered an issue. Please contact support using the chat widget in the bottom right corner of the screen.",
-      );
+      setError("Your KYC application has encountered an issue. Please contact the support using the chat widget");
+      setWithContactSupport(true);
       return;
     }
 
@@ -89,6 +92,13 @@ export const KycRoute = () => {
             className="mt-4"
             data-testid="kyc-error-alert"
           />
+          {withContactSupport && (
+            <div className="flex justify-center mt-4">
+              <Button onClick={() => open()} data-testid="kyc-contact-support-button">
+                Contact support
+              </Button>
+            </div>
+          )}
         </div>
       )}
       {!error && (
