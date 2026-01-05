@@ -23,18 +23,11 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
  *
  * Retrieves the balance information for the authenticated user (total, spendable and pending balances)
  */
-export const getApiV1AccountBalances = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountBalancesData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1AccountBalancesResponses, GetApiV1AccountBalancesErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/account-balances',
-        ...options
-    });
-};
+export const getApiV1AccountBalances = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountBalancesData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AccountBalancesResponses, GetApiV1AccountBalancesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/account-balances',
+    ...options
+});
 
 /**
  * Create or Deploy a Safe (pending Setup)
@@ -61,22 +54,15 @@ export const getApiV1AccountBalances = <ThrowOnError extends boolean = false>(op
  *
  * @deprecated
  */
-export const postApiV1Account = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AccountData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1AccountResponses, PostApiV1AccountErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/account',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1Account = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AccountData, ThrowOnError>) => (options.client ?? client).post<PostApiV1AccountResponses, PostApiV1AccountErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/account',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieve Signature Data for Account Setup
@@ -96,18 +82,11 @@ export const postApiV1Account = <ThrowOnError extends boolean = false>(options: 
  *
  * @deprecated
  */
-export const getApiV1AccountSignaturePayload = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountSignaturePayloadData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1AccountSignaturePayloadResponses, GetApiV1AccountSignaturePayloadErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/account/signature-payload',
-        ...options
-    });
-};
+export const getApiV1AccountSignaturePayload = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountSignaturePayloadData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AccountSignaturePayloadResponses, GetApiV1AccountSignaturePayloadErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/account/signature-payload',
+    ...options
+});
 
 /**
  * Setup Safe with Signature
@@ -135,84 +114,61 @@ export const getApiV1AccountSignaturePayload = <ThrowOnError extends boolean = f
  *
  * @deprecated
  */
-export const patchApiV1AccountDeploySafeModules = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1AccountDeploySafeModulesData, ThrowOnError>) => {
-    return (options.client ?? client).patch<PatchApiV1AccountDeploySafeModulesResponses, PatchApiV1AccountDeploySafeModulesErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/account/deploy-safe-modules',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const patchApiV1AccountDeploySafeModules = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1AccountDeploySafeModulesData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1AccountDeploySafeModulesResponses, PatchApiV1AccountDeploySafeModulesErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/account/deploy-safe-modules',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Generate nonce
  */
-export const getApiV1AuthNonce = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AuthNonceData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1AuthNonceResponses, GetApiV1AuthNonceErrors, ThrowOnError>({
-        url: '/api/v1/auth/nonce',
-        ...options
-    });
-};
+export const getApiV1AuthNonce = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AuthNonceData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AuthNonceResponses, GetApiV1AuthNonceErrors, ThrowOnError>({ url: '/api/v1/auth/nonce', ...options });
 
 /**
  * Verify SIWE signature
  */
-export const postApiV1AuthChallenge = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthChallengeData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1AuthChallengeResponses, PostApiV1AuthChallengeErrors, ThrowOnError>({
-        url: '/api/v1/auth/challenge',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1AuthChallenge = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthChallengeData, ThrowOnError>) => (options.client ?? client).post<PostApiV1AuthChallengeResponses, PostApiV1AuthChallengeErrors, ThrowOnError>({
+    url: '/api/v1/auth/challenge',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Create a new User
  *
  * This endpoint creates a new `User` associating it with the provided email address.
  */
-export const postApiV1AuthSignup = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1AuthSignupResponses, PostApiV1AuthSignupErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/auth/signup',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1AuthSignup = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupData, ThrowOnError>) => (options.client ?? client).post<PostApiV1AuthSignupResponses, PostApiV1AuthSignupErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/auth/signup',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Request OTP for email verification
  *
  * This endpoint generates and sends a one-time password (OTP) to the provided email address for verification purposes.
  */
-export const postApiV1AuthSignupOtp = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupOtpData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1AuthSignupOtpResponses, PostApiV1AuthSignupOtpErrors, ThrowOnError>({
-        url: '/api/v1/auth/signup/otp',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1AuthSignupOtp = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AuthSignupOtpData, ThrowOnError>) => (options.client ?? client).post<PostApiV1AuthSignupOtpResponses, PostApiV1AuthSignupOtpErrors, ThrowOnError>({
+    url: '/api/v1/auth/signup/otp',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Activate a Card
@@ -237,18 +193,11 @@ export const postApiV1AuthSignupOtp = <ThrowOnError extends boolean = false>(opt
  * :::
  *
  */
-export const postApiV1CardsByCardIdActivate = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdActivateData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1CardsByCardIdActivateResponses, PostApiV1CardsByCardIdActivateErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/{cardId}/activate',
-        ...options
-    });
-};
+export const postApiV1CardsByCardIdActivate = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdActivateData, ThrowOnError>) => (options.client ?? client).post<PostApiV1CardsByCardIdActivateResponses, PostApiV1CardsByCardIdActivateErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{cardId}/activate',
+    ...options
+});
 
 /**
  * Freeze a Card
@@ -260,66 +209,38 @@ export const postApiV1CardsByCardIdActivate = <ThrowOnError extends boolean = fa
  * :::
  *
  */
-export const postApiV1CardsByCardIdFreeze = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdFreezeData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1CardsByCardIdFreezeResponses, PostApiV1CardsByCardIdFreezeErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/{cardId}/freeze',
-        ...options
-    });
-};
+export const postApiV1CardsByCardIdFreeze = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdFreezeData, ThrowOnError>) => (options.client ?? client).post<PostApiV1CardsByCardIdFreezeResponses, PostApiV1CardsByCardIdFreezeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{cardId}/freeze',
+    ...options
+});
 
 /**
  * Report a Card as lost
  */
-export const postApiV1CardsByCardIdLost = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdLostData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1CardsByCardIdLostResponses, PostApiV1CardsByCardIdLostErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/{cardId}/lost',
-        ...options
-    });
-};
+export const postApiV1CardsByCardIdLost = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdLostData, ThrowOnError>) => (options.client ?? client).post<PostApiV1CardsByCardIdLostResponses, PostApiV1CardsByCardIdLostErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{cardId}/lost',
+    ...options
+});
 
 /**
  * Get a Card status
  */
-export const getApiV1CardsByCardIdStatus = <ThrowOnError extends boolean = false>(options: Options<GetApiV1CardsByCardIdStatusData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1CardsByCardIdStatusResponses, GetApiV1CardsByCardIdStatusErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/{cardId}/status',
-        ...options
-    });
-};
+export const getApiV1CardsByCardIdStatus = <ThrowOnError extends boolean = false>(options: Options<GetApiV1CardsByCardIdStatusData, ThrowOnError>) => (options.client ?? client).get<GetApiV1CardsByCardIdStatusResponses, GetApiV1CardsByCardIdStatusErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{cardId}/status',
+    ...options
+});
 
 /**
  * Report a Card as stolen
  */
-export const postApiV1CardsByCardIdStolen = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdStolenData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1CardsByCardIdStolenResponses, PostApiV1CardsByCardIdStolenErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/{cardId}/stolen',
-        ...options
-    });
-};
+export const postApiV1CardsByCardIdStolen = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdStolenData, ThrowOnError>) => (options.client ?? client).post<PostApiV1CardsByCardIdStolenResponses, PostApiV1CardsByCardIdStolenErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{cardId}/stolen',
+    ...options
+});
 
 /**
  * Revert a Card freeze
@@ -331,52 +252,31 @@ export const postApiV1CardsByCardIdStolen = <ThrowOnError extends boolean = fals
  * :::
  *
  */
-export const postApiV1CardsByCardIdUnfreeze = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdUnfreezeData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1CardsByCardIdUnfreezeResponses, PostApiV1CardsByCardIdUnfreezeErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/{cardId}/unfreeze',
-        ...options
-    });
-};
+export const postApiV1CardsByCardIdUnfreeze = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdUnfreezeData, ThrowOnError>) => (options.client ?? client).post<PostApiV1CardsByCardIdUnfreezeResponses, PostApiV1CardsByCardIdUnfreezeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{cardId}/unfreeze',
+    ...options
+});
 
 /**
  * Void a Virtual Card
  *
  * Void a virtual card. Only virtual cards can be voided using this endpoint.
  */
-export const postApiV1CardsByCardIdVoid = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdVoidData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1CardsByCardIdVoidResponses, PostApiV1CardsByCardIdVoidErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/{cardId}/void',
-        ...options
-    });
-};
+export const postApiV1CardsByCardIdVoid = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsByCardIdVoidData, ThrowOnError>) => (options.client ?? client).post<PostApiV1CardsByCardIdVoidResponses, PostApiV1CardsByCardIdVoidErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/{cardId}/void',
+    ...options
+});
 
 /**
  * List all Cards
  */
-export const getApiV1Cards = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CardsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1CardsResponses, GetApiV1CardsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards',
-        ...options
-    });
-};
+export const getApiV1Cards = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CardsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1CardsResponses, GetApiV1CardsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards',
+    ...options
+});
 
 /**
  * Create a Virtual Card
@@ -389,18 +289,11 @@ export const getApiV1Cards = <ThrowOnError extends boolean = false>(options?: Op
  * Active cards exclude voided, lost, and stolen cards.
  *
  */
-export const postApiV1CardsVirtual = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1CardsVirtualData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostApiV1CardsVirtualResponses, PostApiV1CardsVirtualErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/virtual',
-        ...options
-    });
-};
+export const postApiV1CardsVirtual = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1CardsVirtualData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1CardsVirtualResponses, PostApiV1CardsVirtualErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/virtual',
+    ...options
+});
 
 /**
  * List Card Transactions
@@ -415,18 +308,11 @@ export const postApiV1CardsVirtual = <ThrowOnError extends boolean = false>(opti
  * The final number might differ slightly, as one thread might contain multiple transactions.
  *
  */
-export const getApiV1CardsTransactions = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CardsTransactionsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1CardsTransactionsResponses, GetApiV1CardsTransactionsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/transactions',
-        ...options
-    });
-};
+export const getApiV1CardsTransactions = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CardsTransactionsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1CardsTransactionsResponses, GetApiV1CardsTransactionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/transactions',
+    ...options
+});
 
 /**
  * Link physical card to user
@@ -435,94 +321,59 @@ export const getApiV1CardsTransactions = <ThrowOnError extends boolean = false>(
  *
  * @deprecated
  */
-export const postApiV1CardsVerify = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsVerifyData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1CardsVerifyResponses, PostApiV1CardsVerifyErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cards/verify',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1CardsVerify = <ThrowOnError extends boolean = false>(options: Options<PostApiV1CardsVerifyData, ThrowOnError>) => (options.client ?? client).post<PostApiV1CardsVerifyResponses, PostApiV1CardsVerifyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cards/verify',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * List Delayed Transactions
  *
  * Returns an array of delayed transactions associated with the authenticated user, excluding failed transactions.
  */
-export const getApiV1DelayRelay = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DelayRelayData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1DelayRelayResponses, GetApiV1DelayRelayErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/delay-relay',
-        ...options
-    });
-};
+export const getApiV1DelayRelay = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1DelayRelayData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1DelayRelayResponses, GetApiV1DelayRelayErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/delay-relay',
+    ...options
+});
 
 /**
  * List Physical Card Orders
  *
  * Retrieves all physical card orders for the authenticated user
  */
-export const getApiV1Order = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1OrderData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1OrderResponses, GetApiV1OrderErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/',
-        ...options
-    });
-};
+export const getApiV1Order = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1OrderData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1OrderResponses, GetApiV1OrderErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/',
+    ...options
+});
 
 /**
  * Retrieve Safe Configuration
  *
  * Returns the configuration of the Safe account associated with the authenticated user, including deployment status, approvals, and account status and allowance details from the chain.
  */
-export const getApiV1SafeConfig = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SafeConfigData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1SafeConfigResponses, GetApiV1SafeConfigErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/safe/config',
-        ...options
-    });
-};
+export const getApiV1SafeConfig = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SafeConfigData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1SafeConfigResponses, GetApiV1SafeConfigErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/safe/config',
+    ...options
+});
 
 /**
  * Get the Safe deployment status.
  *
  * Returns the deployment status of the Safe account for the authenticated user.
  */
-export const getApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SafeDeployData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1SafeDeployResponses, GetApiV1SafeDeployErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/safe/deploy',
-        ...options
-    });
-};
+export const getApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SafeDeployData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1SafeDeployResponses, GetApiV1SafeDeployErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/safe/deploy',
+    ...options
+});
 
 /**
  * Deploy and Setup a Safe
@@ -536,18 +387,11 @@ export const getApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options
  * To monitor the deployment status, call the `GET /api/v1/safe/deploy` endpoint.
  *
  */
-export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1SafeDeployData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostApiV1SafeDeployResponses, PostApiV1SafeDeployErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/safe/deploy',
-        ...options
-    });
-};
+export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1SafeDeployData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1SafeDeployResponses, PostApiV1SafeDeployErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/safe/deploy',
+    ...options
+});
 
 /**
  * Reset Safe Account
@@ -572,18 +416,11 @@ export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(option
  * - Users will need to deploy a new Safe account after reset
  *
  */
-export const deleteApiV1SafeReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1SafeResetData, ThrowOnError>) => {
-    return (options?.client ?? client).delete<DeleteApiV1SafeResetResponses, DeleteApiV1SafeResetErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/safe/reset',
-        ...options
-    });
-};
+export const deleteApiV1SafeReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1SafeResetData, ThrowOnError>) => (options?.client ?? client).delete<DeleteApiV1SafeResetResponses, DeleteApiV1SafeResetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/safe/reset',
+    ...options
+});
 
 /**
  * Set Safe Currency
@@ -601,54 +438,33 @@ export const deleteApiV1SafeReset = <ThrowOnError extends boolean = false>(optio
  *
  * @deprecated
  */
-export const postApiV1SafeSetCurrency = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1SafeSetCurrencyData, ThrowOnError>) => {
-    return (options?.client ?? client).post<PostApiV1SafeSetCurrencyResponses, PostApiV1SafeSetCurrencyErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/safe/set-currency',
-        ...options
-    });
-};
+export const postApiV1SafeSetCurrency = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1SafeSetCurrencyData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1SafeSetCurrencyResponses, PostApiV1SafeSetCurrencyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/safe/set-currency',
+    ...options
+});
 
 /**
  * Retrieve Source of Funds questions
  */
-export const getApiV1SourceOfFunds = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SourceOfFundsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1SourceOfFundsResponses, GetApiV1SourceOfFundsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/source-of-funds',
-        ...options
-    });
-};
+export const getApiV1SourceOfFunds = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SourceOfFundsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1SourceOfFundsResponses, GetApiV1SourceOfFundsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/source-of-funds',
+    ...options
+});
 
 /**
  * Answer Source of Funds questions
  */
-export const postApiV1SourceOfFunds = <ThrowOnError extends boolean = false>(options: Options<PostApiV1SourceOfFundsData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1SourceOfFundsResponses, PostApiV1SourceOfFundsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/source-of-funds',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1SourceOfFunds = <ThrowOnError extends boolean = false>(options: Options<PostApiV1SourceOfFundsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1SourceOfFundsResponses, PostApiV1SourceOfFundsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/source-of-funds',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Dispute a Transaction
@@ -657,40 +473,26 @@ export const postApiV1SourceOfFunds = <ThrowOnError extends boolean = false>(opt
  * If the dispute reason is `unrecognized_transaction_report_fraudulent`, the user's card will be restricted.
  *
  */
-export const postApiV1TransactionsByThreadIdDispute = <ThrowOnError extends boolean = false>(options: Options<PostApiV1TransactionsByThreadIdDisputeData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1TransactionsByThreadIdDisputeResponses, PostApiV1TransactionsByThreadIdDisputeErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/transactions/{threadId}/dispute',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1TransactionsByThreadIdDispute = <ThrowOnError extends boolean = false>(options: Options<PostApiV1TransactionsByThreadIdDisputeData, ThrowOnError>) => (options.client ?? client).post<PostApiV1TransactionsByThreadIdDisputeResponses, PostApiV1TransactionsByThreadIdDisputeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/transactions/{threadId}/dispute',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * List Dispute Reasons
  *
  * Returns a list of available dispute reasons keys with their human-readable text. The keys need to be used in the dispute reason field when creating a dispute.
  */
-export const getApiV1TransactionsDispute = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1TransactionsDisputeData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1TransactionsDisputeResponses, GetApiV1TransactionsDisputeErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/transactions/dispute',
-        ...options
-    });
-};
+export const getApiV1TransactionsDispute = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1TransactionsDisputeData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1TransactionsDisputeResponses, GetApiV1TransactionsDisputeErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/transactions/dispute',
+    ...options
+});
 
 /**
  * List Transactions (without pagination)
@@ -700,78 +502,50 @@ export const getApiV1TransactionsDispute = <ThrowOnError extends boolean = false
  *
  * @deprecated
  */
-export const getApiV1Transactions = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1TransactionsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1TransactionsResponses, GetApiV1TransactionsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/transactions',
-        ...options
-    });
-};
+export const getApiV1Transactions = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1TransactionsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1TransactionsResponses, GetApiV1TransactionsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/transactions',
+    ...options
+});
 
 /**
  * Verify a Phone Number (with OTP Code)
  */
-export const postApiV1VerificationCheck = <ThrowOnError extends boolean = false>(options: Options<PostApiV1VerificationCheckData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1VerificationCheckResponses, PostApiV1VerificationCheckErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/verification/check',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1VerificationCheck = <ThrowOnError extends boolean = false>(options: Options<PostApiV1VerificationCheckData, ThrowOnError>) => (options.client ?? client).post<PostApiV1VerificationCheckResponses, PostApiV1VerificationCheckErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/verification/check',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieve an OTP code to verify a Phone Number
  *
  * This call replaces the existing phone number for a user if it exists, whether it's verified or not.
  */
-export const postApiV1Verification = <ThrowOnError extends boolean = false>(options: Options<PostApiV1VerificationData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1VerificationResponses, PostApiV1VerificationErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/verification',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1Verification = <ThrowOnError extends boolean = false>(options: Options<PostApiV1VerificationData, ThrowOnError>) => (options.client ?? client).post<PostApiV1VerificationResponses, PostApiV1VerificationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/verification',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get current daily spending limit
  *
  * Retrieves the current daily spending limit for the authenticated user's Safe account.
  */
-export const getApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountsDailyLimitData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1AccountsDailyLimitResponses, GetApiV1AccountsDailyLimitErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/daily-limit',
-        ...options
-    });
-};
+export const getApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountsDailyLimitData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AccountsDailyLimitResponses, GetApiV1AccountsDailyLimitErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/daily-limit',
+    ...options
+});
 
 /**
  * Set new daily spending limit
@@ -787,22 +561,15 @@ export const getApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>
  * **Note:** The newLimit must be an integer value between 1 and 8000.
  *
  */
-export const putApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>(options: Options<PutApiV1AccountsDailyLimitData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutApiV1AccountsDailyLimitResponses, PutApiV1AccountsDailyLimitErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/daily-limit',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const putApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>(options: Options<PutApiV1AccountsDailyLimitData, ThrowOnError>) => (options.client ?? client).put<PutApiV1AccountsDailyLimitResponses, PutApiV1AccountsDailyLimitErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/daily-limit',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get EIP-712 typed data for setting daily limit
@@ -816,18 +583,11 @@ export const putApiV1AccountsDailyLimit = <ThrowOnError extends boolean = false>
  * **Note:** The newLimit must be an integer value between 1 and 8000.
  *
  */
-export const getApiV1AccountsDailyLimitTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AccountsDailyLimitTransactionDataData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1AccountsDailyLimitTransactionDataResponses, GetApiV1AccountsDailyLimitTransactionDataErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/daily-limit/transaction-data',
-        ...options
-    });
-};
+export const getApiV1AccountsDailyLimitTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AccountsDailyLimitTransactionDataData, ThrowOnError>) => (options.client ?? client).get<GetApiV1AccountsDailyLimitTransactionDataResponses, GetApiV1AccountsDailyLimitTransactionDataErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/daily-limit/transaction-data',
+    ...options
+});
 
 /**
  * Retrieve Onchain Daily Limit
@@ -840,18 +600,11 @@ export const getApiV1AccountsDailyLimitTransactionData = <ThrowOnError extends b
  *
  * @deprecated
  */
-export const getApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountsOnchainDailyLimitData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1AccountsOnchainDailyLimitResponses, GetApiV1AccountsOnchainDailyLimitErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/onchain-daily-limit',
-        ...options
-    });
-};
+export const getApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountsOnchainDailyLimitData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AccountsOnchainDailyLimitResponses, GetApiV1AccountsOnchainDailyLimitErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/onchain-daily-limit',
+    ...options
+});
 
 /**
  * Change Onchain Daily Limit with Signature
@@ -872,22 +625,15 @@ export const getApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
  *
  * @deprecated
  */
-export const putApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean = false>(options: Options<PutApiV1AccountsOnchainDailyLimitData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutApiV1AccountsOnchainDailyLimitResponses, PutApiV1AccountsOnchainDailyLimitErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/onchain-daily-limit',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const putApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean = false>(options: Options<PutApiV1AccountsOnchainDailyLimitData, ThrowOnError>) => (options.client ?? client).put<PutApiV1AccountsOnchainDailyLimitResponses, PutApiV1AccountsOnchainDailyLimitErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/onchain-daily-limit',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieve Transaction Data for changing Daily Limit
@@ -906,18 +652,11 @@ export const putApiV1AccountsOnchainDailyLimit = <ThrowOnError extends boolean =
  *
  * @deprecated
  */
-export const getApiV1AccountsOnchainDailyLimitTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AccountsOnchainDailyLimitTransactionDataData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1AccountsOnchainDailyLimitTransactionDataResponses, GetApiV1AccountsOnchainDailyLimitTransactionDataErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/onchain-daily-limit/transaction-data',
-        ...options
-    });
-};
+export const getApiV1AccountsOnchainDailyLimitTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AccountsOnchainDailyLimitTransactionDataData, ThrowOnError>) => (options.client ?? client).get<GetApiV1AccountsOnchainDailyLimitTransactionDataResponses, GetApiV1AccountsOnchainDailyLimitTransactionDataErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/onchain-daily-limit/transaction-data',
+    ...options
+});
 
 /**
  * Withdraw from Safe with Signature
@@ -933,22 +672,15 @@ export const getApiV1AccountsOnchainDailyLimitTransactionData = <ThrowOnError ex
  * The withdrawal is processed through a delay relay mechanism that executes after 3 minutes.
  *
  */
-export const postApiV1AccountsWithdraw = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AccountsWithdrawData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1AccountsWithdrawResponses, PostApiV1AccountsWithdrawErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/withdraw',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1AccountsWithdraw = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AccountsWithdrawData, ThrowOnError>) => (options.client ?? client).post<PostApiV1AccountsWithdrawResponses, PostApiV1AccountsWithdrawErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/withdraw',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieve Transaction Data for Withdrawing from Safe
@@ -964,18 +696,11 @@ export const postApiV1AccountsWithdraw = <ThrowOnError extends boolean = false>(
  * 3. Submit the signature to the POST `/api/v1/accounts/withdraw` endpoint
  *
  */
-export const getApiV1AccountsWithdrawTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AccountsWithdrawTransactionDataData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1AccountsWithdrawTransactionDataResponses, GetApiV1AccountsWithdrawTransactionDataErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/accounts/withdraw/transaction-data',
-        ...options
-    });
-};
+export const getApiV1AccountsWithdrawTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1AccountsWithdrawTransactionDataData, ThrowOnError>) => (options.client ?? client).get<GetApiV1AccountsWithdrawTransactionDataResponses, GetApiV1AccountsWithdrawTransactionDataErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/accounts/withdraw/transaction-data',
+    ...options
+});
 
 /**
  * Retrieve Cashback Information
@@ -986,36 +711,22 @@ export const getApiV1AccountsWithdrawTransactionData = <ThrowOnError extends boo
  * **Note:** This cashback structure is valid from November 1st, 2025.
  *
  */
-export const getApiV1Cashback = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CashbackData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1CashbackResponses, GetApiV1CashbackErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/cashback',
-        ...options
-    });
-};
+export const getApiV1Cashback = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1CashbackData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1CashbackResponses, GetApiV1CashbackErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/cashback',
+    ...options
+});
 
 /**
  * List authenticated account addresses
  *
  * Returns a list of addresses associated with the authenticated user.
  */
-export const getApiV1EoaAccounts = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1EoaAccountsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1EoaAccountsResponses, GetApiV1EoaAccountsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/eoa-accounts',
-        ...options
-    });
-};
+export const getApiV1EoaAccounts = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1EoaAccountsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1EoaAccountsResponses, GetApiV1EoaAccountsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/eoa-accounts',
+    ...options
+});
 
 /**
  * Add a new account address for authentication
@@ -1024,76 +735,48 @@ export const getApiV1EoaAccounts = <ThrowOnError extends boolean = false>(option
  * This address can be used to sign in via SIWE and to start new API sessions.
  *
  */
-export const postApiV1EoaAccounts = <ThrowOnError extends boolean = false>(options: Options<PostApiV1EoaAccountsData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1EoaAccountsResponses, PostApiV1EoaAccountsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/eoa-accounts',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1EoaAccounts = <ThrowOnError extends boolean = false>(options: Options<PostApiV1EoaAccountsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1EoaAccountsResponses, PostApiV1EoaAccountsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/eoa-accounts',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Remove account address for authentication
  *
  * Removes the account address associated with the authenticated user.
  */
-export const deleteApiV1EoaAccountsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1EoaAccountsByIdData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteApiV1EoaAccountsByIdResponses, DeleteApiV1EoaAccountsByIdErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/eoa-accounts/{id}',
-        ...options
-    });
-};
+export const deleteApiV1EoaAccountsById = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1EoaAccountsByIdData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1EoaAccountsByIdResponses, DeleteApiV1EoaAccountsByIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/eoa-accounts/{id}',
+    ...options
+});
 
 /**
  * Check IBAN Availability
  *
  * Returns whether the user is eligible to enable an IBAN on their account.
  */
-export const getApiV1IbansAvailable = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansAvailableData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansAvailableResponses, GetApiV1IbansAvailableErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/available',
-        ...options
-    });
-};
+export const getApiV1IbansAvailable = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansAvailableData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1IbansAvailableResponses, GetApiV1IbansAvailableErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ibans/available',
+    ...options
+});
 
 /**
  * Get the message that needs to be signed for IBAN activation
  *
  * Returns the standard message that users need to sign with their wallet to verify ownership for Monerium IBAN activation.
  */
-export const getApiV1IbansSigningMessage = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansSigningMessageData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansSigningMessageResponses, GetApiV1IbansSigningMessageErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/signing-message',
-        ...options
-    });
-};
+export const getApiV1IbansSigningMessage = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansSigningMessageData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1IbansSigningMessageResponses, GetApiV1IbansSigningMessageErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ibans/signing-message',
+    ...options
+});
 
 /**
  * Create a new Monerium integration
@@ -1108,22 +791,15 @@ export const getApiV1IbansSigningMessage = <ThrowOnError extends boolean = false
  * Check their documentation for more information: https://monerium.dev/api-docs/v2
  *
  */
-export const postApiV1IntegrationsMonerium = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IntegrationsMoneriumData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1IntegrationsMoneriumResponses, PostApiV1IntegrationsMoneriumErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/integrations/monerium',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1IntegrationsMonerium = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IntegrationsMoneriumData, ThrowOnError>) => (options.client ?? client).post<PostApiV1IntegrationsMoneriumResponses, PostApiV1IntegrationsMoneriumErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/integrations/monerium',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieve IBAN details
@@ -1132,18 +808,11 @@ export const postApiV1IntegrationsMonerium = <ThrowOnError extends boolean = fal
  *
  * @deprecated
  */
-export const getApiV1IbansDetails = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansDetailsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansDetailsResponses, GetApiV1IbansDetailsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/details',
-        ...options
-    });
-};
+export const getApiV1IbansDetails = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansDetailsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1IbansDetailsResponses, GetApiV1IbansDetailsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ibans/details',
+    ...options
+});
 
 /**
  * Create a new Monerium profile
@@ -1152,22 +821,15 @@ export const getApiV1IbansDetails = <ThrowOnError extends boolean = false>(optio
  *
  * @deprecated
  */
-export const postApiV1IbansMoneriumProfile = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IbansMoneriumProfileData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1IbansMoneriumProfileResponses, PostApiV1IbansMoneriumProfileErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/monerium-profile',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1IbansMoneriumProfile = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IbansMoneriumProfileData, ThrowOnError>) => (options.client ?? client).post<PostApiV1IbansMoneriumProfileResponses, PostApiV1IbansMoneriumProfileErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ibans/monerium-profile',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieves the redirect URL for the Monerium oAuth flow
@@ -1179,18 +841,11 @@ export const postApiV1IbansMoneriumProfile = <ThrowOnError extends boolean = fal
  *
  * @deprecated
  */
-export const getApiV1IbansOauthRedirectUrl = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOauthRedirectUrlData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOauthRedirectUrlErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/oauth/redirect_url',
-        ...options
-    });
-};
+export const getApiV1IbansOauthRedirectUrl = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOauthRedirectUrlData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOauthRedirectUrlErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ibans/oauth/redirect_url',
+    ...options
+});
 
 /**
  * Resets the IBAN integration for this User
@@ -1199,18 +854,11 @@ export const getApiV1IbansOauthRedirectUrl = <ThrowOnError extends boolean = fal
  *
  * @deprecated
  */
-export const deleteApiV1IbansReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1IbansResetData, ThrowOnError>) => {
-    return (options?.client ?? client).delete<DeleteApiV1IbansResetResponses, DeleteApiV1IbansResetErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/reset',
-        ...options
-    });
-};
+export const deleteApiV1IbansReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1IbansResetData, ThrowOnError>) => (options?.client ?? client).delete<DeleteApiV1IbansResetResponses, DeleteApiV1IbansResetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ibans/reset',
+    ...options
+});
 
 /**
  * Retrieve a list of Monerium IBAN orders
@@ -1219,79 +867,53 @@ export const deleteApiV1IbansReset = <ThrowOnError extends boolean = false>(opti
  *
  * @deprecated
  */
-export const getApiV1IbansOrders = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOrdersData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1IbansOrdersResponses, GetApiV1IbansOrdersErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/ibans/orders',
-        ...options
-    });
-};
+export const getApiV1IbansOrders = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOrdersData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1IbansOrdersResponses, GetApiV1IbansOrdersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/ibans/orders',
+    ...options
+});
 
 /**
  * Retrieve Link for Web Integration
  *
  * Retrieve the specification to follow with the KYC integration.
  */
-export const getApiV1KycIntegration = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1KycIntegrationData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1KycIntegrationResponses, GetApiV1KycIntegrationErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/kyc/integration',
-        ...options
-    });
-};
+export const getApiV1KycIntegration = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1KycIntegrationData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1KycIntegrationResponses, GetApiV1KycIntegrationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/kyc/integration',
+    ...options
+});
 
 /**
  * Retrieve Access Token for Sumsub SDK Integration
  *
  * Retrieve the specification to follow with the KYC integration.
  */
-export const getApiV1KycIntegrationSdk = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1KycIntegrationSdkData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1KycIntegrationSdkResponses, GetApiV1KycIntegrationSdkErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/kyc/integration/sdk',
-        ...options
-    });
-};
+export const getApiV1KycIntegrationSdk = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1KycIntegrationSdkData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1KycIntegrationSdkResponses, GetApiV1KycIntegrationSdkErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/kyc/integration/sdk',
+    ...options
+});
 
 /**
  * Retrieve a KYC Sharing Token for Sumsub Partners
  */
-export const postApiV1KycImportPartnerApplicant = <ThrowOnError extends boolean = false>(options: Options<PostApiV1KycImportPartnerApplicantData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1KycImportPartnerApplicantResponses, PostApiV1KycImportPartnerApplicantErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/kyc/import-partner-applicant',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1KycImportPartnerApplicant = <ThrowOnError extends boolean = false>(options: Options<PostApiV1KycImportPartnerApplicantData, ThrowOnError>) => (options.client ?? client).post<PostApiV1KycImportPartnerApplicantResponses, PostApiV1KycImportPartnerApplicantErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/kyc/import-partner-applicant',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Create a Physical Card
  *
  * The last step in the physical card creation process.
+ *
+ * **Note:** To apply a coupon code, use the `/api/v1/order/{orderId}/attach-coupon` endpoint before creating the card.
  *
  * **Validation Requirements:**
  * - User must have completed KYC successfully
@@ -1304,120 +926,78 @@ export const postApiV1KycImportPartnerApplicant = <ThrowOnError extends boolean 
  * - For paid cards, a valid transaction hash is required
  *
  */
-export const postApiV1OrderByOrderIdCreateCard = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdCreateCardData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1OrderByOrderIdCreateCardResponses, PostApiV1OrderByOrderIdCreateCardErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/{orderId}/create-card',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1OrderByOrderIdCreateCard = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdCreateCardData, ThrowOnError>) => (options.client ?? client).post<PostApiV1OrderByOrderIdCreateCardResponses, PostApiV1OrderByOrderIdCreateCardErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/{orderId}/create-card',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Register payment for a Physical Card Order
  *
  * This endpoint associates a provided on-chain transaction hash with an existing card order by its `orderId`. If the card is free, you can skip this step.
  */
-export const putApiV1OrderByOrderIdAttachTransaction = <ThrowOnError extends boolean = false>(options: Options<PutApiV1OrderByOrderIdAttachTransactionData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutApiV1OrderByOrderIdAttachTransactionResponses, PutApiV1OrderByOrderIdAttachTransactionErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/{orderId}/attach-transaction',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const putApiV1OrderByOrderIdAttachTransaction = <ThrowOnError extends boolean = false>(options: Options<PutApiV1OrderByOrderIdAttachTransactionData, ThrowOnError>) => (options.client ?? client).put<PutApiV1OrderByOrderIdAttachTransactionResponses, PutApiV1OrderByOrderIdAttachTransactionErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/{orderId}/attach-transaction',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Attach a coupon to a Physical Card Order
  *
  * This endpoint associates a provided coupon code with an existing card order by its `orderId`. Use the `GPDOCS` coupon code to get the card for free.
  */
-export const postApiV1OrderByOrderIdAttachCoupon = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdAttachCouponData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1OrderByOrderIdAttachCouponResponses, PostApiV1OrderByOrderIdAttachCouponErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/{orderId}/attach-coupon',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1OrderByOrderIdAttachCoupon = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdAttachCouponData, ThrowOnError>) => (options.client ?? client).post<PostApiV1OrderByOrderIdAttachCouponResponses, PostApiV1OrderByOrderIdAttachCouponErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/{orderId}/attach-coupon',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieve details of a Physical Card Order
  *
  * This endpoint retrieves details of a card order by its `orderId`.
  */
-export const getApiV1OrderByOrderId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OrderByOrderIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1OrderByOrderIdResponses, GetApiV1OrderByOrderIdErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/{orderId}',
-        ...options
-    });
-};
+export const getApiV1OrderByOrderId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OrderByOrderIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1OrderByOrderIdResponses, GetApiV1OrderByOrderIdErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/{orderId}',
+    ...options
+});
 
 /**
  * Confirm the payment for a Physical Card Order
  *
  * This endpoint marks the Card Order with `orderId` as paid. Even if the card is free, you need to call this endpoint to confirm the payment.
  */
-export const putApiV1OrderByOrderIdConfirmPayment = <ThrowOnError extends boolean = false>(options: Options<PutApiV1OrderByOrderIdConfirmPaymentData, ThrowOnError>) => {
-    return (options.client ?? client).put<PutApiV1OrderByOrderIdConfirmPaymentResponses, PutApiV1OrderByOrderIdConfirmPaymentErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/{orderId}/confirm-payment',
-        ...options
-    });
-};
+export const putApiV1OrderByOrderIdConfirmPayment = <ThrowOnError extends boolean = false>(options: Options<PutApiV1OrderByOrderIdConfirmPaymentData, ThrowOnError>) => (options.client ?? client).put<PutApiV1OrderByOrderIdConfirmPaymentResponses, PutApiV1OrderByOrderIdConfirmPaymentErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/{orderId}/confirm-payment',
+    ...options
+});
 
 /**
  * Cancel a Physical Card Order
  *
  * This endpoint transitions the card order to the cancelled state.
  */
-export const postApiV1OrderByOrderIdCancel = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdCancelData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1OrderByOrderIdCancelResponses, PostApiV1OrderByOrderIdCancelErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/{orderId}/cancel',
-        ...options
-    });
-};
+export const postApiV1OrderByOrderIdCancel = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderByOrderIdCancelData, ThrowOnError>) => (options.client ?? client).post<PostApiV1OrderByOrderIdCancelResponses, PostApiV1OrderByOrderIdCancelErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/{orderId}/cancel',
+    ...options
+});
 
 /**
  * Create Physical Card Order
@@ -1426,27 +1006,21 @@ export const postApiV1OrderByOrderIdCancel = <ThrowOnError extends boolean = fal
  * This is the first step in the physical card order process, the card is not created yet.
  *
  * Next are the steps to complete the order:
- * 1. Attach a coupon (use the `GPDOCS` coupon code to get the card for free)
- * 2. Confirm the payment (the card will be free using the coupon, so no need to attach a transaction)
- * 3. Create the card out of the order.
+ * 1. Optionally attach a coupon using `/api/v1/order/{orderId}/attach-coupon` (use the `GPDOCS` coupon code to get the card for free)
+ * 2. If not free, attach a transaction hash using `/api/v1/order/{orderId}/attach-transaction`
+ * 3. Confirm the payment using `/api/v1/order/{orderId}/confirm-payment`
+ * 4. Create the card using `/api/v1/order/{orderId}/create-card`
  *
  */
-export const postApiV1OrderCreate = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderCreateData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1OrderCreateResponses, PostApiV1OrderCreateErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/order/create',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1OrderCreate = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OrderCreateData, ThrowOnError>) => (options.client ?? client).post<PostApiV1OrderCreateResponses, PostApiV1OrderCreateErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/order/create',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Remove Safe Owner
@@ -1459,22 +1033,15 @@ export const postApiV1OrderCreate = <ThrowOnError extends boolean = false>(optio
  * The operation is processed through a delay relay mechanism that executes after 3 minutes.
  *
  */
-export const deleteApiV1Owners = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1OwnersData, ThrowOnError>) => {
-    return (options.client ?? client).delete<DeleteApiV1OwnersResponses, DeleteApiV1OwnersErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/owners',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const deleteApiV1Owners = <ThrowOnError extends boolean = false>(options: Options<DeleteApiV1OwnersData, ThrowOnError>) => (options.client ?? client).delete<DeleteApiV1OwnersResponses, DeleteApiV1OwnersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/owners',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * List Safe Owners
@@ -1483,18 +1050,11 @@ export const deleteApiV1Owners = <ThrowOnError extends boolean = false>(options:
  * These owners have the ability to sign transactions and manage the Safe.
  *
  */
-export const getApiV1Owners = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1OwnersData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1OwnersResponses, GetApiV1OwnersErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/owners',
-        ...options
-    });
-};
+export const getApiV1Owners = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1OwnersData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1OwnersResponses, GetApiV1OwnersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/owners',
+    ...options
+});
 
 /**
  * Add Safe Owner
@@ -1507,22 +1067,15 @@ export const getApiV1Owners = <ThrowOnError extends boolean = false>(options?: O
  * The operation is processed through a delay relay mechanism that executes after 3 minutes.
  *
  */
-export const postApiV1Owners = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OwnersData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1OwnersResponses, PostApiV1OwnersErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/owners',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1Owners = <ThrowOnError extends boolean = false>(options: Options<PostApiV1OwnersData, ThrowOnError>) => (options.client ?? client).post<PostApiV1OwnersResponses, PostApiV1OwnersErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/owners',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get typed data for adding a Safe Owner
@@ -1534,18 +1087,11 @@ export const postApiV1Owners = <ThrowOnError extends boolean = false>(options: O
  * 3. Submit the signature to the POST `/api/v1/owners` endpoint
  *
  */
-export const getApiV1OwnersAddTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OwnersAddTransactionDataData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1OwnersAddTransactionDataResponses, GetApiV1OwnersAddTransactionDataErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/owners/add/transaction-data',
-        ...options
-    });
-};
+export const getApiV1OwnersAddTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OwnersAddTransactionDataData, ThrowOnError>) => (options.client ?? client).get<GetApiV1OwnersAddTransactionDataResponses, GetApiV1OwnersAddTransactionDataErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/owners/add/transaction-data',
+    ...options
+});
 
 /**
  * Get typed data for removing a Safe Owner
@@ -1557,18 +1103,11 @@ export const getApiV1OwnersAddTransactionData = <ThrowOnError extends boolean = 
  * 3. Submit the signature to the DELETE `/api/v1/owners` endpoint
  *
  */
-export const getApiV1OwnersRemoveTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OwnersRemoveTransactionDataData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1OwnersRemoveTransactionDataResponses, GetApiV1OwnersRemoveTransactionDataErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/owners/remove/transaction-data',
-        ...options
-    });
-};
+export const getApiV1OwnersRemoveTransactionData = <ThrowOnError extends boolean = false>(options: Options<GetApiV1OwnersRemoveTransactionDataData, ThrowOnError>) => (options.client ?? client).get<GetApiV1OwnersRemoveTransactionDataResponses, GetApiV1OwnersRemoveTransactionDataErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/owners/remove/transaction-data',
+    ...options
+});
 
 /**
  * Retrieve Rewards Information
@@ -1577,18 +1116,11 @@ export const getApiV1OwnersRemoveTransactionData = <ThrowOnError extends boolean
  * Note that the cashbackRate returned does not include the +1% bonus for OG NFT holders - to get the total cashback rate, add 1% to the cashbackRate if isOg is true.
  *
  */
-export const getApiV1Rewards = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1RewardsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1RewardsResponses, GetApiV1RewardsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/rewards',
-        ...options
-    });
-};
+export const getApiV1Rewards = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1RewardsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1RewardsResponses, GetApiV1RewardsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/rewards',
+    ...options
+});
 
 /**
  * Retrieve all Terms and Conditions
@@ -1597,30 +1129,18 @@ export const getApiV1Rewards = <ThrowOnError extends boolean = false>(options?: 
  * current version, URL, and name.
  *
  */
-export const getApiV1Terms = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1TermsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1TermsResponses, GetApiV1TermsErrors, ThrowOnError>({
-        url: '/api/v1/terms',
-        ...options
-    });
-};
+export const getApiV1Terms = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1TermsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1TermsResponses, GetApiV1TermsErrors, ThrowOnError>({ url: '/api/v1/terms', ...options });
 
 /**
  * Get card public key
  *
  * @deprecated
  */
-export const getApiV1UserCardPublicKey = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserCardPublicKeyData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1UserCardPublicKeyResponses, GetApiV1UserCardPublicKeyErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/user/card-public-key',
-        ...options
-    });
-};
+export const getApiV1UserCardPublicKey = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserCardPublicKeyData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1UserCardPublicKeyResponses, GetApiV1UserCardPublicKeyErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/user/card-public-key',
+    ...options
+});
 
 /**
  * Retrieve Terms and Conditions Status
@@ -1629,95 +1149,62 @@ export const getApiV1UserCardPublicKey = <ThrowOnError extends boolean = false>(
  * the latest version, when they were accepted, and links to the terms documents.
  *
  */
-export const getApiV1UserTerms = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserTermsData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1UserTermsResponses, GetApiV1UserTermsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/user/terms',
-        ...options
-    });
-};
+export const getApiV1UserTerms = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserTermsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1UserTermsResponses, GetApiV1UserTermsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/user/terms',
+    ...options
+});
 
 /**
  * Accept Terms and Conditions
  *
  * Accept specific terms and conditions based on type and version.
  */
-export const postApiV1UserTerms = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UserTermsData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1UserTermsResponses, PostApiV1UserTermsErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/user/terms',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1UserTerms = <ThrowOnError extends boolean = false>(options: Options<PostApiV1UserTermsData, ThrowOnError>) => (options.client ?? client).post<PostApiV1UserTermsResponses, PostApiV1UserTermsErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/user/terms',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Retrieve User profile
  *
  * Get the User profile information.
  */
-export const getApiV1User = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserData, ThrowOnError>) => {
-    return (options?.client ?? client).get<GetApiV1UserResponses, GetApiV1UserErrors, ThrowOnError>({
-        security: [
-            {
-                scheme: 'bearer',
-                type: 'http'
-            }
-        ],
-        url: '/api/v1/user',
-        ...options
-    });
-};
+export const getApiV1User = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1UserData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1UserResponses, GetApiV1UserErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/user',
+    ...options
+});
 
 /**
  * Retrieve Message to Sign for Webhook Subscription
  *
  * Generates a message for the user to sign. This message must be sent on `POST /api/v1/webhooks/subscribe/{partnerId}` to subscribe to webhook notifications.
  */
-export const getApiV1WebhooksMessageByPartnerId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1WebhooksMessageByPartnerIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1WebhooksMessageByPartnerIdResponses, GetApiV1WebhooksMessageByPartnerIdErrors, ThrowOnError>({
-        url: '/api/v1/webhooks/message/{partnerId}',
-        ...options
-    });
-};
+export const getApiV1WebhooksMessageByPartnerId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1WebhooksMessageByPartnerIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1WebhooksMessageByPartnerIdResponses, GetApiV1WebhooksMessageByPartnerIdErrors, ThrowOnError>({ url: '/api/v1/webhooks/message/{partnerId}', ...options });
 
 /**
  * Subscribe to Webhooks
  *
  * Allows a partner to receive webhook notifications for the authenticated user.
  */
-export const postApiV1WebhooksSubscribeByPartnerId = <ThrowOnError extends boolean = false>(options: Options<PostApiV1WebhooksSubscribeByPartnerIdData, ThrowOnError>) => {
-    return (options.client ?? client).post<PostApiV1WebhooksSubscribeByPartnerIdResponses, PostApiV1WebhooksSubscribeByPartnerIdErrors, ThrowOnError>({
-        url: '/api/v1/webhooks/subscribe/{partnerId}',
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...options.headers
-        }
-    });
-};
+export const postApiV1WebhooksSubscribeByPartnerId = <ThrowOnError extends boolean = false>(options: Options<PostApiV1WebhooksSubscribeByPartnerIdData, ThrowOnError>) => (options.client ?? client).post<PostApiV1WebhooksSubscribeByPartnerIdResponses, PostApiV1WebhooksSubscribeByPartnerIdErrors, ThrowOnError>({
+    url: '/api/v1/webhooks/subscribe/{partnerId}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Check if authenticated user is subscribed to partner webhooks
  *
  * Allows the authenticated user to check if they are subscribed to a partner's webhook notifications.
  */
-export const getApiV1WebhooksSubscriptionByPartnerId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1WebhooksSubscriptionByPartnerIdData, ThrowOnError>) => {
-    return (options.client ?? client).get<GetApiV1WebhooksSubscriptionByPartnerIdResponses, GetApiV1WebhooksSubscriptionByPartnerIdErrors, ThrowOnError>({
-        url: '/api/v1/webhooks/subscription/{partnerId}',
-        ...options
-    });
-};
+export const getApiV1WebhooksSubscriptionByPartnerId = <ThrowOnError extends boolean = false>(options: Options<GetApiV1WebhooksSubscriptionByPartnerIdData, ThrowOnError>) => (options.client ?? client).get<GetApiV1WebhooksSubscriptionByPartnerIdResponses, GetApiV1WebhooksSubscriptionByPartnerIdErrors, ThrowOnError>({ url: '/api/v1/webhooks/subscription/{partnerId}', ...options });

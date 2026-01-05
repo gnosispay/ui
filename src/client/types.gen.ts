@@ -17,7 +17,7 @@ export type Authorization = {
     hasSignedUp: boolean;
 };
 
-export type _Error = {
+export type Error = {
     /**
      * Error message
      */
@@ -74,7 +74,7 @@ export type CardBlockedError = {
 };
 
 export type AssociatedSafeAccountNotFoundError = {
-    error?: "Couldn't find an associated Safe account";
+    error?: 'Couldn\'t find an associated Safe account';
 };
 
 export type DelayTransaction = {
@@ -409,7 +409,7 @@ export type IbanOrder = {
 export type KycStatus = 'notStarted' | 'documentsRequested' | 'pending' | 'processing' | 'approved' | 'resubmissionRequested' | 'rejected' | 'requiresAction';
 
 export type SafeAccount = {
-    address?: string;
+    address: string;
     chainId?: string;
     tokenSymbol?: string;
     createdAt: string;
@@ -470,7 +470,7 @@ export type GetApiV1AccountBalancesErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1AccountBalancesError = GetApiV1AccountBalancesErrors[keyof GetApiV1AccountBalancesErrors];
@@ -528,7 +528,7 @@ export type PostApiV1AccountErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1AccountError = PostApiV1AccountErrors[keyof PostApiV1AccountErrors];
@@ -601,7 +601,7 @@ export type GetApiV1AccountSignaturePayloadErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1AccountSignaturePayloadError = GetApiV1AccountSignaturePayloadErrors[keyof GetApiV1AccountSignaturePayloadErrors];
@@ -669,7 +669,7 @@ export type PatchApiV1AccountDeploySafeModulesErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PatchApiV1AccountDeploySafeModulesError = PatchApiV1AccountDeploySafeModulesErrors[keyof PatchApiV1AccountDeploySafeModulesErrors];
@@ -709,7 +709,7 @@ export type GetApiV1AuthNonceErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1AuthNonceError = GetApiV1AuthNonceErrors[keyof GetApiV1AuthNonceErrors];
@@ -751,7 +751,7 @@ export type PostApiV1AuthChallengeErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1AuthChallengeError = PostApiV1AuthChallengeErrors[keyof PostApiV1AuthChallengeErrors];
@@ -780,10 +780,6 @@ export type PostApiV1AuthSignupData = {
          * One-time password for email verification (optional during transition period)
          */
         otp?: string;
-        /**
-         * Referral coupon code for the new user
-         */
-        referralCouponCode?: string;
         /**
          * Marketing campaign identifier
          */
@@ -938,7 +934,7 @@ export type PostApiV1CardsByCardIdActivateErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1CardsByCardIdActivateError = PostApiV1CardsByCardIdActivateErrors[keyof PostApiV1CardsByCardIdActivateErrors];
@@ -981,7 +977,7 @@ export type PostApiV1CardsByCardIdFreezeErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1CardsByCardIdFreezeError = PostApiV1CardsByCardIdFreezeErrors[keyof PostApiV1CardsByCardIdFreezeErrors];
@@ -1026,7 +1022,7 @@ export type PostApiV1CardsByCardIdLostErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1CardsByCardIdLostError = PostApiV1CardsByCardIdLostErrors[keyof PostApiV1CardsByCardIdLostErrors];
@@ -1065,7 +1061,7 @@ export type GetApiV1CardsByCardIdStatusErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1CardsByCardIdStatusError = GetApiV1CardsByCardIdStatusErrors[keyof GetApiV1CardsByCardIdStatusErrors];
@@ -1116,7 +1112,7 @@ export type PostApiV1CardsByCardIdStolenErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1CardsByCardIdStolenError = PostApiV1CardsByCardIdStolenErrors[keyof PostApiV1CardsByCardIdStolenErrors];
@@ -1163,7 +1159,7 @@ export type PostApiV1CardsByCardIdUnfreezeErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1CardsByCardIdUnfreezeError = PostApiV1CardsByCardIdUnfreezeErrors[keyof PostApiV1CardsByCardIdUnfreezeErrors];
@@ -1208,7 +1204,7 @@ export type PostApiV1CardsByCardIdVoidErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1CardsByCardIdVoidError = PostApiV1CardsByCardIdVoidErrors[keyof PostApiV1CardsByCardIdVoidErrors];
@@ -1254,7 +1250,7 @@ export type GetApiV1CardsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1CardsError = GetApiV1CardsErrors[keyof GetApiV1CardsErrors];
@@ -1415,7 +1411,7 @@ export type GetApiV1CardsTransactionsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1CardsTransactionsError = GetApiV1CardsTransactionsErrors[keyof GetApiV1CardsTransactionsErrors];
@@ -1688,7 +1684,7 @@ export type GetApiV1SafeDeployErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1SafeDeployError = GetApiV1SafeDeployErrors[keyof GetApiV1SafeDeployErrors];
@@ -1746,7 +1742,7 @@ export type PostApiV1SafeDeployErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1SafeDeployError = PostApiV1SafeDeployErrors[keyof PostApiV1SafeDeployErrors];
@@ -1859,7 +1855,7 @@ export type PostApiV1SafeSetCurrencyErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1SafeSetCurrencyError = PostApiV1SafeSetCurrencyErrors[keyof PostApiV1SafeSetCurrencyErrors];
@@ -1903,7 +1899,7 @@ export type GetApiV1SourceOfFundsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1SourceOfFundsError = GetApiV1SourceOfFundsErrors[keyof GetApiV1SourceOfFundsErrors];
@@ -1934,7 +1930,7 @@ export type PostApiV1SourceOfFundsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1SourceOfFundsError = PostApiV1SourceOfFundsErrors[keyof PostApiV1SourceOfFundsErrors];
@@ -2032,7 +2028,7 @@ export type GetApiV1TransactionsDisputeErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1TransactionsDisputeError = GetApiV1TransactionsDisputeErrors[keyof GetApiV1TransactionsDisputeErrors];
@@ -2096,7 +2092,7 @@ export type GetApiV1TransactionsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1TransactionsError = GetApiV1TransactionsErrors[keyof GetApiV1TransactionsErrors];
@@ -3048,7 +3044,7 @@ export type GetApiV1IbansAvailableErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1IbansAvailableError = GetApiV1IbansAvailableErrors[keyof GetApiV1IbansAvailableErrors];
@@ -3086,7 +3082,7 @@ export type GetApiV1IbansSigningMessageErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1IbansSigningMessageError = GetApiV1IbansSigningMessageErrors[keyof GetApiV1IbansSigningMessageErrors];
@@ -3135,15 +3131,15 @@ export type PostApiV1IntegrationsMoneriumErrors = {
     /**
      * User not found.
      */
-    404: _Error;
+    404: Error;
     /**
      * Validation errors on GP side.
      */
-    422: _Error;
+    422: Error;
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1IntegrationsMoneriumError = PostApiV1IntegrationsMoneriumErrors[keyof PostApiV1IntegrationsMoneriumErrors];
@@ -3174,7 +3170,7 @@ export type GetApiV1IbansDetailsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1IbansDetailsError = GetApiV1IbansDetailsErrors[keyof GetApiV1IbansDetailsErrors];
@@ -3241,7 +3237,7 @@ export type PostApiV1IbansMoneriumProfileErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1IbansMoneriumProfileError = PostApiV1IbansMoneriumProfileErrors[keyof PostApiV1IbansMoneriumProfileErrors];
@@ -3281,7 +3277,7 @@ export type GetApiV1IbansOauthRedirectUrlErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1IbansOauthRedirectUrlError = GetApiV1IbansOauthRedirectUrlErrors[keyof GetApiV1IbansOauthRedirectUrlErrors];
@@ -3316,7 +3312,7 @@ export type DeleteApiV1IbansResetErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type DeleteApiV1IbansResetError = DeleteApiV1IbansResetErrors[keyof DeleteApiV1IbansResetErrors];
@@ -3351,7 +3347,7 @@ export type GetApiV1IbansOrdersErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1IbansOrdersError = GetApiV1IbansOrdersErrors[keyof GetApiV1IbansOrdersErrors];
@@ -3509,7 +3505,7 @@ export type PostApiV1KycImportPartnerApplicantErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1KycImportPartnerApplicantError = PostApiV1KycImportPartnerApplicantErrors[keyof PostApiV1KycImportPartnerApplicantErrors];
@@ -3551,10 +3547,6 @@ export type PostApiV1OrderByOrderIdCreateCardData = {
          *
          */
         transactionHash?: string;
-        /**
-         * Optional coupon code for discount
-         */
-        couponCode?: string;
     };
     path: {
         /**
@@ -4042,7 +4034,7 @@ export type PostApiV1OrderCreateErrors = {
     /**
      * Bad Request - One of several possible client errors
      */
-    400: 'Error: There is already a pending card order' | 'Error: User is not approved through KYC' | 'Error: Unknown personalization source' | "Error: Shipping needs to be done to the user's country";
+    400: 'Error: There is already a pending card order' | 'Error: User is not approved through KYC' | 'Error: Unknown personalization source' | 'Error: Shipping needs to be done to the user\'s country';
     /**
      * Unauthorized Error
      */
@@ -4052,7 +4044,7 @@ export type PostApiV1OrderCreateErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1OrderCreateError = PostApiV1OrderCreateErrors[keyof PostApiV1OrderCreateErrors];
@@ -4485,7 +4477,7 @@ export type GetApiV1TermsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1TermsError = GetApiV1TermsErrors[keyof GetApiV1TermsErrors];
@@ -4594,7 +4586,7 @@ export type GetApiV1UserTermsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1UserTermsError = GetApiV1UserTermsErrors[keyof GetApiV1UserTermsErrors];
@@ -4658,7 +4650,7 @@ export type PostApiV1UserTermsErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1UserTermsError = PostApiV1UserTermsErrors[keyof PostApiV1UserTermsErrors];
@@ -4697,7 +4689,7 @@ export type GetApiV1UserErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1UserError = GetApiV1UserErrors[keyof GetApiV1UserErrors];
@@ -4735,7 +4727,7 @@ export type GetApiV1WebhooksMessageByPartnerIdErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1WebhooksMessageByPartnerIdError = GetApiV1WebhooksMessageByPartnerIdErrors[keyof GetApiV1WebhooksMessageByPartnerIdErrors];
@@ -4795,7 +4787,7 @@ export type PostApiV1WebhooksSubscribeByPartnerIdErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type PostApiV1WebhooksSubscribeByPartnerIdError = PostApiV1WebhooksSubscribeByPartnerIdErrors[keyof PostApiV1WebhooksSubscribeByPartnerIdErrors];
@@ -4842,7 +4834,7 @@ export type GetApiV1WebhooksSubscriptionByPartnerIdErrors = {
     /**
      * Internal Server Error
      */
-    500: _Error;
+    500: Error;
 };
 
 export type GetApiV1WebhooksSubscriptionByPartnerIdError = GetApiV1WebhooksSubscriptionByPartnerIdErrors[keyof GetApiV1WebhooksSubscriptionByPartnerIdErrors];

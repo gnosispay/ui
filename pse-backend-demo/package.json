@@ -62,5 +62,5 @@
     "skipNodeModulesBundle": true,
     "publicDir": "src/static"
   },
-  "packageManager": "pnpm@10.20.0"
+  "packageManager": "pnpm@10.27.0"
 }
