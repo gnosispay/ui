@@ -81,7 +81,7 @@ export const IbanAccountDetails = () => {
               {user?.bankingDetails?.address || "N/A"}
             </div>
             {user?.bankingDetails?.address && (
-              <Button variant="outline" size="sm" onClick={handleCopyAddress} className="p-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={handleCopyAddress} className="p-2 shrink-0">
                 <Copy className="h-4 w-4" />
               </Button>
             )}
@@ -92,7 +92,7 @@ export const IbanAccountDetails = () => {
           <div className="flex items-center gap-2">
             <div className="flex-1 p-3 bg-muted/50 rounded-lg font-medium text-foreground">{fullName}</div>
             {fullName && (
-              <Button variant="outline" size="sm" onClick={handleCopyBeneficiary} className="p-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={handleCopyBeneficiary} className="p-2 shrink-0">
                 <Copy className="h-4 w-4" />
               </Button>
             )}
@@ -106,7 +106,7 @@ export const IbanAccountDetails = () => {
               {user?.bankingDetails?.moneriumIban || "N/A"}
             </div>
             {user?.bankingDetails?.moneriumIban && (
-              <Button variant="outline" size="sm" onClick={handleCopyIban} className="p-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={handleCopyIban} className="p-2 shrink-0">
                 <Copy className="h-4 w-4" />
               </Button>
             )}
@@ -120,7 +120,7 @@ export const IbanAccountDetails = () => {
               {user?.bankingDetails?.moneriumBic || "N/A"}
             </div>
             {user?.bankingDetails?.moneriumBic && (
-              <Button variant="outline" size="sm" onClick={handleCopyBic} className="p-2 flex-shrink-0">
+              <Button variant="outline" size="sm" onClick={handleCopyBic} className="p-2 shrink-0">
                 <Copy className="h-4 w-4" />
               </Button>
             )}

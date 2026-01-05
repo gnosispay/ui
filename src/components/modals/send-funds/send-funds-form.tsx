@@ -9,7 +9,7 @@ import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./token-amount-input";
 import { CustomTokenAmountInput } from "./custom-token-amount-input.tsx";
 import { AddressInput } from "./address-input";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import { useDelayRelay } from "@/context/DelayRelayContext";
 import { QueueNotEmptyAlert } from "@/components/QueueNotEmptyAlert";
 import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
@@ -25,7 +25,7 @@ interface SendFundsFormProps {
 }
 
 export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
-  const { address: connectedAddress } = useAccount();
+  const { address: connectedAddress } = useConnection();
   const { queue } = useDelayRelay();
   const isQueueNotEmpty = useMemo(() => queue.length > 0, [queue]);
   const [toAddress, setToAddress] = useState("");

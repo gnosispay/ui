@@ -6,12 +6,12 @@ import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
 import { Button } from "@/components/ui/button";
 import { useAppKit } from "@reown/appkit/react";
-import { useAccount } from "wagmi";
+import { useConnection } from "wagmi";
 import { useCallback } from "react";
 
 export const HeaderNavBar = () => {
   const { effectiveTheme } = useTheme();
-  const { isConnected } = useAccount();
+  const { isConnected } = useConnection();
   const { open } = useAppKit();
 
   const handleConnect = useCallback(() => {
