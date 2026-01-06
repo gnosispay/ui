@@ -19,7 +19,7 @@ jobs:
         version: stable
     - name: Get installed Playwright version
       id: playwright-version
-      run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package-lock.json').dependencies['@playwright/test'].version)")" >> $GITHUB_ENV
+      run: echo "PLAYWRIGHT_VERSION=$(node -e "console.log(require('./package.json').devDependencies['@playwright/test'])")" >> $GITHUB_ENV
     - name: Cache playwright binaries
       uses: actions/cache@v4
       id: playwright-cache
@@ -30,10 +30,7 @@ jobs:
     - name: Install dependencies
       run: npm install -g pnpm && pnpm install
     - name: Install Playwright Browsers
-      run: pnpm exec playwright install --with-deps
-      if: steps.playwright-cache.outputs.cache-hit != 'true'
-    - name: Install Playwright Dependencies
-      run: pnpm exec playwright install-deps
+      run: pnpm exec playwright install --with-deps chromium
       if: steps.playwright-cache.outputs.cache-hit != 'true'
     - name: Run Playwright tests
       run: pnpm exec playwright test
