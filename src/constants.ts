@@ -1615,26 +1615,24 @@ export const COUNTRIES = [
 
 // Common countries for shipping - can be expanded based on supported regions
 export const SUPPORTED_SHIPPING_COUNTRIES = [
-  { code: "US", name: "United States" },
-  { code: "CA", name: "Canada" },
-  { code: "GB", name: "United Kingdom" },
-  { code: "DE", name: "Germany" },
-  { code: "FR", name: "France" },
-  { code: "IT", name: "Italy" },
-  { code: "ES", name: "Spain" },
-  { code: "NL", name: "Netherlands" },
-  { code: "BE", name: "Belgium" },
+  { code: "AR", name: "Argentina" },
   { code: "AT", name: "Austria" },
+  { code: "BE", name: "Belgium" },
+  { code: "BR", name: "Brazil" },
   { code: "CH", name: "Switzerland" },
-  { code: "SE", name: "Sweden" },
-  { code: "NO", name: "Norway" },
+  { code: "DE", name: "Germany" },
   { code: "DK", name: "Denmark" },
+  { code: "ES", name: "Spain" },
   { code: "FI", name: "Finland" },
+  { code: "FR", name: "France" },
+  { code: "GB", name: "United Kingdom" },
   { code: "IE", name: "Ireland" },
-  { code: "PT", name: "Portugal" },
+  { code: "IT", name: "Italy" },
   { code: "LU", name: "Luxembourg" },
-  { code: "AU", name: "Australia" },
-  { code: "NZ", name: "New Zealand" },
+  { code: "NL", name: "Netherlands" },
+  { code: "NO", name: "Norway" },
+  { code: "PT", name: "Portugal" },
+  { code: "SE", name: "Sweden" },
 ];
 
 export const COUPON_CODES = "GPUI100";
