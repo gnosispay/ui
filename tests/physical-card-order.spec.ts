@@ -65,22 +65,22 @@ test.describe("Physical Card Order", () => {
       // Fill address line 1
       const address1Input = page.getByTestId("shipping-address-address1");
       await expect(address1Input).toBeVisible();
-      await address1Input.fill("123 Main Street");
+      await address1Input.fill("Rua das Flores 123");
 
       // Fill address line 2 (optional)
       const address2Input = page.getByTestId("shipping-address-address2");
       await expect(address2Input).toBeVisible();
-      await address2Input.fill("Apt 4B");
+      await address2Input.fill("4B");
 
       // Fill city
       const cityInput = page.getByTestId("shipping-address-city");
       await expect(cityInput).toBeVisible();
-      await cityInput.fill("New York");
+      await cityInput.fill("Lisboa");
 
       // Fill postal code
       const postalCodeInput = page.getByTestId("shipping-address-postal-code");
       await expect(postalCodeInput).toBeVisible();
-      await postalCodeInput.fill("10001");
+      await postalCodeInput.fill("1000-001");
 
       // Select country
       const countrySelect = page.getByTestId("shipping-address-country");
@@ -89,11 +89,11 @@ test.describe("Physical Card Order", () => {
 
       // Wait for the dropdown to open and options to appear
       await expect(page.getByRole("listbox")).toBeVisible();
-      await expect(page.getByRole("option", { name: "United States" })).toBeVisible();
-      await page.getByRole("option", { name: "United States" }).click();
+      await expect(page.getByRole("option", { name: "Portugal" })).toBeVisible();
+      await page.getByRole("option", { name: "Portugal" }).click();
 
       // Verify the country was selected by checking the select contains the value
-      await expect(countrySelect).toContainText("United States", { timeout: 5000 });
+      await expect(countrySelect).toContainText("Portugal", { timeout: 5000 });
 
       await expect(continueButton).toBeEnabled();
     });
@@ -122,11 +122,11 @@ test.describe("Physical Card Order", () => {
       await expect(createCardButton).toBeEnabled({ timeout: 10000 });
 
       // Verify shipping address is displayed
-      await expect(page.getByText("123 Main Street")).toBeVisible();
-      await expect(page.getByText("Apt 4B")).toBeVisible();
-      await expect(page.getByText("10001")).toBeVisible();
-      await expect(page.getByText("New York")).toBeVisible();
-      await expect(page.getByText("United States")).toBeVisible();
+      await expect(page.getByText("Rua das Flores 123")).toBeVisible();
+      await expect(page.getByText("4B")).toBeVisible();
+      await expect(page.getByText("1000-001")).toBeVisible();
+      await expect(page.getByText("Lisboa")).toBeVisible();
+      await expect(page.getByText("Portugal")).toBeVisible();
 
       // Verify price is 0 (after coupon is applied)
       // The coupon should be applied automatically, making totalAmount - discount = 0
@@ -234,15 +234,15 @@ test.describe("Physical Card Order", () => {
       const continueButton = page.getByRole("button", { name: "Continue" });
 
       // Fill address fields
-      await page.getByTestId("shipping-address-address1").fill("123 Main Street");
-      await page.getByTestId("shipping-address-address2").fill("Apt 4B");
-      await page.getByTestId("shipping-address-city").fill("New York");
-      await page.getByTestId("shipping-address-postal-code").fill("10001");
+      await page.getByTestId("shipping-address-address1").fill("Rua das Flores 123");
+      await page.getByTestId("shipping-address-address2").fill("4B");
+      await page.getByTestId("shipping-address-city").fill("Lisboa");
+      await page.getByTestId("shipping-address-postal-code").fill("1000-001");
 
       // Select country
       await page.getByTestId("shipping-address-country").click();
       await expect(page.getByRole("listbox")).toBeVisible();
-      await page.getByRole("option", { name: "United States" }).click();
+      await page.getByRole("option", { name: "Portugal" }).click();
 
       // Submit order
       await expect(continueButton).toBeEnabled();
@@ -306,11 +306,11 @@ test.describe("Physical Card Order", () => {
       await expect(page.getByRole("heading", { name: "Confirm Order Details" })).toBeVisible({ timeout: 10000 });
 
       // Verify shipping address is displayed
-      await expect(page.getByText("123 Main Street")).toBeVisible();
-      await expect(page.getByText("Apt 4B")).toBeVisible();
-      await expect(page.getByText("10001")).toBeVisible();
-      await expect(page.getByText("New York")).toBeVisible();
-      await expect(page.getByText("United States")).toBeVisible();
+      await expect(page.getByText("Rua das Flores 123")).toBeVisible();
+      await expect(page.getByText("4B")).toBeVisible();
+      await expect(page.getByText("1000-001")).toBeVisible();
+      await expect(page.getByText("Lisboa")).toBeVisible();
+      await expect(page.getByText("Portugal")).toBeVisible();
     });
 
     await test.step("cancel order from home page", async () => {
