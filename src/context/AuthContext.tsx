@@ -206,6 +206,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         version: "1",
         chainId,
         nonce: data,
+        issuedAt: new Date().toISOString(),
       });
 
       const preparedMessage = message.prepareMessage();
