@@ -29,16 +29,10 @@ interface AuthScreenProps {
     disabled?: boolean;
     loading?: boolean;
   };
-  showHelpLinkDebugButton?: boolean;
+  showHelpLink?: boolean;
 }
 
-const AuthScreen = ({
-  title,
-  description,
-  buttonText,
-  buttonProps,
-  showHelpLinkDebugButton = false,
-}: AuthScreenProps) => {
+const AuthScreen = ({ title, description, buttonText, buttonProps, showHelpLink = false }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
@@ -54,19 +48,18 @@ const AuthScreen = ({
         >
           {buttonText}
         </Button>
-        {showHelpLinkDebugButton && (
-          <>
-            <a
-              className="text-xs text-muted-foreground text-center underline"
-              href={TROUBLE_LOGGING_IN_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Trouble logging in? Get help
-            </a>
-            <DebugButton />
-          </>
+        {showHelpLink && (
+          <a
+            className="text-xs text-muted-foreground text-center underline"
+            href={TROUBLE_LOGGING_IN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Trouble logging in? Get help
+          </a>
         )}
+
+        <DebugButton />
       </div>
     </div>
   );
@@ -114,7 +107,7 @@ export const AuthGuard = ({
       description: "Your account has been deactivated.",
       buttonText: "Withdraw funds",
       buttonProps: { onClick: () => navigate("/withdraw"), disabled: false, loading: false },
-      showHelpLinkDebugButton: true,
+      showHelpLink: true,
     };
   }, [navigate]);
 
@@ -137,7 +130,7 @@ export const AuthGuard = ({
       buttonProps: {
         onClick: () => navigate("/register"),
       },
-      showHelpLinkDebugButton: true,
+      showHelpLink: true,
     };
   }, [navigate]);
 
