@@ -120,7 +120,7 @@ export function IbanIntegrationFlow({ onSuccess, onCancel, showCancelButton = tr
       {/* Information Section */}
       <div className="space-y-3">
         <div className="flex items-start gap-3">
-          <AlertCircle className="h-5 w-5 text-info mt-0.5 flex-shrink-0" />
+          <AlertCircle className="h-5 w-5 text-info mt-0.5 shrink-0" />
           <div className="space-y-2 text-sm">
             <p className="font-medium text-foreground">What happens next:</p>
             <ul className="space-y-1 text-muted-foreground">

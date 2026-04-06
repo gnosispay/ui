@@ -4,7 +4,6 @@ import { Building2, Download, ArrowLeftRight, ChevronRight, LifeBuoy } from "luc
 import { useCallback, useMemo, useState } from "react";
 import { BankTransferStep } from "./bank-transfer-step";
 import { CryptoStep } from "./crypto-step";
-import { useDebridgeUrl } from "@/hooks/useDebridgeUrl";
 import { useJumperUrl } from "@/hooks/useJumperUrl";
 import { currencies } from "@/constants";
 
@@ -34,7 +33,6 @@ export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
     [onOpenChange],
   );
 
-  const debridgeUrl = useDebridgeUrl();
   const jumperUrl = useJumperUrl();
 
   const fundingOptions = useMemo(() => {
@@ -56,15 +54,6 @@ export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
           window.open(jumperUrl, "_blank");
         },
       },
-      {
-        icon: ArrowLeftRight,
-        title: "Swap tokens via deBridge",
-        description: `Exchange your crypto for ${currency?.tokenSymbol} • ~5 mins`,
-        onClick: () => {
-          if (!debridgeUrl) return;
-          window.open(debridgeUrl, "_blank");
-        },
-      },
     ];
 
     // Add bank transfer option if user has banking details
@@ -80,7 +69,7 @@ export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
     }
 
     return baseOptions;
-  }, [user?.bankingDetails?.moneriumIban, debridgeUrl, jumperUrl, currency?.tokenSymbol]);
+  }, [user?.bankingDetails?.moneriumIban, jumperUrl, currency?.tokenSymbol]);
 
   return (
     <Dialog open={open} onOpenChange={onLocalOpenChange}>
@@ -98,14 +87,14 @@ export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
                     className="cursor-pointer w-full flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/50 transition-colors text-left"
                     onClick={option.onClick}
                   >
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <IconComponent className="h-6 w-6 text-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-medium text-foreground mb-1">{option.title}</h3>
                       <p className="text-sm text-muted-foreground">{option.description}</p>
                     </div>
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <ChevronRight className="h-5 w-5 text-muted-foreground" />
                     </div>
                   </button>
