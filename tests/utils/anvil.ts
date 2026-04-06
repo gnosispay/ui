@@ -353,7 +353,7 @@ export const GNOSIS_TOKENS = {
   wstETH: {
     address: "0x6C76971f98945AE98dD7d4DFcA8711ebea946eA6" as Address,
     decimals: 18,
-    whale: "0x509Ad7278A2F6530Bc24590C83E93fAF8fd46E99",
+    whale: "0x458cD345B4C05e8DF39d0A07220feb4Ec19F5e6f",
   },
   // GNO
   GNO: {
