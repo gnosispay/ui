@@ -73,7 +73,7 @@ export const SafeOwnersView = ({ owners, isLoading, onEditClick, onDeleteClick }
                   variant="outline"
                   size="sm"
                   onClick={() => handleCopyAddress(ownerAddress)}
-                  className="p-2 flex-shrink-0"
+                  className="p-2 shrink-0"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -82,7 +82,7 @@ export const SafeOwnersView = ({ owners, isLoading, onEditClick, onDeleteClick }
                     variant="outline"
                     size="sm"
                     onClick={() => handleDeleteClick(ownerAddress)}
-                    className="p-2 flex-shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    className="p-2 shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
