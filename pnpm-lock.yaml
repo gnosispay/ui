@@ -45,10 +45,10 @@ importers:
         specifier: ^1.2.6
         version: 1.2.6(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@reown/appkit':
-        specifier: ^1.8.19
+        specifier: ^1.8.18
         version: 1.8.19(@types/react@19.2.14)(bufferutil@4.1.0)(fastestsmallesttextencoderdecoder@1.0.22)(react@19.2.4)(typescript@6.0.2)(use-sync-external-store@1.4.0(react@19.2.4))(utf-8-validate@5.0.10)(ws@8.18.3(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@4.3.5)
       '@reown/appkit-adapter-wagmi':
-        specifier: ^1.8.19
+        specifier: ^1.8.18
         version: 1.8.19(9fc63db93c5de3bd8285675687b2fbe0)
       '@tailwindcss/vite':
         specifier: ^4.2.2
