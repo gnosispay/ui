@@ -1,0 +1,6 @@
+blockExoticSubdeps: true
+minimumReleaseAge: 4320 # 3 days
+minimumReleaseAgeExclude: [
+  "@gnosispay/*"
+]
+trustPolicy: "no-downgrade"
