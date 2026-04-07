@@ -149,7 +149,7 @@ export const AddressCheckStep = ({ orderId, onNext }: AddressCheckStepProps) => 
         return;
       }
 
-      if (!createData || !createData.cardToken) {
+      if (!createData?.cardToken) {
         setGlobalError("An error occurred while creating the card, no cardToken was returned");
         console.error("Error creating card:", createData);
         return;

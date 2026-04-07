@@ -89,7 +89,7 @@ const formatCurrencyForCSV = (
   value: string | undefined,
   currencyInfo: { decimals?: number; symbol?: string } | undefined,
 ): string => {
-  if (!value || !currencyInfo || !currencyInfo.decimals) {
+  if (!value || !currencyInfo?.decimals) {
     return "";
   }
 

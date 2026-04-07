@@ -20,7 +20,7 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
   const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
   const { safeConfig } = useUser();
   const amount = useMemo(() => {
-    if (!selectedToken || !selectedToken.decimals || !displayAmount || displayAmount === "0") {
+    if (!selectedToken?.decimals || !displayAmount || displayAmount === "0") {
       return 0n;
     }
     let newAmount = 0n;
@@ -39,7 +39,7 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
 
   // Check for insufficient balance and update error state
   useEffect(() => {
-    if (!selectedToken || !selectedToken.decimals || amount === 0n) {
+    if (!selectedToken?.decimals || amount === 0n) {
       setError("");
       return;
     }
@@ -73,7 +73,7 @@ export const TokenAmountInput = ({ onTokenChange, onAmountChange, setError }: To
   };
 
   const handleMaxClick = () => {
-    if (!selectedToken || !selectedToken.decimals) {
+    if (!selectedToken?.decimals) {
       return;
     }
 

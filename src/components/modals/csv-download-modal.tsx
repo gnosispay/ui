@@ -111,7 +111,7 @@ export const CSVDownloadModal = ({ className, preSelectedCardToken }: CSVDownloa
         throw new Error(extractErrorMessage(error, "Error fetching transactions"));
       }
 
-      if (!data || !data.results) {
+      if (!data?.results) {
         break;
       }
 
