@@ -4,7 +4,7 @@ export const formatCurrency = (
   value: string | undefined,
   currencyInfo: CurrencyInfo | undefined,
 ): string | undefined => {
-  if (!value || !currencyInfo || !currencyInfo.decimals) {
+  if (!value || !currencyInfo?.decimals) {
     return undefined;
   }
 
@@ -45,7 +45,7 @@ export const formatTokenAmount = (
   value: string | undefined,
   tokenInfo: CurrencyInfo | undefined,
 ): string | undefined => {
-  if (!value || !tokenInfo || !tokenInfo.decimals) {
+  if (!value || !tokenInfo?.decimals) {
     return undefined;
   }
 
