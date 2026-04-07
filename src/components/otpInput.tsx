@@ -66,7 +66,10 @@ export const OtpInput = ({ value, onChange, isLoading, disabled, "data-testid": 
     <div className="flex gap-2" data-testid={dataTestId}>
       {Array.from({ length }).map((_, idx) => (
         <Input
-          key={`${baseId}-otp-input-${idx + 1}`}
+          key={`${baseId}-otp-input-${
+            // biome-ignore lint/suspicious/noArrayIndexKey: no other option
+            idx + 1
+          }`}
           type="text"
           inputMode="numeric"
           pattern="[0-9]*"

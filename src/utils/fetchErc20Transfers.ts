@@ -160,7 +160,7 @@ export const fetchErc20Transfers = async ({
           blockNumber,
         });
 
-        if (!block || !block.timestamp) {
+        if (!block?.timestamp) {
           return null;
         }
 
