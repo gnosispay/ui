@@ -11,7 +11,7 @@ This server exposes the following routes:
 ## 🛠️ Getting Started
 #### ⚙️ Environment Configuration
 
-Copy `.env.template` to `.env` to get started
+Copy `.env.template` to `.env` to get started.
 
 - `NODE_ENV` Options: 'development', 'production'
 - `PORT` The port your server will listen on
