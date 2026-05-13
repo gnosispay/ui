@@ -12,6 +12,7 @@ export enum DateRangeOptions {
   LAST_90 = "90",
   LAST_YEAR = "365",
   LAST_2_YEARS = "730",
+  LAST_3_YEARS = "1095",
 }
 
 export const DATE_RANGE_OPTIONS = [
@@ -20,6 +21,7 @@ export const DATE_RANGE_OPTIONS = [
   { value: DateRangeOptions.LAST_90, label: "Last 90 days" },
   { value: DateRangeOptions.LAST_YEAR, label: "Last 1 year" },
   { value: DateRangeOptions.LAST_2_YEARS, label: "Last 2 years" },
+  { value: DateRangeOptions.LAST_3_YEARS, label: "Last 3 years" },
 ];
 
 // CSV column headers for card transactions
