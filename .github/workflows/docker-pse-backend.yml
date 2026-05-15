@@ -24,10 +24,10 @@ jobs:
       cancel-in-progress: false
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+        uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6.1.1
         with:
           # Assumes the role in the PROD account for ECR push
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID_PROD }}:role/github-actions-gnosispay-v2-pse-backend-prod
@@ -35,7 +35,7 @@ jobs:
 
       - name: Login to AWS Container Registry
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+        uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419 # v2.1.5
 
       - name: Configure and check image name
         id: docker_image
