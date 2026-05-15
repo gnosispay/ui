@@ -66,11 +66,6 @@ export const supportedTokens: Record<string, TokenInfo> = {
   },
 };
 
-export const ADD_FUNDS_CONSTANTS = {
-  GNOSIS_PAY_HELP_URL: "https://help.gnosispay.com/en/articles/8896057-how-to-get-eure-or-gbpe-on-gnosis-chain",
-  MONERIUM_AUTHORISED_URL: "https://cb.is/financial-supervision/regulated-activities/supervised-entities/",
-} as const;
-
 export const TROUBLE_LOGGING_IN_URL =
   "https://help.gnosispay.com/hc/en-us/articles/41558567635988-The-Gnosis-Pay-Web-App";
 

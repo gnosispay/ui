@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ADD_FUNDS_CONSTANTS, currencies } from "@/constants";
+import { currencies } from "@/constants";
 import { useUser } from "@/context/UserContext";
-import { useJumperUrl } from "@/hooks/useJumperUrl";
-import { ExternalLink, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useMemo } from "react";
 import { SafeAccountDetails } from "@/components/account/SafeAccountDetails";
 
@@ -16,13 +15,6 @@ export const CryptoStep = ({ onBack }: CryptoStepProps) => {
     if (!safeConfig?.fiatSymbol) return null;
     return currencies[safeConfig.fiatSymbol];
   }, [safeConfig]);
-
-  const jumperUrl = useJumperUrl();
-
-  const handleJumperClick = () => {
-    if (!jumperUrl) return;
-    window.open(jumperUrl, "_blank");
-  };
 
   return (
     <div className="space-y-4">
