@@ -16,12 +16,7 @@ export function formatDate(dateString?: string) {
 export function groupByDate<E extends Event | Erc20TokenEvent>(transactions: E[]) {
   return transactions.reduce(
     (acc, tx) => {
-      const date =
-        "createdAt" in tx
-          ? formatDate(tx.createdAt)
-          : "date" in tx
-            ? formatDate(tx.date.toISOString())
-            : "";
+      const date = "createdAt" in tx ? formatDate(tx.createdAt) : "date" in tx ? formatDate(tx.date.toISOString()) : "";
       if (!acc[date]) acc[date] = [];
       acc[date].push(tx);
       return acc;
