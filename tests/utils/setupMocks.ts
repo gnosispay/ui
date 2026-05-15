@@ -8,9 +8,7 @@ import { mockAccountBalances, type AccountBalancesMockData } from "./mockAccount
 import { mockCards, type CardsMockData } from "./mockCards";
 import { mockDelayRelay, type DelayRelayMockData } from "./mockDelayRelay";
 import { mockOrder, type OrderMockData } from "./mockOrder";
-import { mockIbansAvailable, type IbansAvailableMockData } from "./mockIbansAvailable";
 import { mockCardTransactions, type CardTransactionsMockData } from "./mockCardTransactions";
-import { mockIbanOrders, type IbanOrdersMockData } from "./mockIbanOrders";
 import { mockOwners, type OwnersMockData } from "./mockOwners";
 
 /**
@@ -31,12 +29,8 @@ export interface MockSetupOptions {
   delayRelay?: DelayRelayMockData;
   /** Optional overrides for orders mock */
   orders?: OrderMockData;
-  /** Optional overrides for IBAN availability mock */
-  ibansAvailable?: IbansAvailableMockData;
   /** Optional overrides for card transactions mock */
   cardTransactions?: CardTransactionsMockData;
-  /** Optional overrides for IBAN orders mock */
-  ibanOrders?: IbanOrdersMockData;
   /** Optional overrides for owners mock */
   owners?: OwnersMockData;
   /** Skip auth challenge mock (useful when setting up custom auth flow) */
@@ -55,12 +49,8 @@ export interface MockSetupOptions {
   skipDelayRelay?: boolean;
   /** Skip orders mock (useful when setting up custom order data) */
   skipOrders?: boolean;
-  /** Skip IBAN availability mock (useful when setting up custom IBAN data) */
-  skipIbansAvailable?: boolean;
   /** Skip card transactions mock (useful when setting up custom pagination or transaction data) */
   skipCardTransactions?: boolean;
-  /** Skip IBAN orders mock (useful when setting up custom IBAN order data) */
-  skipIbanOrders?: boolean;
   /** Skip owners mock (useful when setting up custom owners data) */
   skipOwners?: boolean;
 }
@@ -142,14 +132,8 @@ export async function setupAllMocks(page: Page, testUser: TestUser, options: Moc
   if (!options.skipOrders) {
     mockPromises.push(mockOrder({ page, testUser, orderOverrides: options.orders }));
   }
-  if (!options.skipIbansAvailable) {
-    mockPromises.push(mockIbansAvailable({ page, testUser, ibansAvailableOverrides: options.ibansAvailable }));
-  }
   if (!options.skipCardTransactions) {
     mockPromises.push(mockCardTransactions({ page, testUser, transactionsOverrides: options.cardTransactions }));
-  }
-  if (!options.skipIbanOrders) {
-    mockPromises.push(mockIbanOrders({ page, testUser, ordersOverrides: options.ibanOrders }));
   }
   if (!options.skipOwners) {
     mockPromises.push(mockOwners({ page, testUser, ownersOverrides: options.owners }));

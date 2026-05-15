@@ -1,4 +1,4 @@
-import type { Event, IbanOrder } from "@/client";
+import type { Event } from "@/client";
 import type { Address, Hash } from "viem";
 
 export enum Erc20TokenEventDirection {
@@ -18,7 +18,6 @@ export interface Erc20TokenEvent {
 
 export enum TransactionType {
   CARD = "card",
-  IBAN = "iban",
   ONCHAIN = "onchain",
 }
 
@@ -26,5 +25,5 @@ export interface Transaction {
   id: string;
   createdAt: string;
   type: TransactionType;
-  data: Event | IbanOrder | Erc20TokenEvent;
+  data: Event | Erc20TokenEvent;
 }
