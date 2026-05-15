@@ -1,4 +1,4 @@
-import type { Event, Currency, IbanOrder } from "@/client";
+import type { Event, Currency } from "@/client";
 import type { Erc20TokenEvent } from "@/types/transaction";
 
 export function formatDate(dateString?: string) {
@@ -13,7 +13,7 @@ export function formatDate(dateString?: string) {
     .toUpperCase();
 }
 
-export function groupByDate<E extends Event | Erc20TokenEvent | IbanOrder>(transactions: E[]) {
+export function groupByDate<E extends Event | Erc20TokenEvent>(transactions: E[]) {
   return transactions.reduce(
     (acc, tx) => {
       const date =
@@ -21,9 +21,7 @@ export function groupByDate<E extends Event | Erc20TokenEvent | IbanOrder>(trans
           ? formatDate(tx.createdAt)
           : "date" in tx
             ? formatDate(tx.date.toISOString())
-            : "meta" in tx
-              ? formatDate(tx.meta.placedAt)
-              : "";
+            : "";
       if (!acc[date]) acc[date] = [];
       acc[date].push(tx);
       return acc;

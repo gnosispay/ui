@@ -1,22 +1,14 @@
 const PARTNER_BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v2";
-const IBAN_BANNER_STORAGE_KEY = "gp-ui.iban-banner-dismissed.v1";
 
 export interface BannerDismissalData {
   nextShowTimestamp: number;
   count: number;
 }
 
-export type BannerType = "partner" | "iban";
+export type BannerType = "partner";
 
-function getBannerStorageKey(bannerType: BannerType): string {
-  switch (bannerType) {
-    case "partner":
-      return PARTNER_BANNER_STORAGE_KEY;
-    case "iban":
-      return IBAN_BANNER_STORAGE_KEY;
-    default:
-      throw new Error(`Unknown banner type: ${bannerType}`);
-  }
+function getBannerStorageKey(): string {
+  return PARTNER_BANNER_STORAGE_KEY;
 }
 
 // Utility functions for exponential backoff
@@ -39,7 +31,7 @@ export function shouldShowBanner(dismissalData: BannerDismissalData | null): boo
 
 export function getBannerDismissalData(bannerType: BannerType = "partner"): BannerDismissalData | null {
   try {
-    const storageKey = getBannerStorageKey(bannerType);
+    const storageKey = getBannerStorageKey();
     const stored = localStorage.getItem(storageKey);
     if (!stored) return null;
 
@@ -54,8 +46,8 @@ export function getBannerDismissalData(bannerType: BannerType = "partner"): Bann
   }
 }
 
-export function setBannerDismissalData(data: BannerDismissalData, bannerType: BannerType = "partner"): void {
-  const storageKey = getBannerStorageKey(bannerType);
+export function setBannerDismissalData(data: BannerDismissalData, _bannerType: BannerType = "partner"): void {
+  const storageKey = getBannerStorageKey();
   localStorage.setItem(storageKey, JSON.stringify(data));
 }
 

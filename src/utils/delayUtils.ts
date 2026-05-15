@@ -132,7 +132,7 @@ export const getTxTitle = ({ account, transactionDataString, currencyInfo }: TxT
       }
       return "Changing Daily Limit";
     case DelayedTransactionType.SignMessage:
-      return "Generating IBAN";
+      return "Sign message";
     default:
       return "Contract interaction";
   }

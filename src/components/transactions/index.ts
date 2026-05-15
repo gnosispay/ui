@@ -1,12 +1,9 @@
 export { TransactionRow } from "./transaction-row";
-export { BankTransferRow } from "./bank-transfer-row";
 export { OnchainTransferRow } from "./onchain-transfer-row";
 export { Transactions } from "./transactions";
 export { TransactionSkeleton } from "./transaction-skeleton";
 export { TransactionFetchingAlert } from "./transaction-fetching-alert";
 export { TransactionDetailsModal } from "../modals/transaction-details/transaction-details-modal";
 export { OnchainTransferDetailsModal } from "../modals/transaction-details/onchain-transfer-details-modal";
-export { BankTransferDetailsModal } from "../modals/transaction-details/bank-transfer-details-modal";
 export { CardTransactions } from "./CardTransactions";
 export { OnchainTransactions } from "./OnchainTransactions";
-export { IbanTransactions } from "./IbanTransactions";
