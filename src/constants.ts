@@ -68,7 +68,6 @@ export const supportedTokens: Record<string, TokenInfo> = {
 
 export const ADD_FUNDS_CONSTANTS = {
   GNOSIS_PAY_HELP_URL: "https://help.gnosispay.com/en/articles/8896057-how-to-get-eure-or-gbpe-on-gnosis-chain",
-  DEBRIDGE_LICENSE_URL: "https://docs.debridge.finance/legal/sdk-and-api-license-agreement",
   MONERIUM_AUTHORISED_URL: "https://cb.is/financial-supervision/regulated-activities/supervised-entities/",
 } as const;
 
