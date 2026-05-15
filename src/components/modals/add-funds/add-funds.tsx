@@ -1,8 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { useUser } from "@/context/UserContext";
-import { Building2, Download, ArrowLeftRight, ChevronRight, LifeBuoy } from "lucide-react";
+import { Download, ArrowLeftRight, ChevronRight, LifeBuoy } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
-import { BankTransferStep } from "./bank-transfer-step";
 import { CryptoStep } from "./crypto-step";
 import { useJumperUrl } from "@/hooks/useJumperUrl";
 import { currencies } from "@/constants";
@@ -14,12 +13,11 @@ interface AddFundsModalProps {
 
 enum Step {
   Select = "Add funds",
-  IBAN = "Bank transfer",
   Crypto = "Top up with crypto",
 }
 
 export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
-  const { user, safeConfig } = useUser();
+  const { safeConfig } = useUser();
   const currency = useMemo(() => {
     if (!safeConfig?.fiatSymbol) return null;
     return currencies[safeConfig.fiatSymbol];
@@ -35,8 +33,8 @@ export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
 
   const jumperUrl = useJumperUrl();
 
-  const fundingOptions = useMemo(() => {
-    const baseOptions = [
+  const fundingOptions = useMemo(
+    () => [
       {
         icon: Download,
         title: "Top up with crypto",
@@ -54,22 +52,9 @@ export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
           window.open(jumperUrl, "_blank");
         },
       },
-    ];
-
-    // Add bank transfer option if user has banking details
-    if (user?.bankingDetails?.moneriumIban) {
-      baseOptions.push({
-        icon: Building2,
-        title: "Bank transfer",
-        description: "Send Euros from your bank account • Up to 1 day",
-        onClick: () => {
-          setStep(Step.IBAN);
-        },
-      });
-    }
-
-    return baseOptions;
-  }, [user?.bankingDetails?.moneriumIban, jumperUrl, currency?.tokenSymbol]);
+    ],
+    [jumperUrl, currency?.tokenSymbol],
+  );
 
   return (
     <Dialog open={open} onOpenChange={onLocalOpenChange}>
@@ -117,7 +102,6 @@ export const AddFundsModal = ({ open, onOpenChange }: AddFundsModalProps) => {
               </div>
             </>
           )}
-          {step === Step.IBAN && <BankTransferStep onBack={() => setStep(Step.Select)} />}
           {step === Step.Crypto && <CryptoStep onBack={() => setStep(Step.Select)} />}
         </div>
       </DialogContent>

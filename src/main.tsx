@@ -12,13 +12,11 @@ import "./index.css";
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
 import { UserContextProvider } from "./context/UserContext.tsx";
-import { IBANContextProvider } from "./context/IBANContext.tsx";
 import { CardsContextProvider } from "./context/CardsContext.tsx";
 import { Toaster } from "sonner";
 import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
 import { CardTransactionsContextProvider } from "./context/CardTransactionsContext.tsx";
 import { OnchainTransactionsContextProvider } from "./context/OnchainTransactionsContext.tsx";
-import { IbanTransactionsContextProvider } from "./context/IbanTransactionsContext.tsx";
 import { OrdersContextProvider } from "./context/OrdersContext.tsx";
 import { ZendeskProvider } from "react-use-zendesk";
 
@@ -50,24 +48,20 @@ ReactDOM.createRoot(rootElement).render(
         <QueryClientProvider client={queryClient}>
           <AuthContextProvider>
             <UserContextProvider>
-              <IBANContextProvider>
-                <ZendeskProvider apiKey={zendeskKey}>
-                  <CardsContextProvider>
-                    <OrdersContextProvider>
-                      <CardTransactionsContextProvider>
-                        <OnchainTransactionsContextProvider>
-                          <IbanTransactionsContextProvider>
-                            <DelayRelayContextProvider>
-                              <App />
-                              <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
-                            </DelayRelayContextProvider>
-                          </IbanTransactionsContextProvider>
-                        </OnchainTransactionsContextProvider>
-                      </CardTransactionsContextProvider>
-                    </OrdersContextProvider>
-                  </CardsContextProvider>
-                </ZendeskProvider>
-              </IBANContextProvider>
+              <ZendeskProvider apiKey={zendeskKey}>
+                <CardsContextProvider>
+                  <OrdersContextProvider>
+                    <CardTransactionsContextProvider>
+                      <OnchainTransactionsContextProvider>
+                        <DelayRelayContextProvider>
+                          <App />
+                          <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
+                        </DelayRelayContextProvider>
+                      </OnchainTransactionsContextProvider>
+                    </CardTransactionsContextProvider>
+                  </OrdersContextProvider>
+                </CardsContextProvider>
+              </ZendeskProvider>
             </UserContextProvider>
           </AuthContextProvider>
         </QueryClientProvider>

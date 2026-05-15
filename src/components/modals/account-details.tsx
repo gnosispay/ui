@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { IbanAccountDetails } from "../account/IbanAccountDetails";
 import { SafeAccountDetails } from "../account/SafeAccountDetails";
 
 interface AccountDetailsModalProps {
@@ -8,14 +6,7 @@ interface AccountDetailsModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-enum AccountDetailsTab {
-  SAFE = "safe",
-  IBAN = "iban",
-}
-
 export const AccountDetailsModal = ({ open, onOpenChange }: AccountDetailsModalProps) => {
-  const [activeTab, setActiveTab] = useState<AccountDetailsTab>(AccountDetailsTab.SAFE);
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
@@ -23,36 +14,7 @@ export const AccountDetailsModal = ({ open, onOpenChange }: AccountDetailsModalP
           <DialogTitle>Account details</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* Tab Navigation */}
-          <div className="flex bg-muted/50 rounded-lg p-1">
-            <button
-              type="button"
-              onClick={() => setActiveTab(AccountDetailsTab.SAFE)}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeTab === AccountDetailsTab.SAFE
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Safe
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab(AccountDetailsTab.IBAN)}
-              className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
-                activeTab === AccountDetailsTab.IBAN
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              IBAN
-            </button>
-          </div>
-
-          {activeTab === AccountDetailsTab.SAFE && <SafeAccountDetails />}
-          {activeTab === AccountDetailsTab.IBAN && <IbanAccountDetails />}
-        </div>
+        <SafeAccountDetails />
       </DialogContent>
     </Dialog>
   );
