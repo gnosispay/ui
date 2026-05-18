@@ -4,3 +4,4 @@ minimumReleaseAgeExclude: [
   "@gnosispay/*"
 ]
 trustPolicy: "no-downgrade"
+trustPolicyIgnoreAfter: 4320 # 3 days
