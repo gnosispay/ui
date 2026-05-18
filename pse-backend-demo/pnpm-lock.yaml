@@ -12,7 +12,7 @@ importers:
         specifier: 8.4.1
         version: 8.4.1(zod@4.3.6)
       axios:
-        specifier: ^1.13.5
+        specifier: 1.13.5
         version: 1.13.5
       cors:
         specifier: 2.8.6
@@ -30,7 +30,7 @@ importers:
         specifier: 2.3.0
         version: 2.3.0
       https:
-        specifier: ^1.0.0
+        specifier: 1.0.0
         version: 1.0.0
       pino:
         specifier: 10.3.1

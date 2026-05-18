@@ -1,6 +1,8 @@
 blockExoticSubdeps: true
 minimumReleaseAge: 4320 # 3 days
 minimumReleaseAgeExclude: [
-  "@gnosispay/*"
+  '@gnosispay/*',
+  'viem@2.49.3'
 ]
+trustPolicyIgnoreAfter: 4320 # 3 days
 trustPolicy: "no-downgrade"
