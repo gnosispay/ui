@@ -1,13 +1,8 @@
 name: Deploy UI to Production
 
 on:
-  push:
-    branches:
-      - main
-    # paths:
-    #   - 'services/ui/**'
-  workflow_dispatch:
-  workflow_call:
+  workflow_dispatch: # allows manual redeploy from GitHub Actions UI without a new commit
+  workflow_call: # called by docker-ui.yml after image is built and pushed to ECR
     
 permissions:
   id-token: write
