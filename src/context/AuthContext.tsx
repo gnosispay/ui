@@ -26,6 +26,7 @@ export type IAuthContext = {
   updateClient: (optionalJwt?: string) => void;
   showInitializingLoader: boolean;
   renewToken: () => Promise<string | undefined>;
+  logout: () => void;
 };
 
 const AuthContext = createContext<IAuthContext | undefined>(undefined);
@@ -41,6 +42,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
   const connections = useConnections();
   const renewalTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const renewalInProgressRef = useRef(false);
+  const skipAutoRenewRef = useRef(false);
   const previousAddressRef = useRef<string | undefined>(address);
   const jwtAddressKey = useMemo(() => {
     if (!address) return "";
@@ -146,7 +148,31 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
     [jwtAddressKey],
   );
 
+  const logout = useCallback(() => {
+    if (jwtAddressKey) {
+      localStorage.removeItem(jwtAddressKey);
+    }
+
+    if (renewalTimeoutRef.current) {
+      clearTimeout(renewalTimeoutRef.current);
+      renewalTimeoutRef.current = null;
+    }
+
+    skipAutoRenewRef.current = true;
+    renewalInProgressRef.current = false;
+    setIsAuthenticating(false);
+    setJwt(null);
+    client.setConfig({
+      headers: {
+        Authorization: "",
+      },
+    });
+    setContextKey((prev) => prev + 1);
+  }, [jwtAddressKey]);
+
   const renewToken = useCallback(async () => {
+    skipAutoRenewRef.current = false;
+
     // If already authenticating, skip duplicate request
     if (renewalInProgressRef.current) {
       return;
@@ -318,6 +344,10 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
       return;
     }
 
+    if (skipAutoRenewRef.current) {
+      return;
+    }
+
     const expired = isTokenExpired(jwt);
 
     if (jwt !== null && !expired) {
@@ -349,6 +379,7 @@ const AuthContextProvider = ({ children }: AuthContextProps) => {
         updateClient,
         showInitializingLoader,
         renewToken,
+        logout,
       }}
     >
       <div key={contextKey}>{children}</div>

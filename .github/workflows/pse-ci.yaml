@@ -145,28 +145,36 @@ jobs:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
 
       - name: Generate CI Summary
+        env:
+          REPOSITORY: ${{ github.repository }}
+          REF_NAME: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          EVENT_NAME: ${{ github.event_name }}
+          RUN_ID: ${{ github.run_id }}
+          DOCKER_RESULT: ${{ needs.docker.result }}
         run: |
-          echo "# 📋 CI Workflow Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "# 📋 CI Workflow Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
 
           # Build info
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 🔨 Build Information" >> $GITHUB_STEP_SUMMARY
-          echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Repository** | ${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Branch/Tag** | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Commit** | [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}) |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Triggered by** | ${{ github.event_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| **Workflow Run** | [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "## 🔨 Build Information" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Property | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Repository** | $REPOSITORY |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Branch/Tag** | $REF_NAME |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Commit** | [$SHA](https://github.com/$REPOSITORY/commit/$SHA) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Triggered by** | $EVENT_NAME |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Workflow Run** | [View Details](https://github.com/$REPOSITORY/actions/runs/$RUN_ID) |" >> "$GITHUB_STEP_SUMMARY"
 
           # Docker image info (when applicable)
-          if [[ "${{ needs.docker.result }}" == "success" && "${{ github.event_name }}" != "pull_request" ]]; then
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo "## 🐳 Docker Image" >> $GITHUB_STEP_SUMMARY
-            echo "| Property | Value |" >> $GITHUB_STEP_SUMMARY
-            echo "| --- | --- |" >> $GITHUB_STEP_SUMMARY
-            echo "| **Repository** | ghcr.io/${{ github.repository }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| **Latest Tag** | ghcr.io/${{ github.repository }}:${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
-            echo "| **Package URL** | [View on GitHub](https://github.com/${{ github.repository }}/pkgs/container/$(echo '${{ github.repository }}' | cut -d'/' -f2)) |" >> $GITHUB_STEP_SUMMARY
+          if [[ "$DOCKER_RESULT" == "success" && "$EVENT_NAME" != "pull_request" ]]; then
+            REPO_NAME="${REPOSITORY#*/}"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "## 🐳 Docker Image" >> "$GITHUB_STEP_SUMMARY"
+            echo "| Property | Value |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| --- | --- |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Repository** | ghcr.io/$REPOSITORY |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Latest Tag** | ghcr.io/$REPOSITORY:$SHA |" >> "$GITHUB_STEP_SUMMARY"
+            echo "| **Package URL** | [View on GitHub](https://github.com/$REPOSITORY/pkgs/container/$REPO_NAME) |" >> "$GITHUB_STEP_SUMMARY"
           fi

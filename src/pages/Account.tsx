@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { SquareUser as UserIcon, Landmark, Gauge, Wallet, UserCog, LifeBuoyIcon, Scale } from "lucide-react";
 import { AccountSection, UserProfileHeader } from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
@@ -6,6 +6,7 @@ import { SafeOwnersModal } from "@/components/modals/safe-owners";
 import { HELP_CENTER_URL, LEGAL_LINK } from "@/constants";
 import { useAppKit } from "@reown/appkit/react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthContext";
 import { PersonalDetailsModal } from "@/components/modals/personal-details";
 import { AccountDetailsModal } from "@/components/modals/account-details";
 import { SignInWalletsModal } from "@/components/modals/sign-in-wallets";
@@ -23,12 +24,28 @@ export const AccountRoute = () => {
   const [openModal, setOpenModal] = useState<ModalType>(ModalType.NONE);
   const closeModal = () => setOpenModal(ModalType.NONE);
   const { open } = useAppKit();
+  const { logout } = useAuth();
+
+  const handleLogout = useCallback(() => {
+    logout();
+  }, [logout]);
+
+  const handleDisconnect = useCallback(() => {
+    open();
+  }, [open]);
 
   return (
     <div className="w-full max-w-xl mx-auto p-4 space-y-8">
       <UserProfileHeader />
-      <div className="lg:hidden w-full flex justify-center mb-4">
-        <Button onClick={() => open()}>Disconnect</Button>
+      <div className="flex flex-col gap-2 w-full">
+        <Button variant="outline" onClick={handleLogout} data-testid="logout-button">
+          Log out
+        </Button>
+        <div className="lg:hidden">
+          <Button className="w-full" onClick={handleDisconnect}>
+            Disconnect
+          </Button>
+        </div>
       </div>
       <div className="space-y-4">
         <h2 className="text-lg font-medium text-foreground">Account</h2>
