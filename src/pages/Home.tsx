@@ -11,6 +11,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { StatusHelpIcon } from "@/components/ui/status-help-icon";
 import { PartnerBanner } from "@/components/ui/partner-banner";
+import { WithdrawBanner } from "@/components/ui/withdraw-banner";
 import { UnspendableAmountAlert } from "@/components/unspendable-amount-alert";
 
 export const Home = () => {
@@ -19,6 +20,9 @@ export const Home = () => {
 
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
+      <div className="col-span-6 px-4 lg:px-0">
+        <WithdrawBanner />
+      </div>
       <div className="col-span-6 lg:col-start-2 lg:col-span-4">
         <div className="mx-4 lg:mx-0">
           <PendingCardOrder />
