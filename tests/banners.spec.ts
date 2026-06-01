@@ -17,15 +17,16 @@ test.describe("Home Page Banners", () => {
     await test.step("verify withdraw banner is visible", async () => {
       const withdrawBanner = page.getByTestId("withdraw-banner");
       await expect(withdrawBanner).toBeVisible();
-      await expect(withdrawBanner).toContainText("Withdraw your funds");
-      await expect(withdrawBanner).toContainText("Transfer your balance to an external wallet");
+      await expect(withdrawBanner).toContainText("A bug has been discovered, you can withdraw your funds here");
+      await expect(withdrawBanner).toContainText("More information");
     });
 
-    await test.step("withdraw banner has correct link", async () => {
-      const withdrawBanner = page.getByTestId("withdraw-banner");
+    await test.step("withdraw banner has correct links", async () => {
+      const withdrawLink = page.getByTestId("withdraw-banner-link");
+      await expect(withdrawLink).toHaveAttribute("href", "/withdraw");
 
-      const href = await withdrawBanner.getAttribute("href");
-      expect(href).toBe("/withdraw");
+      const moreInfoLink = page.getByTestId("withdraw-banner-more-info");
+      await expect(moreInfoLink).toHaveAttribute("href", "https://x.com/gnosispay");
     });
   });
 
