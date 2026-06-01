@@ -169,7 +169,8 @@ export const DelayModuleQueueContextProvider = ({
           if (creationTimestamp !== null) {
             const expirationTimestamp = creationTimestamp + expiration;
             const cooldownTimestamp = creationTimestamp + cooldown;
-            const isExpired = expiration > 0n && currentTimeSeconds > expirationTimestamp;
+            const onChainExpirationTimestamp = cooldownTimestamp + expiration;
+            const isExpired = expiration > 0n && currentTimeSeconds > onChainExpirationTimestamp;
             const isCooledDown = currentTimeSeconds > cooldownTimestamp;
 
             pendingQueue.push({
