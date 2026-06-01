@@ -59,6 +59,7 @@ jobs:
           VITE_GNOSIS_PAY_API_BASE_URL: ${{ secrets.VITE_GNOSIS_PAY_API_BASE_URL }}
           VITE_PSE_APP_ID: ${{ secrets.VITE_PSE_APP_ID }}
           VITE_ZENDESK_KEY: ${{ secrets.VITE_ZENDESK_KEY }}
+          VITE_GNOSIS_RPC_URL: ${{ secrets.GNOSIS_RPC_URL }}
         if: steps.docker_image.outputs.image_exists == 'false'
         run: |
           docker buildx build \
@@ -67,6 +68,7 @@ jobs:
             --build-arg VITE_GNOSIS_PAY_API_BASE_URL=$VITE_GNOSIS_PAY_API_BASE_URL \
             --build-arg VITE_PSE_APP_ID=$VITE_PSE_APP_ID \
             --build-arg VITE_ZENDESK_KEY=$VITE_ZENDESK_KEY \
+            --build-arg VITE_GNOSIS_RPC_URL=$VITE_GNOSIS_RPC_URL \
             -t $IMAGE_NAME . -f ./Dockerfile.ui --push
 
   deploy-on-production:

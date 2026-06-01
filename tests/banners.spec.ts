@@ -8,6 +8,27 @@ test.describe("Home Page Banners", () => {
     await setupMockWallet(page);
   });
 
+  test("withdraw banner displays and has correct link", async ({ page }) => {
+    await setupAllMocks(page, BASE_USER);
+
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    await test.step("verify withdraw banner is visible", async () => {
+      const withdrawBanner = page.getByTestId("withdraw-banner");
+      await expect(withdrawBanner).toBeVisible();
+      await expect(withdrawBanner).toContainText("Withdraw your funds");
+      await expect(withdrawBanner).toContainText("Transfer your balance to an external wallet");
+    });
+
+    await test.step("withdraw banner has correct link", async () => {
+      const withdrawBanner = page.getByTestId("withdraw-banner");
+
+      const href = await withdrawBanner.getAttribute("href");
+      expect(href).toBe("/withdraw");
+    });
+  });
+
   test("partner banner displays, has correct link, and dismisses correctly", async ({ page }) => {
     await setupAllMocks(page, BASE_USER);
 
