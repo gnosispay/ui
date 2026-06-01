@@ -32,7 +32,7 @@ export function WithdrawBanner({ className }: WithdrawBannerProps) {
             className="group flex items-start justify-between gap-4"
           >
             <h3 className="font-bold text-foreground text-base sm:text-lg leading-tight">
-              A bug has been discovered, you can withdraw your funds here
+              A bug has been discovered, we are working on a fix. In the mean time you can withdraw your funds here
             </h3>
             <ChevronRight
               size={24}
