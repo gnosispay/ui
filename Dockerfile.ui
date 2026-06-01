@@ -8,6 +8,7 @@ ARG VITE_IFRAME_HOST
 ARG VITE_GNOSIS_PAY_API_BASE_URL
 ARG VITE_PSE_APP_ID
 ARG VITE_ZENDESK_KEY
+ARG VITE_GNOSIS_RPC_URL
 
 # Set these arguments as environment variables for subsequent RUN commands in this stage.
 # Vite reads environment variables prefixed with VITE_ during the build.
@@ -16,6 +17,7 @@ ENV VITE_IFRAME_HOST=$VITE_IFRAME_HOST
 ENV VITE_GNOSIS_PAY_API_BASE_URL=$VITE_GNOSIS_PAY_API_BASE_URL
 ENV VITE_PSE_APP_ID=$VITE_PSE_APP_ID
 ENV VITE_ZENDESK_KEY=$VITE_ZENDESK_KEY
+ENV VITE_GNOSIS_RPC_URL=$VITE_GNOSIS_RPC_URL
 
 # Set working directory
 WORKDIR /app
