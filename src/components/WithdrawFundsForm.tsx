@@ -209,14 +209,6 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       // The transaction we just queued has nonce = queueNonce - 1
       const txNonce = queueNonce - 1n;
 
-      // Get the transaction hash from the delay module
-      const delayTxHash = (await readContract(wagmiAdapter.wagmiConfig, {
-        address: delayModAddress as Address,
-        abi: DELAY_MOD_ABI,
-        functionName: "getTxHash",
-        args: [txNonce],
-      })) as `0x${string}`;
-
       // Store transaction details locally for later execution
       storeTransaction(safeConfig.address, {
         to: transaction.to,
@@ -228,7 +220,7 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
         tokenDecimals: selectedToken.decimals,
         recipient: toAddress,
         timestamp: Date.now(),
-        txHash: delayTxHash,
+        enqueueTxHash: sendTxHash,
         nonce: Number(txNonce),
       });
 

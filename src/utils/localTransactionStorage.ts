@@ -13,6 +13,9 @@ export interface StoredTransaction {
   recipient?: string;
   tokenDecimals?: number;
   timestamp: number;
+  /** On-chain hash of the enqueue transaction (visible on block explorers) */
+  enqueueTxHash?: string;
+  /** @deprecated Safe transaction hash from the delay module — not valid on block explorers */
   txHash?: string;
   nonce: number;
 }
