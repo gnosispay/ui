@@ -4,7 +4,7 @@ import { shortenAddress } from "@/utils/shortenAddress";
 import { getStoredTransactions, type StoredTransaction, removeTransaction } from "@/utils/localTransactionStorage";
 import { useUser } from "@/context/UserContext";
 import type { PendingTransaction } from "@/context/DelayModuleQueueContext";
-import { CheckCircle2, Clock, AlertTriangle, Copy } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, Copy, ExternalLink } from "lucide-react";
 import { Button } from "../ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { getTxInfo } from "@/utils/delayUtils";
@@ -35,17 +35,15 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
     [copyToClipboard],
   );
 
-  // Find stored transaction by hash
+  // Find stored transaction by nonce
   const storedTransaction = useMemo<StoredTransaction | null>(() => {
-    if (!transaction.hash || !safeConfig?.address) return null;
+    if (!safeConfig?.address) return null;
 
     const storedTransactions = getStoredTransactions(safeConfig.address);
-    return (
-      storedTransactions.find(
-        (stored) => stored.txHash === transaction.hash && stored.nonce === Number(transaction.nonce),
-      ) || null
-    );
-  }, [transaction.hash, transaction.nonce, safeConfig?.address]);
+    return storedTransactions.find((stored) => stored.nonce === Number(transaction.nonce)) || null;
+  }, [transaction.nonce, safeConfig?.address]);
+
+  const onChainTxHash = storedTransaction?.enqueueTxHash;
 
   // Format creation date
   const creationDate = useMemo(() => {
@@ -151,20 +149,31 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
       </div>
 
       {/* Transaction Hash */}
-      <div className="flex items-center justify-between text-sm">
-        <span className="text-muted-foreground">Transaction Hash</span>
-        <span className="font-mono font-medium text-foreground">
-          {transaction.hash ? shortenAddress(transaction.hash) : "N/A"}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => handleCopyHash(transaction.hash || "")}
-            className="ml-2 p-2 shrink-0"
-          >
-            <Copy className="h-4 w-4" />
-          </Button>
-        </span>
-      </div>
+      {onChainTxHash && (
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Transaction Hash</span>
+          <span className="font-mono font-medium text-foreground">
+            {shortenAddress(onChainTxHash)}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleCopyHash(onChainTxHash)}
+              className="ml-2 p-2 shrink-0"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(`https://gnosisscan.io/tx/${onChainTxHash}`, "_blank")}
+              className="ml-2 p-2 shrink-0"
+              data-testid="pending-tx-external-link"
+            >
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </span>
+        </div>
+      )}
 
       {/* Creation Date */}
       <div className="flex items-center justify-between text-sm">
