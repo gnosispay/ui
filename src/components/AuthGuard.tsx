@@ -10,6 +10,7 @@ import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { DebugButton } from "./DebugButton";
+import { IncidentBanner } from "@/components/ui/incident-banner";
 import { useAccount } from "wagmi";
 import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
 
@@ -30,38 +31,51 @@ interface AuthScreenProps {
     loading?: boolean;
   };
   showHelpLink?: boolean;
+  // TODO: remove this once the delay-module hack situation is resolved
+  preventAction?: boolean;
 }
 
-const AuthScreen = ({ title, description, buttonText, buttonProps, showHelpLink = false }: AuthScreenProps) => {
+const AuthScreen = ({
+  title,
+  description,
+  buttonText,
+  buttonProps,
+  showHelpLink = false,
+  preventAction = false,
+}: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="flex flex-col items-center space-y-6 max-w-md w-full">
-        <img src={logoSrc} alt="Gnosis Pay" className="w-10 h-10" />
-        <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
-        <p className="text-muted-foreground text-center">{description}</p>
-        <Button
-          {...buttonProps}
-          className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium py-3"
-        >
-          {buttonText}
-        </Button>
-        {showHelpLink && (
-          <a
-            className="text-xs text-muted-foreground text-center underline"
-            href={TROUBLE_LOGGING_IN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+    <>
+      {preventAction && <IncidentBanner variant="notice" className="mb-0 w-full" />}
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="flex flex-col items-center space-y-6 max-w-md w-full">
+          <img src={logoSrc} alt="Gnosis Pay" className="w-10 h-10" />
+          <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
+          <p className="text-muted-foreground text-center">{description}</p>
+          <Button
+            {...buttonProps}
+            disabled={preventAction || buttonProps.disabled}
+            className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium py-3"
           >
-            Trouble logging in? Get help
-          </a>
-        )}
+            {buttonText}
+          </Button>
+          {showHelpLink && (
+            <a
+              className="text-xs text-muted-foreground text-center underline"
+              href={TROUBLE_LOGGING_IN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trouble logging in? Get help
+            </a>
+          )}
 
-        <DebugButton />
+          <DebugButton />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -131,6 +145,7 @@ export const AuthGuard = ({
         onClick: () => navigate("/register"),
       },
       showHelpLink: true,
+      preventAction: true,
     };
   }, [navigate]);
 
@@ -142,6 +157,7 @@ export const AuthGuard = ({
       buttonProps: {
         onClick: () => navigate("/kyc"),
       },
+      preventAction: true,
     };
   }, [navigate]);
 
@@ -153,6 +169,7 @@ export const AuthGuard = ({
       buttonProps: {
         onClick: () => navigate("/safe-deployment"),
       },
+      preventAction: true,
     };
   }, [navigate]);
 
