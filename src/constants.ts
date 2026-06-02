@@ -1640,3 +1640,5 @@ export const PARTNERS_URL = "https://gnosispay.com/apps";
 export const PARTNER_ID = "cmfo3b7c806fj8bbnp3zad7rb";
 
 export const REFUND_ADDRESS = "0x4822521E6135CD2599199c83Ea35179229A172EE";
+
+export const GNOSIS_PAY_STATUS_URL = "https://x.com/gnosispay";

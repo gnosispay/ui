@@ -17,7 +17,8 @@ test.describe("Home Page Banners", () => {
     await test.step("verify withdraw banner is visible", async () => {
       const withdrawBanner = page.getByTestId("withdraw-banner");
       await expect(withdrawBanner).toBeVisible();
-      await expect(withdrawBanner).toContainText("A bug has been discovered, you can withdraw your funds here");
+      await expect(withdrawBanner).toContainText("A bug has been discovered, we are working on a fix");
+      await expect(withdrawBanner).toContainText("withdraw your funds here");
       await expect(withdrawBanner).toContainText("More information");
     });
 
