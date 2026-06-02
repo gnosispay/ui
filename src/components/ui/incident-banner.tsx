@@ -9,7 +9,7 @@ interface IncidentBannerProps {
 }
 
 const INCIDENT_HEADLINE =
-  "A bug has been discovered, we are working on a fix." as const;
+  "Normal operations have been suspended in response to a security incident. The issue has now been contained and we will bre resuming normal operations over the coming days. User funds are not at risk." as const;
 
 const WITHDRAW_HEADLINE =
   `${INCIDENT_HEADLINE} In the mean time you can withdraw your funds here` as const;

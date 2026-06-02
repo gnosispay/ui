@@ -14,12 +14,12 @@ test.describe("Home Page Banners", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    await test.step("verify withdraw banner is visible", async () => {
-      const withdrawBanner = page.getByTestId("withdraw-banner");
-      await expect(withdrawBanner).toBeVisible();
-      await expect(withdrawBanner).toContainText("A bug has been discovered, we are working on a fix");
-      await expect(withdrawBanner).toContainText("withdraw your funds here");
-      await expect(withdrawBanner).toContainText("More information");
+    await test.step("verify incident notice banner is visible", async () => {
+      const incidentNoticeBanner = page.getByTestId("incident-notice-banner");
+      await expect(incidentNoticeBanner).toBeVisible();
+      await expect(incidentNoticeBanner).toContainText("A bug has been discovered, we are working on a fix");
+      await expect(incidentNoticeBanner).toContainText("withdraw your funds here");
+      await expect(incidentNoticeBanner).toContainText("More information");
     });
 
     await test.step("withdraw banner has correct links", async () => {
