@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo, useEffect } from "react";
 import type { Address } from "viem";
 import { useAccount } from "wagmi";
-import { getApiV1Owners } from "@/client";
-import { useUser } from "@/context/UserContext";
+import { call } from "wagmi/actions";
+import { wagmiAdapter } from "@/wagmi";
+import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 
 interface UseSafeSignerVerificationResult {
@@ -11,63 +12,67 @@ interface UseSafeSignerVerificationResult {
   isDataLoading: boolean;
 }
 
-export const useSafeSignerVerification = (): UseSafeSignerVerificationResult => {
+export const useSafeSignerVerification = (
+  safeAddress: Address | undefined,
+  kind: SafeKind = "next",
+): UseSafeSignerVerificationResult => {
   const { address: connectedAddress } = useAccount();
-  const { safeConfig } = useUser();
 
   const [safeSigners, setSafeSigners] = useState<Address[] | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [signerError, setSignerError] = useState<Error | null>(null);
 
-  const getSafeSigners = useCallback(async () => {
-    setSignerError(null);
-    setIsDataLoading(true);
+  const getSafeSigners = useCallback(
+    async (address: Address) => {
+      setSignerError(null);
+      setIsDataLoading(true);
 
-    try {
-      const { data: apiResponse, error: ownerError } = await getApiV1Owners();
+      try {
+        const accountKit = getAccountKit(kind);
+        // Gnosis Pay account owners are the EOAs enabled as modules on the
+        // account's Delay Mod, not the Safe's own owners. account-kit reads them
+        // by paginating the Delay Mod's enabled modules.
+        const delayModAddress = accountKit.predictAddresses(address).delay as Address;
 
-      if (ownerError) {
-        console.error("Failed to fetch safe owners:", ownerError);
-        const message = extractErrorMessage(ownerError, "Failed to fetch safe owners");
+        const owners = await accountKit.getAccountOwners(async (data) => {
+          const { data: result } = await call(wagmiAdapter.wagmiConfig, {
+            to: delayModAddress,
+            data,
+          });
+          return { data: result };
+        });
+
+        setSafeSigners(owners as Address[]);
+      } catch (error) {
+        console.error("Error getting safe signers", error);
+        const message = extractErrorMessage(error, "Failed to fetch safe owners");
         setSignerError(new Error(message));
-        return;
+      } finally {
+        setIsDataLoading(false);
       }
-
-      if (!apiResponse?.data?.owners || !Array.isArray(apiResponse.data.owners)) {
-        const message = "API returned invalid owners data";
-        setSignerError(new Error(message));
-        return;
-      }
-
-      setSafeSigners(apiResponse.data.owners as Address[]);
-    } catch (error) {
-      console.error("Error getting safe signers", error);
-      const message = extractErrorMessage(error, "Failed to fetch safe owners");
-      setSignerError(new Error(message));
-    } finally {
-      setIsDataLoading(false);
-    }
-  }, []);
+    },
+    [kind],
+  );
 
   useEffect(() => {
-    if (!safeConfig) {
+    if (!safeAddress) {
       return;
     }
 
-    getSafeSigners();
-  }, [safeConfig, getSafeSigners]);
+    getSafeSigners(safeAddress);
+  }, [safeAddress, getSafeSigners]);
 
   const isSignerConnected = useMemo(() => {
     if (!safeSigners?.length) return false;
     if (!connectedAddress) return false;
-    if (!safeConfig?.address) return false;
+    if (!safeAddress) return false;
     if (isDataLoading) return false;
 
     const lowerCaseConnectedAddress = connectedAddress.toLowerCase();
     const lowerCaseSafeSigners = safeSigners.map((signer) => signer.toLowerCase());
 
     return lowerCaseSafeSigners.includes(lowerCaseConnectedAddress);
-  }, [safeSigners, connectedAddress, isDataLoading, safeConfig?.address]);
+  }, [safeSigners, connectedAddress, isDataLoading, safeAddress]);
 
   return {
     isSignerConnected,

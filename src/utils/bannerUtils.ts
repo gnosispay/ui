@@ -1,14 +1,20 @@
 const PARTNER_BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v2";
+const LEGACY_SAFE_RECOVERY_BANNER_STORAGE_KEY = "gp-ui.legacy-safe-recovery-banner-dismissed.v1";
 
 export interface BannerDismissalData {
   nextShowTimestamp: number;
   count: number;
 }
 
-export type BannerType = "partner";
+export type BannerType = "partner" | "legacy-safe-recovery";
 
-function getBannerStorageKey(): string {
-  return PARTNER_BANNER_STORAGE_KEY;
+function getBannerStorageKey(bannerType: BannerType): string {
+  switch (bannerType) {
+    case "legacy-safe-recovery":
+      return LEGACY_SAFE_RECOVERY_BANNER_STORAGE_KEY;
+    default:
+      return PARTNER_BANNER_STORAGE_KEY;
+  }
 }
 
 // Utility functions for exponential backoff
@@ -31,7 +37,7 @@ export function shouldShowBanner(dismissalData: BannerDismissalData | null): boo
 
 export function getBannerDismissalData(bannerType: BannerType = "partner"): BannerDismissalData | null {
   try {
-    const storageKey = getBannerStorageKey();
+    const storageKey = getBannerStorageKey(bannerType);
     const stored = localStorage.getItem(storageKey);
     if (!stored) return null;
 
@@ -46,8 +52,8 @@ export function getBannerDismissalData(bannerType: BannerType = "partner"): Bann
   }
 }
 
-export function setBannerDismissalData(data: BannerDismissalData, _bannerType: BannerType = "partner"): void {
-  const storageKey = getBannerStorageKey();
+export function setBannerDismissalData(data: BannerDismissalData, bannerType: BannerType = "partner"): void {
+  const storageKey = getBannerStorageKey(bannerType);
   localStorage.setItem(storageKey, JSON.stringify(data));
 }
 

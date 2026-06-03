@@ -16,6 +16,12 @@ interface CustomTokenAmountInputProps {
   onTokenChange: (token: TokenInfoWithBalance) => void;
   onAmountChange: (amount: bigint) => void;
   setError: (error: string) => void;
+  /**
+   * Safe to read the token balance from. Defaults to the current user's safe.
+   * Pass an explicit address (e.g. the legacy safe) so the balance and Max
+   * button reflect the correct safe.
+   */
+  safeAddress?: Address;
 }
 
 interface CustomTokenInfo {
@@ -26,8 +32,14 @@ interface CustomTokenInfo {
   balance: bigint;
 }
 
-export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError }: CustomTokenAmountInputProps) => {
+export const CustomTokenAmountInput = ({
+  onTokenChange,
+  onAmountChange,
+  setError,
+  safeAddress: safeAddressProp,
+}: CustomTokenAmountInputProps) => {
   const { safeConfig } = useUser();
+  const safeAddress = (safeAddressProp ?? safeConfig?.address) as Address | undefined;
   const [contractAddress, setContractAddress] = useState("");
   const [addressError, setAddressError] = useState("");
   const [displayAmount, setDisplayAmount] = useState("");
@@ -68,7 +80,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
 
   const fetchTokenInfo = useCallback(
     async (address: string) => {
-      if (!safeConfig?.address || !isAddress(address)) {
+      if (!safeAddress || !isAddress(address)) {
         return;
       }
 
@@ -98,7 +110,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
               address: address as Address,
               abi: ERC20_ABI,
               functionName: "balanceOf",
-              args: [safeConfig.address as Address],
+              args: [safeAddress],
             },
           ],
         });
@@ -169,7 +181,7 @@ export const CustomTokenAmountInput = ({ onTokenChange, onAmountChange, setError
         setIsLoadingToken(false);
       }
     },
-    [safeConfig?.address, onTokenChange],
+    [safeAddress, onTokenChange],
   );
 
   const handleAddressChange = useCallback(

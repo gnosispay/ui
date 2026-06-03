@@ -1,13 +1,18 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
-import { useUser } from "@/context/UserContext";
 import { readContract, writeContract, waitForTransactionReceipt } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import type { Address } from "viem";
-import { OperationType, predictAddresses } from "@gnosispay/account-kit";
+import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
 import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils/errorHelpers";
+
+// The Delay module enforces cooldown against the chain's block.timestamp, which
+// can lag the browser clock. Require a small extra buffer before enabling
+// execution so we don't surface the button (and let users execute) a moment
+// before the chain will accept it, which would revert with a generic error.
+const EXECUTION_COOLDOWN_BUFFER_SECONDS = 30n;
 
 export interface PendingTransaction {
   nonce: bigint;
@@ -27,6 +32,8 @@ export interface DelayModuleQueueInfo {
 }
 
 interface DelayModuleQueueContextValue {
+  safeAddress: Address | undefined;
+  kind: SafeKind;
   queueInfo: DelayModuleQueueInfo | null;
   queue: PendingTransaction[];
   isError: boolean;
@@ -40,14 +47,17 @@ const DelayModuleQueueContext = createContext<DelayModuleQueueContextValue | und
 
 interface DelayModuleQueueContextProviderProps {
   children: ReactNode;
+  safeAddress: Address | undefined;
+  kind: SafeKind;
   onTransactionExecuted?: () => void;
 }
 
 export const DelayModuleQueueContextProvider = ({
   children,
+  safeAddress,
+  kind,
   onTransactionExecuted,
 }: DelayModuleQueueContextProviderProps) => {
-  const { safeConfig } = useUser();
   const [queueInfo, setQueueInfo] = useState<DelayModuleQueueInfo | null>(null);
   const [queue, setQueue] = useState<PendingTransaction[]>([]);
   const [isError, setIsError] = useState(false);
@@ -56,19 +66,19 @@ export const DelayModuleQueueContextProvider = ({
   }, [queue]);
 
   const delayModAddress = useMemo(() => {
-    if (!safeConfig?.address) return undefined;
+    if (!safeAddress) return undefined;
 
     let delayModAddress: string | undefined;
 
     try {
-      delayModAddress = predictAddresses(safeConfig.address).delay;
+      delayModAddress = getAccountKit(kind).predictAddresses(safeAddress).delay;
     } catch (error) {
       console.error("Error getting delay module address:", error);
       return undefined;
     }
 
     return delayModAddress as Address;
-  }, [safeConfig]);
+  }, [safeAddress, kind]);
 
   const fetchQueueInfo = useCallback(async () => {
     if (!delayModAddress) {
@@ -171,7 +181,7 @@ export const DelayModuleQueueContextProvider = ({
             const cooldownTimestamp = creationTimestamp + cooldown;
             const onChainExpirationTimestamp = cooldownTimestamp + expiration;
             const isExpired = expiration > 0n && currentTimeSeconds > onChainExpirationTimestamp;
-            const isCooledDown = currentTimeSeconds > cooldownTimestamp;
+            const isCooledDown = currentTimeSeconds > cooldownTimestamp + EXECUTION_COOLDOWN_BUFFER_SECONDS;
 
             pendingQueue.push({
               nonce,
@@ -258,7 +268,7 @@ export const DelayModuleQueueContextProvider = ({
           address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "executeNextTx",
-          args: [to, value, data, OperationType.Call],
+          args: [to, value, data, getAccountKit(kind).OperationType.Call],
         });
 
         // Wait for transaction confirmation
@@ -278,10 +288,12 @@ export const DelayModuleQueueContextProvider = ({
         throw error; // Re-throw so component can handle loading state
       }
     },
-    [delayModAddress, refetch, onTransactionExecuted],
+    [delayModAddress, kind, refetch, onTransactionExecuted],
   );
 
   const value: DelayModuleQueueContextValue = {
+    safeAddress,
+    kind,
     queueInfo,
     queue,
     isError,
