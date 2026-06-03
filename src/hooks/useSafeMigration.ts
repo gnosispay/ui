@@ -16,21 +16,32 @@ interface UseSafeMigrationResult {
 }
 
 export const useSafeMigration = (): UseSafeMigrationResult => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, getJWT } = useAuth();
   const [migration, setMigration] = useState<SafeMigrationInfo | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchMigration = useCallback(() => {
     setIsLoading(true);
 
-    getApiV1SafeMigration()
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Error fetching safe migration:", error);
+    // On a direct navigation, the shared API client's Authorization header may
+    // not be set yet at the moment this runs. Resolve a valid token explicitly
+    // and pass it on the request so it isn't sent unauthenticated (401).
+    getJWT()
+      .then((jwt) => {
+        if (!jwt) {
           return;
         }
 
-        setMigration(data);
+        return getApiV1SafeMigration({
+          headers: { Authorization: `Bearer ${jwt}` },
+        }).then(({ data, error }) => {
+          if (error) {
+            console.error("Error fetching safe migration:", error);
+            return;
+          }
+
+          setMigration(data);
+        });
       })
       .catch((error) => {
         console.error("Error fetching safe migration:", error);
@@ -38,7 +49,7 @@ export const useSafeMigration = (): UseSafeMigrationResult => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  }, [getJWT]);
 
   useEffect(() => {
     if (!isAuthenticated) {
