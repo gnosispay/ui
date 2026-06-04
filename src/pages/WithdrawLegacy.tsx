@@ -5,6 +5,7 @@ import { DelayModuleQueueContextProvider } from "@/context/DelayModuleQueueConte
 import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { useOldSafeBalances } from "@/hooks/useOldSafeBalances";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StandardAlert } from "@/components/ui/standard-alert";
 import { buttonVariants } from "@/components/ui/button";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
@@ -56,6 +57,12 @@ export const WithdrawLegacyRoute = () => {
       <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
         <div className="col-span-6 lg:col-start-2 lg:col-span-4">
           <div className="flex flex-col gap-4">
+            <StandardAlert
+              className="bg-destructive/15 border-destructive text-destructive-foreground"
+              variant="destructive"
+              description="This page helps you perform operations on the legacy card safe. If the execution of a transaction
+              succeeds, but the funds are not transferred, it may mean that the legacy safe has been taken over."
+            />
             <OnchainBalance currenciesWithBalance={currenciesWithBalance} isLoading={isLoading} isError={isError} />
             <DelayModuleQueue />
             <WithdrawFundsForm

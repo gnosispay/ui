@@ -17,8 +17,12 @@ test.describe("Home Page Banners", () => {
     await test.step("verify incident notice banner is visible", async () => {
       const incidentNoticeBanner = page.getByTestId("incident-notice-banner");
       await expect(incidentNoticeBanner).toBeVisible();
-      await expect(incidentNoticeBanner).toContainText("A bug has been discovered, we are working on a fix");
-      await expect(incidentNoticeBanner).toContainText("withdraw your funds here");
+      await expect(incidentNoticeBanner).toContainText(
+        "Normal operations have been suspended in response to a security incident. The issue has now been contained and we will be resuming operations over the coming days. User funds are not at risk.",
+      );
+      await expect(incidentNoticeBanner).toContainText("In the meantime:");
+      await expect(incidentNoticeBanner).toContainText("do not send funds to your Card account");
+      await expect(incidentNoticeBanner).toContainText("do not use IBAN");
       await expect(incidentNoticeBanner).toContainText("More information");
     });
 

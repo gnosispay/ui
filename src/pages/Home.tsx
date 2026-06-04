@@ -22,7 +22,7 @@ export const Home = () => {
   return (
     <div className="grid grid-cols-6 gap-4 h-full mt-4">
       <div className="col-span-6 px-4 lg:px-0">
-        <IncidentBanner variant="notice" />
+        <IncidentBanner />
         <LegacySafeRecoveryBanner />
       </div>
       <div className="col-span-6 lg:col-start-2 lg:col-span-4">

@@ -15,6 +15,7 @@ import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { sendTransaction, readContract, waitForTransactionReceipt, getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import { toast } from "sonner";
+import { GNOSIS_FAUCET_URL } from "@/constants";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { gnosis } from "wagmi/chains";
 import { storeTransaction } from "@/utils/localTransactionStorage";
@@ -112,19 +113,18 @@ export const WithdrawFundsForm = ({
         : "You are not an owner of this Safe. Please connect an owner account.";
     }
 
-    if (!hasSufficientGasBalance) {
-      return "Your connected account has insufficient xDAI balance to pay for gas. Please ensure you have xDAI in your wallet.";
-    }
-
     return null;
-  }, [
-    connectedAddress,
-    isSignerConnected,
-    signerError,
-    isSignerVerificationLoading,
-    hasSufficientGasBalance,
-    isBalanceLoading,
-  ]);
+  }, [connectedAddress, isSignerConnected, signerError, isSignerVerificationLoading, isBalanceLoading]);
+
+  const showInsufficientGasAlert = useMemo(() => {
+    return (
+      !!connectedAddress &&
+      !isSignerVerificationLoading &&
+      !isBalanceLoading &&
+      isSignerConnected &&
+      !hasSufficientGasBalance
+    );
+  }, [connectedAddress, isSignerVerificationLoading, isBalanceLoading, isSignerConnected, hasSufficientGasBalance]);
 
   const isFormValid = useMemo(() => {
     return !!(
@@ -284,6 +284,26 @@ export const WithdrawFundsForm = ({
       )}
 
       {connectedAddress && validationError && <StandardAlert variant="destructive" description={validationError} />}
+
+      {showInsufficientGasAlert && (
+        <StandardAlert
+          variant="destructive"
+          description={
+            <span>
+              Your connected account has insufficient xDAI balance to pay for gas. Get xDAI from the{" "}
+              <a
+                href={GNOSIS_FAUCET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground underline cursor-pointer"
+              >
+                Gnosis Faucet
+              </a>
+              .
+            </span>
+          }
+        />
+      )}
 
       <StandardAlert
         variant="warning"
