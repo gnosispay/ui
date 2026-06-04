@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { isAddress, type Address } from "viem";
 import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { useOldSafeBalances } from "@/hooks/useOldSafeBalances";
+import { useIsLegacyRecoverySafe } from "@/hooks/useIsLegacyRecoverySafe";
 import {
   createDismissalData,
   getBannerDismissalData,
@@ -22,6 +23,7 @@ export function LegacySafeRecoveryBanner({ className }: LegacySafeRecoveryBanner
   const { hasOldSafe, oldSafe } = useSafeMigration();
   const oldSafeAddress = oldSafe?.address && isAddress(oldSafe.address) ? (oldSafe.address as Address) : undefined;
   const { hasBalance } = useOldSafeBalances(oldSafeAddress);
+  const { isEligible } = useIsLegacyRecoverySafe(oldSafeAddress);
   const [isDismissed, setIsDismissed] = useState(true);
 
   useEffect(() => {
@@ -37,7 +39,7 @@ export function LegacySafeRecoveryBanner({ className }: LegacySafeRecoveryBanner
     setIsDismissed(true);
   }, []);
 
-  if (isDismissed || !hasOldSafe || !oldSafeAddress || !hasBalance) {
+  if (isDismissed || !hasOldSafe || !oldSafeAddress || !isEligible || !hasBalance) {
     return null;
   }
 
