@@ -17,7 +17,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     // Force Vite to pre-bundle this package
-    include: ["@gnosispay/account-kit"],
+    include: ["@gnosispay/account-kit", "@gnosispay/account-kit-next"],
   },
   build: {
     commonjsOptions: {

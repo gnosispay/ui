@@ -2,9 +2,9 @@
 
 import type { Client, Options as Options2, TDataShape } from './client';
 import { client } from './client.gen';
-import type { DeleteApiV1EoaAccountsByIdData, DeleteApiV1EoaAccountsByIdErrors, DeleteApiV1EoaAccountsByIdResponses, DeleteApiV1IbansResetData, DeleteApiV1IbansResetErrors, DeleteApiV1IbansResetResponses, DeleteApiV1OwnersData, DeleteApiV1OwnersErrors, DeleteApiV1OwnersResponses, DeleteApiV1SafeResetData, DeleteApiV1SafeResetErrors, DeleteApiV1SafeResetResponses, GetApiV1AccountBalancesData, GetApiV1AccountBalancesErrors, GetApiV1AccountBalancesResponses, GetApiV1AccountsDailyLimitData, GetApiV1AccountsDailyLimitErrors, GetApiV1AccountsDailyLimitResponses, GetApiV1AccountsDailyLimitTransactionDataData, GetApiV1AccountsDailyLimitTransactionDataErrors, GetApiV1AccountsDailyLimitTransactionDataResponses, GetApiV1AccountSignaturePayloadData, GetApiV1AccountSignaturePayloadErrors, GetApiV1AccountSignaturePayloadResponses, GetApiV1AccountsOnchainDailyLimitData, GetApiV1AccountsOnchainDailyLimitErrors, GetApiV1AccountsOnchainDailyLimitResponses, GetApiV1AccountsOnchainDailyLimitTransactionDataData, GetApiV1AccountsOnchainDailyLimitTransactionDataErrors, GetApiV1AccountsOnchainDailyLimitTransactionDataResponses, GetApiV1AccountsWithdrawTransactionDataData, GetApiV1AccountsWithdrawTransactionDataErrors, GetApiV1AccountsWithdrawTransactionDataResponses, GetApiV1AuthNonceData, GetApiV1AuthNonceErrors, GetApiV1AuthNonceResponses, GetApiV1CardsByCardIdStatusData, GetApiV1CardsByCardIdStatusErrors, GetApiV1CardsByCardIdStatusResponses, GetApiV1CardsData, GetApiV1CardsErrors, GetApiV1CardsResponses, GetApiV1CardsTransactionsData, GetApiV1CardsTransactionsErrors, GetApiV1CardsTransactionsResponses, GetApiV1CashbackData, GetApiV1CashbackErrors, GetApiV1CashbackResponses, GetApiV1DelayRelayData, GetApiV1DelayRelayErrors, GetApiV1DelayRelayResponses, GetApiV1EoaAccountsData, GetApiV1EoaAccountsErrors, GetApiV1EoaAccountsResponses, GetApiV1IbansAvailableData, GetApiV1IbansAvailableErrors, GetApiV1IbansAvailableResponses, GetApiV1IbansDetailsData, GetApiV1IbansDetailsErrors, GetApiV1IbansDetailsResponses, GetApiV1IbansOauthRedirectUrlData, GetApiV1IbansOauthRedirectUrlErrors, GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOrdersData, GetApiV1IbansOrdersErrors, GetApiV1IbansOrdersResponses, GetApiV1IbansSigningMessageData, GetApiV1IbansSigningMessageErrors, GetApiV1IbansSigningMessageResponses, GetApiV1KycIntegrationData, GetApiV1KycIntegrationErrors, GetApiV1KycIntegrationResponses, GetApiV1KycIntegrationSdkData, GetApiV1KycIntegrationSdkErrors, GetApiV1KycIntegrationSdkResponses, GetApiV1OrderByOrderIdData, GetApiV1OrderByOrderIdErrors, GetApiV1OrderByOrderIdResponses, GetApiV1OrderData, GetApiV1OrderErrors, GetApiV1OrderResponses, GetApiV1OwnersAddTransactionDataData, GetApiV1OwnersAddTransactionDataErrors, GetApiV1OwnersAddTransactionDataResponses, GetApiV1OwnersData, GetApiV1OwnersErrors, GetApiV1OwnersRemoveTransactionDataData, GetApiV1OwnersRemoveTransactionDataErrors, GetApiV1OwnersRemoveTransactionDataResponses, GetApiV1OwnersResponses, GetApiV1RewardsData, GetApiV1RewardsErrors, GetApiV1RewardsResponses, GetApiV1SafeConfigData, GetApiV1SafeConfigErrors, GetApiV1SafeConfigResponses, GetApiV1SafeDeployData, GetApiV1SafeDeployErrors, GetApiV1SafeDeployResponses, GetApiV1SourceOfFundsData, GetApiV1SourceOfFundsErrors, GetApiV1SourceOfFundsResponses, GetApiV1TermsData, GetApiV1TermsErrors, GetApiV1TermsResponses, GetApiV1TransactionsData, GetApiV1TransactionsDisputeData, GetApiV1TransactionsDisputeErrors, GetApiV1TransactionsDisputeResponses, GetApiV1TransactionsErrors, GetApiV1TransactionsResponses, GetApiV1UserCardPublicKeyData, GetApiV1UserCardPublicKeyErrors, GetApiV1UserCardPublicKeyResponses, GetApiV1UserData, GetApiV1UserErrors, GetApiV1UserResponses, GetApiV1UserTermsData, GetApiV1UserTermsErrors, GetApiV1UserTermsResponses, GetApiV1WebhooksMessageByPartnerIdData, GetApiV1WebhooksMessageByPartnerIdErrors, GetApiV1WebhooksMessageByPartnerIdResponses, GetApiV1WebhooksSubscriptionByPartnerIdData, GetApiV1WebhooksSubscriptionByPartnerIdErrors, GetApiV1WebhooksSubscriptionByPartnerIdResponses, PatchApiV1AccountDeploySafeModulesData, PatchApiV1AccountDeploySafeModulesErrors, PatchApiV1AccountDeploySafeModulesResponses, PostApiV1AccountData, PostApiV1AccountErrors, PostApiV1AccountResponses, PostApiV1AccountsWithdrawData, PostApiV1AccountsWithdrawErrors, PostApiV1AccountsWithdrawResponses, PostApiV1AuthChallengeData, PostApiV1AuthChallengeErrors, PostApiV1AuthChallengeResponses, PostApiV1AuthSignupData, PostApiV1AuthSignupErrors, PostApiV1AuthSignupOtpData, PostApiV1AuthSignupOtpErrors, PostApiV1AuthSignupOtpResponses, PostApiV1AuthSignupResponses, PostApiV1CardsByCardIdActivateData, PostApiV1CardsByCardIdActivateErrors, PostApiV1CardsByCardIdActivateResponses, PostApiV1CardsByCardIdFreezeData, PostApiV1CardsByCardIdFreezeErrors, PostApiV1CardsByCardIdFreezeResponses, PostApiV1CardsByCardIdLostData, PostApiV1CardsByCardIdLostErrors, PostApiV1CardsByCardIdLostResponses, PostApiV1CardsByCardIdStolenData, PostApiV1CardsByCardIdStolenErrors, PostApiV1CardsByCardIdStolenResponses, PostApiV1CardsByCardIdUnfreezeData, PostApiV1CardsByCardIdUnfreezeErrors, PostApiV1CardsByCardIdUnfreezeResponses, PostApiV1CardsByCardIdVoidData, PostApiV1CardsByCardIdVoidErrors, PostApiV1CardsByCardIdVoidResponses, PostApiV1CardsVerifyData, PostApiV1CardsVerifyErrors, PostApiV1CardsVerifyResponses, PostApiV1CardsVirtualData, PostApiV1CardsVirtualErrors, PostApiV1CardsVirtualResponses, PostApiV1EoaAccountsData, PostApiV1EoaAccountsErrors, PostApiV1EoaAccountsResponses, PostApiV1IbansMoneriumProfileData, PostApiV1IbansMoneriumProfileErrors, PostApiV1IbansMoneriumProfileResponses, PostApiV1IntegrationsMoneriumData, PostApiV1IntegrationsMoneriumErrors, PostApiV1IntegrationsMoneriumResponses, PostApiV1KycImportPartnerApplicantData, PostApiV1KycImportPartnerApplicantErrors, PostApiV1KycImportPartnerApplicantResponses, PostApiV1OrderByOrderIdAttachCouponData, PostApiV1OrderByOrderIdAttachCouponErrors, PostApiV1OrderByOrderIdAttachCouponResponses, PostApiV1OrderByOrderIdCancelData, PostApiV1OrderByOrderIdCancelErrors, PostApiV1OrderByOrderIdCancelResponses, PostApiV1OrderByOrderIdCreateCardData, PostApiV1OrderByOrderIdCreateCardErrors, PostApiV1OrderByOrderIdCreateCardResponses, PostApiV1OrderCreateData, PostApiV1OrderCreateErrors, PostApiV1OrderCreateResponses, PostApiV1OwnersData, PostApiV1OwnersErrors, PostApiV1OwnersResponses, PostApiV1SafeDeployData, PostApiV1SafeDeployErrors, PostApiV1SafeDeployResponses, PostApiV1SafeSetCurrencyData, PostApiV1SafeSetCurrencyErrors, PostApiV1SafeSetCurrencyResponses, PostApiV1SourceOfFundsData, PostApiV1SourceOfFundsErrors, PostApiV1SourceOfFundsResponses, PostApiV1TransactionsByThreadIdDisputeData, PostApiV1TransactionsByThreadIdDisputeErrors, PostApiV1TransactionsByThreadIdDisputeResponses, PostApiV1UserTermsData, PostApiV1UserTermsErrors, PostApiV1UserTermsResponses, PostApiV1VerificationCheckData, PostApiV1VerificationCheckErrors, PostApiV1VerificationCheckResponses, PostApiV1VerificationData, PostApiV1VerificationErrors, PostApiV1VerificationResponses, PostApiV1WebhooksSubscribeByPartnerIdData, PostApiV1WebhooksSubscribeByPartnerIdErrors, PostApiV1WebhooksSubscribeByPartnerIdResponses, PutApiV1AccountsDailyLimitData, PutApiV1AccountsDailyLimitErrors, PutApiV1AccountsDailyLimitResponses, PutApiV1AccountsOnchainDailyLimitData, PutApiV1AccountsOnchainDailyLimitErrors, PutApiV1AccountsOnchainDailyLimitResponses, PutApiV1OrderByOrderIdAttachTransactionData, PutApiV1OrderByOrderIdAttachTransactionErrors, PutApiV1OrderByOrderIdAttachTransactionResponses, PutApiV1OrderByOrderIdConfirmPaymentData, PutApiV1OrderByOrderIdConfirmPaymentErrors, PutApiV1OrderByOrderIdConfirmPaymentResponses } from './types.gen';
+import type { DeleteApiV1EoaAccountsByIdData, DeleteApiV1EoaAccountsByIdErrors, DeleteApiV1EoaAccountsByIdResponses, DeleteApiV1OwnersData, DeleteApiV1OwnersErrors, DeleteApiV1OwnersResponses, DeleteApiV1SafeResetData, DeleteApiV1SafeResetErrors, DeleteApiV1SafeResetResponses, GetApiV1AccountBalancesData, GetApiV1AccountBalancesErrors, GetApiV1AccountBalancesResponses, GetApiV1AccountsDailyLimitData, GetApiV1AccountsDailyLimitErrors, GetApiV1AccountsDailyLimitResponses, GetApiV1AccountsDailyLimitTransactionDataData, GetApiV1AccountsDailyLimitTransactionDataErrors, GetApiV1AccountsDailyLimitTransactionDataResponses, GetApiV1AccountsOnchainDailyLimitData, GetApiV1AccountsOnchainDailyLimitErrors, GetApiV1AccountsOnchainDailyLimitResponses, GetApiV1AccountsOnchainDailyLimitTransactionDataData, GetApiV1AccountsOnchainDailyLimitTransactionDataErrors, GetApiV1AccountsOnchainDailyLimitTransactionDataResponses, GetApiV1AccountsWithdrawTransactionDataData, GetApiV1AccountsWithdrawTransactionDataErrors, GetApiV1AccountsWithdrawTransactionDataResponses, GetApiV1AuthNonceData, GetApiV1AuthNonceErrors, GetApiV1AuthNonceResponses, GetApiV1CardsByCardIdStatusData, GetApiV1CardsByCardIdStatusErrors, GetApiV1CardsByCardIdStatusResponses, GetApiV1CardsData, GetApiV1CardsErrors, GetApiV1CardsResponses, GetApiV1CardsTransactionsData, GetApiV1CardsTransactionsErrors, GetApiV1CardsTransactionsResponses, GetApiV1CashbackData, GetApiV1CashbackErrors, GetApiV1CashbackResponses, GetApiV1DelayRelayData, GetApiV1DelayRelayErrors, GetApiV1DelayRelayResponses, GetApiV1EoaAccountsData, GetApiV1EoaAccountsErrors, GetApiV1EoaAccountsResponses, GetApiV1IbansAvailableData, GetApiV1IbansAvailableErrors, GetApiV1IbansAvailableResponses, GetApiV1IbansDetailsData, GetApiV1IbansDetailsErrors, GetApiV1IbansDetailsResponses, GetApiV1IbansOrdersData, GetApiV1IbansOrdersErrors, GetApiV1IbansOrdersResponses, GetApiV1IbansSigningMessageData, GetApiV1IbansSigningMessageErrors, GetApiV1IbansSigningMessageResponses, GetApiV1KycIntegrationData, GetApiV1KycIntegrationErrors, GetApiV1KycIntegrationResponses, GetApiV1KycIntegrationSdkData, GetApiV1KycIntegrationSdkErrors, GetApiV1KycIntegrationSdkResponses, GetApiV1OrderByOrderIdData, GetApiV1OrderByOrderIdErrors, GetApiV1OrderByOrderIdResponses, GetApiV1OrderData, GetApiV1OrderErrors, GetApiV1OrderResponses, GetApiV1OwnersAddTransactionDataData, GetApiV1OwnersAddTransactionDataErrors, GetApiV1OwnersAddTransactionDataResponses, GetApiV1OwnersData, GetApiV1OwnersErrors, GetApiV1OwnersRemoveTransactionDataData, GetApiV1OwnersRemoveTransactionDataErrors, GetApiV1OwnersRemoveTransactionDataResponses, GetApiV1OwnersResponses, GetApiV1RewardsData, GetApiV1RewardsErrors, GetApiV1RewardsResponses, GetApiV1SafeConfigData, GetApiV1SafeConfigErrors, GetApiV1SafeConfigResponses, GetApiV1SafeDeployData, GetApiV1SafeDeployErrors, GetApiV1SafeDeployResponses, GetApiV1SafeMigrationData, GetApiV1SafeMigrationErrors, GetApiV1SafeMigrationResponses, GetApiV1SourceOfFundsData, GetApiV1SourceOfFundsErrors, GetApiV1SourceOfFundsResponses, GetApiV1TermsData, GetApiV1TermsErrors, GetApiV1TermsResponses, GetApiV1TransactionsData, GetApiV1TransactionsDisputeData, GetApiV1TransactionsDisputeErrors, GetApiV1TransactionsDisputeResponses, GetApiV1TransactionsErrors, GetApiV1TransactionsResponses, GetApiV1UserCardPublicKeyData, GetApiV1UserCardPublicKeyErrors, GetApiV1UserCardPublicKeyResponses, GetApiV1UserData, GetApiV1UserErrors, GetApiV1UserResponses, GetApiV1UserTermsData, GetApiV1UserTermsErrors, GetApiV1UserTermsResponses, GetApiV1WebhooksMessageByPartnerIdData, GetApiV1WebhooksMessageByPartnerIdErrors, GetApiV1WebhooksMessageByPartnerIdResponses, GetApiV1WebhooksSubscriptionByPartnerIdData, GetApiV1WebhooksSubscriptionByPartnerIdErrors, GetApiV1WebhooksSubscriptionByPartnerIdResponses, PostApiV1AccountsWithdrawData, PostApiV1AccountsWithdrawErrors, PostApiV1AccountsWithdrawResponses, PostApiV1AuthChallengeData, PostApiV1AuthChallengeErrors, PostApiV1AuthChallengeResponses, PostApiV1AuthSignupData, PostApiV1AuthSignupErrors, PostApiV1AuthSignupOtpData, PostApiV1AuthSignupOtpErrors, PostApiV1AuthSignupOtpResponses, PostApiV1AuthSignupResponses, PostApiV1CardsByCardIdActivateData, PostApiV1CardsByCardIdActivateErrors, PostApiV1CardsByCardIdActivateResponses, PostApiV1CardsByCardIdFreezeData, PostApiV1CardsByCardIdFreezeErrors, PostApiV1CardsByCardIdFreezeResponses, PostApiV1CardsByCardIdLostData, PostApiV1CardsByCardIdLostErrors, PostApiV1CardsByCardIdLostResponses, PostApiV1CardsByCardIdStolenData, PostApiV1CardsByCardIdStolenErrors, PostApiV1CardsByCardIdStolenResponses, PostApiV1CardsByCardIdUnfreezeData, PostApiV1CardsByCardIdUnfreezeErrors, PostApiV1CardsByCardIdUnfreezeResponses, PostApiV1CardsByCardIdVoidData, PostApiV1CardsByCardIdVoidErrors, PostApiV1CardsByCardIdVoidResponses, PostApiV1CardsVerifyData, PostApiV1CardsVerifyErrors, PostApiV1CardsVerifyResponses, PostApiV1CardsVirtualData, PostApiV1CardsVirtualErrors, PostApiV1CardsVirtualResponses, PostApiV1EoaAccountsData, PostApiV1EoaAccountsErrors, PostApiV1EoaAccountsResponses, PostApiV1IntegrationsMoneriumData, PostApiV1IntegrationsMoneriumErrors, PostApiV1IntegrationsMoneriumResponses, PostApiV1KycImportPartnerApplicantData, PostApiV1KycImportPartnerApplicantErrors, PostApiV1KycImportPartnerApplicantResponses, PostApiV1OrderByOrderIdAttachCouponData, PostApiV1OrderByOrderIdAttachCouponErrors, PostApiV1OrderByOrderIdAttachCouponResponses, PostApiV1OrderByOrderIdCancelData, PostApiV1OrderByOrderIdCancelErrors, PostApiV1OrderByOrderIdCancelResponses, PostApiV1OrderByOrderIdCreateCardData, PostApiV1OrderByOrderIdCreateCardErrors, PostApiV1OrderByOrderIdCreateCardResponses, PostApiV1OrderCreateData, PostApiV1OrderCreateErrors, PostApiV1OrderCreateResponses, PostApiV1OwnersData, PostApiV1OwnersErrors, PostApiV1OwnersResponses, PostApiV1SafeDeployData, PostApiV1SafeDeployErrors, PostApiV1SafeDeployResponses, PostApiV1SafeSetCurrencyData, PostApiV1SafeSetCurrencyErrors, PostApiV1SafeSetCurrencyResponses, PostApiV1SourceOfFundsData, PostApiV1SourceOfFundsErrors, PostApiV1SourceOfFundsResponses, PostApiV1TransactionsByThreadIdDisputeData, PostApiV1TransactionsByThreadIdDisputeErrors, PostApiV1TransactionsByThreadIdDisputeResponses, PostApiV1UserTermsData, PostApiV1UserTermsErrors, PostApiV1UserTermsResponses, PostApiV1VerificationCheckData, PostApiV1VerificationCheckErrors, PostApiV1VerificationCheckResponses, PostApiV1VerificationData, PostApiV1VerificationErrors, PostApiV1VerificationResponses, PostApiV1WebhooksSubscribeByPartnerIdData, PostApiV1WebhooksSubscribeByPartnerIdErrors, PostApiV1WebhooksSubscribeByPartnerIdResponses, PutApiV1AccountsDailyLimitData, PutApiV1AccountsDailyLimitErrors, PutApiV1AccountsDailyLimitResponses, PutApiV1AccountsOnchainDailyLimitData, PutApiV1AccountsOnchainDailyLimitErrors, PutApiV1AccountsOnchainDailyLimitResponses, PutApiV1OrderByOrderIdAttachTransactionData, PutApiV1OrderByOrderIdAttachTransactionErrors, PutApiV1OrderByOrderIdAttachTransactionResponses, PutApiV1OrderByOrderIdConfirmPaymentData, PutApiV1OrderByOrderIdConfirmPaymentErrors, PutApiV1OrderByOrderIdConfirmPaymentResponses } from './types.gen';
 
-export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean> = Options2<TData, ThrowOnError> & {
+export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
      * You can provide a client instance returned by `createClient()` instead of
      * individual options. This might be also useful if you want to implement a
@@ -27,101 +27,6 @@ export const getApiV1AccountBalances = <ThrowOnError extends boolean = false>(op
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/account-balances',
     ...options
-});
-
-/**
- * Create or Deploy a Safe (pending Setup)
- *
- * This endpoint serves two purposes - it first checks if a Safe account exists for the user. If no account exists, it creates one and initiates deployment.
- * If an account already exists but is not deployed, it initiates the deployment process.
- *
- * This endpoint can be called immediately after user signup as there are no restrictions or prerequisites.
- *
- * When deploying a new Safe, the endpoint waits for transaction execution and confirmation on-chain.
- * Because of this, the request may take up to 10 seconds to complete when a deployment is needed.
- *
- * The deployment process is handled by a sponsored transaction on the Gnosis Chain, and the response
- * includes the transaction hash for tracking the deployment status.
- *
- * Next steps after successful deployment is to setup the Safe:
- * - Once this endpoint successfully creates and deploys a Safe account, the user should call
- * the `/api/v1/safe/set-currency` endpoint to set the currency for the account.
- * - Note that the `/api/v1/safe/set-currency` endpoint requires the user to have completed
- * the KYC process successfully.
- * - Then, the user should call the `/api/v1/account/signature-payload` endpoint to get the signature data for the account setup.
- * - Finally, the user should call the `/api/v1/account/deploy-safe-modules` endpoint to deploy the Safe modules with the user's signature.
- *
- *
- * @deprecated
- */
-export const postApiV1Account = <ThrowOnError extends boolean = false>(options: Options<PostApiV1AccountData, ThrowOnError>) => (options.client ?? client).post<PostApiV1AccountResponses, PostApiV1AccountErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/account',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Retrieve Signature Data for Account Setup
- *
- * Returns the domain, types, and message objects needed for EIP-712 typed data signing.
- * This is typically used to prepare the data that needs to be signed by the user's wallet
- * to set up account allowances and delays.
- *
- * The response contains structured data compatible with the EIP-712 signature standard.
- * After obtaining this data and signing it with the user's wallet, the signature can be
- * sent to the `/api/v1/account/deploy-safe-modules` endpoint to complete the setup process.
- *
- * Prerequisites:
- * - User must have a deployed Safe account
- * - The Safe account must have a currency set (via `/api/v1/safe/set-currency`)
- *
- *
- * @deprecated
- */
-export const getApiV1AccountSignaturePayload = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1AccountSignaturePayloadData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1AccountSignaturePayloadResponses, GetApiV1AccountSignaturePayloadErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/account/signature-payload',
-    ...options
-});
-
-/**
- * Setup Safe with Signature
- *
- * Takes an EIP-712 signature provided by the user's wallet and executes the account setup transaction.
- * This is the second step in the account setup process, after obtaining the signature data
- * from the GET /api/v1/account/signature-payload endpoint.
- *
- * The process flow is:
- * 1. Call GET /api/v1/account/signature-payload to get the EIP-712 signature data
- * 2. Sign the data with the user's wallet
- * 3. Submit the signature to this endpoint to execute the transaction
- *
- * This endpoint will wait for the transaction to be confirmed on-chain and return the
- * transaction hash when successful. Because it waits for on-chain confirmation, this request
- * may take up to 10 seconds to complete.
- *
- * The setup process configures Safe account allowances and delay mechanisms required for secure operation.
- *
- * Prerequisites:
- * - User must have a deployed Safe account
- * - The Safe account must have a currency set (via /api/v1/safe/set-currency)
- * - User must have signed the data from GET /api/v1/account/signature-payload
- *
- *
- * @deprecated
- */
-export const patchApiV1AccountDeploySafeModules = <ThrowOnError extends boolean = false>(options: Options<PatchApiV1AccountDeploySafeModulesData, ThrowOnError>) => (options.client ?? client).patch<PatchApiV1AccountDeploySafeModulesResponses, PatchApiV1AccountDeploySafeModulesErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/account/deploy-safe-modules',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
 });
 
 /**
@@ -384,13 +289,20 @@ export const getApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options
  * This endpoint replaces the `POST /api/v1/account` and related endpoints.
  * Using this endpoint, the user can deploy the Safe without having to sign the data.
  *
- * To monitor the deployment status, call the `GET /api/v1/safe/deploy` endpoint.
+ * This endpoint is idempotent: calling it again while a deployment is
+ * already in flight for the same user will return `202` without starting
+ * a new workflow. Use `GET /api/v1/safe/deploy` as the source of truth
+ * for deployment status (`processing`, `ok`, `failed`, `not_deployed`).
  *
  */
 export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(options?: Options<PostApiV1SafeDeployData, ThrowOnError>) => (options?.client ?? client).post<PostApiV1SafeDeployResponses, PostApiV1SafeDeployErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/safe/deploy',
-    ...options
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options?.headers
+    }
 });
 
 /**
@@ -419,6 +331,17 @@ export const postApiV1SafeDeploy = <ThrowOnError extends boolean = false>(option
 export const deleteApiV1SafeReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1SafeResetData, ThrowOnError>) => (options?.client ?? client).delete<DeleteApiV1SafeResetResponses, DeleteApiV1SafeResetErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/safe/reset',
+    ...options
+});
+
+/**
+ * Retrieve Safe migration status
+ *
+ * Returns the current safe, previous safe (if migrated), and migration status for the authenticated user.
+ */
+export const getApiV1SafeMigration = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1SafeMigrationData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1SafeMigrationResponses, GetApiV1SafeMigrationErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api/v1/safe/migration',
     ...options
 });
 
@@ -811,52 +734,6 @@ export const postApiV1IntegrationsMonerium = <ThrowOnError extends boolean = fal
 export const getApiV1IbansDetails = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansDetailsData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1IbansDetailsResponses, GetApiV1IbansDetailsErrors, ThrowOnError>({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/api/v1/ibans/details',
-    ...options
-});
-
-/**
- * Create a new Monerium profile
- *
- * This endpoint attempts to create a new Monerium profile for the authenticated user. If the user already has a Monerium profile, it will return a redirect URL for the OAuth flow to link the existing profile.
- *
- * @deprecated
- */
-export const postApiV1IbansMoneriumProfile = <ThrowOnError extends boolean = false>(options: Options<PostApiV1IbansMoneriumProfileData, ThrowOnError>) => (options.client ?? client).post<PostApiV1IbansMoneriumProfileResponses, PostApiV1IbansMoneriumProfileErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/ibans/monerium-profile',
-    ...options,
-    headers: {
-        'Content-Type': 'application/json',
-        ...options.headers
-    }
-});
-
-/**
- * Retrieves the redirect URL for the Monerium oAuth flow
- *
- * This is the same URL we return on /monerium-profile,
- * in the case something goes wrong you have this endpoint
- * if you need to redirect your users without calling /monerium-profile.
- *
- *
- * @deprecated
- */
-export const getApiV1IbansOauthRedirectUrl = <ThrowOnError extends boolean = false>(options?: Options<GetApiV1IbansOauthRedirectUrlData, ThrowOnError>) => (options?.client ?? client).get<GetApiV1IbansOauthRedirectUrlResponses, GetApiV1IbansOauthRedirectUrlErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/ibans/oauth/redirect_url',
-    ...options
-});
-
-/**
- * Resets the IBAN integration for this User
- *
- * Remove the IBAN information from our DB and deletes the User's IBAN functionality.
- *
- * @deprecated
- */
-export const deleteApiV1IbansReset = <ThrowOnError extends boolean = false>(options?: Options<DeleteApiV1IbansResetData, ThrowOnError>) => (options?.client ?? client).delete<DeleteApiV1IbansResetResponses, DeleteApiV1IbansResetErrors, ThrowOnError>({
-    security: [{ scheme: 'bearer', type: 'http' }],
-    url: '/api/v1/ibans/reset',
     ...options
 });
 

@@ -4,18 +4,18 @@ import { StandardAlert } from "@/components/ui/standard-alert";
 import { Switch } from "@/components/ui/switch";
 import { Coins } from "lucide-react";
 import { useState, useCallback, useMemo, useEffect } from "react";
-import { isAddress, encodeFunctionData, type Address } from "viem";
-import type { TokenInfoWithBalance } from "@/hooks/useTokenBalance";
+import { isAddress, encodeFunctionData, zeroAddress, type Address } from "viem";
+import type { TokenInfoWithBalance, TokenWithBalance } from "@/hooks/useTokenBalance";
 import { TokenAmountInput } from "./modals/send-funds/token-amount-input";
 import { CustomTokenAmountInput } from "./modals/send-funds/custom-token-amount-input";
 import { AddressInput } from "./modals/send-funds/address-input";
 import { useAccount, useSignTypedData } from "wagmi";
-import { useUser } from "@/context/UserContext";
 import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
-import { populateExecuteEnqueue, predictAddresses } from "@gnosispay/account-kit";
+import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { sendTransaction, readContract, waitForTransactionReceipt, getBalance } from "wagmi/actions";
 import { wagmiAdapter } from "@/wagmi";
 import { toast } from "sonner";
+import { GNOSIS_FAUCET_URL } from "@/constants";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { gnosis } from "wagmi/chains";
 import { storeTransaction } from "@/utils/localTransactionStorage";
@@ -23,14 +23,27 @@ import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
 import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
 
 interface WithdrawFundsFormProps {
+  safeAddress: Address;
+  kind: SafeKind;
+  currenciesWithBalance: TokenWithBalance;
+  isLoadingBalances: boolean;
   onSuccess?: () => void;
 }
 
-export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) => {
+export const WithdrawFundsForm = ({
+  safeAddress,
+  kind,
+  currenciesWithBalance,
+  isLoadingBalances,
+  onSuccess,
+}: WithdrawFundsFormProps) => {
   const { address: connectedAddress } = useAccount();
-  const { safeConfig } = useUser();
   const { signTypedDataAsync } = useSignTypedData();
-  const { isSignerConnected, signerError, isDataLoading: isSignerVerificationLoading } = useSafeSignerVerification();
+  const {
+    isSignerConnected,
+    signerError,
+    isDataLoading: isSignerVerificationLoading,
+  } = useSafeSignerVerification(safeAddress, kind);
   const [toAddress, setToAddress] = useState("");
   const [addressError, setAddressError] = useState("");
   const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
@@ -100,19 +113,18 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
         : "You are not an owner of this Safe. Please connect an owner account.";
     }
 
-    if (!hasSufficientGasBalance) {
-      return "Your connected account has insufficient xDAI balance to pay for gas. Please ensure you have xDAI in your wallet.";
-    }
-
     return null;
-  }, [
-    connectedAddress,
-    isSignerConnected,
-    signerError,
-    isSignerVerificationLoading,
-    hasSufficientGasBalance,
-    isBalanceLoading,
-  ]);
+  }, [connectedAddress, isSignerConnected, signerError, isSignerVerificationLoading, isBalanceLoading]);
+
+  const showInsufficientGasAlert = useMemo(() => {
+    return (
+      !!connectedAddress &&
+      !isSignerVerificationLoading &&
+      !isBalanceLoading &&
+      isSignerConnected &&
+      !hasSufficientGasBalance
+    );
+  }, [connectedAddress, isSignerVerificationLoading, isBalanceLoading, isSignerConnected, hasSufficientGasBalance]);
 
   const isFormValid = useMemo(() => {
     return !!(
@@ -123,7 +135,7 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       !amountError &&
       !addressError &&
       connectedAddress &&
-      safeConfig?.address &&
+      safeAddress &&
       isSignerConnected &&
       hasSufficientGasBalance &&
       !validationError
@@ -135,38 +147,47 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
     selectedToken,
     amountError,
     connectedAddress,
-    safeConfig?.address,
+    safeAddress,
     isSignerConnected,
     hasSufficientGasBalance,
     validationError,
   ]);
 
   const handleWithdraw = useCallback(async () => {
-    if (!isFormValid || !selectedToken || !connectedAddress || !safeConfig?.address) {
+    if (!isFormValid || !selectedToken || !connectedAddress || !safeAddress) {
       return;
     }
+
+    const { populateExecuteEnqueue, predictAddresses } = getAccountKit(kind);
 
     setIsLoading(true);
 
     try {
-      // Encode the ERC20 transfer call
-      const transferData = encodeFunctionData({
-        abi: ERC20_ABI,
-        functionName: "transfer",
-        args: [toAddress as Address, amount],
-      });
+      // Native xDAI uses the zero address as its token address. It must be sent
+      // as a value transfer to the recipient, not as an ERC20 transfer call.
+      const isNativeToken = !selectedToken.address || selectedToken.address === zeroAddress;
 
       // Create the transaction to be executed
-      const transaction = {
-        to: selectedToken.address as Address,
-        value: 0n,
-        data: transferData,
-      };
+      const transaction = isNativeToken
+        ? {
+            to: toAddress as Address,
+            value: amount,
+            data: "0x" as `0x${string}`,
+          }
+        : {
+            to: selectedToken.address as Address,
+            value: 0n,
+            data: encodeFunctionData({
+              abi: ERC20_ABI,
+              functionName: "transfer",
+              args: [toAddress as Address, amount],
+            }),
+          };
 
       // Use account-kit to populate the execute enqueue transaction
       const txRequest = await populateExecuteEnqueue(
         {
-          account: safeConfig.address,
+          account: safeAddress,
           chainId: gnosis.id,
         },
         transaction,
@@ -198,7 +219,7 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       });
 
       // Get the delay module address
-      const delayModAddress = predictAddresses(safeConfig.address).delay;
+      const delayModAddress = predictAddresses(safeAddress).delay;
 
       const queueNonce = (await readContract(wagmiAdapter.wagmiConfig, {
         address: delayModAddress as Address,
@@ -210,7 +231,7 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       const txNonce = queueNonce - 1n;
 
       // Store transaction details locally for later execution
-      storeTransaction(safeConfig.address, {
+      storeTransaction(safeAddress, {
         to: transaction.to,
         value: transaction.value.toString(),
         data: transaction.data,
@@ -246,7 +267,8 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
     isFormValid,
     selectedToken,
     connectedAddress,
-    safeConfig?.address,
+    safeAddress,
+    kind,
     toAddress,
     amount,
     signTypedDataAsync,
@@ -262,6 +284,26 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
       )}
 
       {connectedAddress && validationError && <StandardAlert variant="destructive" description={validationError} />}
+
+      {showInsufficientGasAlert && (
+        <StandardAlert
+          variant="destructive"
+          description={
+            <span>
+              Your connected account has insufficient xDAI balance to pay for gas. Get xDAI from the{" "}
+              <a
+                href={GNOSIS_FAUCET_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground underline cursor-pointer"
+              >
+                Gnosis Faucet
+              </a>
+              .
+            </span>
+          }
+        />
+      )}
 
       <StandardAlert
         variant="warning"
@@ -293,9 +335,16 @@ export const WithdrawFundsForm = ({ onSuccess }: WithdrawFundsFormProps = {}) =>
             onTokenChange={setSelectedToken}
             onAmountChange={setAmount}
             setError={setAmountError}
+            safeAddress={safeAddress}
           />
         ) : (
-          <TokenAmountInput onTokenChange={setSelectedToken} onAmountChange={setAmount} setError={setAmountError} />
+          <TokenAmountInput
+            onTokenChange={setSelectedToken}
+            onAmountChange={setAmount}
+            setError={setAmountError}
+            currenciesWithBalance={currenciesWithBalance}
+            isLoadingBalances={isLoadingBalances}
+          />
         )}
 
         {amountError && (

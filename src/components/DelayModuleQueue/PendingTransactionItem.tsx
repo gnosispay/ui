@@ -2,13 +2,12 @@ import { useCallback, useMemo, useState, useEffect } from "react";
 import { format } from "date-fns";
 import { shortenAddress } from "@/utils/shortenAddress";
 import { getStoredTransactions, type StoredTransaction, removeTransaction } from "@/utils/localTransactionStorage";
-import { useUser } from "@/context/UserContext";
 import type { PendingTransaction } from "@/context/DelayModuleQueueContext";
 import { CheckCircle2, Clock, AlertTriangle, Copy, ExternalLink } from "lucide-react";
 import { Button } from "../ui/button";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
 import { getTxInfo } from "@/utils/delayUtils";
-import { OperationType } from "@gnosispay/account-kit";
+import { getAccountKit } from "@/utils/accountKit";
 import { formatTokenAmount } from "@/utils/formatCurrency";
 import { formatCountdown } from "@/utils/timeUtils";
 import { useDelayModuleQueue } from "@/context/DelayModuleQueueContext";
@@ -19,9 +18,8 @@ interface PendingTransactionItemProps {
 }
 
 export const PendingTransactionItem = ({ transaction }: PendingTransactionItemProps) => {
-  const { safeConfig } = useUser();
   const { copyToClipboard } = useCopyToClipboard();
-  const { queueInfo, hasExpiredTransaction, refetch, executeTransaction } = useDelayModuleQueue();
+  const { safeAddress, kind, queueInfo, hasExpiredTransaction, refetch, executeTransaction } = useDelayModuleQueue();
   const [isExecuting, setIsExecuting] = useState(false);
   const [timeRemaining, setTimeRemaining] = useState<number>(0);
 
@@ -37,11 +35,11 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
 
   // Find stored transaction by nonce
   const storedTransaction = useMemo<StoredTransaction | null>(() => {
-    if (!safeConfig?.address) return null;
+    if (!safeAddress) return null;
 
-    const storedTransactions = getStoredTransactions(safeConfig.address);
+    const storedTransactions = getStoredTransactions(safeAddress);
     return storedTransactions.find((stored) => stored.nonce === Number(transaction.nonce)) || null;
-  }, [transaction.nonce, safeConfig?.address]);
+  }, [transaction.nonce, safeAddress]);
 
   const onChainTxHash = storedTransaction?.enqueueTxHash;
 
@@ -52,14 +50,14 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
   }, [transaction.creationTimestamp]);
 
   const txInfo = useMemo(() => {
-    if (!storedTransaction || !safeConfig?.address) return null;
-    return getTxInfo(safeConfig.address, {
+    if (!storedTransaction || !safeAddress) return null;
+    return getTxInfo(safeAddress, {
       to: storedTransaction.to,
       value: Number(storedTransaction.value),
       data: storedTransaction.data,
-      operationType: OperationType.Call,
+      operationType: getAccountKit(kind).OperationType.Call,
     });
-  }, [storedTransaction, safeConfig?.address]);
+  }, [storedTransaction, safeAddress, kind]);
 
   // Format transaction summary
   const transactionSummary = useMemo(() => {
@@ -115,7 +113,7 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
   }, [transaction.isCooledDown, transaction.isExpired, transaction.creationTimestamp, queueInfo?.cooldown, refetch]);
 
   const handleExecute = useCallback(async () => {
-    if (!safeConfig?.address || !transaction.isCooledDown || !storedTransaction) {
+    if (!safeAddress || !transaction.isCooledDown || !storedTransaction) {
       return;
     }
 
@@ -129,13 +127,13 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
       );
 
       // Remove from local storage after successful execution
-      removeTransaction(safeConfig.address, storedTransaction.timestamp);
+      removeTransaction(safeAddress, storedTransaction.timestamp);
     } catch {
       // Error is already handled in the context
     } finally {
       setIsExecuting(false);
     }
-  }, [safeConfig?.address, transaction.isCooledDown, storedTransaction, executeTransaction]);
+  }, [safeAddress, transaction.isCooledDown, storedTransaction, executeTransaction]);
 
   return (
     <div className="flex flex-col gap-3 p-4 rounded-lg border border-border bg-card">

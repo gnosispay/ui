@@ -169,6 +169,32 @@ export type SafeConfig = {
     accountAllowance?: AccountAllowance;
 };
 
+export type SafeMigrationSafeInfo = {
+    address: string;
+    chainId?: string | null;
+    tokenSymbol?: string | null;
+};
+
+export type SafeMigrationOldSafeInfo = {
+    address: string;
+    chainId: string;
+    recordedAt: string;
+};
+
+export type SafeMigrationInfo = {
+    migrationId: string;
+    /**
+     * Migration status, or null if the user has not started this migration.
+     */
+    status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'FAILED';
+    /**
+     * Whether a previous safe was recorded for this migration.
+     */
+    hasOldSafe: boolean;
+    newSafe?: SafeMigrationSafeInfo;
+    oldSafe?: SafeMigrationOldSafeInfo;
+};
+
 export type KycQuestion = {
     /**
      * The text of the question.
@@ -496,201 +522,6 @@ export type GetApiV1AccountBalancesResponses = {
 };
 
 export type GetApiV1AccountBalancesResponse = GetApiV1AccountBalancesResponses[keyof GetApiV1AccountBalancesResponses];
-
-export type PostApiV1AccountData = {
-    body: {
-        /**
-         * The ID of chain (currently only supports Gnosis Chain)
-         */
-        chainId: '100';
-    };
-    path?: never;
-    query?: never;
-    url: '/api/v1/account';
-};
-
-export type PostApiV1AccountErrors = {
-    /**
-     * Bad request (missing parameters or signer address)
-     */
-    400: {
-        /**
-         * Error message
-         */
-        error?: string;
-    };
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: Error;
-};
-
-export type PostApiV1AccountError = PostApiV1AccountErrors[keyof PostApiV1AccountErrors];
-
-export type PostApiV1AccountResponses = {
-    /**
-     * Successfully created or checked Safe account
-     */
-    200: {
-        /**
-         * The Safe account ID
-         */
-        id?: string;
-        /**
-         * The Safe account address
-         */
-        address?: string;
-        /**
-         * ID of the user owning this Safe
-         */
-        userId?: string;
-        /**
-         * ID of the blockchain
-         */
-        chainId?: string;
-        /**
-         * Salt used for Safe address generation
-         */
-        salt?: string;
-        /**
-         * Timestamp of when the Safe was created
-         */
-        createdAt?: string;
-        /**
-         * Whether the Safe is deployed on-chain
-         */
-        deployed?: boolean;
-        /**
-         * Transaction hash of the deployment transaction (if completed)
-         */
-        transactionHash?: string;
-    };
-};
-
-export type PostApiV1AccountResponse = PostApiV1AccountResponses[keyof PostApiV1AccountResponses];
-
-export type GetApiV1AccountSignaturePayloadData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/account/signature-payload';
-};
-
-export type GetApiV1AccountSignaturePayloadErrors = {
-    /**
-     * Bad request (missing account, token, or signer)
-     */
-    400: {
-        /**
-         * Error message explaining why the request failed
-         */
-        error?: string;
-    };
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: Error;
-};
-
-export type GetApiV1AccountSignaturePayloadError = GetApiV1AccountSignaturePayloadErrors[keyof GetApiV1AccountSignaturePayloadErrors];
-
-export type GetApiV1AccountSignaturePayloadResponses = {
-    /**
-     * Signature data for EIP-712 typed data signing
-     */
-    200: {
-        /**
-         * Domain data for EIP-712 signature
-         */
-        domain?: {
-            [key: string]: unknown;
-        };
-        /**
-         * Primary type for EIP-712 signature
-         */
-        primaryType?: string;
-        /**
-         * Type definitions for EIP-712 signature
-         */
-        types?: {
-            [key: string]: unknown;
-        };
-        /**
-         * Message data for EIP-712 signature
-         */
-        message?: {
-            [key: string]: unknown;
-        };
-    };
-};
-
-export type GetApiV1AccountSignaturePayloadResponse = GetApiV1AccountSignaturePayloadResponses[keyof GetApiV1AccountSignaturePayloadResponses];
-
-export type PatchApiV1AccountDeploySafeModulesData = {
-    body: {
-        /**
-         * The EIP-712 signature for the account setup transaction
-         */
-        signature: string;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/v1/account/deploy-safe-modules';
-};
-
-export type PatchApiV1AccountDeploySafeModulesErrors = {
-    /**
-     * Bad request (missing parameters, account, or signer)
-     */
-    400: {
-        /**
-         * Error message explaining why the request failed
-         */
-        error?: string;
-    };
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: Error;
-};
-
-export type PatchApiV1AccountDeploySafeModulesError = PatchApiV1AccountDeploySafeModulesErrors[keyof PatchApiV1AccountDeploySafeModulesErrors];
-
-export type PatchApiV1AccountDeploySafeModulesResponses = {
-    /**
-     * Successfully executed setup transaction
-     */
-    200: {
-        /**
-         * The transaction hash of the executed transaction
-         */
-        transactionHash?: string;
-        /**
-         * Whether the account setup is deployed
-         */
-        deployed?: boolean;
-    };
-};
-
-export type PatchApiV1AccountDeploySafeModulesResponse = PatchApiV1AccountDeploySafeModulesResponses[keyof PatchApiV1AccountDeploySafeModulesResponses];
 
 export type GetApiV1AuthNonceData = {
     body?: never;
@@ -1491,6 +1322,12 @@ export type PostApiV1CardsVerifyErrors = {
         error?: string;
     };
     /**
+     * Card is in a state that prevents verification (e.g. void)
+     */
+    422: {
+        error?: string;
+    };
+    /**
      * Internal server error.
      */
     500: {
@@ -1708,7 +1545,12 @@ export type GetApiV1SafeDeployResponses = {
 export type GetApiV1SafeDeployResponse = GetApiV1SafeDeployResponses[keyof GetApiV1SafeDeployResponses];
 
 export type PostApiV1SafeDeployData = {
-    body?: never;
+    body?: {
+        /**
+         * The daily spending allowance to configure for the Safe, in whole token units (no decimals). Defaults to 350 if omitted.
+         */
+        dailyLimit?: number;
+    };
     path?: never;
     query?: never;
     url: '/api/v1/safe/deploy';
@@ -1716,13 +1558,22 @@ export type PostApiV1SafeDeployData = {
 
 export type PostApiV1SafeDeployErrors = {
     /**
+     * Bad request. The request body is invalid.
+     */
+    400: {
+        /**
+         * Error message
+         */
+        error?: string;
+    };
+    /**
      * Unauthorized Error
      */
     401: {
         message?: string;
     };
     /**
-     * Forbidden. Missing signer address.
+     * Forbidden. Missing signer address or Safe deployment is not available.
      */
     403: {
         /**
@@ -1819,6 +1670,46 @@ export type DeleteApiV1SafeResetResponses = {
 };
 
 export type DeleteApiV1SafeResetResponse = DeleteApiV1SafeResetResponses[keyof DeleteApiV1SafeResetResponses];
+
+export type GetApiV1SafeMigrationData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Migration identifier to look up.
+         */
+        migrationId?: string;
+    };
+    url: '/api/v1/safe/migration';
+};
+
+export type GetApiV1SafeMigrationErrors = {
+    /**
+     * Invalid query parameters.
+     */
+    400: unknown;
+    /**
+     * Unauthorized Error
+     */
+    401: {
+        message?: string;
+    };
+    /**
+     * Internal server error.
+     */
+    500: unknown;
+};
+
+export type GetApiV1SafeMigrationError = GetApiV1SafeMigrationErrors[keyof GetApiV1SafeMigrationErrors];
+
+export type GetApiV1SafeMigrationResponses = {
+    /**
+     * Successfully retrieved safe migration info.
+     */
+    200: SafeMigrationInfo;
+};
+
+export type GetApiV1SafeMigrationResponse = GetApiV1SafeMigrationResponses[keyof GetApiV1SafeMigrationResponses];
 
 export type PostApiV1SafeSetCurrencyData = {
     body?: never;
@@ -3194,142 +3085,6 @@ export type GetApiV1IbansDetailsResponses = {
 
 export type GetApiV1IbansDetailsResponse = GetApiV1IbansDetailsResponses[keyof GetApiV1IbansDetailsResponses];
 
-export type PostApiV1IbansMoneriumProfileData = {
-    body: {
-        /**
-         * Signature of the message "I hereby declare that I am the address owner."
-         * This signature is created by signing the message with the user's wallet.
-         * The exact message can be retrieved from the /api/v1/ibans/signing-message endpoint.
-         * The signature is used to verify ownership of the address on Monerium.
-         * Format: Ethereum signature string (e.g., "0x1234...").
-         *
-         */
-        signature: string;
-        /**
-         * Optional URL to redirect the user to after the OAuth flow is completed.
-         * This is used when the user already has a Monerium account that needs to be linked.
-         * If not provided, a default redirect URL will be used.
-         *
-         */
-        callbackUrl: string;
-    };
-    path?: never;
-    query?: never;
-    url: '/api/v1/ibans/monerium-profile';
-};
-
-export type PostApiV1IbansMoneriumProfileErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * User already has a Monerium profile that needs to be linked
-     */
-    422: {
-        errors?: {
-            redirectUrl: string;
-            message: string;
-        };
-    };
-    /**
-     * Internal Server Error
-     */
-    500: Error;
-};
-
-export type PostApiV1IbansMoneriumProfileError = PostApiV1IbansMoneriumProfileErrors[keyof PostApiV1IbansMoneriumProfileErrors];
-
-export type PostApiV1IbansMoneriumProfileResponses = {
-    /**
-     * Successfully created a new Monerium profile
-     */
-    200: {
-        data?: {
-            success: boolean;
-        };
-    };
-};
-
-export type PostApiV1IbansMoneriumProfileResponse = PostApiV1IbansMoneriumProfileResponses[keyof PostApiV1IbansMoneriumProfileResponses];
-
-export type GetApiV1IbansOauthRedirectUrlData = {
-    body?: never;
-    path?: never;
-    query?: {
-        /**
-         * Optional URL to redirect the user to after the OAuth flow is completed. If not provided, a default redirect URL will be used.
-         */
-        callbackUrl?: string;
-    };
-    url: '/api/v1/ibans/oauth/redirect_url';
-};
-
-export type GetApiV1IbansOauthRedirectUrlErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: Error;
-};
-
-export type GetApiV1IbansOauthRedirectUrlError = GetApiV1IbansOauthRedirectUrlErrors[keyof GetApiV1IbansOauthRedirectUrlErrors];
-
-export type GetApiV1IbansOauthRedirectUrlResponses = {
-    /**
-     * Successfully retrieved the redirect URL
-     */
-    200: {
-        data?: {
-            redirectUrl: string;
-        };
-    };
-};
-
-export type GetApiV1IbansOauthRedirectUrlResponse = GetApiV1IbansOauthRedirectUrlResponses[keyof GetApiV1IbansOauthRedirectUrlResponses];
-
-export type DeleteApiV1IbansResetData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/ibans/reset';
-};
-
-export type DeleteApiV1IbansResetErrors = {
-    /**
-     * Unauthorized Error
-     */
-    401: {
-        message?: string;
-    };
-    /**
-     * Internal Server Error
-     */
-    500: Error;
-};
-
-export type DeleteApiV1IbansResetError = DeleteApiV1IbansResetErrors[keyof DeleteApiV1IbansResetErrors];
-
-export type DeleteApiV1IbansResetResponses = {
-    /**
-     * Successfully created or linked Monerium profile
-     */
-    200: {
-        data?: {
-            success: boolean;
-        };
-    };
-};
-
-export type DeleteApiV1IbansResetResponse = DeleteApiV1IbansResetResponses[keyof DeleteApiV1IbansResetResponses];
-
 export type GetApiV1IbansOrdersData = {
     body?: never;
     path?: never;
@@ -4491,7 +4246,7 @@ export type GetApiV1TermsResponses = {
             /**
              * Type of terms and conditions
              */
-            type?: 'general-tos' | 'card-monavate-tos' | 'cashback-tos' | 'privacy-policy';
+            type?: 'general-tos' | 'card-monavate-tos' | 'cashback-tos' | 'privacy-policy' | 'monavate-privacy-policy';
             /**
              * Current version of these terms
              */
@@ -4711,11 +4466,20 @@ export type GetApiV1WebhooksMessageByPartnerIdData = {
          */
         partnerId: string;
     };
-    query?: never;
+    query?: {
+        /**
+         * Optional Ethereum wallet address to use for signing. Must be one of the user's verified EOA addresses. If not provided, defaults to the user's primary verified wallet.
+         */
+        walletAddress?: string;
+    };
     url: '/api/v1/webhooks/message/{partnerId}';
 };
 
 export type GetApiV1WebhooksMessageByPartnerIdErrors = {
+    /**
+     * Wallet address does not belong to user
+     */
+    400: unknown;
     /**
      * Authentication required
      */
@@ -4724,6 +4488,10 @@ export type GetApiV1WebhooksMessageByPartnerIdErrors = {
      * Partner not found
      */
     404: unknown;
+    /**
+     * Invalid wallet address format
+     */
+    422: unknown;
     /**
      * Internal Server Error
      */

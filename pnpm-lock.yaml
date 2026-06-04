@@ -15,6 +15,9 @@ importers:
       '@gnosispay/account-kit':
         specifier: 4.10.1
         version: 4.10.1(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@gnosispay/account-kit-next':
+        specifier: npm:@gnosispay/account-kit@5.0.0
+        version: '@gnosispay/account-kit@5.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)'
       '@gnosispay/pse-sdk':
         specifier: 1.5.0
         version: 1.5.0
@@ -396,6 +399,9 @@ packages:
 
   '@gnosispay/account-kit@4.10.1':
     resolution: {integrity: sha512-2C9POPvVALrjLov34fIvNKzR7yl6pilTcoTJUXKEDHkGWXI0xmGT1dkxsDJcRO9IP4JI0OYKP+TCgkyi6VfYjQ==}
+
+  '@gnosispay/account-kit@5.0.0':
+    resolution: {integrity: sha512-+wqg8++vxuPkpJW3Z1BZPIEDVjfEd/Wf/0zWRZSSWtisfYBFqgRhYzSpkY9Wo/zMmrYsUQuErx736HHg58hjag==}
 
   '@gnosispay/pse-sdk@1.5.0':
     resolution: {integrity: sha512-14gnc1YY01ko8Ikc5hT+VsA1Zsp9/rUx5IC5Nj8x64DZzWprzBFiHgo32sRpTlensospAx3Zir03FyHDOQo2DQ==}
@@ -4232,6 +4238,18 @@ snapshots:
       - bufferutil
       - utf-8-validate
 
+  '@gnosispay/account-kit@5.0.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)':
+    dependencies:
+      '@gnosis.pm/safe-contracts': 1.3.0(ethers@6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
+      '@gnosis.pm/zodiac': 3.5.2(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      '@safe-global/safe-deployments': 1.28.0
+      '@safe-global/safe-singleton-factory': 1.0.16
+      ethers: 6.16.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
+      typescript: 5.3.2
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+
   '@gnosispay/pse-sdk@1.5.0': {}
 
   '@johanneskares/wallet-mock@1.4.1(@playwright/test@1.60.0)(viem@2.49.3(bufferutil@4.1.0)(typescript@6.0.3)(utf-8-validate@5.0.10)(zod@4.4.3))':
@@ -4447,7 +4465,7 @@ snapshots:
       '@noble/hashes': 1.8.0
       '@scure/base': 1.2.6
       '@types/debug': 4.1.13
-      debug: 4.3.4
+      debug: 4.4.3
       pony-cause: 2.1.11
       semver: 7.8.0
       uuid: 9.0.1

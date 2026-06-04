@@ -37,7 +37,9 @@ export const SafeOwnersDeleteConfirmation = ({
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const { fetchDelayQueue } = useDelayRelay();
-  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification(
+    safeConfig?.address as Address | undefined,
+  );
 
   const handleDelete = useCallback(async () => {
     if (!safeConfig?.address) {

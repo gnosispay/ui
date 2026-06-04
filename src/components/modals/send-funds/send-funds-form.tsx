@@ -13,6 +13,8 @@ import { useAccount } from "wagmi";
 import { useDelayRelay } from "@/context/DelayRelayContext";
 import { QueueNotEmptyAlert } from "@/components/QueueNotEmptyAlert";
 import { useSafeSignerVerification } from "@/hooks/useSafeSignerVerification";
+import { useUser } from "@/context/UserContext";
+import type { Address } from "viem";
 
 interface ValidatedFormData {
   toAddress: string;
@@ -26,6 +28,7 @@ interface SendFundsFormProps {
 
 export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
   const { address: connectedAddress } = useAccount();
+  const { safeConfig } = useUser();
   const { queue } = useDelayRelay();
   const isQueueNotEmpty = useMemo(() => queue.length > 0, [queue]);
   const [toAddress, setToAddress] = useState("");
@@ -34,7 +37,9 @@ export const SendFundsForm = ({ onNext }: SendFundsFormProps) => {
   const [amount, setAmount] = useState<bigint>(0n);
   const [amountError, setAmountError] = useState("");
   const [isCustomToken, setIsCustomToken] = useState(false);
-  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification(
+    safeConfig?.address as Address | undefined,
+  );
 
   const handleAddressChange = useCallback((value: string) => {
     setAddressError("");

@@ -28,7 +28,9 @@ export const SafeOwnersAdd = ({ onCancel, onSuccess, currentOwners }: SafeOwners
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const { fetchDelayQueue } = useDelayRelay();
-  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification(
+    safeConfig?.address as Address | undefined,
+  );
   const handleAddressChange = useCallback((value: string) => {
     setError(null);
     setNewOwnerAddress(value);

@@ -18,6 +18,7 @@ import { useAppInitialization } from "./hooks/useAppInitialization";
 import { useAppKitTheme } from "./hooks/useAppKitTheme";
 import { PARTNERS_URL } from "./constants";
 import { WithdrawRoute } from "./pages/Withdraw";
+import { WithdrawLegacyRoute } from "./pages/WithdrawLegacy";
 import { ResetRoute } from "./pages/Reset";
 
 const ExternalRedirect = ({ url }: { url: string }) => {
@@ -147,6 +148,7 @@ function App() {
         </Route>
         <Route element={<ProtectedLayout isWithdrawRoute={true} />}>
           <Route path="/withdraw" element={<WithdrawRoute />} />
+          <Route path="/withdraw-legacy" element={<WithdrawLegacyRoute />} />
         </Route>
         <Route element={<ProtectedLayout isResetRoute={true} />}>
           <Route path="/reset" element={<ResetRoute />} />

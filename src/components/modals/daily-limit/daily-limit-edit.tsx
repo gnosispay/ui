@@ -28,7 +28,9 @@ export const DailyLimitEdit: React.FC<DailyLimitEditProps> = ({ initialLimit, cu
   const { signTypedDataAsync } = useSignTypedData();
   const { smartWalletAddress, isLoading: isSmartWalletLoading } = useSmartWallet();
   const { fetchDelayQueue } = useDelayRelay();
-  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification();
+  const { isSignerConnected, signerError, isDataLoading } = useSafeSignerVerification(
+    safeConfig?.address as Address | undefined,
+  );
 
   const handleLimitChange = useCallback((value: string) => {
     setError(null);
