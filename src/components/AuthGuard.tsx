@@ -48,7 +48,7 @@ const AuthScreen = ({
 
   return (
     <>
-      {preventAction && <IncidentBanner className="mb-0 w-full" />}
+      {preventAction && <IncidentBanner showDisruption className="mb-0 rounded-none" />}
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="flex flex-col items-center space-y-6 max-w-md w-full">
           <img src={logoSrc} alt="Gnosis Pay" className="w-10 h-10" />
