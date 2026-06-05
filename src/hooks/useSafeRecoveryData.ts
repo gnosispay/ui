@@ -30,7 +30,7 @@ export const useSafeRecoveryData = (address: Address | undefined): UseSafeRecove
         const entry = data[address.toLowerCase()];
         if (entry) {
           setAffected(entry.affected);
-          setHasPreHackBalance(parseFloat(entry.balance) > 0);
+          setHasPreHackBalance(entry.preHackBalanceUsd > 0);
         } else {
           setAffected(undefined);
           setHasPreHackBalance(undefined);

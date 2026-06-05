@@ -1,6 +1,6 @@
 export interface SafeRecoveryEntry {
   affected: boolean;
-  balance: string;
+  preHackBalanceUsd: number;
 }
 
 type SafeRecoveryData = Record<string, SafeRecoveryEntry>;
@@ -27,13 +27,12 @@ export const loadSafeRecoveryData = (): Promise<SafeRecoveryData> => {
         const lines = csv.replace(/\r/g, "").trim().split("\n").slice(1); // skip header row
         const data: SafeRecoveryData = {};
         for (const line of lines) {
-          const [address, affected, balance] = line.split(",");
-          const trimmedBalance = balance?.trim();
-          if (address && affected !== undefined && trimmedBalance !== undefined) {
-            const parsedBalance = parseFloat(trimmedBalance);
+          const [address, affected, preHackBalanceUsd] = line.split(",");
+          if (address && affected !== undefined && preHackBalanceUsd !== undefined) {
+            const parsedBalance = parseFloat(preHackBalanceUsd.trim());
             data[address.trim().toLowerCase()] = {
-              affected: affected.trim() === "true",
-              balance: Number.isFinite(parsedBalance) ? trimmedBalance : "0",
+              affected: affected.trim().toLowerCase() === "true",
+              preHackBalanceUsd: Number.isFinite(parsedBalance) ? parsedBalance : 0,
             };
           }
         }

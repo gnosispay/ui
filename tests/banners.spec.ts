@@ -10,11 +10,11 @@ const OLD_SAFE_AFFECTED_WITH_BALANCE = "0xcccccccccccccccccccccccccccccccccccccc
 const OLD_SAFE_AFFECTED_NO_BALANCE = "0xdddddddddddddddddddddddddddddddddddddddd";
 
 const RECOVERY_CSV = [
-  "address,affected,balance",
-  `${OLD_SAFE_NOT_AFFECTED_WITH_BALANCE},false,150.00`,
-  `${OLD_SAFE_NOT_AFFECTED_NO_BALANCE},false,0`,
-  `${OLD_SAFE_AFFECTED_WITH_BALANCE},true,75.50`,
-  `${OLD_SAFE_AFFECTED_NO_BALANCE},true,0`,
+  "old_safe_address,affected,pre_hack_balance_usd",
+  `${OLD_SAFE_NOT_AFFECTED_WITH_BALANCE},FALSE,150.00`,
+  `${OLD_SAFE_NOT_AFFECTED_NO_BALANCE},FALSE,0`,
+  `${OLD_SAFE_AFFECTED_WITH_BALANCE},TRUE,75.50`,
+  `${OLD_SAFE_AFFECTED_NO_BALANCE},TRUE,0`,
 ].join("\n");
 
 async function setupBannerTest(page: Parameters<typeof setupAllMocks>[0], oldSafeAddress: string) {
