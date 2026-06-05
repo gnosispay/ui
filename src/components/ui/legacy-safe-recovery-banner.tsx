@@ -4,8 +4,7 @@ import { cn } from "@/utils/cn";
 import { Link } from "react-router-dom";
 import { isAddress, type Address } from "viem";
 import { useSafeMigration } from "@/hooks/useSafeMigration";
-import { useOldSafeBalances } from "@/hooks/useOldSafeBalances";
-import { useIsLegacyRecoverySafe } from "@/hooks/useIsLegacyRecoverySafe";
+import { useSafeRecoveryData } from "@/hooks/useSafeRecoveryData";
 import {
   createDismissalData,
   getBannerDismissalData,
@@ -17,13 +16,10 @@ interface LegacySafeRecoveryBannerProps {
   className?: string;
 }
 
-const HEADLINE = "You may be able to recover funds from a previous Safe account." as const;
-
 export function LegacySafeRecoveryBanner({ className }: LegacySafeRecoveryBannerProps) {
   const { hasOldSafe, oldSafe } = useSafeMigration();
   const oldSafeAddress = oldSafe?.address && isAddress(oldSafe.address) ? (oldSafe.address as Address) : undefined;
-  const { hasBalance } = useOldSafeBalances(oldSafeAddress);
-  const { isEligible } = useIsLegacyRecoverySafe(oldSafeAddress);
+  const { affected, hasPreHackBalance } = useSafeRecoveryData(oldSafeAddress);
   const [isDismissed, setIsDismissed] = useState(true);
 
   useEffect(() => {
@@ -34,12 +30,11 @@ export function LegacySafeRecoveryBanner({ className }: LegacySafeRecoveryBanner
   const handleDismiss = useCallback(() => {
     const currentData = getBannerDismissalData("legacy-safe-recovery");
     const newData = createDismissalData(currentData);
-
     setBannerDismissalData(newData, "legacy-safe-recovery");
     setIsDismissed(true);
   }, []);
 
-  if (isDismissed || !hasOldSafe || !oldSafeAddress || !isEligible || !hasBalance) {
+  if (isDismissed || !hasOldSafe || !oldSafeAddress || affected !== false || !hasPreHackBalance) {
     return null;
   }
 
@@ -76,7 +71,9 @@ export function LegacySafeRecoveryBanner({ className }: LegacySafeRecoveryBanner
             data-testid="legacy-safe-recovery-banner-link"
             className="group flex items-start justify-between gap-4 pr-6"
           >
-            <h3 className="font-bold text-foreground text-base sm:text-lg leading-tight">{HEADLINE}</h3>
+            <h3 className="font-bold text-foreground text-base sm:text-lg leading-tight">
+              You may be able to recover funds from a previous Safe account.
+            </h3>
             <ChevronRight
               size={24}
               className="shrink-0 text-foreground hidden sm:block group-hover:translate-x-0.5 transition-transform"
