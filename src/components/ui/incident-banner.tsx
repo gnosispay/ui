@@ -71,7 +71,9 @@ export function IncidentBanner({ className }: IncidentBannerProps) {
 
         <div className="flex-1 min-w-0 pr-6">
           <p className="font-bold text-foreground text-base sm:text-lg leading-tight">
-            Your Gnosis Pay card is back up and running.
+            {affected && hasPreHackBalance
+              ? "Your Gnosis Pay card is coming back."
+              : "Your Gnosis Pay card is back up and running."}
           </p>
 
           {!affected && hasPreHackBalance && (
@@ -95,9 +97,14 @@ export function IncidentBanner({ className }: IncidentBannerProps) {
           )}
 
           {affected && hasPreHackBalance && (
-            <p className="mt-2 text-sm sm:text-base text-foreground leading-snug">
-              We've restored your balance and issued you a new Gnosis Pay Safe. Your previous Safe is no longer secure. Do not use your old Safe address again: anything you send there will be lost.
-            </p>
+            <>
+              <p className="mt-1 text-sm sm:text-base text-foreground leading-snug">
+                We've issued you a new Gnosis Pay Safe because your previous Safe is no longer secure. Do not use your old Safe address again: anything you send there will be lost.
+              </p>
+              <p className="mt-1 text-sm sm:text-base text-foreground leading-snug">
+                Funds are now being restored and will appear on your balance by EOD Sunday, June 7th.
+              </p>
+            </>
           )}
 
           {affected && !hasPreHackBalance && (

@@ -57,8 +57,10 @@ test.describe("Incident banner - 4 cases", () => {
     await setupBannerTest(page, OLD_SAFE_AFFECTED_WITH_BALANCE);
     const banner = page.getByTestId("incident-notice-banner");
     await expect(banner).toBeVisible();
-    await expect(banner).toContainText("Your Gnosis Pay card is back up and running.");
-    await expect(banner).toContainText("We've restored your balance");
+    await expect(banner).toContainText("Your Gnosis Pay card is coming back.");
+    await expect(banner).toContainText(
+      "Funds are now being restored and will appear on your balance by EOD Sunday, June 7th.",
+    );
     await expect(banner).toContainText("Do not use your old Safe address again");
   });
 
