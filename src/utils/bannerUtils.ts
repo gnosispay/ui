@@ -1,17 +1,20 @@
 const PARTNER_BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v2";
 const LEGACY_SAFE_RECOVERY_BANNER_STORAGE_KEY = "gp-ui.legacy-safe-recovery-banner-dismissed.v1";
+const INCIDENT_BANNER_STORAGE_KEY = "gp-ui.incident-banner-dismissed.v1";
 
 export interface BannerDismissalData {
   nextShowTimestamp: number;
   count: number;
 }
 
-export type BannerType = "partner" | "legacy-safe-recovery";
+export type BannerType = "partner" | "legacy-safe-recovery" | "incident";
 
 function getBannerStorageKey(bannerType: BannerType): string {
   switch (bannerType) {
     case "legacy-safe-recovery":
       return LEGACY_SAFE_RECOVERY_BANNER_STORAGE_KEY;
+    case "incident":
+      return INCIDENT_BANNER_STORAGE_KEY;
     default:
       return PARTNER_BANNER_STORAGE_KEY;
   }
