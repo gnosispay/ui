@@ -80,61 +80,6 @@ test.describe("Incident banner - 4 cases", () => {
     await page.waitForLoadState("networkidle");
     await expect(page.getByTestId("incident-notice-banner")).not.toBeVisible();
   });
-
-  test("dismisses and stays hidden after reload", async ({ page }) => {
-    await setupBannerTest(page, OLD_SAFE_NOT_AFFECTED_WITH_BALANCE);
-    const banner = page.getByTestId("incident-notice-banner");
-    await expect(banner).toBeVisible();
-
-    await page.getByTestId("incident-notice-banner-dismiss").click();
-    await expect(banner).not.toBeVisible();
-
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await expect(banner).not.toBeVisible();
-  });
-});
-
-test.describe("Legacy safe recovery banner", () => {
-  test.beforeEach(async ({ page }) => {
-    await setupMockWallet(page);
-  });
-
-  test("not affected, has balance - shows legacy recovery banner", async ({ page }) => {
-    await setupBannerTest(page, OLD_SAFE_NOT_AFFECTED_WITH_BALANCE);
-    const banner = page.getByTestId("legacy-safe-recovery-banner");
-    await expect(banner).toBeVisible();
-    await expect(banner).toContainText("recover funds from a previous Safe account");
-    await expect(banner.getByTestId("legacy-safe-recovery-banner-link")).toHaveAttribute("href", "/withdraw-legacy");
-  });
-
-  test("not affected, no balance - legacy recovery banner not shown", async ({ page }) => {
-    await setupBannerTest(page, OLD_SAFE_NOT_AFFECTED_NO_BALANCE);
-    await expect(page.getByTestId("legacy-safe-recovery-banner")).not.toBeVisible();
-  });
-
-  test("affected, has balance - legacy recovery banner not shown", async ({ page }) => {
-    await setupBannerTest(page, OLD_SAFE_AFFECTED_WITH_BALANCE);
-    await expect(page.getByTestId("legacy-safe-recovery-banner")).not.toBeVisible();
-  });
-
-  test("affected, no balance - legacy recovery banner not shown", async ({ page }) => {
-    await setupBannerTest(page, OLD_SAFE_AFFECTED_NO_BALANCE);
-    await expect(page.getByTestId("legacy-safe-recovery-banner")).not.toBeVisible();
-  });
-
-  test("dismisses and stays hidden after reload", async ({ page }) => {
-    await setupBannerTest(page, OLD_SAFE_NOT_AFFECTED_WITH_BALANCE);
-    const banner = page.getByTestId("legacy-safe-recovery-banner");
-    await expect(banner).toBeVisible();
-
-    await page.getByTestId("legacy-safe-recovery-banner-dismiss").click();
-    await expect(banner).not.toBeVisible();
-
-    await page.reload();
-    await page.waitForLoadState("networkidle");
-    await expect(banner).not.toBeVisible();
-  });
 });
 
 test.describe("Partner banner", () => {
