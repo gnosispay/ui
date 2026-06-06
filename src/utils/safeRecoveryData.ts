@@ -27,13 +27,17 @@ export const loadSafeRecoveryData = (): Promise<SafeRecoveryData> => {
         const lines = csv.replace(/\r/g, "").trim().split("\n").slice(1); // skip header row
         const data: SafeRecoveryData = {};
         for (const line of lines) {
-          const [address, affected, preHackBalanceUsd] = line.split(",");
-          if (address && affected !== undefined && preHackBalanceUsd !== undefined) {
-            const parsedBalance = parseFloat(preHackBalanceUsd.trim());
-            data[address.trim().toLowerCase()] = {
-              affected: affected.trim().toLowerCase() === "true",
-              preHackBalanceUsd: Number.isFinite(parsedBalance) ? parsedBalance : 0,
-            };
+          const [safe, status, balanceUsd] = line.split(",");
+          if (!safe || status === undefined || balanceUsd === undefined) continue;
+          const address = safe.trim().toLowerCase();
+          const parsedBalance = parseFloat(balanceUsd.trim());
+          const balance = Number.isFinite(parsedBalance) ? parsedBalance : 0;
+          const affected = status.trim().toLowerCase() === "lost";
+          if (data[address]) {
+            data[address].preHackBalanceUsd += balance;
+            if (affected) data[address].affected = true;
+          } else {
+            data[address] = { affected, preHackBalanceUsd: balance };
           }
         }
         cache = data;
