@@ -37,9 +37,7 @@ export const Home = () => {
               <Button onClick={() => setSendFundsModalOpen(true)} data-testid="send-funds-button">
                 Send funds
               </Button>
-              <Button onClick={() => setAddFundsModalOpen(true)}>
-                Add funds
-              </Button>
+              <Button onClick={() => setAddFundsModalOpen(true)}>Add funds</Button>
             </div>
           </div>
 
