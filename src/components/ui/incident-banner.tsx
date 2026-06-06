@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { isAddress, type Address } from "viem";
 import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { useSafeRecoveryData } from "@/hooks/useSafeRecoveryData";
+import { useZendesk } from "react-use-zendesk";
+import { useCallback } from "react";
 
 interface IncidentBannerProps {
   className?: string;
@@ -11,6 +13,8 @@ interface IncidentBannerProps {
 }
 
 export function IncidentBanner({ className, showDisruption = false }: IncidentBannerProps) {
+  const { open, show } = useZendesk();
+  const handleSupportClick = useCallback(() => { open(); show(); }, [open, show]);
   const { hasOldSafe, oldSafe, isLoading: isMigrationLoading } = useSafeMigration();
   const oldSafeAddress = oldSafe?.address && isAddress(oldSafe.address) ? (oldSafe.address as Address) : undefined;
   const { affected, hasPreHackBalance, isLoading: isDataLoading } = useSafeRecoveryData(oldSafeAddress);
@@ -60,9 +64,7 @@ export function IncidentBanner({ className, showDisruption = false }: IncidentBa
 
         <div className="flex-1 min-w-0">
           <p className="font-bold text-foreground text-base sm:text-lg leading-tight">
-            {affected && hasPreHackBalance
-              ? "Your Gnosis Pay card is coming back."
-              : "Your Gnosis Pay card is back up and running."}
+            Your Gnosis Pay card is back up and running.
           </p>
 
           {!affected && hasPreHackBalance && (
@@ -87,11 +89,18 @@ export function IncidentBanner({ className, showDisruption = false }: IncidentBa
 
           {affected && hasPreHackBalance && (
             <>
-              <p className="mt-1 text-sm sm:text-base text-foreground leading-snug">
-                We've issued you a new Gnosis Pay Safe because your previous Safe is no longer secure. Do not use your old Safe address again: anything you send there will be lost.
+              <p className="mt-2 text-sm sm:text-base text-foreground leading-snug">
+                We issued you a new Gnosis Pay Safe. Your previous Safe is no longer secure. Do not use your old Safe address again: anything you send there will be lost.
               </p>
               <p className="mt-1 text-sm sm:text-base text-foreground leading-snug">
-                Funds are now being restored and will appear on your balance by EOD Sunday, June 7th.
+                Balances have also been restored for over 95% of cases and we are working through final edge cases now. If you have any doubts please{" "}
+                <button
+                  onClick={handleSupportClick}
+                  className="underline font-medium hover:opacity-80 transition-opacity cursor-pointer"
+                >
+                  contact support
+                </button>
+                .
               </p>
             </>
           )}
