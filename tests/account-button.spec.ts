@@ -16,12 +16,15 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Account Button", () => {
   test.beforeEach(async ({ page }) => {
-    // Ensure Anvil is stopped for this test (it doesn't use Anvil)
-    await stopAnvil();
     await setupMockWallet(page);
   });
 
   test("displays account button with correct address and balance properties", async ({ page }) => {
+    // Global Anvil may be running; ensure the connected wallet has no xDAI on the fork.
+    if (isAnvilAvailable()) {
+      await setupTestBalances(USER_TEST_SIGNER_ADDRESS as Address, { xDAI: "0" });
+    }
+
     // Set up all mocks for fully onboarded user
     await setupAllMocks(page, BASE_USER);
 

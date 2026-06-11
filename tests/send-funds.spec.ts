@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
+import { clearDelayModuleMock, mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
 import { ANVIL_RPC_URL, GNOSIS_TOKENS, isAnvilAvailable, setupTestBalances, startAnvil } from "./utils/anvil";
 import type { Address } from "viem";
 
@@ -437,13 +437,12 @@ test.describe("Send Funds Modal without Anvil", () => {
   });
 
   test("shows error when connected account is not a Safe owner", async ({ page }) => {
-    // Set up all mocks but mock owners with a different address (not the connected wallet)
-    // This simulates the case where the connected wallet is not an owner
-    await setupAllMocks(page, BASE_USER, {
-      owners: {
-        owners: ["0x1111111111111111111111111111111111111111"], // Different address, not the connected wallet
-      },
-    });
+    // Signer verification is on-chain; clear any mock delay module left by Anvil tests.
+    if (anvilAvailable) {
+      await clearDelayModuleMock(BASE_USER.safeAddress as Address);
+    }
+
+    await setupAllMocks(page, BASE_USER);
 
     // Navigate to home page
     await page.goto("/");

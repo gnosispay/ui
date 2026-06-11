@@ -30,3 +30,17 @@ export async function mockDelayModuleOwners(safeAddress: Address, owners: Addres
     bytecode: MOCK_DELAY_MODULE_BYTECODE,
   });
 }
+
+/**
+ * Removes a mock delay module from the Anvil fork so signer verification falls
+ * back to an undeployed contract (no owners found).
+ */
+export async function clearDelayModuleMock(safeAddress: Address): Promise<void> {
+  const delayModAddress = next.predictAddresses(safeAddress).delay as Address;
+  const client = createAnvilClient();
+
+  await client.setCode({
+    address: delayModAddress,
+    bytecode: "0x",
+  });
+}
