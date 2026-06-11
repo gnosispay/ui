@@ -3,7 +3,7 @@ import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
 import { mockDelayModuleNonOwner, mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
-import { ANVIL_RPC_URL, GNOSIS_TOKENS, isAnvilAvailable, setupTestBalances, startAnvil } from "./utils/anvil";
+import { ANVIL_RPC_URL, GNOSIS_TOKENS, setupTestBalances, startAnvil } from "./utils/anvil";
 import type { Address } from "viem";
 
 const wstETHInfo = {
@@ -12,19 +12,15 @@ const wstETHInfo = {
   name: "Wrapped liquid staked Ether",
 };
 
-const anvilAvailable = isAnvilAvailable();
-
 // Share one Anvil fork; avoid parallel tests racing on delay-module mock state.
 test.describe.configure({ mode: "serial" });
 
 test.describe("Send Funds Modal with Anvil", () => {
-  test.skip(!anvilAvailable, "Anvil is required for on-chain balance tests");
-
   test.beforeEach(async ({ page }) => {
     // Anvil is started once in global setup; ensure it is available before each test.
     await startAnvil();
     await setupMockWallet(page, {
-      rpcUrl: anvilAvailable ? ANVIL_RPC_URL : undefined,
+      rpcUrl: ANVIL_RPC_URL,
     });
   });
 
@@ -449,9 +445,7 @@ test.describe("Send Funds Modal without Anvil", () => {
     await test.step("open send funds modal", async () => {
       // Signer verification is on-chain; install a non-owner mock immediately before
       // opening the modal so parallel Anvil tests cannot overwrite fork state first.
-      if (anvilAvailable) {
-        await mockDelayModuleNonOwner(BASE_USER.safeAddress as Address);
-      }
+      await mockDelayModuleNonOwner(BASE_USER.safeAddress as Address);
 
       const sendFundsButton = page.getByTestId("send-funds-button");
       await expect(sendFundsButton).toBeVisible();

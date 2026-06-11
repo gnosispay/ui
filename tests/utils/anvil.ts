@@ -54,6 +54,16 @@ export function isAnvilAvailable(): boolean {
 }
 
 /**
+ * Ensures Anvil is installed before running on-chain tests.
+ * @throws If the `anvil` binary is not found on PATH or in the default Foundry location.
+ */
+export function requireAnvil(): void {
+  if (!isAnvilAvailable()) {
+    throw new Error("Anvil not found. Install Foundry: https://getfoundry.sh");
+  }
+}
+
+/**
  * Anvil RPC URL - default port
  */
 export const ANVIL_RPC_URL = "http://127.0.0.1:8545";

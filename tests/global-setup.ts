@@ -1,9 +1,6 @@
-import { isAnvilAvailable, startAnvil } from "./utils/anvil";
+import { requireAnvil, startAnvil } from "./utils/anvil";
 
 export default async function globalSetup() {
-  if (!isAnvilAvailable()) {
-    return;
-  }
-
+  requireAnvil();
   await startAnvil();
 }

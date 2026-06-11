@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { ANVIL_RPC_URL, isAnvilAvailable, setupTestBalances, startAnvil } from "./utils/anvil";
+import { ANVIL_RPC_URL, setupTestBalances, startAnvil } from "./utils/anvil";
 import type { Address } from "viem";
 
 /**
@@ -20,10 +20,8 @@ test.describe("Account Button", () => {
   });
 
   test("displays account button with correct address and balance properties", async ({ page }) => {
-    // Global Anvil may be running; ensure the connected wallet has no xDAI on the fork.
-    if (isAnvilAvailable()) {
-      await setupTestBalances(USER_TEST_SIGNER_ADDRESS as Address, { xDAI: "0" });
-    }
+    // Ensure the connected wallet has no xDAI on the Anvil fork.
+    await setupTestBalances(USER_TEST_SIGNER_ADDRESS as Address, { xDAI: "0" });
 
     // Set up all mocks for fully onboarded user
     await setupAllMocks(page, BASE_USER);
@@ -50,15 +48,11 @@ test.describe("Account Button", () => {
   });
 });
 
-const anvilAvailable = isAnvilAvailable();
-
 test.describe("Account Button with Anvil", () => {
-  test.skip(!anvilAvailable, "Anvil is required for on-chain balance tests");
-
   test.beforeEach(async ({ page }) => {
     await startAnvil();
     await setupMockWallet(page, {
-      rpcUrl: anvilAvailable ? ANVIL_RPC_URL : undefined,
+      rpcUrl: ANVIL_RPC_URL,
     });
   });
 
