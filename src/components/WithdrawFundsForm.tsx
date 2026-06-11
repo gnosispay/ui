@@ -46,10 +46,10 @@ export const WithdrawFundsForm = ({
     [kind, newSafe?.address],
   );
   const { signTypedDataAsync } = useSignTypedData();
-  const {
-    isSignerConnected,
-    isDataLoading: isSignerVerificationLoading,
-  } = useSafeSignerVerification(safeAddress, kind);
+  const { isSignerConnected, isDataLoading: isSignerVerificationLoading } = useSafeSignerVerification(
+    safeAddress,
+    kind,
+  );
   const [toAddress, setToAddress] = useState("");
   const [addressError, setAddressError] = useState("");
   const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
