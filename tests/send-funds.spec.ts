@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { clearDelayModuleMock, mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
+import { mockDelayModuleNonOwner, mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
 import { ANVIL_RPC_URL, GNOSIS_TOKENS, isAnvilAvailable, setupTestBalances, startAnvil } from "./utils/anvil";
 import type { Address } from "viem";
 
@@ -13,6 +13,9 @@ const wstETHInfo = {
 };
 
 const anvilAvailable = isAnvilAvailable();
+
+// Share one Anvil fork; avoid parallel tests racing on delay-module mock state.
+test.describe.configure({ mode: "serial" });
 
 test.describe("Send Funds Modal with Anvil", () => {
   test.skip(!anvilAvailable, "Anvil is required for on-chain balance tests");
@@ -437,11 +440,6 @@ test.describe("Send Funds Modal without Anvil", () => {
   });
 
   test("shows error when connected account is not a Safe owner", async ({ page }) => {
-    // Signer verification is on-chain; clear any mock delay module left by Anvil tests.
-    if (anvilAvailable) {
-      await clearDelayModuleMock(BASE_USER.safeAddress as Address);
-    }
-
     await setupAllMocks(page, BASE_USER);
 
     // Navigate to home page
@@ -449,6 +447,12 @@ test.describe("Send Funds Modal without Anvil", () => {
     await page.waitForLoadState("networkidle");
 
     await test.step("open send funds modal", async () => {
+      // Signer verification is on-chain; install a non-owner mock immediately before
+      // opening the modal so parallel Anvil tests cannot overwrite fork state first.
+      if (anvilAvailable) {
+        await mockDelayModuleNonOwner(BASE_USER.safeAddress as Address);
+      }
+
       const sendFundsButton = page.getByTestId("send-funds-button");
       await expect(sendFundsButton).toBeVisible();
       await sendFundsButton.click();
@@ -460,11 +464,10 @@ test.describe("Send Funds Modal without Anvil", () => {
     });
 
     await test.step("verify error message appears for non-owner account", async () => {
-      // Verify the error message is displayed
       const errorAlert = page
         .getByRole("alert")
         .filter({ hasText: "You must be connected with an account that is a signer of the Gnosis Pay account" });
-      await expect(errorAlert).toBeVisible();
+      await expect(errorAlert).toBeVisible({ timeout: 10000 });
 
       // Verify the Next button is disabled
       const nextButton = page.getByTestId("send-funds-next-button");
