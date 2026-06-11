@@ -9,16 +9,20 @@ import { toast } from "sonner";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 
 // The Delay module enforces cooldown against the chain's block.timestamp, which
-// can lag the browser clock. Require a small extra buffer before enabling
-// execution so we don't surface the button (and let users execute) a moment
-// before the chain will accept it, which would revert with a generic error.
-const EXECUTION_COOLDOWN_BUFFER_SECONDS = 30n;
+// can lag the browser clock by up to ~1-2 block times (~5-10s on Gnosis Chain).
+// This buffer delays showing the Execute button so we don't surface it a moment
+// before the chain will accept it, which would cause the transaction to revert.
+const EXECUTION_COOLDOWN_BUFFER_SECONDS = 15n;
 
 export interface PendingTransaction {
   nonce: bigint;
   hash: string | null;
   expirationTimestamp: bigint;
   creationTimestamp: bigint;
+  // Timestamp (seconds) at which isCooledDown becomes true — includes the
+  // execution buffer so the countdown in the UI matches exactly when the
+  // Execute button will appear.
+  cooldownEndTimestamp: bigint;
   isExpired: boolean;
   isCooledDown: boolean;
 }
@@ -177,7 +181,6 @@ export const DelayModuleQueueContextProvider = ({
           const { nonce, createdAt: creationTimestamp, hash } = txDataArray[i];
 
           if (creationTimestamp !== null) {
-            const expirationTimestamp = creationTimestamp + expiration;
             const cooldownTimestamp = creationTimestamp + cooldown;
             const onChainExpirationTimestamp = cooldownTimestamp + expiration;
             const isExpired = expiration > 0n && currentTimeSeconds > onChainExpirationTimestamp;
@@ -186,7 +189,8 @@ export const DelayModuleQueueContextProvider = ({
             pendingQueue.push({
               nonce,
               hash,
-              expirationTimestamp,
+              expirationTimestamp: onChainExpirationTimestamp,
+              cooldownEndTimestamp: cooldownTimestamp + EXECUTION_COOLDOWN_BUFFER_SECONDS,
               creationTimestamp,
               isExpired,
               isCooledDown,

@@ -127,7 +127,7 @@ export const TokenAmountInput = ({
         <div className="absolute right-3 top-2 flex flex-col items-end gap-1">
           <Select value={selectedSymbol} onValueChange={handleTokenSelect}>
             <SelectTrigger
-              className="w-auto border-0 bg-transparent p-0 h-auto shadow-none"
+              className="w-auto border-0 bg-foreground/8 dark:bg-foreground/20 hover:bg-foreground/12 dark:hover:bg-foreground/25 px-2.5 py-1 h-auto shadow-none rounded-full [&_svg]:text-foreground [&_svg]:opacity-100"
               data-testid="token-selector"
             >
               <SelectValue>

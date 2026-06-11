@@ -84,33 +84,40 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
 
   // Calculate and update countdown timer
   useEffect(() => {
-    if (!transaction.isCooledDown && !transaction.isExpired && queueInfo?.cooldown) {
+    if (!transaction.isCooledDown && !transaction.isExpired) {
+      const cooldownEndMs = Number(transaction.cooldownEndTimestamp) * 1000;
+
       const updateCountdown = () => {
-        const creationTimestampMs = Number(transaction.creationTimestamp) * 1000;
-        const cooldownMs = Number(queueInfo.cooldown) * 1000;
-        const cooldownEndMs = creationTimestampMs + cooldownMs;
         const remainingMs = cooldownEndMs - Date.now();
 
         if (remainingMs <= 0) {
           setTimeRemaining(0);
-          // Refetch to update the transaction status
-          refetch();
-        } else {
-          setTimeRemaining(remainingMs);
+          return;
         }
+
+        setTimeRemaining(remainingMs);
       };
 
       // Update immediately
       updateCountdown();
 
-      // Update every second
-      const interval = setInterval(updateCountdown, 1000);
+      const interval = setInterval(() => {
+        const remainingMs = cooldownEndMs - Date.now();
+        if (remainingMs <= 0) {
+          setTimeRemaining(0);
+          clearInterval(interval);
+          // Single refetch once the cooldown has passed
+          refetch();
+        } else {
+          setTimeRemaining(remainingMs);
+        }
+      }, 1000);
 
       return () => clearInterval(interval);
     } else {
       setTimeRemaining(0);
     }
-  }, [transaction.isCooledDown, transaction.isExpired, transaction.creationTimestamp, queueInfo?.cooldown, refetch]);
+  }, [transaction.isCooledDown, transaction.isExpired, transaction.cooldownEndTimestamp, refetch]);
 
   const handleExecute = useCallback(async () => {
     if (!safeAddress || !transaction.isCooledDown || !storedTransaction) {
@@ -179,6 +186,16 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
         <span className="font-medium text-foreground">{creationDate}</span>
       </div>
 
+      {/* Execute before deadline */}
+      {!transaction.isExpired && queueInfo && queueInfo.expiration > 0n && (
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">Execute before</span>
+          <span className="font-medium text-warning">
+            {format(new Date(Number(transaction.expirationTimestamp) * 1000), "MMM dd, HH:mm")}
+          </span>
+        </div>
+      )}
+
       {/* status indicators */}
       <div className="flex items-center justify-between border-t border-border pt-2">
         <div className="flex items-center gap-2">
@@ -193,6 +210,11 @@ export const PendingTransactionItem = ({ transaction }: PendingTransactionItemPr
             <span className="text-sm font-medium text-foreground">
               {transaction.isExpired ? "Expired" : transaction.isCooledDown ? "Ready" : "Cooling Down"}
             </span>
+            {transaction.isExpired && (
+              <span className="text-xs text-muted-foreground">
+                This expired before it was executed — use "Skip Expired" below to clear it, then re-submit.
+              </span>
+            )}
             {!transaction.isCooledDown && !transaction.isExpired && timeRemaining > 0 && (
               <span className="text-xs text-muted-foreground font-mono">{formatCountdown(timeRemaining)}</span>
             )}
