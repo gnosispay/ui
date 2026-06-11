@@ -37,6 +37,7 @@ export const useTokenBalance = (): UseTokenBalanceResult => {
         };
       }
       setCurrenciesWithBalance(initialTokens);
+      setIsLoading(false);
       return;
     }
 

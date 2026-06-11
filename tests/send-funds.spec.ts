@@ -1,15 +1,9 @@
 import { test, expect } from "@playwright/test";
-import { BASE_USER } from "./utils/testUsers";
+import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import {
-  ANVIL_RPC_URL,
-  GNOSIS_TOKENS,
-  isAnvilAvailable,
-  setupTestBalances,
-  startAnvil,
-  stopAnvil,
-} from "./utils/anvil";
+import { mockDelayModuleNonOwner, mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
+import { ANVIL_RPC_URL, GNOSIS_TOKENS, setupTestBalances, startAnvil } from "./utils/anvil";
 import type { Address } from "viem";
 
 const wstETHInfo = {
@@ -18,19 +12,16 @@ const wstETHInfo = {
   name: "Wrapped liquid staked Ether",
 };
 
-const anvilAvailable = isAnvilAvailable();
+// Share one Anvil fork; avoid parallel tests racing on delay-module mock state.
+test.describe.configure({ mode: "serial" });
 
 test.describe("Send Funds Modal with Anvil", () => {
   test.beforeEach(async ({ page }) => {
+    // Anvil is started once in global setup; ensure it is available before each test.
     await startAnvil();
-    // Point the mock wallet to Anvil if available
     await setupMockWallet(page, {
-      rpcUrl: anvilAvailable ? ANVIL_RPC_URL : undefined,
+      rpcUrl: ANVIL_RPC_URL,
     });
-  });
-
-  test.afterEach(async () => {
-    await stopAnvil();
   });
 
   test("custom token functionality and insufficient funds error", async ({ page }) => {
@@ -42,6 +33,7 @@ test.describe("Send Funds Modal with Anvil", () => {
 
     // Set up all mocks with the base user
     await setupAllMocks(page, BASE_USER);
+    await mockDelayModuleOwners(BASE_USER.safeAddress as Address, [USER_TEST_SIGNER_ADDRESS as Address]);
 
     // Navigate to home page
     await page.goto("/");
@@ -108,10 +100,10 @@ test.describe("Send Funds Modal with Anvil", () => {
       const amountInput = page.getByTestId("standard-token-amount-input");
       await expect(amountInput).toBeVisible();
 
-      //token amount should be 1000
+      // Token balance is fetched on-chain from Anvil after the modal opens
       const tokenBalance = page.getByTestId("token-balance");
       await expect(tokenBalance).toBeVisible();
-      await expect(tokenBalance).toHaveText("1000");
+      await expect(tokenBalance).toHaveText("1000", { timeout: 15000 });
 
       await amountInput.fill("100"); // Try to send 100 EUR
 
@@ -295,7 +287,7 @@ test.describe("Send Funds Modal with Anvil", () => {
       // make sure the amount balance is correct and the max button is visible
       const tokenBalance = page.getByTestId("token-balance");
       await expect(tokenBalance).toBeVisible();
-      await expect(tokenBalance).toHaveText("2.5");
+      await expect(tokenBalance).toHaveText("2.5", { timeout: 15000 });
 
       const maxButton = page.getByTestId("custom-token-max-button");
       await expect(maxButton).toBeVisible();
@@ -444,19 +436,17 @@ test.describe("Send Funds Modal without Anvil", () => {
   });
 
   test("shows error when connected account is not a Safe owner", async ({ page }) => {
-    // Set up all mocks but mock owners with a different address (not the connected wallet)
-    // This simulates the case where the connected wallet is not an owner
-    await setupAllMocks(page, BASE_USER, {
-      owners: {
-        owners: ["0x1111111111111111111111111111111111111111"], // Different address, not the connected wallet
-      },
-    });
+    await setupAllMocks(page, BASE_USER);
 
     // Navigate to home page
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
     await test.step("open send funds modal", async () => {
+      // Signer verification is on-chain; install a non-owner mock immediately before
+      // opening the modal so parallel Anvil tests cannot overwrite fork state first.
+      await mockDelayModuleNonOwner(BASE_USER.safeAddress as Address);
+
       const sendFundsButton = page.getByTestId("send-funds-button");
       await expect(sendFundsButton).toBeVisible();
       await sendFundsButton.click();
@@ -468,11 +458,10 @@ test.describe("Send Funds Modal without Anvil", () => {
     });
 
     await test.step("verify error message appears for non-owner account", async () => {
-      // Verify the error message is displayed
       const errorAlert = page
         .getByRole("alert")
         .filter({ hasText: "You must be connected with an account that is a signer of the Gnosis Pay account" });
-      await expect(errorAlert).toBeVisible();
+      await expect(errorAlert).toBeVisible({ timeout: 10000 });
 
       // Verify the Next button is disabled
       const nextButton = page.getByTestId("send-funds-next-button");

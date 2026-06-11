@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
-import { ANVIL_RPC_URL, isAnvilAvailable, setupTestBalances, startAnvil, stopAnvil } from "./utils/anvil";
+import { ANVIL_RPC_URL, setupTestBalances, startAnvil } from "./utils/anvil";
 import type { Address } from "viem";
 
 /**
@@ -16,12 +16,13 @@ test.describe.configure({ mode: "serial" });
 
 test.describe("Account Button", () => {
   test.beforeEach(async ({ page }) => {
-    // Ensure Anvil is stopped for this test (it doesn't use Anvil)
-    await stopAnvil();
     await setupMockWallet(page);
   });
 
   test("displays account button with correct address and balance properties", async ({ page }) => {
+    // Ensure the connected wallet has no xDAI on the Anvil fork.
+    await setupTestBalances(USER_TEST_SIGNER_ADDRESS as Address, { xDAI: "0" });
+
     // Set up all mocks for fully onboarded user
     await setupAllMocks(page, BASE_USER);
 
@@ -47,19 +48,12 @@ test.describe("Account Button", () => {
   });
 });
 
-const anvilAvailable = isAnvilAvailable();
-
 test.describe("Account Button with Anvil", () => {
   test.beforeEach(async ({ page }) => {
     await startAnvil();
-    // Point the mock wallet to Anvil if available
     await setupMockWallet(page, {
-      rpcUrl: anvilAvailable ? ANVIL_RPC_URL : undefined,
+      rpcUrl: ANVIL_RPC_URL,
     });
-  });
-
-  test.afterEach(async () => {
-    await stopAnvil();
   });
 
   test("displays account button with 100 XDAI balance", async ({ page }) => {
