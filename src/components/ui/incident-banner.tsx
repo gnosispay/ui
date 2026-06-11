@@ -9,33 +9,14 @@ import { useCallback } from "react";
 
 interface IncidentBannerProps {
   className?: string;
-  showDisruption?: boolean;
 }
 
-export function IncidentBanner({ className, showDisruption = false }: IncidentBannerProps) {
+export function IncidentBanner({ className }: IncidentBannerProps) {
   const { open, show } = useZendesk();
   const handleSupportClick = useCallback(() => { open(); show(); }, [open, show]);
   const { hasOldSafe, oldSafe, isLoading: isMigrationLoading } = useSafeMigration();
   const oldSafeAddress = oldSafe?.address && isAddress(oldSafe.address) ? (oldSafe.address as Address) : undefined;
   const { affected, hasPreHackBalance, isLoading: isDataLoading } = useSafeRecoveryData(oldSafeAddress);
-
-  if (showDisruption) {
-    return (
-      <div className={cn("block w-full rounded-lg mb-6 bg-warning/15", className)} role="alert">
-        <div className="flex items-start gap-4 p-5 sm:p-6">
-          <div className="shrink-0 flex items-center justify-center size-12 sm:size-14 rounded-full bg-warning" aria-hidden>
-            <AlertTriangle size={28} className="text-background" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-bold text-foreground text-base sm:text-lg leading-tight">Service disruption</p>
-            <p className="mt-2 text-sm sm:text-base text-foreground leading-snug">
-              Normal card operations will resume within the next 12-24 hours. We're very sorry for the disruption.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   if (!hasOldSafe || isMigrationLoading || isDataLoading || affected === undefined || hasPreHackBalance === undefined) {
     return null;
@@ -93,7 +74,7 @@ export function IncidentBanner({ className, showDisruption = false }: IncidentBa
                 We issued you a new Gnosis Pay Safe. Your previous Safe is no longer secure. Do not use your old Safe address again: anything you send there will be lost.
               </p>
               <p className="mt-1 text-sm sm:text-base text-foreground leading-snug">
-                Balances have also been restored for over 95% of cases and we are working through final edge cases now. If you have any doubts please{" "}
+                Balances have also been restored for all affected accounts. If you have any doubts please{" "}
                 <button
                   onClick={handleSupportClick}
                   className="underline font-medium hover:opacity-80 transition-opacity cursor-pointer"

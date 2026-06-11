@@ -34,15 +34,21 @@ export const DelayModuleQueue = () => {
           <PendingTransactionItem key={transaction.nonce.toString()} transaction={transaction} />
         ))}
         {hasExpiredTransaction && (
-          <Button
-            variant="default"
-            size="sm"
-            onClick={handleSkipExpired}
-            disabled={isSkippingExpired}
-            loading={isSkippingExpired}
-          >
-            Skip Expired
-          </Button>
+          <div className="flex flex-col gap-2 pt-1">
+            <StandardAlert
+              variant="destructive"
+              description="Clear the expired transaction above before you can re-submit."
+            />
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleSkipExpired}
+              disabled={isSkippingExpired}
+              loading={isSkippingExpired}
+            >
+              Skip Expired
+            </Button>
+          </div>
         )}
       </div>
     </div>

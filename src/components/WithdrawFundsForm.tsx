@@ -10,6 +10,7 @@ import { TokenAmountInput } from "./modals/send-funds/token-amount-input";
 import { CustomTokenAmountInput } from "./modals/send-funds/custom-token-amount-input";
 import { AddressInput } from "./modals/send-funds/address-input";
 import { useAccount, useSignTypedData } from "wagmi";
+import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
 import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { sendTransaction, readContract, waitForTransactionReceipt, getBalance } from "wagmi/actions";
@@ -38,12 +39,17 @@ export const WithdrawFundsForm = ({
   onSuccess,
 }: WithdrawFundsFormProps) => {
   const { address: connectedAddress } = useAccount();
+  const { newSafe } = useSafeMigration();
+  // Only offer the "send to new Safe" shortcut when withdrawing from the legacy safe
+  const newSafeAddress = useMemo(
+    () => (kind === "legacy" && newSafe?.address && isAddress(newSafe.address) ? newSafe.address : undefined),
+    [kind, newSafe?.address],
+  );
   const { signTypedDataAsync } = useSignTypedData();
-  const {
-    isSignerConnected,
-    signerError,
-    isDataLoading: isSignerVerificationLoading,
-  } = useSafeSignerVerification(safeAddress, kind);
+  const { isSignerConnected, isDataLoading: isSignerVerificationLoading } = useSafeSignerVerification(
+    safeAddress,
+    kind,
+  );
   const [toAddress, setToAddress] = useState("");
   const [addressError, setAddressError] = useState("");
   const [selectedToken, setSelectedToken] = useState<TokenInfoWithBalance | undefined>();
@@ -108,13 +114,11 @@ export const WithdrawFundsForm = ({
     }
 
     if (!isSignerConnected) {
-      return signerError
-        ? `You are not an owner of this Safe. ${signerError.message}`
-        : "You are not an owner of this Safe. Please connect an owner account.";
+      return "You are not an owner of this Safe. Please connect an owner account.";
     }
 
     return null;
-  }, [connectedAddress, isSignerConnected, signerError, isSignerVerificationLoading, isBalanceLoading]);
+  }, [connectedAddress, isSignerConnected, isSignerVerificationLoading, isBalanceLoading]);
 
   const showInsufficientGasAlert = useMemo(() => {
     return (
@@ -317,6 +321,7 @@ export const WithdrawFundsForm = ({
           onChange={handleAddressChange}
           error={addressError}
           connectedAddress={connectedAddress}
+          newSafeAddress={newSafeAddress}
         />
       </div>
 

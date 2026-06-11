@@ -4,17 +4,20 @@ import { DelayModuleQueue } from "@/components/DelayModuleQueue/DelayModuleQueue
 import { DelayModuleQueueContextProvider } from "@/context/DelayModuleQueueContext";
 import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { useOldSafeBalances } from "@/hooks/useOldSafeBalances";
+import { useSafeIntegrity } from "@/hooks/useSafeIntegrity";
 import { Skeleton } from "@/components/ui/skeleton";
 import { StandardAlert } from "@/components/ui/standard-alert";
 import { buttonVariants } from "@/components/ui/button";
 import { useCallback } from "react";
 import { Link } from "react-router-dom";
 import { isAddress, type Address } from "viem";
+import { shortenAddress } from "@/utils/shortenAddress";
 
 export const WithdrawLegacyRoute = () => {
   const { oldSafe, isLoading: isMigrationLoading } = useSafeMigration();
   const oldSafeAddress = oldSafe?.address && isAddress(oldSafe.address) ? (oldSafe.address as Address) : undefined;
   const { currenciesWithBalance, isLoading, isError, refetch } = useOldSafeBalances(oldSafeAddress);
+  const { isCompromised, singletonAddress } = useSafeIntegrity(oldSafeAddress);
 
   const handleTransactionExecuted = useCallback(() => {
     refetch();
@@ -57,12 +60,30 @@ export const WithdrawLegacyRoute = () => {
       <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
         <div className="col-span-6 lg:col-start-2 lg:col-span-4">
           <div className="flex flex-col gap-4">
-            <StandardAlert
-              className="bg-destructive/15 border-destructive text-destructive-foreground"
-              variant="destructive"
-              description="This page helps you perform operations on the legacy card safe. If the execution of a transaction
-              succeeds, but the funds are not transferred, it may mean that the legacy safe has been taken over."
-            />
+            {isCompromised ? (
+              <StandardAlert
+                variant="destructive"
+                title="Safe compromised"
+                description={
+                  <span>
+                    This Safe&apos;s singleton contract has been replaced with an compromised implementation
+                    {singletonAddress ? (
+                      <>
+                        {" "}
+                        (<span className="font-mono">{shortenAddress(singletonAddress)}</span>)
+                      </>
+                    ) : null}
+                    . This is a known attack pattern used to take over a Safe. Transactions through this Safe are likely
+                    to fail and any remaining funds may be unrecoverable.
+                  </span>
+                }
+              />
+            ) : (
+              <StandardAlert
+                variant="warning"
+                description="This page allows you to recover funds from your previous Safe. Transactions go through the delay module and require a cooldown period before execution."
+              />
+            )}
             <OnchainBalance currenciesWithBalance={currenciesWithBalance} isLoading={isLoading} isError={isError} />
             <DelayModuleQueue />
             <WithdrawFundsForm

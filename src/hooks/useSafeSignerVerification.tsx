@@ -46,7 +46,18 @@ export const useSafeSignerVerification = (
       } catch (error) {
         console.error("Error getting safe signers", error);
         const message = extractErrorMessage(error, "Failed to fetch safe owners");
-        setSignerError(new Error(message));
+        // "No data returned" means the delay module isn't deployed at the predicted
+        // address yet. Treat this as an unrecoverable loading state rather than
+        // surfacing a raw contract error to the user.
+        const isContractNotDeployed =
+          message.toLowerCase().includes("no data returned") ||
+          message.toLowerCase().includes("zero data") ||
+          message.toLowerCase().includes("returned no data");
+        if (isContractNotDeployed) {
+          setSafeSigners([]);
+        } else {
+          setSignerError(new Error(message));
+        }
       } finally {
         setIsDataLoading(false);
       }
