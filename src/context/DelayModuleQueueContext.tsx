@@ -210,6 +210,20 @@ export const DelayModuleQueueContextProvider = ({
       });
     } catch (error) {
       console.error("Error fetching delay module queue info:", error);
+      const message = error instanceof Error ? error.message : String(error);
+      // If the delay module contract isn't deployed at the predicted address yet,
+      // treat it as an empty queue rather than a hard error so the UI doesn't
+      // enter a persistent error state while the account is being set up.
+      const isContractNotDeployed =
+        message.toLowerCase().includes("returned no data") ||
+        message.toLowerCase().includes("zero data") ||
+        message.toLowerCase().includes("no data returned");
+      if (isContractNotDeployed) {
+        setQueue([]);
+        setQueueInfo(null);
+      } else {
+        setIsError(true);
+      }
     }
   }, [delayModAddress]);
 
