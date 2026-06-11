@@ -245,7 +245,11 @@ async function impersonatedErc20Transfer(
  * Sets an exact on-chain token balance on the Anvil fork.
  * Existing fork balances are adjusted up or down so tests can assert precise values.
  */
-async function setExactTokenBalance(tokenAddress: Address, holderAddress: Address, targetBalance: bigint): Promise<void> {
+async function setExactTokenBalance(
+  tokenAddress: Address,
+  holderAddress: Address,
+  targetBalance: bigint,
+): Promise<void> {
   const client = createAnvilClient();
   const isNativeToken = tokenAddress.toLowerCase() === "0x0000000000000000000000000000000000000000";
   const [symbol, token] = Object.entries(GNOSIS_TOKENS).find(([_, entry]) => entry.address === tokenAddress) ?? [];

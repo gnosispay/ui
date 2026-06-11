@@ -3,13 +3,7 @@ import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
 import { mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
-import {
-  ANVIL_RPC_URL,
-  GNOSIS_TOKENS,
-  isAnvilAvailable,
-  setupTestBalances,
-  startAnvil,
-} from "./utils/anvil";
+import { ANVIL_RPC_URL, GNOSIS_TOKENS, isAnvilAvailable, setupTestBalances, startAnvil } from "./utils/anvil";
 import type { Address } from "viem";
 
 const wstETHInfo = {
