@@ -346,10 +346,6 @@ test.describe("AuthGuard - Different User States", () => {
     await mockSafeConfig({
       page,
       testUser: USER_KYC_REJECTED,
-      configOverrides: {
-        isDeployed: false,
-        accountStatus: 1, // SafeNotDeployed
-      },
     });
 
     // Navigate directly to withdraw page

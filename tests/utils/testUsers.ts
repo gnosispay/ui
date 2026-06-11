@@ -321,7 +321,12 @@ export const USER_DEACTIVATED = createTestUser({
  */
 export const USER_KYC_REJECTED = createTestUser({
   ...USER_SIGNED_UP_NO_KYC,
+  safeAddress: "0x1234567890123456789012345678901234567890",
   kycStatus: "rejected",
   isSourceOfFundsAnswered: false,
   isPhoneValidated: false,
+  safeConfig: {
+    isDeployed: false,
+    accountStatus: 1, // SafeNotDeployed
+  },
 });

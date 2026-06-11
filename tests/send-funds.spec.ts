@@ -1,14 +1,14 @@
 import { test, expect } from "@playwright/test";
-import { BASE_USER } from "./utils/testUsers";
+import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";
+import { mockDelayModuleOwners } from "./utils/mockAnvilDelayModule";
 import {
   ANVIL_RPC_URL,
   GNOSIS_TOKENS,
   isAnvilAvailable,
   setupTestBalances,
   startAnvil,
-  stopAnvil,
 } from "./utils/anvil";
 import type { Address } from "viem";
 
@@ -21,16 +21,14 @@ const wstETHInfo = {
 const anvilAvailable = isAnvilAvailable();
 
 test.describe("Send Funds Modal with Anvil", () => {
+  test.skip(!anvilAvailable, "Anvil is required for on-chain balance tests");
+
   test.beforeEach(async ({ page }) => {
+    // Anvil is started once in global setup; ensure it is available before each test.
     await startAnvil();
-    // Point the mock wallet to Anvil if available
     await setupMockWallet(page, {
       rpcUrl: anvilAvailable ? ANVIL_RPC_URL : undefined,
     });
-  });
-
-  test.afterEach(async () => {
-    await stopAnvil();
   });
 
   test("custom token functionality and insufficient funds error", async ({ page }) => {
@@ -42,6 +40,7 @@ test.describe("Send Funds Modal with Anvil", () => {
 
     // Set up all mocks with the base user
     await setupAllMocks(page, BASE_USER);
+    await mockDelayModuleOwners(BASE_USER.safeAddress as Address, [USER_TEST_SIGNER_ADDRESS as Address]);
 
     // Navigate to home page
     await page.goto("/");
@@ -108,10 +107,10 @@ test.describe("Send Funds Modal with Anvil", () => {
       const amountInput = page.getByTestId("standard-token-amount-input");
       await expect(amountInput).toBeVisible();
 
-      //token amount should be 1000
+      // Token balance is fetched on-chain from Anvil after the modal opens
       const tokenBalance = page.getByTestId("token-balance");
       await expect(tokenBalance).toBeVisible();
-      await expect(tokenBalance).toHaveText("1000");
+      await expect(tokenBalance).toHaveText("1000", { timeout: 15000 });
 
       await amountInput.fill("100"); // Try to send 100 EUR
 
@@ -295,7 +294,7 @@ test.describe("Send Funds Modal with Anvil", () => {
       // make sure the amount balance is correct and the max button is visible
       const tokenBalance = page.getByTestId("token-balance");
       await expect(tokenBalance).toBeVisible();
-      await expect(tokenBalance).toHaveText("2.5");
+      await expect(tokenBalance).toHaveText("2.5", { timeout: 15000 });
 
       const maxButton = page.getByTestId("custom-token-max-button");
       await expect(maxButton).toBeVisible();

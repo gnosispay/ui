@@ -197,27 +197,58 @@ export function createAnvilWalletClient(privateKey: Hex) {
   });
 }
 
-/**
- * Sets ERC20 balance by impersonating a whale address and transferring tokens
- * This is more reliable than storage manipulation for complex token contracts
- *
- * @param tokenAddress - The ERC20 token contract address
- * @param holderAddress - The address to set balance for
- * @param balance - The balance in wei (as bigint)
- */
-async function setErc20BalanceViaTransfer(
+const ERC20_TRANSFER_ABI = [
+  {
+    inputs: [
+      { internalType: "address", name: "recipient", type: "address" },
+      { internalType: "uint256", name: "amount", type: "uint256" },
+    ],
+    name: "transfer",
+    outputs: [{ internalType: "bool", name: "success", type: "bool" }],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+] as const;
+
+const DUMMY_PRIVATE_KEY = "0x0000000000000000000000000000000000000000000000000000000000000001" as Hex;
+
+async function impersonatedErc20Transfer(
   tokenAddress: Address,
-  holderAddress: Address,
-  balance: bigint,
+  from: Address,
+  to: Address,
+  amount: bigint,
 ): Promise<void> {
+  if (amount === 0n) {
+    return;
+  }
+
   const client = createAnvilClient();
-  const publicClient = createAnvilPublicClient();
+  const walletClient = createAnvilWalletClient(DUMMY_PRIVATE_KEY);
 
-  // Check if token address is zero address (native token)
+  await client.impersonateAccount({ address: from });
+
+  try {
+    await walletClient.writeContract({
+      address: tokenAddress,
+      abi: ERC20_TRANSFER_ABI,
+      functionName: "transfer",
+      args: [to, amount],
+      account: from,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  } finally {
+    await client.stopImpersonatingAccount({ address: from });
+  }
+}
+
+/**
+ * Sets an exact on-chain token balance on the Anvil fork.
+ * Existing fork balances are adjusted up or down so tests can assert precise values.
+ */
+async function setExactTokenBalance(tokenAddress: Address, holderAddress: Address, targetBalance: bigint): Promise<void> {
+  const client = createAnvilClient();
   const isNativeToken = tokenAddress.toLowerCase() === "0x0000000000000000000000000000000000000000";
-
-  const [symbol, token] = Object.entries(GNOSIS_TOKENS).find(([_, token]) => token.address === tokenAddress) ?? [];
-
+  const [symbol, token] = Object.entries(GNOSIS_TOKENS).find(([_, entry]) => entry.address === tokenAddress) ?? [];
   const whale = token?.whale;
 
   if (!whale) {
@@ -225,112 +256,59 @@ async function setErc20BalanceViaTransfer(
   }
 
   try {
-    let whaleBalanceBigInt: bigint;
-
     if (isNativeToken) {
-      // For native token, check native balance
-      const whaleBalance = (await publicClient.request({
-        method: "eth_getBalance",
-        params: [whale, "latest"],
-      })) as Hex;
-      whaleBalanceBigInt = BigInt(whaleBalance || "0x0");
-    } else {
-      // For ERC20 token, check token balance
-      const whaleBalance = (await publicClient.request({
-        method: "eth_call",
-        params: [
-          {
-            to: tokenAddress,
-            data: `0x70a08231${pad(whale, { size: 32 }).slice(2)}`,
-          },
-          "latest",
-        ],
-      })) as Hex;
-      whaleBalanceBigInt = BigInt(whaleBalance || "0x0");
-    }
-
-    if (whaleBalanceBigInt < balance) {
-      console.log(`❌ Whale ${whale} has insufficient balance ${symbol}: ${whaleBalanceBigInt.toString()}`);
-    }
-
-    // Impersonate the whale
-    await client.impersonateAccount({
-      address: whale,
-    });
-
-    // Create wallet client with dummy private key (not needed when impersonating)
-    // Use a dummy key - Anvil will accept transactions from impersonated address
-    const dummyKey = "0x0000000000000000000000000000000000000000000000000000000000000001" as Hex;
-    const walletClient = createAnvilWalletClient(dummyKey);
-
-    if (isNativeToken) {
-      // For native token, use standard transfer
       await client.setBalance({
         address: holderAddress,
-        value: balance,
+        value: targetBalance,
       });
     } else {
-      // Transfer ERC20 tokens using wallet client
-      // The account will be set to whaleAddress via impersonation
-      await walletClient.writeContract({
-        address: tokenAddress,
-        abi: [
-          {
-            inputs: [
-              { internalType: "address", name: "recipient", type: "address" },
-              { internalType: "uint256", name: "amount", type: "uint256" },
-            ],
-            name: "transfer",
-            outputs: [{ internalType: "bool", name: "success", type: "bool" }],
-            stateMutability: "nonpayable",
-            type: "function",
-          },
-        ],
-        functionName: "transfer",
-        args: [holderAddress, balance],
-        account: whale,
-      });
+      const currentBalance = await readOnChainBalance(tokenAddress, holderAddress);
+
+      if (currentBalance > targetBalance) {
+        await impersonatedErc20Transfer(tokenAddress, holderAddress, whale, currentBalance - targetBalance);
+      } else if (currentBalance < targetBalance) {
+        await impersonatedErc20Transfer(tokenAddress, whale, holderAddress, targetBalance - currentBalance);
+      }
     }
 
-    // Wait for transaction to be mined
-    await new Promise((resolve) => setTimeout(resolve, 200));
+    const finalBalance = await readOnChainBalance(tokenAddress, holderAddress);
 
-    // Stop impersonating
-    await client.stopImpersonatingAccount({
-      address: whale,
-    });
-
-    // Verify balance was set
-    let newBalanceBigInt: bigint;
-    if (isNativeToken) {
-      const newBalance = (await publicClient.request({
-        method: "eth_getBalance",
-        params: [holderAddress, "latest"],
-      })) as Hex;
-      newBalanceBigInt = BigInt(newBalance || "0x0");
-    } else {
-      const newBalance = (await publicClient.request({
-        method: "eth_call",
-        params: [
-          {
-            to: tokenAddress,
-            data: `0x70a08231${pad(holderAddress, { size: 32 }).slice(2)}`,
-          },
-          "latest",
-        ],
-      })) as Hex;
-      newBalanceBigInt = BigInt(newBalance || "0x0");
-    }
-
-    if (newBalanceBigInt >= balance) {
-      console.log(
-        `✅ Set ${symbol} balance via transfer from whale ${whale} (balance: ${newBalanceBigInt.toString()})`,
+    if (finalBalance !== targetBalance) {
+      throw new Error(
+        `Failed to set ${symbol} balance for ${holderAddress}: expected ${targetBalance.toString()}, got ${finalBalance.toString()}`,
       );
-      return;
     }
-  } catch {
-    console.log(`❌ Failed to set ${symbol} balance using whale ${whale}`);
+
+    console.log(`✅ Set ${symbol} balance to ${targetBalance.toString()} for ${holderAddress}`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    throw new Error(`Failed to set ${symbol} balance using whale ${whale}: ${message}`);
   }
+}
+
+async function readOnChainBalance(tokenAddress: Address, holderAddress: Address): Promise<bigint> {
+  const publicClient = createAnvilPublicClient();
+  const isNativeToken = tokenAddress.toLowerCase() === "0x0000000000000000000000000000000000000000";
+
+  if (isNativeToken) {
+    const balance = (await publicClient.request({
+      method: "eth_getBalance",
+      params: [holderAddress, "latest"],
+    })) as Hex;
+    return BigInt(balance || "0x0");
+  }
+
+  const balance = (await publicClient.request({
+    method: "eth_call",
+    params: [
+      {
+        to: tokenAddress,
+        data: `0x70a08231${pad(holderAddress, { size: 32 }).slice(2)}`,
+      },
+      "latest",
+    ],
+  })) as Hex;
+  return BigInt(balance || "0x0");
 }
 
 /**
@@ -394,11 +372,27 @@ export async function setupTestBalances(
     const tokenInfo = GNOSIS_TOKENS[symbol];
     if (tokenInfo) {
       const balanceWei = parseUnits(amount, tokenInfo.decimals);
-      promises.push(setErc20BalanceViaTransfer(tokenInfo.address, accountAddress, balanceWei));
+      promises.push(setExactTokenBalance(tokenInfo.address, accountAddress, balanceWei));
     }
   }
 
   await Promise.all(promises);
+
+  for (const [symbol, amount] of Object.entries(balances)) {
+    const tokenInfo = GNOSIS_TOKENS[symbol as keyof typeof GNOSIS_TOKENS];
+    if (!tokenInfo) {
+      continue;
+    }
+
+    const expectedBalance = parseUnits(amount, tokenInfo.decimals);
+    const actualBalance = await readOnChainBalance(tokenInfo.address, accountAddress);
+
+    if (actualBalance !== expectedBalance) {
+      throw new Error(
+        `On-chain ${symbol} balance verification failed for ${accountAddress}: expected ${expectedBalance.toString()}, got ${actualBalance.toString()}`,
+      );
+    }
+  }
 }
 
 /**
