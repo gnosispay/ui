@@ -1,23 +1,41 @@
 const PARTNER_BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v2";
 const LEGACY_SAFE_RECOVERY_BANNER_STORAGE_KEY = "gp-ui.legacy-safe-recovery-banner-dismissed.v1";
-const INCIDENT_BANNER_STORAGE_KEY = "gp-ui.incident-banner-dismissed.v1";
+const INCIDENT_BANNER_STORAGE_KEY_PREFIX = "gp-ui.incident-banner-dismissed.v1";
 
 export interface BannerDismissalData {
   nextShowTimestamp: number;
   count: number;
 }
 
-export type BannerType = "partner" | "legacy-safe-recovery" | "incident";
+export type BannerType = "partner" | "legacy-safe-recovery";
+
+export type IncidentBannerVariant =
+  | "not-affected-has-pre-hack-balance"
+  | "not-affected-no-pre-hack-balance"
+  | "affected-has-pre-hack-balance"
+  | "affected-no-pre-hack-balance";
 
 function getBannerStorageKey(bannerType: BannerType): string {
   switch (bannerType) {
     case "legacy-safe-recovery":
       return LEGACY_SAFE_RECOVERY_BANNER_STORAGE_KEY;
-    case "incident":
-      return INCIDENT_BANNER_STORAGE_KEY;
     default:
       return PARTNER_BANNER_STORAGE_KEY;
   }
+}
+
+function getIncidentBannerStorageKey(variant: IncidentBannerVariant): string {
+  return `${INCIDENT_BANNER_STORAGE_KEY_PREFIX}.${variant}`;
+}
+
+export function getIncidentBannerVariant(
+  affected: boolean,
+  hasPreHackBalance: boolean
+): IncidentBannerVariant {
+  if (!affected && hasPreHackBalance) return "not-affected-has-pre-hack-balance";
+  if (!affected && !hasPreHackBalance) return "not-affected-no-pre-hack-balance";
+  if (affected && hasPreHackBalance) return "affected-has-pre-hack-balance";
+  return "affected-no-pre-hack-balance";
 }
 
 // Utility functions for exponential backoff
@@ -66,4 +84,12 @@ export function createDismissalData(currentData: BannerDismissalData | null): Ba
     nextShowTimestamp: calculateNextShowTimestamp(newCount),
     count: newCount,
   };
+}
+
+export function isIncidentBannerDismissed(variant: IncidentBannerVariant): boolean {
+  return localStorage.getItem(getIncidentBannerStorageKey(variant)) === "true";
+}
+
+export function dismissIncidentBanner(variant: IncidentBannerVariant): void {
+  localStorage.setItem(getIncidentBannerStorageKey(variant), "true");
 }
