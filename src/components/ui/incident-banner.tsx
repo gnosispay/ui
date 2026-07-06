@@ -5,7 +5,7 @@ import { isAddress, type Address } from "viem";
 import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { useSafeRecoveryData } from "@/hooks/useSafeRecoveryData";
 import { useZendesk } from "react-use-zendesk";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   dismissIncidentBanner,
   getIncidentBannerVariant,
@@ -28,27 +28,29 @@ export function IncidentBanner({ className }: IncidentBannerProps) {
     return getIncidentBannerVariant(affected, hasPreHackBalance);
   }, [affected, hasPreHackBalance]);
 
-  const [isVisible, setIsVisible] = useState(true);
+  const [dismissedLocally, setDismissedLocally] = useState(false);
 
-  useEffect(() => {
-    if (!variant) return;
-    setIsVisible(!isIncidentBannerDismissed(variant));
-  }, [variant]);
+  const isDismissed = useMemo(() => {
+    if (dismissedLocally) return true;
+    if (!variant) return true;
+    return isIncidentBannerDismissed(variant);
+  }, [variant, dismissedLocally]);
 
   const handleDismiss = useCallback(() => {
     if (!variant) return;
     dismissIncidentBanner(variant);
-    setIsVisible(false);
+    setDismissedLocally(true);
   }, [variant]);
 
-  if (
-    !hasOldSafe ||
-    isMigrationLoading ||
-    isDataLoading ||
-    affected === undefined ||
-    hasPreHackBalance === undefined ||
-    !isVisible
-  ) {
+  const isReady =
+    hasOldSafe &&
+    !isMigrationLoading &&
+    !isDataLoading &&
+    affected !== undefined &&
+    hasPreHackBalance !== undefined &&
+    variant !== null;
+
+  if (!isReady || isDismissed) {
     return null;
   }
 
