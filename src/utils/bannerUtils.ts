@@ -28,10 +28,7 @@ function getIncidentBannerStorageKey(variant: IncidentBannerVariant): string {
   return `${INCIDENT_BANNER_STORAGE_KEY_PREFIX}.${variant}`;
 }
 
-export function getIncidentBannerVariant(
-  affected: boolean,
-  hasPreHackBalance: boolean
-): IncidentBannerVariant {
+export function getIncidentBannerVariant(affected: boolean, hasPreHackBalance: boolean): IncidentBannerVariant {
   if (!affected && hasPreHackBalance) return "not-affected-has-pre-hack-balance";
   if (!affected && !hasPreHackBalance) return "not-affected-no-pre-hack-balance";
   if (affected && hasPreHackBalance) return "affected-has-pre-hack-balance";
