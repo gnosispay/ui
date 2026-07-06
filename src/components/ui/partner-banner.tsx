@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { Link } from "react-router-dom";
@@ -16,20 +16,19 @@ interface PartnerBannerProps {
 }
 
 export function PartnerBanner({ className }: PartnerBannerProps) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [dismissedLocally, setDismissedLocally] = useState(false);
 
-  useEffect(() => {
-    const dismissalData = getBannerDismissalData('partner');
-    const shouldShow = shouldShowBanner(dismissalData);
-    setIsVisible(shouldShow);
-  }, []);
+  const isVisible = useMemo(() => {
+    if (dismissedLocally) return false;
+    return shouldShowBanner(getBannerDismissalData("partner"));
+  }, [dismissedLocally]);
 
   const handleDismiss = useCallback(() => {
-    const currentData = getBannerDismissalData('partner');
+    const currentData = getBannerDismissalData("partner");
     const newData = createDismissalData(currentData);
-    
-    setBannerDismissalData(newData, 'partner');
-    setIsVisible(false);
+
+    setBannerDismissalData(newData, "partner");
+    setDismissedLocally(true);
   }, []);
 
   if (!isVisible) {
