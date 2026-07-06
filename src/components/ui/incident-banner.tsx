@@ -1,11 +1,16 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { Link } from "react-router-dom";
 import { isAddress, type Address } from "viem";
 import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { useSafeRecoveryData } from "@/hooks/useSafeRecoveryData";
 import { useZendesk } from "react-use-zendesk";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  dismissIncidentBanner,
+  getIncidentBannerVariant,
+  isIncidentBannerDismissed,
+} from "@/utils/bannerUtils";
 
 interface IncidentBannerProps {
   className?: string;
@@ -18,7 +23,32 @@ export function IncidentBanner({ className }: IncidentBannerProps) {
   const oldSafeAddress = oldSafe?.address && isAddress(oldSafe.address) ? (oldSafe.address as Address) : undefined;
   const { affected, hasPreHackBalance, isLoading: isDataLoading } = useSafeRecoveryData(oldSafeAddress);
 
-  if (!hasOldSafe || isMigrationLoading || isDataLoading || affected === undefined || hasPreHackBalance === undefined) {
+  const variant = useMemo(() => {
+    if (affected === undefined || hasPreHackBalance === undefined) return null;
+    return getIncidentBannerVariant(affected, hasPreHackBalance);
+  }, [affected, hasPreHackBalance]);
+
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (!variant) return;
+    setIsVisible(!isIncidentBannerDismissed(variant));
+  }, [variant]);
+
+  const handleDismiss = useCallback(() => {
+    if (!variant) return;
+    dismissIncidentBanner(variant);
+    setIsVisible(false);
+  }, [variant]);
+
+  if (
+    !hasOldSafe ||
+    isMigrationLoading ||
+    isDataLoading ||
+    affected === undefined ||
+    hasPreHackBalance === undefined ||
+    !isVisible
+  ) {
     return null;
   }
 
@@ -26,12 +56,21 @@ export function IncidentBanner({ className }: IncidentBannerProps) {
     <div
       data-testid="incident-notice-banner"
       className={cn(
-        "block w-full rounded-lg mb-6",
+        "relative block w-full mb-6",
         affected ? "bg-destructive/15" : "bg-warning/15",
         className
       )}
       role="alert"
     >
+      <button
+        onClick={handleDismiss}
+        className="absolute top-3 right-3 p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 cursor-pointer z-10"
+        aria-label="Dismiss banner"
+        data-testid="incident-notice-banner-dismiss"
+      >
+        <X size={16} className="text-foreground" />
+      </button>
+
       <div className="flex items-start gap-4 p-5 sm:p-6">
         <div
           className={cn(
