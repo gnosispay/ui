@@ -56,7 +56,7 @@ export function IncidentBanner({ className }: IncidentBannerProps) {
     <div
       data-testid="incident-notice-banner"
       className={cn(
-        "relative block w-full rounded-lg mb-6",
+        "relative block w-full mb-6",
         affected ? "bg-destructive/15" : "bg-warning/15",
         className
       )}
