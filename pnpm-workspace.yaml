@@ -1,8 +1,17 @@
+overrides:
+  '@wagmi/core': '2.22.1'
+  '@wagmi/connectors': '6.2.0'
+
+# pnpm 11 prompts before purging node_modules; without a TTY (git hooks, CI) that aborts install.
+confirmModulesPurge: false
+
 blockExoticSubdeps: true
 minimumReleaseAge: 4320 # 3 days
-minimumReleaseAgeExclude: [
-  '@gnosispay/*',
-  'viem@2.49.3'
-]
+minimumReleaseAgeExclude: [ '@gnosispay/*', 'viem@2.49.3' ]
 trustPolicyIgnoreAfter: 4320 # 3 days
 trustPolicy: "no-downgrade"
+allowBuilds:
+  '@reown/appkit': true
+  bufferutil: true
+  keccak: true
+  utf-8-validate: true
