@@ -7,6 +7,7 @@ settings:
 overrides:
   '@wagmi/core': 2.22.1
   '@wagmi/connectors': 6.2.0
+  qr: 0.5.5
 
 importers:
 
@@ -3018,8 +3019,8 @@ packages:
   pump@3.0.4:
     resolution: {integrity: sha512-VS7sjc6KR7e1ukRFhQSY5LM2uBWAUPiOPa/A3mkKmiMwSmRFUITt0xuj+/lesgnCv+dPIEYlkzrcyXgquIHMcA==}
 
-  qr@0.6.0:
-    resolution: {integrity: sha512-P23VoX7SipHALdiIYG+D+LT/6n22dNKwV92FAb3d+Nlki/5WisSsfLt0UDFz2XEBtuwrECTznvu+chKKFCSYhA==}
+  qr@0.5.5:
+    resolution: {integrity: sha512-iQBvKj7MRKO+co+MY0IZpyLO+ezvttxsmV86WywrgPuAmgBkv0pytyi03wourniSoPgzffeBW6cBgIkpqcvjTg==}
     engines: {node: '>= 20.19.0'}
 
   qrcode@1.5.3:
@@ -4447,7 +4448,7 @@ snapshots:
       '@types/debug': 4.1.13
       debug: 4.4.3
       pony-cause: 2.1.11
-      semver: 7.8.0
+      semver: 7.8.3
       uuid: 9.0.1
     transitivePeerDependencies:
       - supports-color
@@ -6783,7 +6784,7 @@ snapshots:
 
   cuer@0.0.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(typescript@6.0.3):
     dependencies:
-      qr: 0.6.0
+      qr: 0.5.5
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
     optionalDependencies:
@@ -7669,7 +7670,7 @@ snapshots:
       end-of-stream: 1.4.5
       once: 1.4.0
 
-  qr@0.6.0: {}
+  qr@0.5.5: {}
 
   qrcode@1.5.3:
     dependencies:
