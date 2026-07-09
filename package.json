@@ -17,7 +17,7 @@
     "test:ui": "playwright test --ui"
   },
   "dependencies": {
-    "@gnosispay/account-kit": "4.10.1",
+    "@gnosispay/account-kit": "5.1.1",
     "@gnosispay/account-kit-next": "npm:@gnosispay/account-kit@5.0.0",
     "@gnosispay/pse-sdk": "2.0.1",
     "@radix-ui/react-checkbox": "^1.3.4",
