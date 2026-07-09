@@ -48,7 +48,7 @@
     "siwe": "3.0.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",
-    "tailwindcss": "^4.2.2",
+    "tailwindcss": "^4.3.2",
     "viem": "2.52.2",
     "wagmi": "2.19.5"
   },
