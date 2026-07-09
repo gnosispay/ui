@@ -4,7 +4,7 @@ import { AccountSection, UserProfileHeader } from "@/components/account";
 import { DailyLimitModal } from "@/components/modals/daily-limit";
 import { SafeOwnersModal } from "@/components/modals/safe-owners";
 import { HELP_CENTER_URL, LEGAL_LINK } from "@/constants";
-import { useAppKit } from "@reown/appkit/react";
+import { useDisconnect } from "wagmi";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
 import { PersonalDetailsModal } from "@/components/modals/personal-details";
@@ -23,7 +23,7 @@ enum ModalType {
 export const AccountRoute = () => {
   const [openModal, setOpenModal] = useState<ModalType>(ModalType.NONE);
   const closeModal = () => setOpenModal(ModalType.NONE);
-  const { open } = useAppKit();
+  const { disconnect } = useDisconnect();
   const { logout } = useAuth();
 
   const handleLogout = useCallback(() => {
@@ -31,8 +31,8 @@ export const AccountRoute = () => {
   }, [logout]);
 
   const handleDisconnect = useCallback(() => {
-    open();
-  }, [open]);
+    disconnect();
+  }, [disconnect]);
 
   return (
     <div className="w-full max-w-xl mx-auto p-4 space-y-8">

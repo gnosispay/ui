@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { Address } from "viem";
 import { getStorageAt } from "wagmi/actions";
-import { wagmiAdapter } from "@/wagmi";
+import { wagmiConfig } from "@/wagmi";
 
 // Known legitimate Gnosis Safe singleton implementations across all versions and deployment types.
 // Source: https://github.com/safe-global/safe-deployments (gnosis_safe, gnosis_safe_l2, safe, safe_l2 contracts)
@@ -49,7 +49,7 @@ export const useSafeIntegrity = (safeAddress: Address | undefined): SafeIntegrit
   const check = useCallback(async (address: Address) => {
     setIsLoading(true);
 
-    getStorageAt(wagmiAdapter.wagmiConfig, {
+    getStorageAt(wagmiConfig, {
       address,
       slot: "0x0",
     })

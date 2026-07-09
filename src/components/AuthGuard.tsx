@@ -2,7 +2,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useUser } from "@/context/UserContext";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { useAppKit } from "@reown/appkit/react";
+import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useTheme } from "@/context/ThemeContext";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
@@ -73,7 +73,7 @@ export const AuthGuard = ({
 }: AuthGuardProps) => {
   const { isAuthenticating, isAuthenticated, renewToken } = useAuth();
   const { isDeactivated, isUserSignedUp, isKycApproved, isSafeConfigured, isOnboarded } = useUser();
-  const { open } = useAppKit();
+  const { openConnectModal } = useConnectModal();
   const navigate = useNavigate();
   const { isConnected, isConnecting } = useAccount();
 
@@ -81,11 +81,11 @@ export const AuthGuard = ({
 
   const handleConnect = useCallback(() => {
     try {
-      open();
+      openConnectModal?.();
     } catch (error) {
-      console.error("Error opening AppKit modal:", error);
+      console.error("Error opening wallet connect modal:", error);
     }
-  }, [open]);
+  }, [openConnectModal]);
 
   const loginScreenConfig = useMemo((): AuthScreenProps => {
     const buttonText = isAuthenticating ? "Signing message..." : "Sign message";

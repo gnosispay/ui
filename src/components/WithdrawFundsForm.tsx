@@ -14,7 +14,7 @@ import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { ERC20_ABI } from "@/utils/abis/ERC20Abi";
 import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { sendTransaction, readContract, waitForTransactionReceipt, getBalance } from "wagmi/actions";
-import { wagmiAdapter } from "@/wagmi";
+import { wagmiConfig } from "@/wagmi";
 import { toast } from "sonner";
 import { GNOSIS_FAUCET_URL } from "@/constants";
 import { extractErrorMessage } from "@/utils/errorHelpers";
@@ -85,7 +85,7 @@ export const WithdrawFundsForm = ({
     }
 
     setIsBalanceLoading(true);
-    getBalance(wagmiAdapter.wagmiConfig, {
+    getBalance(wagmiConfig, {
       address: connectedAddress as Address,
     })
       .then((balance) => {
@@ -211,21 +211,21 @@ export const WithdrawFundsForm = ({
       );
 
       // Send the transaction
-      const sendTxHash = await sendTransaction(wagmiAdapter.wagmiConfig, {
+      const sendTxHash = await sendTransaction(wagmiConfig, {
         to: txRequest.to as Address,
         data: txRequest.data as `0x${string}`,
         value: BigInt(txRequest.value),
       });
 
       // Wait for transaction confirmation
-      await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, {
+      await waitForTransactionReceipt(wagmiConfig, {
         hash: sendTxHash,
       });
 
       // Get the delay module address
       const delayModAddress = predictAddresses(safeAddress).delay;
 
-      const queueNonce = (await readContract(wagmiAdapter.wagmiConfig, {
+      const queueNonce = (await readContract(wagmiConfig, {
         address: delayModAddress as Address,
         abi: DELAY_MOD_ABI,
         functionName: "queueNonce",
