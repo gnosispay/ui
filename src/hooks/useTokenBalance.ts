@@ -1,7 +1,7 @@
 import { getBalance } from "wagmi/actions";
 import { currencies as moneriumTokens, supportedTokens, type TokenInfo } from "@/constants";
 import { useState, useEffect, useCallback } from "react";
-import { wagmiAdapter } from "@/wagmi";
+import { wagmiConfig } from "@/wagmi";
 import { useUser } from "@/context/UserContext";
 import type { Address } from "viem";
 
@@ -50,7 +50,7 @@ export const useTokenBalance = (): UseTokenBalanceResult => {
           return Promise.resolve({ value: 0n });
         }
 
-        return getBalance(wagmiAdapter.wagmiConfig, {
+        return getBalance(wagmiConfig, {
           address: safeConfig.address as Address,
           token: token.address !== supportedTokens.XDAI.address ? (token.address as Address) : undefined,
         });

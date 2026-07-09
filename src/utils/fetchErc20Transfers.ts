@@ -12,6 +12,7 @@ import {
 import { gnosis } from "viem/chains";
 import { fromUnixTime } from "date-fns";
 import { GNOSIS_PAY_SETTLEMENT_ADDRESS } from "@/constants";
+import { gnosisRpcUrl } from "@/wagmi";
 import { Erc20TokenEventDirection } from "@/types/transaction";
 import type { Erc20TokenEvent } from "@/types/transaction";
 import { ERC20_ABI } from "./abis/ERC20Abi";
@@ -79,7 +80,7 @@ export const fetchErc20Transfers = async ({
   try {
     const provider = createPublicClient({
       chain: gnosis,
-      transport: http(),
+      transport: http(gnosisRpcUrl),
     });
 
     // Determine which token addresses to fetch

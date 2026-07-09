@@ -6,8 +6,10 @@ import { WagmiProvider } from "wagmi";
 import { BrowserRouter } from "react-router-dom";
 
 import App from "./App.tsx";
-import { wagmiAdapter } from "./wagmi.ts";
+import { wagmiConfig } from "./wagmi.ts";
+import { WalletProvider } from "./components/WalletProvider.tsx";
 
+import "@rainbow-me/rainbowkit/styles.css";
 import "./index.css";
 import { client } from "./client/client.gen.ts";
 import { AuthContextProvider } from "./context/AuthContext.tsx";
@@ -44,26 +46,28 @@ client.setConfig({
 ReactDOM.createRoot(rootElement).render(
   <BrowserRouter>
     <ThemeProvider defaultTheme="system" storageKey="gp-ui-theme">
-      <WagmiProvider config={wagmiAdapter.wagmiConfig}>
+      <WagmiProvider config={wagmiConfig}>
         <QueryClientProvider client={queryClient}>
-          <AuthContextProvider>
-            <UserContextProvider>
-              <ZendeskProvider apiKey={zendeskKey}>
-                <CardsContextProvider>
-                  <OrdersContextProvider>
-                    <CardTransactionsContextProvider>
-                      <OnchainTransactionsContextProvider>
-                        <DelayRelayContextProvider>
-                          <App />
-                          <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
-                        </DelayRelayContextProvider>
-                      </OnchainTransactionsContextProvider>
-                    </CardTransactionsContextProvider>
-                  </OrdersContextProvider>
-                </CardsContextProvider>
-              </ZendeskProvider>
-            </UserContextProvider>
-          </AuthContextProvider>
+          <WalletProvider>
+            <AuthContextProvider>
+              <UserContextProvider>
+                <ZendeskProvider apiKey={zendeskKey}>
+                  <CardsContextProvider>
+                    <OrdersContextProvider>
+                      <CardTransactionsContextProvider>
+                        <OnchainTransactionsContextProvider>
+                          <DelayRelayContextProvider>
+                            <App />
+                            <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
+                          </DelayRelayContextProvider>
+                        </OnchainTransactionsContextProvider>
+                      </CardTransactionsContextProvider>
+                    </OrdersContextProvider>
+                  </CardsContextProvider>
+                </ZendeskProvider>
+              </UserContextProvider>
+            </AuthContextProvider>
+          </WalletProvider>
         </QueryClientProvider>
       </WagmiProvider>
     </ThemeProvider>

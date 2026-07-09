@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo, useEffect } from "react";
 import type { Address } from "viem";
 import { useAccount } from "wagmi";
 import { call } from "wagmi/actions";
-import { wagmiAdapter } from "@/wagmi";
+import { wagmiConfig } from "@/wagmi";
 import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 
@@ -35,7 +35,7 @@ export const useSafeSignerVerification = (
         const delayModAddress = accountKit.predictAddresses(address).delay as Address;
 
         const owners = await accountKit.getAccountOwners(async (data) => {
-          const { data: result } = await call(wagmiAdapter.wagmiConfig, {
+          const { data: result } = await call(wagmiConfig, {
             to: delayModAddress,
             data,
           });

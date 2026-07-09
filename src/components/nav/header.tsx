@@ -5,18 +5,18 @@ import { useTheme } from "../../context/ThemeContext";
 import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
 import { Button } from "@/components/ui/button";
-import { useAppKit } from "@reown/appkit/react";
+import { ConnectButton, useConnectModal } from "@rainbow-me/rainbowkit";
 import { useAccount } from "wagmi";
 import { useCallback } from "react";
 
 export const HeaderNavBar = () => {
   const { effectiveTheme } = useTheme();
   const { isConnected } = useAccount();
-  const { open } = useAppKit();
+  const { openConnectModal } = useConnectModal();
 
   const handleConnect = useCallback(() => {
-    open();
-  }, [open]);
+    openConnectModal?.();
+  }, [openConnectModal]);
 
   return (
     <header className="w-full border-b hidden lg:block">
@@ -49,7 +49,11 @@ export const HeaderNavBar = () => {
           </div>
           {/* Actions */}
           <div className="flex gap-2 items-center justify-end">
-            {isConnected ? <appkit-account-button /> : <Button onClick={handleConnect}>Connect</Button>}
+            {isConnected ? (
+              <ConnectButton showBalance={false} chainStatus="none" accountStatus="address" />
+            ) : (
+              <Button onClick={handleConnect}>Connect</Button>
+            )}
             <ModeToggle />
           </div>
         </div>

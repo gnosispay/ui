@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
 import { readContract, writeContract, waitForTransactionReceipt } from "wagmi/actions";
-import { wagmiAdapter } from "@/wagmi";
+import { wagmiConfig } from "@/wagmi";
 import type { Address } from "viem";
 import { getAccountKit, type SafeKind } from "@/utils/accountKit";
 import { DELAY_MOD_ABI } from "@/utils/abis/delayAbi";
@@ -96,22 +96,22 @@ export const DelayModuleQueueContextProvider = ({
     try {
       // Fetch txNonce, queueNonce, cooldown, and expiration in parallel
       const [txNonce, queueNonce, cooldown, expiration] = await Promise.all([
-        readContract(wagmiAdapter.wagmiConfig, {
+        readContract(wagmiConfig, {
           address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "txNonce",
         }) as Promise<bigint>,
-        readContract(wagmiAdapter.wagmiConfig, {
+        readContract(wagmiConfig, {
           address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "queueNonce",
         }) as Promise<bigint>,
-        readContract(wagmiAdapter.wagmiConfig, {
+        readContract(wagmiConfig, {
           address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "txCooldown",
         }) as Promise<bigint>,
-        readContract(wagmiAdapter.wagmiConfig, {
+        readContract(wagmiConfig, {
           address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "txExpiration",
@@ -140,7 +140,7 @@ export const DelayModuleQueueContextProvider = ({
           // Fetch both createdAt and hash in parallel for each nonce
           txDataPromises.push(
             Promise.all([
-              readContract(wagmiAdapter.wagmiConfig, {
+              readContract(wagmiConfig, {
                 address: delayModAddress,
                 abi: DELAY_MOD_ABI,
                 functionName: "getTxCreatedAt",
@@ -151,7 +151,7 @@ export const DelayModuleQueueContextProvider = ({
                   console.error(`Error fetching txCreatedAt for nonce ${nonce}:`, error);
                   return null;
                 }),
-              readContract(wagmiAdapter.wagmiConfig, {
+              readContract(wagmiConfig, {
                 address: delayModAddress,
                 abi: DELAY_MOD_ABI,
                 functionName: "getTxHash",
@@ -250,14 +250,14 @@ export const DelayModuleQueueContextProvider = ({
 
     try {
       // Call skipExpired on the delay module
-      const txHash = await writeContract(wagmiAdapter.wagmiConfig, {
+      const txHash = await writeContract(wagmiConfig, {
         address: delayModAddress,
         abi: DELAY_MOD_ABI,
         functionName: "skipExpired",
       });
 
       // Wait for transaction confirmation
-      await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, {
+      await waitForTransactionReceipt(wagmiConfig, {
         hash: txHash,
       });
 
@@ -282,7 +282,7 @@ export const DelayModuleQueueContextProvider = ({
 
       try {
         // Call executeNextTx on the delay module with transaction parameters
-        const txHash = await writeContract(wagmiAdapter.wagmiConfig, {
+        const txHash = await writeContract(wagmiConfig, {
           address: delayModAddress,
           abi: DELAY_MOD_ABI,
           functionName: "executeNextTx",
@@ -290,7 +290,7 @@ export const DelayModuleQueueContextProvider = ({
         });
 
         // Wait for transaction confirmation
-        await waitForTransactionReceipt(wagmiAdapter.wagmiConfig, {
+        await waitForTransactionReceipt(wagmiConfig, {
           hash: txHash,
         });
 
