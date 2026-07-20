@@ -1,7 +1,8 @@
+allowBuilds:
+  '@scarf/scarf': false
+  esbuild: true
 blockExoticSubdeps: true
 minimumReleaseAge: 4320 # 3 days
-minimumReleaseAgeExclude: [
-  "@gnosispay/*"
-]
+minimumReleaseAgeExclude: [ "@gnosispay/*" ]
 trustPolicy: "no-downgrade"
 trustPolicyIgnoreAfter: 4320 # 3 days
