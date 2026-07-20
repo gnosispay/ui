@@ -222,6 +222,9 @@ const ERC20_TRANSFER_ABI = [
 
 const DUMMY_PRIVATE_KEY = "0x0000000000000000000000000000000000000000000000000000000000000001" as Hex;
 
+/** xDAI sent to impersonated accounts so they can pay gas on the fork. */
+const IMPERSONATION_GAS_FUNDING = parseUnits("1", 18);
+
 async function impersonatedErc20Transfer(
   tokenAddress: Address,
   from: Address,
@@ -234,6 +237,12 @@ async function impersonatedErc20Transfer(
 
   const client = createAnvilClient();
   const walletClient = createAnvilWalletClient(DUMMY_PRIVATE_KEY);
+
+  // Whales often hold tokens but no native xDAI; fund gas before impersonating.
+  await client.setBalance({
+    address: from,
+    value: IMPERSONATION_GAS_FUNDING,
+  });
 
   await client.impersonateAccount({ address: from });
 
