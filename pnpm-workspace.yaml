@@ -1,6 +1,7 @@
 overrides:
   '@wagmi/core': '2.22.1'
   '@wagmi/connectors': '6.2.0'
+  qr: '0.5.5'
 
 # pnpm 11 prompts before purging node_modules; without a TTY (git hooks, CI) that aborts install.
 confirmModulesPurge: false

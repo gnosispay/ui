@@ -15,7 +15,6 @@ import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
 import { useZendeskUserId } from "./hooks/useZendeskUserId";
 import { AppLoader } from "./components/AppLoader";
 import { useAppInitialization } from "./hooks/useAppInitialization";
-import { useAppKitTheme } from "./hooks/useAppKitTheme";
 import { PARTNERS_URL } from "./constants";
 import { WithdrawRoute } from "./pages/Withdraw";
 import { WithdrawLegacyRoute } from "./pages/WithdrawLegacy";
@@ -125,7 +124,6 @@ function ProtectedLayout({
 
 function App() {
   useZendeskUserId();
-  useAppKitTheme();
   const { isInitializing } = useAppInitialization();
 
   if (isInitializing) {

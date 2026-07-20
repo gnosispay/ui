@@ -192,11 +192,11 @@ test.describe("AuthGuard - Different User States", () => {
     const connectButton = page.getByRole("button", { name: "Connect wallet" });
     await expect(connectButton).toBeVisible();
 
-    // Click the connect button - this opens the AppKit modal, doesn't navigate
+    // Click the connect button - this opens the RainbowKit modal, doesn't navigate
     await connectButton.click();
 
-    // Verify the AppKit modal appears
-    await expect(page.getByTestId("w3m-modal-card")).toBeVisible();
+    // Verify the RainbowKit connect modal appears
+    await expect(page.getByText("Connect a Wallet")).toBeVisible();
 
     // Verify the Zendesk widget is visible
     await expect(page.getByTitle("Button to launch messaging window")).toBeVisible();
