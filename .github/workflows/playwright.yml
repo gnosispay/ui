@@ -21,7 +21,7 @@ jobs:
       run: npm install -g pnpm && pnpm install
     - name: Resolve Playwright version for cache key
       id: playwright-version
-      run: echo "version=$(pnpm exec playwright --version | awk '{print $2}')" >> $GITHUB_OUTPUT
+      run: echo "version=$(pnpm exec playwright --version | tail -1 | awk '{print $2}')" >> $GITHUB_OUTPUT
     # Lockfile hash invalidates cache when resolved @playwright/test changes even if semver range stays the same.
     - name: Cache Playwright browsers
       uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
