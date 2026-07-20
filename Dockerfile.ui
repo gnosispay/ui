@@ -22,12 +22,9 @@ ENV VITE_GNOSIS_RPC_URL=$VITE_GNOSIS_RPC_URL
 # Set working directory
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
-
 # Copy package files and install dependencies
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+RUN corepack enable && pnpm install --frozen-lockfile
 
 # Copy the rest of the source code
 COPY . .
