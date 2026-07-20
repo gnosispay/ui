@@ -13,8 +13,12 @@ export const gnosisRpcUrl = import.meta.env.VITE_GNOSIS_RPC_URL || undefined;
 export const wagmiConfig = getDefaultConfig({
   appName: "Gnosis Pay",
   appDescription: "Decentralization. Accepted Everywhere.",
-  appUrl: "https://gnosispay.com",
-  appIcon: "https://gnosispay.com/favicon.ico",
+  // Must match the origin the app is served from and the SIWE `domain`
+  // (app.gnosispay.com). A mismatch makes WalletConnect/MetaMask flag the
+  // sign-in as suspicious ("the site making the request is not the site
+  // you're signing into").
+  appUrl: "https://app.gnosispay.com",
+  appIcon: "https://app.gnosispay.com/favicon.ico",
   projectId,
   chains: [gnosis],
   transports: {
