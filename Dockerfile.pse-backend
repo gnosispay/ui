@@ -19,9 +19,6 @@ FROM node:24-alpine AS runner
 
 WORKDIR /app
 
-COPY --from=builder /app/package.json ./
-RUN corepack enable
-
 # Copy only the built output and production dependencies
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
@@ -32,5 +29,6 @@ COPY --from=builder /app/node_modules ./node_modules
 # Expose the port (default 3000, can be overridden by env)
 EXPOSE 3000
 
-# Start the server
-CMD ["pnpm", "start:prod"] 
+# Run directly with node — avoid pnpm at runtime (pnpm 11 runs install on script
+# execution and fails without pnpm-workspace.yaml allowBuilds config)
+CMD ["node", "dist/index.js"] 
