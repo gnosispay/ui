@@ -47,7 +47,7 @@ jobs:
           image: ${{ secrets.AWS_ACCOUNT_ID_PROD }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/pse-backend:${{ github.sha }}
 
       - name: Deploy Amazon ECS task definition
-        uses: aws-actions/amazon-ecs-deploy-task-definition@a310a830f5c14e583e35d84e4e1ec7dd177c3c9c # v2.6.2
+        uses: aws-actions/amazon-ecs-deploy-task-definition@c465972ecbd160473f22e683363b422a5412a3de # v2.6.3
         with:
           task-definition: ${{ steps.task-def.outputs.task-definition }}
           service: pse-backend
