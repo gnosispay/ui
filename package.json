@@ -53,7 +53,7 @@
     "wagmi": "2.19.5"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.6",
+    "@biomejs/biome": "^2.5.7",
     "@johanneskares/wallet-mock": "^1.4.1",
     "@playwright/test": "^1.62.1",
     "@types/jsonwebtoken": "^9.0.10",
