@@ -46,7 +46,7 @@
     "react-router-dom": "7.18.2",
     "react-use-zendesk": "^2.0.0",
     "siwe": "3.0.0",
-    "sonner": "^2.0.7",
+    "sonner": "^2.0.8",
     "tailwind-merge": "^3.5.0",
     "tailwindcss": "^4.3.3",
     "viem": "2.55.10",
