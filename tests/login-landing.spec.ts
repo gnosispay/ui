@@ -39,7 +39,7 @@ test.describe("AuthGuard - Different User States", () => {
 
     // Wait for the Rebind screen to appear
     await expect(page.getByRole("heading", { name: "Sign-ups are closed" })).toBeVisible();
-    await expect(page.getByText("This Web app is no longer accepting new accounts.")).toBeVisible();
+    await expect(page.getByText("This Web application is no longer accepting new accounts.")).toBeVisible();
     const rebindButton = page.getByRole("button", { name: "Go to Rebind" });
     await expect(rebindButton).toBeVisible();
 
