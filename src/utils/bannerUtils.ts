@@ -1,6 +1,7 @@
 const PARTNER_BANNER_STORAGE_KEY = "gp-ui.partner-banner-dismissed.v2";
 const LEGACY_SAFE_RECOVERY_BANNER_STORAGE_KEY = "gp-ui.legacy-safe-recovery-banner-dismissed.v1";
 const INCIDENT_BANNER_STORAGE_KEY_PREFIX = "gp-ui.incident-banner-dismissed.v1";
+const PLATFORM_CHANGE_BANNER_STORAGE_KEY = "gp-ui.platform-change-banner-dismissed.v1";
 
 export interface BannerDismissalData {
   nextShowTimestamp: number;
@@ -89,4 +90,12 @@ export function isIncidentBannerDismissed(variant: IncidentBannerVariant): boole
 
 export function dismissIncidentBanner(variant: IncidentBannerVariant): void {
   localStorage.setItem(getIncidentBannerStorageKey(variant), "true");
+}
+
+export function isPlatformChangeBannerDismissed(): boolean {
+  return localStorage.getItem(PLATFORM_CHANGE_BANNER_STORAGE_KEY) === "true";
+}
+
+export function dismissPlatformChangeBanner(): void {
+  localStorage.setItem(PLATFORM_CHANGE_BANNER_STORAGE_KEY, "true");
 }

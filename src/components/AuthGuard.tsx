@@ -6,6 +6,7 @@ import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useTheme } from "@/context/ThemeContext";
 import { useCallback, useMemo } from "react";
 import type { ReactNode } from "react";
+import { PlatformChangeBanner } from "@/components/ui/platform-change-banner";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
 import { TROUBLE_LOGGING_IN_URL } from "@/constants";
@@ -30,36 +31,40 @@ interface AuthScreenProps {
     loading?: boolean;
   };
   showHelpLink?: boolean;
+  banner?: ReactNode;
 }
 
-const AuthScreen = ({ title, description, buttonText, buttonProps, showHelpLink = false }: AuthScreenProps) => {
+const AuthScreen = ({ title, description, buttonText, buttonProps, showHelpLink = false, banner }: AuthScreenProps) => {
   const { effectiveTheme } = useTheme();
   const logoSrc = useMemo(() => (effectiveTheme === "dark" ? darkOwl : lightOwl), [effectiveTheme]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
-      <div className="flex flex-col items-center space-y-6 max-w-md w-full">
-        <img src={logoSrc} alt="Gnosis Pay" className="w-10 h-10" />
-        <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
-        <p className="text-muted-foreground text-center">{description}</p>
-        <Button
-          {...buttonProps}
-          className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium py-3"
-        >
-          {buttonText}
-        </Button>
-        {showHelpLink && (
-          <a
-            className="text-xs text-muted-foreground text-center underline"
-            href={TROUBLE_LOGGING_IN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="flex flex-col min-h-screen">
+      {banner}
+      <div className="flex flex-col items-center justify-center flex-1 p-4">
+        <div className="flex flex-col items-center space-y-6 max-w-md w-full">
+          <img src={logoSrc} alt="Gnosis Pay" className="w-10 h-10" />
+          <h1 className="text-2xl font-semibold text-foreground">{title}</h1>
+          <p className="text-muted-foreground text-center">{description}</p>
+          <Button
+            {...buttonProps}
+            className="w-full bg-button-bg hover:bg-button-bg-hover text-button-black font-medium py-3"
           >
-            Trouble logging in? Get help
-          </a>
-        )}
+            {buttonText}
+          </Button>
+          {showHelpLink && (
+            <a
+              className="text-xs text-muted-foreground text-center underline"
+              href={TROUBLE_LOGGING_IN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trouble logging in? Get help
+            </a>
+          )}
 
-        <DebugButton />
+          <DebugButton />
+        </div>
       </div>
     </div>
   );
@@ -158,7 +163,7 @@ export const AuthGuard = ({
 
   // this is purely related to the wallet
   if (!isConnected) {
-    return <AuthScreen {...connectionScreenConfig} />;
+    return <AuthScreen {...connectionScreenConfig} banner={<PlatformChangeBanner className="mb-0" />} />;
   }
 
   // the wallet is connected but the JWT is not set or expired

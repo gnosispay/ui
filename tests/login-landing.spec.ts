@@ -192,6 +192,20 @@ test.describe("AuthGuard - Different User States", () => {
     const connectButton = page.getByRole("button", { name: "Connect wallet" });
     await expect(connectButton).toBeVisible();
 
+    const platformBanner = page.getByTestId("platform-change-banner");
+    await expect(platformBanner).toBeVisible();
+    await expect(platformBanner.getByText("Gnosis Pay the Next Era")).toBeVisible();
+    await expect(platformBanner.getByRole("link", { name: "this article" })).toHaveAttribute(
+      "href",
+      "https://help.gnosispay.com/hc/en-us/articles/53246151768596-Gnosis-Pay-is-changing-what-you-need-to-know",
+    );
+
+    await page.getByTestId("platform-change-banner-dismiss").click();
+    await expect(platformBanner).not.toBeVisible();
+    await expect
+      .poll(async () => page.evaluate(() => localStorage.getItem("gp-ui.platform-change-banner-dismissed.v1")))
+      .toBe("true");
+
     // Click the connect button - this opens the RainbowKit modal, doesn't navigate
     await connectButton.click();
 
@@ -223,6 +237,8 @@ test.describe("AuthGuard - Different User States", () => {
     // Verify we're on the home page by checking for home page content
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("heading", { name: "Balance" })).toBeVisible();
+    await expect(page.getByTestId("platform-change-banner")).toBeVisible();
+    await expect(page.getByTestId("platform-change-banner").getByText("Gnosis Pay the Next Era")).toBeVisible();
   });
 
   test("Reset page is accessible to deactivated users without auth guard screens", async ({ page }) => {
