@@ -1,7 +1,5 @@
 import { test, expect } from "@playwright/test";
-import jwt from "jsonwebtoken";
 import { setupMockWallet } from "./utils/mockWallet";
-import { mockSignup } from "./utils/mockSignup";
 import { mockKycIntegration } from "./utils/mockKycIntegration";
 import { mockSourceOfFunds, DEFAULT_SOURCE_OF_FUNDS_QUESTIONS } from "./utils/mockSourceOfFunds";
 import { mockPhoneVerification } from "./utils/mockPhoneVerification";
@@ -20,167 +18,36 @@ import {
 } from "./utils/testUsers";
 
 test.describe("Onboarding Flow - Happy Path", () => {
-  test("Complete onboarding flow from signup to safe deployment", async ({ page }) => {
+  test("Complete onboarding flow from KYC to safe deployment", async ({ page }) => {
     // Set up wallet mock
     await setupMockWallet(page);
 
     // ========================================================================
-    // STEP 1: Signup
+    // STEP 1: KYC
     // ========================================================================
 
-    // Mock auth challenge for initial connection (not signed up yet)
-    await mockAuthChallenge({ page, testUser: USER_NOT_SIGNED_UP });
+    // Sign-ups are closed, so onboarding starts from an existing account without KYC
+    await mockAuthChallenge({ page, testUser: USER_SIGNED_UP_NO_KYC });
 
-    // Mock user endpoint to return not signed up user initially
-    await mockUser({ page, testUser: USER_NOT_SIGNED_UP });
+    // Mock user endpoint to return a signed up user without KYC
+    await mockUser({ page, testUser: USER_SIGNED_UP_NO_KYC });
 
-    // Generate a valid JWT token for the signed-up user
-    const signedUpToken = jwt.sign(
-      {
-        userId: USER_SIGNED_UP_NO_KYC.userId,
-        signerAddress: USER_SIGNED_UP_NO_KYC.signerAddress,
-        chainId: "100",
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 3600,
-        hasSignedUp: true,
-      },
-      "test-secret-key",
-    );
-
-    // Mock signup endpoint
-    await mockSignup(page, {
-      isError: false,
-      successResponse: {
-        id: USER_SIGNED_UP_NO_KYC.userId,
-        token: signedUpToken,
-        hasSignedUp: true,
-      },
-    });
-
-    // Mock KYC integration endpoint (needed after signup)
+    // Mock KYC integration endpoint
     await mockKycIntegration(page, {
       kycUrl: "https://mock-sumsub.example.com/kyc-flow",
     });
 
-    // Set up request tracking for user terms acceptance
-    const termsRequests: Array<{ terms: string; version: string }> = [];
-    let termsRequestCount = 0;
+    // Navigate to the KYC page
+    await page.goto("/kyc");
 
-    await page.route("**/api/v1/user/terms", async (route) => {
-      const method = route.request().method();
-
-      if (method === "POST") {
-        const postData = await route.request().postDataJSON();
-        termsRequests.push(postData as { terms: string; version: string });
-        termsRequestCount++;
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({ ok: true }),
-        });
-      } else if (method === "GET") {
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            terms: [
-              {
-                type: "general-tos",
-                currentVersion: "1.0",
-                accepted: false,
-                acceptedVersion: null,
-                acceptedAt: null,
-              },
-              {
-                type: "card-monavate-tos",
-                currentVersion: "1.0",
-                accepted: false,
-                acceptedVersion: null,
-                acceptedAt: null,
-              },
-              {
-                type: "privacy-policy",
-                currentVersion: "1.0",
-                accepted: false,
-                acceptedVersion: null,
-                acceptedAt: null,
-              },
-            ],
-          }),
-        });
-      } else {
-        await route.continue();
-      }
-    });
-
-    // Navigate to home page
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
-
-    // The home page should show "Complete signup" button since wallet is connected but user not signed up
-    const completeSignupButton = page.getByRole("button", { name: "Complete signup" });
-    await expect(completeSignupButton).toBeVisible({ timeout: 10000 });
-    await completeSignupButton.click();
-
-    // Wait for signup page to load
-    await expect(page.getByTestId("signup-page")).toBeVisible();
-
-    // Verify submit button is disabled initially (no email, no TOS acceptance)
-    await expect(page.getByTestId("signup-submit-button")).toBeDisabled();
-
-    // Fill in email
-    await page.getByTestId("signup-email-input").fill("test@example.com");
-
-    // Verify submit button is still disabled (email filled but TOS not accepted)
-    await expect(page.getByTestId("signup-submit-button")).toBeDisabled();
-
-    // Accept terms of service
-    await page.getByTestId("signup-tos-checkbox").check();
-
-    // Verify submit button is now enabled (email filled and TOS accepted)
-    await expect(page.getByTestId("signup-submit-button")).toBeEnabled();
-
-    // Update user mock to signed up state (before clicking submit so refetchUser sees it)
-    await mockUser({
-      page,
-      testUser: USER_SIGNED_UP_NO_KYC,
-    });
-
-    // Click submit
-    await page.getByTestId("signup-submit-button").click();
-
-    // Wait for all 3 terms acceptance POST requests to complete
-    await expect
-      .poll(() => termsRequestCount, {
-        message: `Expected 3 user terms POST requests, got ${termsRequestCount}`,
-        timeout: 10000,
-        intervals: [100, 250, 500, 1000],
-      })
-      .toBe(3);
-
-    // Verify all 3 terms were accepted with correct types and versions
-    expect(termsRequests).toHaveLength(3);
-
-    const hasGeneralTos = termsRequests.some((req) => req.terms === "general-tos" && req.version === "1.0");
-    const hasCardTos = termsRequests.some((req) => req.terms === "card-monavate-tos" && req.version === "1.0");
-    const hasPrivacyPolicy = termsRequests.some((req) => req.terms === "privacy-policy" && req.version === "1.0");
-
-    expect(hasGeneralTos, `Missing general-tos in: ${JSON.stringify(termsRequests)}`).toBe(true);
-    expect(hasCardTos, `Missing card-monavate-tos in: ${JSON.stringify(termsRequests)}`).toBe(true);
-    expect(hasPrivacyPolicy, `Missing privacy-policy in: ${JSON.stringify(termsRequests)}`).toBe(true);
-
-    // ========================================================================
-    // STEP 2: KYC
-    // ========================================================================
-
-    // Wait for KYC page to load (after signup redirect)
+    // Wait for KYC page to load
     await expect(page.getByTestId("kyc-page")).toBeVisible();
 
     // Verify KYC iframe is loaded
     await expect(page.getByTestId("kyc-iframe")).toBeVisible();
 
     // ========================================================================
-    // STEP 3: Source of Funds
+    // STEP 2: Source of Funds
     // ========================================================================
 
     // Mock source of funds endpoints (set up before status change)
@@ -227,7 +94,7 @@ test.describe("Onboarding Flow - Happy Path", () => {
     await page.getByTestId("source-of-funds-submit-button").click();
 
     // ========================================================================
-    // STEP 4: Phone Verification
+    // STEP 3: Phone Verification
     // ========================================================================
 
     // Mock phone verification endpoints
@@ -267,7 +134,7 @@ test.describe("Onboarding Flow - Happy Path", () => {
     });
 
     // ========================================================================
-    // STEP 5: Safe Deployment
+    // STEP 4: Safe Deployment
     // ========================================================================
 
     // Mock safe deployment endpoints with progression simulation
@@ -321,45 +188,6 @@ test.describe("Onboarding Flow - Happy Path", () => {
 });
 
 test.describe("Onboarding Flow - Error Scenarios", () => {
-  test("Signup error - email already registered", async ({ page }) => {
-    // Set up wallet mock
-    await setupMockWallet(page);
-
-    // Mock auth challenge for initial connection
-    await mockAuthChallenge({ page, testUser: USER_NOT_SIGNED_UP });
-
-    // Mock user endpoint
-    await mockUser({ page, testUser: USER_NOT_SIGNED_UP });
-
-    // Mock signup endpoint with error
-    await mockSignup(page, {
-      isError: true,
-      errorStatus: 409,
-      errorResponse: {
-        error: "Email address already registered",
-      },
-    });
-
-    // Navigate to signup page
-    await page.goto("/register");
-
-    // Wait for signup page to load
-    await expect(page.getByTestId("signup-page")).toBeVisible();
-
-    // Fill in email
-    await page.getByTestId("signup-email-input").fill("existing@example.com");
-
-    // Accept terms of service
-    await page.getByTestId("signup-tos-checkbox").check();
-
-    // Click submit
-    await page.getByTestId("signup-submit-button").click();
-
-    // Verify error alert is shown
-    await expect(page.getByTestId("signup-error-alert")).toBeVisible();
-    await expect(page.getByTestId("signup-error-alert")).toContainText("already associated with a Gnosis Pay account");
-  });
-
   test("KYC error - requires action", async ({ page }) => {
     // Set up wallet mock
     await setupMockWallet(page);
@@ -698,7 +526,7 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
 });
 
 test.describe("Onboarding Flow - Redirect Behavior", () => {
-  test("User not signed up - redirects from /safe-deployment to /register", async ({ page }) => {
+  test("User not signed up - sees the Rebind screen on /safe-deployment", async ({ page }) => {
     // Set up wallet mock
     await setupMockWallet(page);
 
@@ -716,15 +544,12 @@ test.describe("Onboarding Flow - Redirect Behavior", () => {
     // Navigate to safe-deployment page
     await page.goto("/safe-deployment");
 
-    // Wait for redirect to register page
-    // Note: May redirect through /kyc first, then to /register
-    await expect(page).toHaveURL("/register", { timeout: 10000 });
-
-    // Verify signup page is visible
-    await expect(page.getByTestId("signup-page")).toBeVisible();
+    // Sign-ups are closed, so the onboarding routes are gated too
+    await expect(page.getByRole("heading", { name: "Sign-ups are closed" })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("safe-deployment-page")).not.toBeVisible();
   });
 
-  test("User not signed up - stays on /register", async ({ page }) => {
+  test("User not signed up - sees the Rebind screen on /register", async ({ page }) => {
     // Set up wallet mock
     await setupMockWallet(page);
 
@@ -737,10 +562,11 @@ test.describe("Onboarding Flow - Redirect Behavior", () => {
     // Navigate to register page
     await page.goto("/register");
 
-    // Wait for signup page to load
-    await expect(page.getByTestId("signup-page")).toBeVisible();
+    // The signup page is no longer reachable
+    await expect(page.getByRole("heading", { name: "Sign-ups are closed" })).toBeVisible({ timeout: 10000 });
+    await expect(page.getByTestId("signup-page")).not.toBeVisible();
 
-    // Verify we're still on /register (no redirect)
+    // Verify the URL is untouched, the guard renders in place
     await expect(page).toHaveURL("/register");
   });
 
