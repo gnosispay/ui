@@ -15,33 +15,49 @@ import {
 import { mockKycIntegration } from "./utils/mockKycIntegration";
 
 test.describe("AuthGuard - Different User States", () => {
-  test("Shows signup screen when user is not signed up and button redirects to /register", async ({ page }) => {
+  test("Shows the Rebind screen when the user has no account, on the home page and on /register", async ({ page }) => {
     // Set up wallet mock
     await setupMockWallet(page);
 
     // Mock auth challenge for user not signed up (no userId in JWT)
     await mockAuthChallenge({ page, testUser: USER_NOT_SIGNED_UP });
 
-    // Mock user endpoint (though it won't be called until after signup)
+    // Mock user endpoint (it won't be called since there is no account)
     await mockUser({ page, testUser: USER_NOT_SIGNED_UP });
+
+    // Avoid hitting the real Rebind website when the CTA opens it
+    await page.context().route("https://rebind.co/**", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "text/html",
+        body: "<html><body>Rebind</body></html>",
+      }),
+    );
 
     // Navigate to home page
     await page.goto("/");
 
-    // Wait for the signup screen to appear
-    await expect(page.getByRole("heading", { name: "Welcome to Gnosis Pay" })).toBeVisible();
-    await expect(page.getByText("You need to complete the signup process to use the app.")).toBeVisible();
-    const signupButton = page.getByRole("button", { name: "Complete Signup" });
-    await expect(signupButton).toBeVisible();
+    // Wait for the Rebind screen to appear
+    await expect(page.getByRole("heading", { name: "Sign-ups are closed" })).toBeVisible();
+    await expect(page.getByText("This Web app is no longer accepting new accounts.")).toBeVisible();
+    const rebindButton = page.getByRole("button", { name: "Go to Rebind" });
+    await expect(rebindButton).toBeVisible();
 
     // Verify the help link is visible
     await expect(page.getByText("Trouble logging in? Get help")).toBeVisible();
 
-    // Click the signup button and verify navigation
-    await signupButton.click();
-    await expect(page).toHaveURL("/register");
-    await expect(page.getByRole("heading", { name: "Welcome to Gnosis Pay" })).not.toBeVisible();
-    await expect(page.getByText("Type your email")).toBeVisible();
+    // Click the CTA and verify it opens the Rebind website in a new tab
+    const popupPromise = page.waitForEvent("popup");
+    await rebindButton.click();
+    const popup = await popupPromise;
+    await popup.waitForLoadState("domcontentloaded");
+    expect(popup.url()).toContain("rebind.co");
+    await popup.close();
+
+    // The signup page is no longer reachable, the Rebind screen takes over
+    await page.goto("/register");
+    await expect(page.getByRole("heading", { name: "Sign-ups are closed" })).toBeVisible();
+    await expect(page.getByTestId("signup-page")).not.toBeVisible();
   });
 
   test("Shows KYC screen when user has signed up but no KYC and button redirects to /kyc", async ({ page }) => {
@@ -213,7 +229,7 @@ test.describe("AuthGuard - Different User States", () => {
     await page.goto("/");
 
     // Should not see any auth guard screens
-    await expect(page.getByRole("heading", { name: "Welcome to Gnosis Pay" })).not.toBeVisible();
+    await expect(page.getByRole("heading", { name: "Sign-ups are closed" })).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Identity Verification" })).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Safe Setup" })).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Account deactivated" })).not.toBeVisible();
