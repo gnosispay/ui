@@ -8,6 +8,7 @@ export const currencyData: Record<string, Omit<CurrencyInfo, "logo">> = {
   EUR: {
     tokenSymbol: "EURe",
     address: "0xcB444e90D8198415266c6a2724b7900fb12FC56E",
+    jumperAddress: "0x420CA0f9B9b604cE0fd9C18EF134C705e5Fa3430",
     decimals: 18,
     symbol: "€",
     fiatSymbol: "EUR",
