@@ -5,7 +5,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { Button } from "@/components/ui/button";
-import { useZendesk } from "react-use-zendesk";
+import { SUPPORT_EMAIL } from "@/constants";
+// Chat support is temporarily offline, restore the chat widget trigger below once it is back.
+// import { useZendesk } from "react-use-zendesk";
 
 const kycStatusesRequiringContact: KycStatus[] = ["rejected", "requiresAction"];
 
@@ -15,7 +17,7 @@ export const KycRoute = () => {
   const [withContactSupport, setWithContactSupport] = useState(false);
   const [kycUrl, setKycUrl] = useState("");
   const navigate = useNavigate();
-  const { open } = useZendesk();
+  // const { open } = useZendesk();
 
   useEffect(() => {
     if (!user?.kycStatus) return;
@@ -23,7 +25,7 @@ export const KycRoute = () => {
     // an issue happened during the KYC process, sumsub rejected the application
     // or an action is required, they need to contact your support
     if (kycStatusesRequiringContact.includes(user.kycStatus)) {
-      setError("Your KYC application has encountered an issue. Please contact the support using the chat widget");
+      setError(`Your KYC application has encountered an issue. Please contact our support at ${SUPPORT_EMAIL}`);
       setWithContactSupport(true);
       return;
     }
@@ -94,8 +96,8 @@ export const KycRoute = () => {
           />
           {withContactSupport && (
             <div className="flex justify-center mt-4">
-              <Button onClick={() => open()} data-testid="kyc-contact-support-button">
-                Contact support
+              <Button asChild data-testid="kyc-contact-support-button">
+                <a href={`mailto:${SUPPORT_EMAIL}`}>Contact support</a>
               </Button>
             </div>
           )}

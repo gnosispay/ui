@@ -214,8 +214,10 @@ test.describe("AuthGuard - Different User States", () => {
     // Verify the RainbowKit connect modal appears
     await expect(page.getByText("Connect a Wallet")).toBeVisible();
 
-    // Verify the Zendesk widget is visible
-    await expect(page.getByTitle("Button to launch messaging window")).toBeVisible();
+    // Chat support is temporarily offline: the widget is disabled and replaced by a banner.
+    // Restore the assertion below once the chat widget is back.
+    // await expect(page.getByTitle("Button to launch messaging window")).toBeVisible();
+    await expect(page.getByTestId("chat-outage-banner")).toBeVisible();
   });
 
   test("Allows access to app when user is fully onboarded", async ({ page }) => {
