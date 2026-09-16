@@ -23,7 +23,11 @@ import { OrdersContextProvider } from "./context/OrdersContext.tsx";
 import { ZendeskProvider } from "react-use-zendesk";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
-export const zendeskKey = import.meta.env.VITE_ZENDESK_KEY;
+// Chat support is temporarily offline: an empty key keeps the ZendeskProvider mounted
+// (so `useZendesk` consumers don't throw) without loading the widget script.
+// Restore the line below to bring the chat widget back.
+// export const zendeskKey = import.meta.env.VITE_ZENDESK_KEY;
+export const zendeskKey = "";
 
 globalThis.Buffer = Buffer;
 
@@ -34,9 +38,9 @@ if (!rootElement) {
   throw new Error("Root element not found");
 }
 
-if (!zendeskKey) {
-  console.warn("VITE_ZENDESK_API_KEY is not set");
-}
+// if (!zendeskKey) {
+//   console.warn("VITE_ZENDESK_API_KEY is not set");
+// }
 
 client.setConfig({
   // set default base url for requests

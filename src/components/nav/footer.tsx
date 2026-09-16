@@ -1,28 +1,29 @@
 import { ModeToggle } from "../theme-toggle";
 import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
-import { MessageCircle } from "lucide-react";
-import { useZendesk } from "react-use-zendesk";
-import { useCallback, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/utils/cn";
+// Chat support is temporarily offline, restore the commented out code below to bring the chat launcher back.
+// import { MessageCircle } from "lucide-react";
+// import { useZendesk } from "react-use-zendesk";
+// import { useCallback, useState } from "react";
+// import { Button } from "@/components/ui/button";
+// import { cn } from "@/utils/cn";
 
 export const FooterNavBar = () => {
-  const { open, show } = useZendesk();
-  const [isAnimating, setIsAnimating] = useState(false);
+  // const { open, show } = useZendesk();
+  // const [isAnimating, setIsAnimating] = useState(false);
 
-  const handleSupportClick = useCallback(() => {
-    open();
-    show();
-    setIsAnimating(true);
+  // const handleSupportClick = useCallback(() => {
+  //   open();
+  //   show();
+  //   setIsAnimating(true);
 
-    // Stop animation after 2 seconds
-    const timer = setTimeout(() => {
-      setIsAnimating(false);
-    }, 2000);
+  //   // Stop animation after 2 seconds
+  //   const timer = setTimeout(() => {
+  //     setIsAnimating(false);
+  //   }, 2000);
 
-    return () => clearTimeout(timer);
-  }, [open, show]);
+  //   return () => clearTimeout(timer);
+  // }, [open, show]);
 
   return (
     <>
@@ -49,10 +50,10 @@ export const FooterNavBar = () => {
           </div>
           {/* Absolute positioned buttons on the right */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
-            <Button variant="outline" size="icon" onClick={handleSupportClick}>
+            {/* <Button variant="outline" size="icon" onClick={handleSupportClick}>
               <MessageCircle className={cn("h-[1.2rem] w-[1.2rem]", isAnimating && "animate-ping")} />
               <span className="sr-only">Open support</span>
-            </Button>
+            </Button> */}
             <ModeToggle />
           </div>
         </div>

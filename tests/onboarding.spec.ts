@@ -210,17 +210,17 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
     // Verify error alert is shown
     await expect(page.getByTestId("kyc-error-alert")).toBeVisible();
     await expect(page.getByTestId("kyc-error-alert")).toContainText(
-      "Your KYC application has encountered an issue. Please contact the support using the chat widget",
+      "Your KYC application has encountered an issue. Please contact our support at help@gnosispay.com",
     );
 
     // Verify contact support button is shown
     await expect(page.getByTestId("kyc-contact-support-button")).toBeVisible();
 
-    // Click contact support button
-    await page.getByTestId("kyc-contact-support-button").click();
-
-    // Verify Zendesk chat iframe is opened
-    await expect(page.getByTitle("Button to launch messaging window, conversation in progress")).toBeVisible();
+    // Chat support is temporarily offline: the button now opens an email instead of the chat widget.
+    // Restore the click + Zendesk assertion below once the chat widget is back.
+    await expect(page.getByTestId("kyc-contact-support-button")).toHaveAttribute("href", "mailto:help@gnosispay.com");
+    // await page.getByTestId("kyc-contact-support-button").click();
+    // await expect(page.getByTitle("Button to launch messaging window, conversation in progress")).toBeVisible();
   });
 
   test("KYC error - failed to load integration", async ({ page }) => {

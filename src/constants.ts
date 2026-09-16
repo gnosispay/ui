@@ -1639,6 +1639,7 @@ export const ZENDESK_USER_ID_FIELD_ID = "40875525876372";
 export const ZENDESK_PARTNER_TAG_VALUE = "GnosisPay v2app";
 
 export const HELP_CENTER_URL = "https://help.gnosispay.com/";
+export const SUPPORT_EMAIL = "help@gnosispay.com";
 export const GNOSIS_FAUCET_URL = "https://faucet.gnosischain.com/?chain=gnosis";
 export const PARTNERS_URL = "https://gnosispay.com/apps";
 

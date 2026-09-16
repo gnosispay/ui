@@ -19,6 +19,7 @@ import { PARTNERS_URL } from "./constants";
 import { WithdrawRoute } from "./pages/Withdraw";
 import { WithdrawLegacyRoute } from "./pages/WithdrawLegacy";
 import { ResetRoute } from "./pages/Reset";
+import { ChatOutageBanner } from "./components/ui/chat-outage-banner";
 
 const ExternalRedirect = ({ url }: { url: string }) => {
   useEffect(() => {
@@ -133,6 +134,7 @@ function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />
+      <ChatOutageBanner />
       <Routes>
         <Route element={<ProtectedLayout />}>
           {otherRoutes.map((route) => (
