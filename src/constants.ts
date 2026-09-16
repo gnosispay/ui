@@ -10,6 +10,8 @@ import safeLogo from "./assets/tokens/safe.png";
 export interface CurrencyInfo {
   tokenSymbol?: string;
   address?: string;
+  /** Token address used for Jumper swap destinations; falls back to `address` when omitted. */
+  jumperAddress?: string;
   decimals?: number;
   symbol?: string;
   fiatSymbol?: string;
