@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { setupMockWallet } from "./utils/mockWallet";
 import { setupAllMocks } from "./utils/setupMocks";
 import { mockSafeReset, SAFE_RESET_ERROR_SCENARIOS } from "./utils/mockSafeReset";

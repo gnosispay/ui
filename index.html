@@ -40,5 +40,10 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <!-- Pylon chat widget. The workspace is US-hosted, so widget.eu.usepylon.com serves an empty
+         configuration for this app id. Keep the app id in sync with PYLON_APP_ID in src/constants.ts -->
+    <script>
+      (function(){var e=window;var t=document;var n=function(){n.e(arguments)};n.q=[];n.e=function(e){n.q.push(e)};e.Pylon=n;var r=function(){var e=t.createElement("script");e.setAttribute("type","text/javascript");e.setAttribute("async","true");e.setAttribute("src","https://widget.usepylon.com/widget/118db8c8-acc4-4fd1-bfb7-2e6ddb4bdf8a");var n=t.getElementsByTagName("script")[0];n.parentNode.insertBefore(e,n)};if(t.readyState==="complete"){r()}else if(e.addEventListener){e.addEventListener("load",r,false)}})();
+    </script>
   </body>
 </html>

@@ -7,7 +7,6 @@ ARG VITE_PSE_RELAY_SERVER_URL
 ARG VITE_IFRAME_HOST
 ARG VITE_GNOSIS_PAY_API_BASE_URL
 ARG VITE_PSE_APP_ID
-ARG VITE_ZENDESK_KEY
 ARG VITE_GNOSIS_RPC_URL
 
 # Set these arguments as environment variables for subsequent RUN commands in this stage.
@@ -16,7 +15,6 @@ ENV VITE_PSE_RELAY_SERVER_URL=$VITE_PSE_RELAY_SERVER_URL
 ENV VITE_IFRAME_HOST=$VITE_IFRAME_HOST
 ENV VITE_GNOSIS_PAY_API_BASE_URL=$VITE_GNOSIS_PAY_API_BASE_URL
 ENV VITE_PSE_APP_ID=$VITE_PSE_APP_ID
-ENV VITE_ZENDESK_KEY=$VITE_ZENDESK_KEY
 ENV VITE_GNOSIS_RPC_URL=$VITE_GNOSIS_RPC_URL
 
 # Set working directory
@@ -70,7 +68,9 @@ server {
         # Security Headers
         add_header X-Content-Type-Options "nosniff" always;
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
-        add_header Content-Security-Policy "frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https:; object-src 'none'; base-uri 'none'" always;
+        # connect-src, img-src, font-src and style-src stay unset (no default-src), which already
+        # covers the Pylon chat widget hosts as well as the api, RPC and wallet endpoints
+        add_header Content-Security-Policy "frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https: https://widget.usepylon.com; object-src 'none'; base-uri 'none'" always;
     }
 
     location = /manifest.json {

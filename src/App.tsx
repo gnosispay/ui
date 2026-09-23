@@ -12,14 +12,13 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { AccountRoute } from "./pages/Account";
 import { NotFound } from "./pages/NotFound";
 import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
-import { useZendeskUserId } from "./hooks/useZendeskUserId";
+import { usePylonIdentity } from "./hooks/usePylonIdentity";
 import { AppLoader } from "./components/AppLoader";
 import { useAppInitialization } from "./hooks/useAppInitialization";
 import { PARTNERS_URL } from "./constants";
 import { WithdrawRoute } from "./pages/Withdraw";
 import { WithdrawLegacyRoute } from "./pages/WithdrawLegacy";
 import { ResetRoute } from "./pages/Reset";
-import { ChatOutageBanner } from "./components/ui/chat-outage-banner";
 
 const ExternalRedirect = ({ url }: { url: string }) => {
   useEffect(() => {
@@ -124,7 +123,7 @@ function ProtectedLayout({
 }
 
 function App() {
-  useZendeskUserId();
+  usePylonIdentity();
   const { isInitializing } = useAppInitialization();
 
   if (isInitializing) {
@@ -134,7 +133,6 @@ function App() {
   return (
     <div className="flex min-h-screen flex-col">
       <HeaderNavBar />
-      <ChatOutageBanner />
       <Routes>
         <Route element={<ProtectedLayout />}>
           {otherRoutes.map((route) => (

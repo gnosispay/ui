@@ -8,7 +8,6 @@ Set this variables in a `.env` file
 - `VITE_PSE_APP_ID` the app id that you after registering as a partner to Gnosis Pay, e.g `gp_abc...`
 - `VITE_IFRAME_HOST` (optional, prod is used per default) Gnosis pay public Partner Secure Elements endpoint
 - `VITE_GNOSIS_PAY_API_BASE_URL` (optional, prod url is used per default) Gnosis pay api endpoint
-- `VITE_ZENDESK_KEY` (optional) Zendesk key to enable Zendesk chat
 - `VITE_GNOSIS_RPC_URL` (optional) Gnosis Chain JSON-RPC URL; defaults to wagmi's public RPC if unset. CI uses the `GNOSIS_RPC_URL` repository secret.
 
 # Commands
