@@ -6,8 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { extractErrorMessage } from "@/utils/errorHelpers";
 import { Button } from "@/components/ui/button";
 import { SUPPORT_EMAIL } from "@/constants";
-// Chat support is temporarily offline, restore the chat widget trigger below once it is back.
-// import { useZendesk } from "react-use-zendesk";
+import { usePylon } from "@/hooks/usePylon";
 
 const kycStatusesRequiringContact: KycStatus[] = ["rejected", "requiresAction"];
 
@@ -17,7 +16,7 @@ export const KycRoute = () => {
   const [withContactSupport, setWithContactSupport] = useState(false);
   const [kycUrl, setKycUrl] = useState("");
   const navigate = useNavigate();
-  // const { open } = useZendesk();
+  const { open } = usePylon();
 
   useEffect(() => {
     if (!user?.kycStatus) return;
@@ -96,8 +95,8 @@ export const KycRoute = () => {
           />
           {withContactSupport && (
             <div className="flex justify-center mt-4">
-              <Button asChild data-testid="kyc-contact-support-button">
-                <a href={`mailto:${SUPPORT_EMAIL}`}>Contact support</a>
+              <Button onClick={open} data-testid="kyc-contact-support-button">
+                Contact support
               </Button>
             </div>
           )}

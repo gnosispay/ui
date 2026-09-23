@@ -4,8 +4,8 @@ import { Link } from "react-router-dom";
 import { isAddress, type Address } from "viem";
 import { useSafeMigration } from "@/hooks/useSafeMigration";
 import { useSafeRecoveryData } from "@/hooks/useSafeRecoveryData";
-import { useZendesk } from "react-use-zendesk";
-import { useCallback, useMemo, useState } from "react";
+import { usePylon } from "@/hooks/usePylon";
+import { useMemo, useState, useCallback } from "react";
 import {
   dismissIncidentBanner,
   getIncidentBannerVariant,
@@ -17,8 +17,7 @@ interface IncidentBannerProps {
 }
 
 export function IncidentBanner({ className }: IncidentBannerProps) {
-  const { open, show } = useZendesk();
-  const handleSupportClick = useCallback(() => { open(); show(); }, [open, show]);
+  const { open } = usePylon();
   const { hasOldSafe, oldSafe, isLoading: isMigrationLoading } = useSafeMigration();
   const oldSafeAddress = oldSafe?.address && isAddress(oldSafe.address) ? (oldSafe.address as Address) : undefined;
   const { affected, hasPreHackBalance, isLoading: isDataLoading } = useSafeRecoveryData(oldSafeAddress);
@@ -117,7 +116,7 @@ export function IncidentBanner({ className }: IncidentBannerProps) {
               <p className="mt-1 text-sm sm:text-base text-foreground leading-snug">
                 Balances have also been restored for all affected accounts. If you have any doubts please{" "}
                 <button
-                  onClick={handleSupportClick}
+                  onClick={open}
                   className="underline font-medium hover:opacity-80 transition-opacity cursor-pointer"
                 >
                   contact support

@@ -1635,8 +1635,12 @@ export const SUPPORTED_SHIPPING_COUNTRIES = [
 
 export const COUPON_CODES = "GPUI100";
 
-export const ZENDESK_USER_ID_FIELD_ID = "40875525876372";
-export const ZENDESK_PARTNER_TAG_VALUE = "GnosisPay v2app";
+// The widget loader script lives in index.html and repeats this app id
+export const PYLON_APP_ID = "118db8c8-acc4-4fd1-bfb7-2e6ddb4bdf8a";
+// Slugs of the custom fields configured in Pylon, not their labels
+export const PYLON_USER_ID_FIELD_SLUG = "user_id";
+export const PYLON_PARTNER_FIELD_SLUG = "partner";
+export const PYLON_PARTNER_FIELD_VALUE = "GnosisPay v2app";
 
 export const HELP_CENTER_URL = "https://help.gnosispay.com/";
 export const SUPPORT_EMAIL = "help@gnosispay.com";

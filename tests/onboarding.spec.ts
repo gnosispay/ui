@@ -7,6 +7,7 @@ import { mockSafeDeployment } from "./utils/mockSafeDeployment";
 import { mockUser } from "./utils/mockUser";
 import { mockSafeConfig } from "./utils/mockSafeConfig";
 import { mockAuthChallenge } from "./utils/mockAuthChallenge";
+import { blockPylonWidget, expectPylonCommand } from "./utils/mockPylon";
 import {
   USER_NOT_SIGNED_UP,
   USER_SIGNED_UP_NO_KYC,
@@ -191,6 +192,7 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
   test("KYC error - requires action", async ({ page }) => {
     // Set up wallet mock
     await setupMockWallet(page);
+    await blockPylonWidget(page);
 
     // Mock auth challenge
     await mockAuthChallenge({ page, testUser: USER_SIGNED_UP_NO_KYC });
@@ -216,11 +218,9 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
     // Verify contact support button is shown
     await expect(page.getByTestId("kyc-contact-support-button")).toBeVisible();
 
-    // Chat support is temporarily offline: the button now opens an email instead of the chat widget.
-    // Restore the click + Zendesk assertion below once the chat widget is back.
-    await expect(page.getByTestId("kyc-contact-support-button")).toHaveAttribute("href", "mailto:help@gnosispay.com");
-    // await page.getByTestId("kyc-contact-support-button").click();
-    // await expect(page.getByTitle("Button to launch messaging window, conversation in progress")).toBeVisible();
+    // Verify it opens the Pylon chat widget
+    await page.getByTestId("kyc-contact-support-button").click();
+    await expectPylonCommand(page, "show");
   });
 
   test("KYC error - failed to load integration", async ({ page }) => {

@@ -1,7 +1,7 @@
 /*
   X-Content-Type-Options: nosniff
   Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https:; object-src 'none'; base-uri 'none'
+  Content-Security-Policy: frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https: https://widget.eu.usepylon.com; object-src 'none'; base-uri 'none'
 
 /manifest.json
   Access-Control-Allow-Origin: *
