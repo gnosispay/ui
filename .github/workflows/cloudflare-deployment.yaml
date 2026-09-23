@@ -39,10 +39,10 @@ jobs:
           VITE_GNOSIS_RPC_URL: '${{ secrets.GNOSIS_RPC_URL }}'
         run: pnpm build
       - name: Publish to Cloudflare Pages
-        uses: cloudflare/pages-action@f0a1cd58cd66095dee69bfa18fa5efd1dde93bca # v1.5.0
+        # v4.1.x tags are missing the compiled dist/ bundle upstream, so pin the v4 release commit.
+        uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4.0.0
         with:
           apiToken: ${{ secrets.CLOUDFLARE_GP_UI }}
           accountId: 8c558f9b31e53240659ee45069b7ec2b
-          projectName: gp-ui
-          directory: ./dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy ./dist --project-name=gp-ui --branch=${{ github.head_ref || github.ref_name }}
