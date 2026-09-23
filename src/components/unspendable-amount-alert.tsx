@@ -1,12 +1,11 @@
-import { HELP_CENTER_URL, SUPPORT_EMAIL } from "@/constants";
+import { HELP_CENTER_URL } from "@/constants";
 import { StandardAlert } from "./ui/standard-alert";
 import { useUnspendableAmount } from "@/hooks/useUnspendableAmount";
-// Chat support is temporarily offline, restore the chat widget trigger below once it is back.
-// import { useZendesk } from "react-use-zendesk";
+import { usePylon } from "@/hooks/usePylon";
 
 export const UnspendableAmountAlert = () => {
   const { unspendableFormatted, hasUnspendableAmount } = useUnspendableAmount();
-  // const { open } = useZendesk();
+  const { open } = usePylon();
 
   if (!hasUnspendableAmount) {
     return null;
@@ -18,9 +17,9 @@ export const UnspendableAmountAlert = () => {
       description={
         <span>
           A deposit into your account did not pass validation check and {unspendableFormatted} are unspendable. Please{" "}
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="text-muted-foreground underline cursor-pointer">
+          <button type="button" onClick={open} className="text-muted-foreground underline cursor-pointer">
             contact support
-          </a>{" "}
+          </button>{" "}
           or{" "}
           <a
             href={HELP_CENTER_URL}

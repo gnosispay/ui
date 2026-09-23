@@ -94,9 +94,6 @@ importers:
       react-router-dom:
         specifier: 7.18.2
         version: 7.18.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      react-use-zendesk:
-        specifier: ^2.0.0
-        version: 2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       siwe:
         specifier: 3.0.0
         version: 3.0.0(ethers@6.17.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))
@@ -3289,12 +3286,6 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
-
-  react-use-zendesk@2.0.0:
-    resolution: {integrity: sha512-Kq/2p3DPs3fp694aqEBQKslZ1pSC8Y3IoHdjjEZ1usEpxH4PEP+qpLBncH95IoLwl1rImdJZFbr/EGuroUwzFg==}
-    peerDependencies:
-      react: '>=17'
-      react-dom: '>=17'
 
   react@19.2.8:
     resolution: {integrity: sha512-PWaYA1L/q9u2u7xYQi+Y3L3Yfnie7XyLeaJICV1MGD6LprsBxcAqGjYyr0eY3p+QdsA+x/Irkt4Qif8D63+Sbw==}
@@ -8044,11 +8035,6 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.2.18
-
-  react-use-zendesk@2.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8):
-    dependencies:
-      react: 19.2.8
-      react-dom: 19.2.8(react@19.2.8)
 
   react@19.2.8: {}
 

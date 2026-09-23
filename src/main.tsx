@@ -20,14 +20,9 @@ import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
 import { CardTransactionsContextProvider } from "./context/CardTransactionsContext.tsx";
 import { OnchainTransactionsContextProvider } from "./context/OnchainTransactionsContext.tsx";
 import { OrdersContextProvider } from "./context/OrdersContext.tsx";
-import { ZendeskProvider } from "react-use-zendesk";
+import { SupportProvider } from "./context/SupportContext.tsx";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
-// Chat support is temporarily offline: an empty key keeps the ZendeskProvider mounted
-// (so `useZendesk` consumers don't throw) without loading the widget script.
-// Restore the line below to bring the chat widget back.
-// export const zendeskKey = import.meta.env.VITE_ZENDESK_KEY;
-export const zendeskKey = "";
 
 globalThis.Buffer = Buffer;
 
@@ -37,10 +32,6 @@ const rootElement = document.getElementById("root");
 if (!rootElement) {
   throw new Error("Root element not found");
 }
-
-// if (!zendeskKey) {
-//   console.warn("VITE_ZENDESK_API_KEY is not set");
-// }
 
 client.setConfig({
   // set default base url for requests
@@ -55,7 +46,7 @@ ReactDOM.createRoot(rootElement).render(
           <WalletProvider>
             <AuthContextProvider>
               <UserContextProvider>
-                <ZendeskProvider apiKey={zendeskKey}>
+                <SupportProvider>
                   <CardsContextProvider>
                     <OrdersContextProvider>
                       <CardTransactionsContextProvider>
@@ -68,7 +59,7 @@ ReactDOM.createRoot(rootElement).render(
                       </CardTransactionsContextProvider>
                     </OrdersContextProvider>
                   </CardsContextProvider>
-                </ZendeskProvider>
+                </SupportProvider>
               </UserContextProvider>
             </AuthContextProvider>
           </WalletProvider>

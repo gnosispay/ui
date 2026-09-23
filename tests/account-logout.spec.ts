@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { getAddress } from "viem";
 import { LOCALSTORAGE_JWT_KEY } from "../src/context/AuthContext";
 import { setupMockWallet } from "./utils/mockWallet";
