@@ -70,7 +70,7 @@ server {
         add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
         # connect-src, img-src, font-src and style-src stay unset (no default-src), which already
         # covers the Pylon chat widget hosts as well as the api, RPC and wallet endpoints
-        add_header Content-Security-Policy "frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https: https://widget.eu.usepylon.com; object-src 'none'; base-uri 'none'" always;
+        add_header Content-Security-Policy "frame-ancestors https://app.safe.global; script-src 'self' 'unsafe-inline' https: https://widget.usepylon.com; object-src 'none'; base-uri 'none'" always;
     }
 
     location = /manifest.json {

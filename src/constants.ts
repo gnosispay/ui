@@ -1637,10 +1637,8 @@ export const COUPON_CODES = "GPUI100";
 
 // The widget loader script lives in index.html and repeats this app id
 export const PYLON_APP_ID = "118db8c8-acc4-4fd1-bfb7-2e6ddb4bdf8a";
-// Slugs of the custom fields configured in Pylon, not their labels
-export const PYLON_USER_ID_FIELD_SLUG = "user_id";
-export const PYLON_PARTNER_FIELD_SLUG = "partner";
-export const PYLON_PARTNER_FIELD_VALUE = "GnosisPay v2app";
+// Slug of the Pylon custom field, as configured in Settings > Issue fields
+export const PYLON_SAFE_ADDRESS_FIELD_SLUG = "user_safe_address";
 
 export const HELP_CENTER_URL = "https://help.gnosispay.com/";
 export const SUPPORT_EMAIL = "help@gnosispay.com";

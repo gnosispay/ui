@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { setupMockWallet } from "./utils/mockWallet";
 import { mockAuthChallenge } from "./utils/mockAuthChallenge";
 import { mockUser } from "./utils/mockUser";
@@ -13,6 +13,7 @@ import {
   USER_KYC_REJECTED,
 } from "./utils/testUsers";
 import { mockKycIntegration } from "./utils/mockKycIntegration";
+import { expectPylonChatSettings, expectPylonCommand } from "./utils/mockPylon";
 
 test.describe("AuthGuard - Different User States", () => {
   test("Shows the Rebind screen when the user has no account, on the home page and on /register", async ({ page }) => {
@@ -215,7 +216,16 @@ test.describe("AuthGuard - Different User States", () => {
     await expect(page.getByText("Connect a Wallet")).toBeVisible();
 
     // The Pylon chat widget loader is installed on the page
-    await expect(page.locator('script[src*="widget.eu.usepylon.com"]')).toHaveCount(1);
+    await expect(page.locator('script[src*="widget.usepylon.com"]')).toHaveCount(1);
+
+    // Close the wallet modal so the floating support button is clickable
+    await page.keyboard.press("Escape");
+
+    // Unidentified visitors get the contact modal instead of the chat
+    await expect(page.getByTestId("desktop-support-button")).toBeVisible();
+    await page.getByTestId("desktop-support-button").click();
+    await expect(page.getByTestId("support-contact-modal")).toBeVisible();
+    await expect(page.getByTestId("support-contact-modal")).toContainText("help@gnosispay.com");
   });
 
   test("Allows access to app when user is fully onboarded", async ({ page }) => {
@@ -239,6 +249,14 @@ test.describe("AuthGuard - Different User States", () => {
     // Verify we're on the home page by checking for home page content
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("heading", { name: "Balance" })).toBeVisible();
+
+    // The chat widget is handed the identity it needs to render
+    await expectPylonChatSettings(page, { email: "approved@test.com", name: "John Approved" });
+
+    // The same floating button opens the Pylon chat once the user is identified
+    await page.getByTestId("desktop-support-button").click();
+    await expect(page.getByTestId("support-contact-modal")).toHaveCount(0);
+    await expectPylonCommand(page, "show");
   });
 
   test("Reset page is accessible to deactivated users without auth guard screens", async ({ page }) => {

@@ -9,11 +9,13 @@ export interface PylonChatSettings {
   avatar_url?: string;
 }
 
+export type PylonCustomFields = Record<string, string | number | boolean | null | undefined>;
+
 interface PylonApi {
-  (command: "show" | "hide" | "showChatBubble" | "hideChatBubble"): void;
+  (command: "show" | "hide" | "hideChatBubble"): void;
   (command: "setTheme", theme: PylonTheme): void;
+  (command: "setNewIssueCustomFields" | "setTicketFormFields", fields: PylonCustomFields): void;
   (command: "showNewMessage", message: string): void;
-  (command: "setNewIssueCustomFields", fields: Record<string, string>): void;
   (command: "onShow" | "onHide", callback: (() => void) | null): void;
 }
 
@@ -33,8 +35,14 @@ export const setPylonChatSettings = (settings: Omit<PylonChatSettings, "app_id">
   };
 };
 
-export const setPylonNewIssueCustomFields = (fields: Record<string, string>) => {
+/**
+ * Custom fields have to be keyed by their Pylon slug, not their label. Pylon splits them in two:
+ * `setNewIssueCustomFields` covers issues opened from the chat module, `setTicketFormFields`
+ * prefills the ticket forms. Unknown slugs are ignored, so both can be sent unconditionally.
+ */
+export const setPylonCustomFields = (fields: PylonCustomFields) => {
   window.Pylon?.("setNewIssueCustomFields", fields);
+  window.Pylon?.("setTicketFormFields", fields);
 };
 
 export const setPylonTheme = (theme: PylonTheme) => {
@@ -49,12 +57,12 @@ export const hidePylonChat = () => {
   window.Pylon?.("hide");
 };
 
-export const showPylonChatBubble = () => {
-  window.Pylon?.("showChatBubble");
-};
-
 export const hidePylonChatBubble = () => {
   window.Pylon?.("hideChatBubble");
+};
+
+export const setPylonOnShow = (callback: (() => void) | null) => {
+  window.Pylon?.("onShow", callback);
 };
 
 export const setPylonOnHide = (callback: (() => void) | null) => {

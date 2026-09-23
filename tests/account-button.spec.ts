@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { BASE_USER, USER_TEST_SIGNER_ADDRESS } from "./utils/testUsers";
 import { setupAllMocks } from "./utils/setupMocks";
 import { setupMockWallet } from "./utils/mockWallet";

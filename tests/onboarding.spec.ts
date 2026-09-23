@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 import { setupMockWallet } from "./utils/mockWallet";
 import { mockKycIntegration } from "./utils/mockKycIntegration";
 import { mockSourceOfFunds, DEFAULT_SOURCE_OF_FUNDS_QUESTIONS } from "./utils/mockSourceOfFunds";
@@ -7,7 +7,7 @@ import { mockSafeDeployment } from "./utils/mockSafeDeployment";
 import { mockUser } from "./utils/mockUser";
 import { mockSafeConfig } from "./utils/mockSafeConfig";
 import { mockAuthChallenge } from "./utils/mockAuthChallenge";
-import { blockPylonWidget, expectPylonCommand } from "./utils/mockPylon";
+import { expectPylonCommand } from "./utils/mockPylon";
 import {
   USER_NOT_SIGNED_UP,
   USER_SIGNED_UP_NO_KYC,
@@ -192,7 +192,6 @@ test.describe("Onboarding Flow - Error Scenarios", () => {
   test("KYC error - requires action", async ({ page }) => {
     // Set up wallet mock
     await setupMockWallet(page);
-    await blockPylonWidget(page);
 
     // Mock auth challenge
     await mockAuthChallenge({ page, testUser: USER_SIGNED_UP_NO_KYC });

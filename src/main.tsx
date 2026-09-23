@@ -20,6 +20,7 @@ import { DelayRelayContextProvider } from "./context/DelayRelayContext.tsx";
 import { CardTransactionsContextProvider } from "./context/CardTransactionsContext.tsx";
 import { OnchainTransactionsContextProvider } from "./context/OnchainTransactionsContext.tsx";
 import { OrdersContextProvider } from "./context/OrdersContext.tsx";
+import { SupportProvider } from "./context/SupportContext.tsx";
 
 export const BASE_URL = import.meta.env.VITE_GNOSIS_PAY_API_BASE_URL || "https://api.gnosispay.com/";
 
@@ -45,18 +46,20 @@ ReactDOM.createRoot(rootElement).render(
           <WalletProvider>
             <AuthContextProvider>
               <UserContextProvider>
-                <CardsContextProvider>
-                  <OrdersContextProvider>
-                    <CardTransactionsContextProvider>
-                      <OnchainTransactionsContextProvider>
-                        <DelayRelayContextProvider>
-                          <App />
-                          <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
-                        </DelayRelayContextProvider>
-                      </OnchainTransactionsContextProvider>
-                    </CardTransactionsContextProvider>
-                  </OrdersContextProvider>
-                </CardsContextProvider>
+                <SupportProvider>
+                  <CardsContextProvider>
+                    <OrdersContextProvider>
+                      <CardTransactionsContextProvider>
+                        <OnchainTransactionsContextProvider>
+                          <DelayRelayContextProvider>
+                            <App />
+                            <Toaster offset={{ right: "6rem", bottom: "1rem" }} expand />
+                          </DelayRelayContextProvider>
+                        </OnchainTransactionsContextProvider>
+                      </CardTransactionsContextProvider>
+                    </OrdersContextProvider>
+                  </CardsContextProvider>
+                </SupportProvider>
               </UserContextProvider>
             </AuthContextProvider>
           </WalletProvider>
