@@ -2,27 +2,27 @@ import { ModeToggle } from "../theme-toggle";
 import { NavLink } from "react-router-dom";
 import { menuRoutes } from "@/App";
 import { MessageCircle } from "lucide-react";
-import { useZendesk } from "react-use-zendesk";
-import { useCallback, useState } from "react";
+import { usePylon } from "@/hooks/usePylon";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
 
 export const FooterNavBar = () => {
-  const { open, show } = useZendesk();
+  const { open } = usePylon();
   const [isAnimating, setIsAnimating] = useState(false);
+  const animationTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+
+  useEffect(() => () => clearTimeout(animationTimer.current), []);
 
   const handleSupportClick = useCallback(() => {
     open();
-    show();
     setIsAnimating(true);
 
-    // Stop animation after 2 seconds
-    const timer = setTimeout(() => {
+    clearTimeout(animationTimer.current);
+    animationTimer.current = setTimeout(() => {
       setIsAnimating(false);
     }, 2000);
-
-    return () => clearTimeout(timer);
-  }, [open, show]);
+  }, [open]);
 
   return (
     <>
@@ -49,7 +49,7 @@ export const FooterNavBar = () => {
           </div>
           {/* Absolute positioned buttons on the right */}
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex gap-2">
-            <Button variant="outline" size="icon" onClick={handleSupportClick}>
+            <Button variant="outline" size="icon" onClick={handleSupportClick} data-testid="footer-support-button">
               <MessageCircle className={cn("h-[1.2rem] w-[1.2rem]", isAnimating && "animate-ping")} />
               <span className="sr-only">Open support</span>
             </Button>

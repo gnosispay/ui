@@ -5,6 +5,7 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { DelayModuleQueueContextProvider, useDelayModuleQueue } from "@/context/DelayModuleQueueContext";
 import { useUser } from "@/context/UserContext";
 import { StandardAlert } from "@/components/ui/standard-alert";
+import { TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { useCallback, useRef, useState, useEffect } from "react";
 import type { Address } from "viem";
 
@@ -86,7 +87,27 @@ export const WithdrawRoute = () => {
   }, [refetch]);
 
   if (!safeAddress) {
-    return null;
+    return (
+      <div className="grid grid-cols-6 gap-4 h-full m-4 lg:m-0 lg:mt-4">
+        <div className="col-span-6 lg:col-start-2 lg:col-span-4">
+          <div className="flex flex-col items-center gap-4 bg-card p-8 rounded-lg text-center">
+            <h2 className="font-bold text-secondary text-lg">No Safe found</h2>
+            <p className="text-sm text-muted-foreground">
+              We couldn&apos;t find a Safe for the connected wallet. If you have a Gnosis Pay account, make sure you are
+              connected with the wallet you signed up with, then reload this page.
+            </p>
+            <a
+              className="text-xs text-muted-foreground underline"
+              href={TROUBLE_LOGGING_IN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Trouble logging in? Get help
+            </a>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

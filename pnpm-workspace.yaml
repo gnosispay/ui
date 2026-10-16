@@ -14,5 +14,8 @@ trustPolicy: "no-downgrade"
 allowBuilds:
   '@reown/appkit': true
   bufferutil: true
+  esbuild: true
   keccak: true
   utf-8-validate: true
+  # esbuild and workerd come from wrangler, which CI installs on the fly to deploy to Cloudflare Pages.
+  workerd: true

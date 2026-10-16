@@ -10,6 +10,8 @@ import safeLogo from "./assets/tokens/safe.png";
 export interface CurrencyInfo {
   tokenSymbol?: string;
   address?: string;
+  /** Token address used for Jumper swap destinations; falls back to `address` when omitted. */
+  jumperAddress?: string;
   decimals?: number;
   symbol?: string;
   fiatSymbol?: string;
@@ -69,8 +71,7 @@ export const supportedTokens: Record<string, TokenInfo> = {
 export const TROUBLE_LOGGING_IN_URL =
   "https://help.gnosispay.com/hc/en-us/articles/41558567635988-The-Gnosis-Pay-Web-App";
 
-export const PLATFORM_CHANGE_ARTICLE_URL =
-  "https://help.gnosispay.com/hc/en-us/articles/53246151768596-Gnosis-Pay-is-changing-what-you-need-to-know";
+export const REBIND_URL = "https://rebind.co/gnosis-pay";
 
 export const LEGAL_LINK = "https://help.gnosispay.com/hc/en-us/categories/41384871493524-Legal-Terms-and-Policies";
 
@@ -1634,10 +1635,13 @@ export const SUPPORTED_SHIPPING_COUNTRIES = [
 
 export const COUPON_CODES = "GPUI100";
 
-export const ZENDESK_USER_ID_FIELD_ID = "40875525876372";
-export const ZENDESK_PARTNER_TAG_VALUE = "GnosisPay v2app";
+// The widget loader script lives in index.html and repeats this app id
+export const PYLON_APP_ID = "118db8c8-acc4-4fd1-bfb7-2e6ddb4bdf8a";
+// Slug of the Pylon custom field, as configured in Settings > Issue fields
+export const PYLON_SAFE_ADDRESS_FIELD_SLUG = "user_safe_address";
 
 export const HELP_CENTER_URL = "https://help.gnosispay.com/";
+export const SUPPORT_EMAIL = "help@gnosispay.com";
 export const GNOSIS_FAUCET_URL = "https://faucet.gnosischain.com/?chain=gnosis";
 export const PARTNERS_URL = "https://gnosispay.com/apps";
 

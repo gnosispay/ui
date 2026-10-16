@@ -5,7 +5,7 @@ import { mockPhysicalCardOrder } from "./utils/mockPhysicalCardOrder";
 import { OrderStatus } from "./utils/mockOrder";
 import { mockPseEphemeralToken } from "./utils/mockPseEphemeralToken";
 import { mockPseIframe } from "./utils/mockPseIframe";
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures";
 
 test.describe("Physical Card Order", () => {
   test.beforeEach(async ({ page }) => {

@@ -2,7 +2,7 @@ import { Info, X } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { useCallback, useMemo, useState } from "react";
 import { dismissPlatformChangeBanner, isPlatformChangeBannerDismissed } from "@/utils/bannerUtils";
-import { PLATFORM_CHANGE_ARTICLE_URL } from "@/constants";
+import { HELP_CENTER_URL, REBIND_URL } from "@/constants";
 
 interface PlatformChangeBannerProps {
   className?: string;
@@ -51,16 +51,31 @@ export function PlatformChangeBanner({ className }: PlatformChangeBannerProps) {
         <div className="flex-1 min-w-0">
           <p className="font-bold text-foreground text-base sm:text-lg leading-tight">Gnosis Pay the Next Era</p>
           <p className="mt-2 text-sm sm:text-base text-foreground leading-snug">
-            Gnosis Pay is moving to a new platform where partner apps run their own card programmes. Find out more in{" "}
+            The web app will close down for everything apart from withdrawals from December 20th.
+          </p>
+          <p className="mt-2 text-sm sm:text-base text-foreground leading-snug">
+            EUR cardholders can move their existing account to Rebind via their dedicated migration flow:{" "}
             <a
-              href={PLATFORM_CHANGE_ARTICLE_URL}
+              href={REBIND_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="underline font-medium hover:opacity-80 transition-opacity"
             >
-              this article
-            </a>{" "}
-            and how this affects you.
+              rebind.co/gnosis-pay
+            </a>
+            .
+          </p>
+          <p className="mt-2 text-sm sm:text-base text-foreground leading-snug">
+            Or visit our help centre for more options:{" "}
+            <a
+              href={HELP_CENTER_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline font-medium hover:opacity-80 transition-opacity"
+            >
+              help.gnosispay.com
+            </a>
+            .
           </p>
         </div>
       </div>

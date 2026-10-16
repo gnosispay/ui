@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
 import { PlatformChangeBanner } from "@/components/ui/platform-change-banner";
 import darkOwl from "@/assets/Gnosis-owl-white.svg";
 import lightOwl from "@/assets/Gnosis-owl-black.svg";
-import { TROUBLE_LOGGING_IN_URL } from "@/constants";
+import { REBIND_URL, TROUBLE_LOGGING_IN_URL } from "@/constants";
 import { DebugButton } from "./DebugButton";
 import { useAccount } from "wagmi";
 import { useGnosisChainEnforcer } from "@/hooks/useGnosisChainEnforcer";
@@ -127,17 +127,18 @@ export const AuthGuard = ({
     };
   }, [handleConnect, isConnecting]);
 
-  const signupScreenConfig = useMemo((): AuthScreenProps => {
+  const rebindScreenConfig = useMemo((): AuthScreenProps => {
     return {
-      title: "Welcome to Gnosis Pay",
-      description: "You need to complete the signup process to use the app.",
-      buttonText: "Complete Signup",
+      title: "Sign-ups are closed",
+      description:
+        "This Web application is no longer accepting new accounts. You can open an account with Rebind instead. Already have a Gnosis Pay account? Make sure you are connected with the right wallet.",
+      buttonText: "Go to Rebind",
       buttonProps: {
-        onClick: () => navigate("/register"),
+        onClick: () => window.open(REBIND_URL, "_blank", "noopener,noreferrer"),
       },
       showHelpLink: true,
     };
-  }, [navigate]);
+  }, []);
 
   const kycScreenConfig = useMemo((): AuthScreenProps => {
     return {
@@ -187,8 +188,9 @@ export const AuthGuard = ({
     return <AuthScreen {...deactivatedScreenConfig} />;
   }
 
-  if (isUserSignedUp === false && !isOnboardingRoute) {
-    return <AuthScreen {...signupScreenConfig} />;
+  // sign-ups are closed, so users without an account can't reach the onboarding routes either
+  if (isUserSignedUp === false) {
+    return <AuthScreen {...rebindScreenConfig} />;
   }
 
   if (isKycApproved === false && !isOnboardingRoute) {
@@ -199,9 +201,9 @@ export const AuthGuard = ({
     return <AuthScreen {...safeDeploymentScreenConfig} />;
   }
 
-  // the wallet is connected and the JWT is set but the user needs to sign up
+  // the user has an account but some onboarding state is still unknown
   if (isOnboarded === false && !isOnboardingRoute) {
-    return <AuthScreen {...signupScreenConfig} />;
+    return <AuthScreen {...kycScreenConfig} />;
   }
 
   return <>{children}</>;

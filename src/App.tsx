@@ -12,7 +12,7 @@ import { AuthGuard } from "@/components/AuthGuard";
 import { AccountRoute } from "./pages/Account";
 import { NotFound } from "./pages/NotFound";
 import { ExistingCardOrder, NewCardOrder } from "./components/card-order";
-import { useZendeskUserId } from "./hooks/useZendeskUserId";
+import { usePylonIdentity } from "./hooks/usePylonIdentity";
 import { AppLoader } from "./components/AppLoader";
 import { useAppInitialization } from "./hooks/useAppInitialization";
 import { PARTNERS_URL } from "./constants";
@@ -123,7 +123,7 @@ function ProtectedLayout({
 }
 
 function App() {
-  useZendeskUserId();
+  usePylonIdentity();
   const { isInitializing } = useAppInitialization();
 
   if (isInitializing) {

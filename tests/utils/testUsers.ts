@@ -225,6 +225,8 @@ export const USER_SIGNED_UP_NO_KYC = createTestUser({
 
 export const USER_SIGNED_UP_NO_KYC_REQUIRES_ACTION = createTestUser({
   ...USER_SIGNED_UP_NO_KYC,
+  // Spreading a TestUser drops the profile fields, and the chat widget needs the email
+  email: USER_SIGNED_UP_NO_KYC.user.email,
   kycStatus: "requiresAction",
 });
 
