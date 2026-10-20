@@ -71,7 +71,7 @@ export const supportedTokens: Record<string, TokenInfo> = {
 export const TROUBLE_LOGGING_IN_URL =
   "https://help.gnosispay.com/hc/en-us/articles/41558567635988-The-Gnosis-Pay-Web-App";
 
-export const REBIND_URL = "https://rebind.co/";
+export const REBIND_URL = "https://rebind.co/gnosis-pay";
 
 export const LEGAL_LINK = "https://help.gnosispay.com/hc/en-us/categories/41384871493524-Legal-Terms-and-Policies";
 

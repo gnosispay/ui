@@ -209,6 +209,27 @@ test.describe("AuthGuard - Different User States", () => {
     const connectButton = page.getByRole("button", { name: "Connect wallet" });
     await expect(connectButton).toBeVisible();
 
+    const platformBanner = page.getByTestId("platform-change-banner");
+    await expect(platformBanner).toBeVisible();
+    await expect(platformBanner.getByText("Gnosis Pay the Next Era")).toBeVisible();
+    await expect(platformBanner).toContainText(
+      "The web app will close down for everything apart from withdrawals from December 20th.",
+    );
+    await expect(platformBanner.getByRole("link", { name: "rebind.co/gnosis-pay" })).toHaveAttribute(
+      "href",
+      "https://rebind.co/gnosis-pay",
+    );
+    await expect(platformBanner.getByRole("link", { name: "help.gnosispay.com" })).toHaveAttribute(
+      "href",
+      "https://help.gnosispay.com/",
+    );
+
+    await page.getByTestId("platform-change-banner-dismiss").click();
+    await expect(platformBanner).not.toBeVisible();
+    await expect
+      .poll(async () => page.evaluate(() => localStorage.getItem("gp-ui.platform-change-banner-dismissed.v1")))
+      .toBe("true");
+
     // Click the connect button - this opens the RainbowKit modal, doesn't navigate
     await connectButton.click();
 
@@ -249,6 +270,8 @@ test.describe("AuthGuard - Different User States", () => {
     // Verify we're on the home page by checking for home page content
     await expect(page).toHaveURL("/");
     await expect(page.getByRole("heading", { name: "Balance" })).toBeVisible();
+    await expect(page.getByTestId("platform-change-banner")).toBeVisible();
+    await expect(page.getByTestId("platform-change-banner").getByText("Gnosis Pay the Next Era")).toBeVisible();
 
     // The chat widget is handed the identity it needs to render
     await expectPylonChatSettings(page, { email: "approved@test.com", name: "John Approved" });
